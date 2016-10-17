@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+
+<!-- The name of the product -->
+<?define Name = "tcpTrigger" ?>
+
+<!-- The manufacturer, for setup package publisher and folder info -->
+<?define Manufacturer = "SmithLV.com" ?>
+
+<!-- The version number of this setup package-->
+<?define Version = "1.0.0" ?>
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+  <Product Name="$(var.Name)"
+           Manufacturer="$(var.Manufacturer)"
+           Version="$(var.Version)"
+           Id="{4374F05A-90E7-474E-87C9-42DD8947858D}"
+           UpgradeCode="{68A80CF7-645A-48A6-9B13-BE7D639D519B}"
+           Language="1033" Codepage="1252">
+    
+    <Package Id="*" Keywords="Installer" InstallerVersion="300" Compressed="yes"
+             Languages="1033" SummaryCodepage="1252"
+             InstallPrivileges="elevated" InstallScope="perMachine" />
+
+    <!-- Allow upgrades and prevent downgrades -->
+    <MajorUpgrade DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit." />
+    
+    <Media Id="1" Cabinet="tcptrigger.cab" EmbedCab="yes" />
+    
+    <!-- WiX UI -->
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER"/>
+    <UIRef Id="WixUI_InstallDir" />
+    <UI>
+      <UIRef Id="WixUI_InstallDir" />
+      <Publish Dialog="WelcomeDlg"
+            Control="Next"
+            Event="NewDialog"
+            Value="InstallDirDlg"
+            Order="2">1</Publish>
+      <Publish Dialog="InstallDirDlg"
+            Control="Back"
+            Event="NewDialog"
+            Value="WelcomeDlg"
+            Order="2">1</Publish>
+    </UI>
+    
+    <!-- Define the directory structure -->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="$(var.Name)">
+          
+          <!-- Installation components -->
+          <Component Id="MainExecutable" Guid="{F4E5590B-B4A7-4A74-A5D8-E91AB7A05014}">
+            <File Id="tcpTrigger.exe" Source="$(var.tcpTrigger.TargetPath)" Vital="yes" KeyPath="yes">
+              
+              <!-- Add a Windows firewall exception for tcpTrigger.exe -->
+              <fire:FirewallException Id="FirewallException" Name="$(var.Name)" Scope="any" />
+            </File>
+            
+            <!-- Register Windows event log source -->
+            <Util:EventSource xmlns:Util="http://schemas.microsoft.com/wix/UtilExtension"
+                              Name="$(var.Name)"
+                              Log="Application"
+                              EventMessageFile="%SystemRoot%\Microsoft.NET\Framework\v2.0.50727\EventLogMessages.dll" />
+            
+            <!-- Install tcpTrigger as a Windows service -->
+            <ServiceInstall Name="$(var.Name)"
+                            DisplayName="$(var.Name)"
+                            Type="ownProcess"
+                            Description="Carries out tasks based on incoming network connections"
+                            Start="auto"
+                            Vital="yes"
+                            Account="NT AUTHORITY\LocalService"
+                            ErrorControl="normal" />
+
+            <!-- Start the service -->
+            <ServiceControl Id="StartService"
+                            Start="install"
+                            Stop="both"
+                            Remove="uninstall"
+                            Name="tcpTrigger"
+                            Wait="yes" />
+          </Component>
+
+          <Component Id="ConfigurationFile" Guid="{7425DF50-EFAA-4053-BEFE-C4D5626A35DC}">
+            <File Id="tcpTrigger.config" Source="$(var.tcpTrigger.TargetPath).config" KeyPath="yes" />
+          </Component>
+
+          <Component Id="ConfigurationEditor" Guid="{E326FFDE-ED02-4C1D-AF5D-C2BFD002C2CB}">
+            <File Id="tcpTrigger.Editor.exe" Source="$(var.tcpTrigger.Editor.TargetPath)" KeyPath="yes">
+              <Shortcut Id="EditorDesktopShortcut"
+                        Name="tcpTrigger Editor"
+                        Description="Configuration editor for the tcpTrigger service"
+                        Directory="DesktopFolder"
+                        WorkingDirectory="INSTALLFOLDER"
+                        Icon="tcpTrigger.ico"
+                        Advertise="yes" />
+            </File>
+          </Component>
+          
+        </Directory>
+      </Directory>
+
+      <Directory Id="DesktopFolder" Name="Desktop" />
+    </Directory>
+    
+    <!-- Install the components -->
+    <Feature Id="FullInstallation" Level="1">
+      <ComponentRef Id="MainExecutable" />
+      <ComponentRef Id="ConfigurationFile" />
+      <ComponentRef Id="ConfigurationEditor" />
+    </Feature>
+
+    <!-- Add the icon used for add/remove programs and the desktop shortcut -->
+    <Icon Id="tcpTrigger.ico" SourceFile="tcpTrigger.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="tcpTrigger.ico" />
+    
+  </Product>
+</Wix>

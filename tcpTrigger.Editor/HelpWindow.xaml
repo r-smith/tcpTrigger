@@ -1,0 +1,170 @@
+﻿<Controls:MetroWindow x:Class="tcpTrigger.Editor.HelpWindow"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:local="clr-namespace:tcpTrigger.Editor"
+                      xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                      mc:Ignorable="d"
+                      BorderThickness="0" 
+                      GlowBrush="Black"
+                      Title="tcpTrigger Help" Height="550" Width="650">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <!-- Title -->
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center" Grid.Row="0">
+            <Image Source="/Resources/tcpTrigger Logo.png"
+                   Height="48"
+                   Width="48"
+                   Margin="0,15,0,10" />
+            <Label Content="tcpTrigger Help"
+                   FontSize="22"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   FontWeight="SemiBold" />
+        </StackPanel>
+        <ScrollViewer Padding="12" FontSize="14" Grid.Row="1">
+
+            <StackPanel Orientation="Vertical">
+                <TextBlock FontWeight="SemiBold"
+                       Margin="0,20,0,0"
+                       Text="Overview"/>
+                <TextBlock TextWrapping="Wrap"
+                       Margin="10,0,0,0"
+                       Foreground="#555"
+                       Text="tcpTrigger is a Windows service intended to notify you of incoming network connections.  You specify a TCP port to monitor and an action to take.  Actions taken include: sending a notification email and/or launching an external application or script.  Your action will then be triggered each time an incoming connection is attempted on your specified port." />
+
+                <TextBlock FontWeight="SemiBold"
+                       Margin="0,15,0,0"
+                       Text="Variable Usage" />
+                <TextBlock TextWrapping="Wrap"
+                       Margin="10,0,0,0"
+                       Foreground="#555"
+                       Text="Some of the configuration fields allow you to use pre-defined variables.  The text for each variable name will be substituted with its referenced value whenever an action is triggered.  For example, #SOURCEIP# might get replaced with 192.168.0.37 in your email body.  Fields that can use variables are:  external application arguments, email notification subject, and email notification body." />
+
+                <TextBlock FontWeight="SemiBold"
+                       Margin="0,15,0,0"
+                       Text="Variables" />
+                <StackPanel Orientation="Horizontal" Margin="10,5,0,0">
+                    <TextBox Background="Transparent"
+                         BorderThickness="0"
+                         IsReadOnly="True"
+                         TextWrapping="Wrap"
+                         Foreground="#600"
+                         FontWeight="SemiBold"
+                         Width="200"
+                         Text="#SOURCEIP#" />
+                    <TextBlock Foreground="#555"
+                           Text="Source IP address." />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="10,2,0,0">
+                    <TextBox Background="Transparent"
+                         BorderThickness="0"
+                         IsReadOnly="True"
+                         TextWrapping="Wrap"
+                         Foreground="#600"
+                         FontWeight="SemiBold"
+                         Width="200"
+                         Text="#SOURCEPORT#" />
+                    <TextBlock Foreground="#555"
+                           Text="Source TCP port number."/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="10,2,0,0">
+                    <TextBox Background="Transparent"
+                         BorderThickness="0"
+                         IsReadOnly="True"
+                         TextWrapping="Wrap"
+                         Foreground="#600"
+                         FontWeight="SemiBold"
+                         Width="200"
+                         Text="#SOURCEHOSTNAME#" />
+                    <TextBlock Foreground="#555"
+                           Text="DNS hostname of the source, if resolvable." />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="10,2,0,0">
+                    <TextBox Background="Transparent"
+                         BorderThickness="0"
+                         IsReadOnly="True"
+                         TextWrapping="Wrap"
+                         Foreground="#600"
+                         FontWeight="SemiBold"
+                         Width="200"
+                         Text="#DESTINATIONIP#" />
+                    <TextBlock Foreground="#555"
+                           Text="Destination IP address. (The computer running tcpTrigger)" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="10,2,0,0">
+                    <TextBox Background="Transparent"
+                         BorderThickness="0"
+                         IsReadOnly="True"
+                         TextWrapping="Wrap"
+                         Foreground="#600"
+                         FontWeight="SemiBold"
+                         Width="200"
+                         Text="#DESTINATIONPORT#" />
+                    <TextBlock Foreground="#555"
+                           Text="Destination TCP port number." />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="10,2,0,0">
+                    <TextBox Background="Transparent"
+                         BorderThickness="0"
+                         IsReadOnly="True"
+                         TextWrapping="Wrap"
+                         Foreground="#600"
+                         FontWeight="SemiBold"
+                         Width="200"
+                         Text="#DESTINATIONHOSTNAME#" />
+                    <TextBlock Foreground="#555"
+                           Text="DNS hostname of the destination, if resolvable." />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="10,2,0,0">
+                    <TextBox Background="Transparent"
+                         BorderThickness="0"
+                         IsReadOnly="True"
+                         TextWrapping="Wrap"
+                         Foreground="#600"
+                         FontWeight="SemiBold"
+                         Width="200"
+                         Text="#TCPFLAGS#" />
+                    <TextBlock Foreground="#555"
+                           Text="Flags set in the TCP header. (SYN, ACK, RST, etc...)" />
+                </StackPanel>
+
+                <TextBlock FontWeight="SemiBold"
+                       Margin="0,15,0,0"
+                       Text="Notes" />
+
+                <BulletDecorator Margin="10,0,0,0">
+                    <BulletDecorator.Bullet>
+                        <Ellipse Height="5" Width="5" Fill="#555"/>
+                    </BulletDecorator.Bullet>
+                    <TextBlock TextWrapping="Wrap"
+                           Margin="6,0,0,0"
+                           Foreground="#555"
+                           Text="The tcpTrigger service listens on all available IPv4 network interfaces.  It does not actively bind to any port nor does it accept connections.  It is entirely passive and can safely watch ports used by other applications.  If you monitor a port with no other service on it, tcpTrigger will still detect packets sent to that port." />
+                </BulletDecorator>
+                <BulletDecorator Margin="10,2,0,0">
+                    <BulletDecorator.Bullet>
+                        <Ellipse Height="5" Width="5" Fill="#555"/>
+                    </BulletDecorator.Bullet>
+                    <TextBlock TextWrapping="Wrap" Margin="6,0,0,0" Foreground="#555" Text="By default, the tcpTrigger service runs as the built-in Local Service account.  This account has very limited permissions, so be aware of this if you are using tcpTrigger to launch an external application.  You might need to configure the service to run from a different account." />
+                </BulletDecorator>
+                <BulletDecorator Margin="10,2,0,0">
+                    <BulletDecorator.Bullet>
+                        <Ellipse Height="5" Width="5" Fill="#555"/>
+                    </BulletDecorator.Bullet>
+                    <TextBlock TextWrapping="Wrap"
+                           Margin="6,0,0,0"
+                           Foreground="#555"
+                           Text="If something isn't working correctly, check the Windows event log for troubleshooting.  If tcpTrigger is not detecting incoming connections, make sure tcpTrigger.exe is permitted on the Windows firewall." />
+                </BulletDecorator>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Controls:MetroWindow>
