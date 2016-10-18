@@ -16,9 +16,18 @@ For a simple, yet effective, internal intrusion detection system, deploy tcpTrig
 
 #### Connection Notifier
 
-Want to know when someone RDPs to your server?  Monitor port 3389 and you're set.  Use tcpTrigger on any Windows computer to notify you whenever someone connects to your important services.
+Want to know when someone is connecting to your important services?  Use tcpTrigger to monitor the ports you're intersted in and you're set.  You'll get an email each time someone connects, or you can even kick off a script.
 
 
 Download
 --------
 ### [Click here to download latest .msi installer](https://github.com/R-Smith/supporting-docs/raw/master/tcpTrigger/tcpTrigger%20Setup.msi)
+
+### [Click here to download the source](https://github.com/R-Smith/tcpTrigger/archive/master.zip)
+
+##### Notes
+* .NET 3.5 or greater is required to run the service.
+* .NET 4.5 or greater is required to run the graphical configuration editor.
+* The installer does not do a prerequisites check, so make sure you have the required .NET frameworks.
+* The pre-compiled installer is not code-signed, so you will get a scary warning when you run it.
+* My build environment is Microsoft Visual Studio Community 2015 and WiX Toolset v3.10.
