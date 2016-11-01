@@ -127,8 +127,7 @@ namespace tcpTrigger.Editor
                 txtMailRecipient.Text = config.AppSettings.Settings["Email.RecipientAddress"].Value;
                 txtMailSender.Text = config.AppSettings.Settings["Email.SenderAddress"].Value;
                 txtMailSenderDisplay.Text = config.AppSettings.Settings["Email.SenderDisplayName"].Value;
-                txtMailSubject.Text = config.AppSettings.Settings["Email.Subect"].Value;
-                txtMailBody.Text = config.AppSettings.Settings["Email.Body"].Value;
+                txtMailSubject.Text = config.AppSettings.Settings["Email.Subject"].Value;
 
                 txtMailRateLimitMinutes.Text = config.AppSettings.Settings["Action.RateLimitMinutes"].Value;
                 if (txtMailRateLimitMinutes.Text.Length == 0 || txtMailRateLimitMinutes.Text == "0")
@@ -149,6 +148,12 @@ namespace tcpTrigger.Editor
                 else
                     chkMonitorIcmp.IsChecked = false;
 
+                bool.TryParse(config.AppSettings.Settings["Trigger.EnableNamePoisonDetection"].Value, out checkedValue);
+                if (checkedValue == true)
+                    chkNamePoisonDetection.IsChecked = true;
+                else
+                    chkNamePoisonDetection.IsChecked = false;
+
                 bool.TryParse(config.AppSettings.Settings["Action.EnableEventLog"].Value, out checkedValue);
                 if (checkedValue == true)
                     chkEventLog.IsChecked = true;
@@ -166,6 +171,12 @@ namespace tcpTrigger.Editor
                     chkNotificationEmail.IsChecked = true;
                 else
                     chkNotificationEmail.IsChecked = false;
+
+                bool.TryParse(config.AppSettings.Settings["Action.EnablePopupMessage"].Value, out checkedValue);
+                if (checkedValue == true)
+                    chkDisplayPopupMessage.IsChecked = true;
+                else
+                    chkDisplayPopupMessage.IsChecked = false;
             }
 
             catch (Exception ex)
@@ -345,6 +356,11 @@ namespace tcpTrigger.Editor
                 else
                     config.AppSettings.Settings["Trigger.EnableMonitorIcmpPing"].Value = "false";
 
+                if (chkNamePoisonDetection.IsChecked.Value == true)
+                    config.AppSettings.Settings["Trigger.EnableNamePoisonDetection"].Value = "true";
+                else
+                    config.AppSettings.Settings["Trigger.EnableNamePoisonDetection"].Value = "false";
+
                 if (chkEventLog.IsChecked == true)
                     config.AppSettings.Settings["Action.EnableEventLog"].Value = "true";
                 else
@@ -369,12 +385,20 @@ namespace tcpTrigger.Editor
                     config.AppSettings.Settings["Email.RecipientAddress"].Value = txtMailRecipient.Text;
                     config.AppSettings.Settings["Email.SenderAddress"].Value = txtMailSender.Text;
                     config.AppSettings.Settings["Email.SenderDisplayName"].Value = txtMailSenderDisplay.Text;
-                    config.AppSettings.Settings["Email.Subect"].Value = txtMailSubject.Text;
-                    config.AppSettings.Settings["Email.Body"].Value = txtMailBody.Text;
+                    config.AppSettings.Settings["Email.Subject"].Value = txtMailSubject.Text;
                 }
                 else
                 {
                     config.AppSettings.Settings["Action.EnableEmailNotification"].Value = "false";
+                }
+
+                if (chkDisplayPopupMessage.IsChecked == true)
+                {
+                    config.AppSettings.Settings["Action.EnablePopupMessage"].Value = "true";
+                }
+                else
+                {
+                    config.AppSettings.Settings["Action.EnablePopupMessage"].Value = "false";
                 }
 
                 if (chkTriggerRateLimit.IsChecked == true)

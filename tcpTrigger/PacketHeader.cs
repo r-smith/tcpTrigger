@@ -12,6 +12,14 @@ namespace tcpTrigger
         Unknown = -1
     };
 
+    public enum PacketMatch
+    {
+        PingRequest,
+        TcpConnect,
+        NamePoison,
+        None
+    }
+
     class PacketHeader
     {
         public IPAddress SourceIP { get; set; }
@@ -21,6 +29,9 @@ namespace tcpTrigger
         public byte TcpFlags { get; set; }
         public byte IcmpType { get; set; }
         public Protocol ProtocolType { get; set; }
+        public ushort NetbiosTransactionId { get; set; }
+        public bool IsNetbiosResponse { get; set; }
+        public PacketMatch MatchType { get; set; }
 
         public string TcpFlagsAsString
         {
@@ -52,6 +63,8 @@ namespace tcpTrigger
 
         public PacketHeader(byte[] buffer)
         {
+            MatchType = PacketMatch.None;
+
             // Read the protocol number - byte 9.
             ProtocolType = GetProtocolFromByte(buffer[9]);
 
@@ -103,6 +116,16 @@ namespace tcpTrigger
 
                     // Read the UDP destination port - starting at byte [IP header length] + 2 (16 bits).
                     DestinationPort = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, headerLength + 2));
+                    
+                    // If NetBIOS packet, read the Transaction ID and query response flag.
+                    if (DestinationPort == 137)
+                    {
+                        NetbiosTransactionId = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, headerLength + 8));
+                        var queryFlag = buffer[headerLength + 10];
+                        queryFlag >>= 7;
+                        if (queryFlag == 1) IsNetbiosResponse = true; else IsNetbiosResponse = false;
+                    }
+
                     break;
                 default:
                     break;

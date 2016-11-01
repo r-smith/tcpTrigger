@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.ServiceProcess;
 using System.Text;
@@ -17,6 +18,10 @@ namespace tcpTrigger
         private Thread _ListenerThread = null;
         private Dictionary<IPAddress, DateTime> _RateLimitDictionary = new Dictionary<IPAddress, DateTime>();
         private Configuration _Configuration = new Configuration();
+        private System.Timers.Timer _NamePoisionDetectionTimer;
+        private ushort _NetbiosTransactionId = 0x8000;
+        private bool _IsNamePoisonDetectionInProgress = false;
+        private int _NamePoisonTransactionIdResponse = int.MinValue;
 
         public tcpTrigger()
         {
@@ -31,10 +36,155 @@ namespace tcpTrigger
 
             _ListenerThread = new Thread(StartIpListeners);
             _ListenerThread.Start();
+
+            if (_Configuration.EnableNamePoisonDetection)
+            {
+                _NamePoisionDetectionTimer = new System.Timers.Timer();
+                _NamePoisionDetectionTimer.Interval = TimeSpan.FromMinutes(4).TotalMilliseconds;
+                _NamePoisionDetectionTimer.Elapsed += _NamePoisionDetectionTimer_Elapsed;
+                _NamePoisionDetectionTimer.Enabled = true;
+            }
         }
+
+        private void _NamePoisionDetectionTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            _IsNamePoisonDetectionInProgress = true;
+            _NamePoisonTransactionIdResponse = int.MinValue;
+
+            var ipAddresses = new List<UnicastIPAddressInformation>();
+            foreach (NetworkInterface networkInterface in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                if (networkInterface.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
+                    networkInterface.OperationalStatus == OperationalStatus.Up)
+                {
+                    foreach (UnicastIPAddressInformation address in networkInterface.GetIPProperties().UnicastAddresses)
+                    {
+                        if (address.Address.AddressFamily == AddressFamily.InterNetwork)
+                        {
+                            ipAddresses.Add(address);
+                        }
+                    }
+                }
+            }
+
+            foreach (var ip in ipAddresses)
+            {
+                // Generate three random hostnames between 7 and 15 characters to emulate a user opening Chrome.
+                // Chromium source: https://cs.chromium.org/chromium/src/chrome/browser/intranet_redirect_detector.cc
+
+                var randomHostnames = new string[3];
+                var r = new Random();
+                for (int i = 0; i < randomHostnames.Length; ++i)
+                {
+                    var hostname = string.Empty;
+                    int numberOfCharacters = r.Next(7, 16);
+                    for (int j = 0; j < numberOfCharacters; ++j)
+                        hostname += (char)('a' + r.Next(0, 26));
+                    randomHostnames[i] = hostname;
+                }
+
+                // Send NetBIOS name queries.
+                Thread.Sleep(1000);
+                for (int i = 0; i < 3; ++i)
+                {
+                    for (int j = 0; j < randomHostnames.Length; ++j)
+                    {
+                        SendNetbiosQuery(ip, (ushort)(_NetbiosTransactionId + j), randomHostnames[j]);
+                    }
+                    Thread.Sleep(750);
+                }
+            }
+
+            Thread.Sleep(1000);
+            _NetbiosTransactionId += 3;
+            _IsNamePoisonDetectionInProgress = true;
+        }
+
+        private static void SendNetbiosQuery(UnicastIPAddressInformation ip, ushort transactionId, string netbiosName)
+        {
+            var byteList = new List<byte[]>();
+            byteList.Add(BitConverter.GetBytes(transactionId));
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(byteList[0]);
+            byteList.Add(new byte[] { 0x01, 0x10, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, });
+            byteList.Add(EncodeNetbiosName(netbiosName));
+            byteList.Add(new byte[] { 0x00, 0x00, 0x20, 0x00, 0x01 });
+
+            var sendBytes = byteList.SelectMany(a => a).ToArray();
+
+            try
+            {
+                var broadcastAddress = GetBroadcastAddress(ip.Address, ip.IPv4Mask);
+                var endpoint = new IPEndPoint(broadcastAddress, 137);
+
+                var udpClient = new UdpClient(137);
+                udpClient.Send(sendBytes, sendBytes.Length, endpoint);
+                udpClient.Close();
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry(
+                    "tcpTrigger",
+                    $"Error transmitting NetBIOS query: {ex.Message}",
+                    EventLogEntryType.Error,
+                    405);
+            }
+        }
+
+        private static byte[] EncodeNetbiosName(string name)
+        {
+            // Check here: https://support.microsoft.com/en-us/kb/194203
+            // Check here: https://tools.ietf.org/html/rfc1002
+            // Windows uses 15 characters for the name (padded with spaces).
+            // The 16th character is reserved for the service identifier.
+
+            name = name.ToUpper();
+            if (name.Length > 15) name = name.Substring(0, 15);
+            name = name.PadRight(16);
+
+            var encodedNameBuffer = new byte[32];
+            for (int i = 0; i < name.Length; ++i)
+            {
+                encodedNameBuffer[i * 2] = Convert.ToByte((name[i] >> 4) + 'A');
+                encodedNameBuffer[(i * 2) + 1] = Convert.ToByte((name[i] & 0x0F) + 'A');
+            }
+
+            // Append NetBIOS suffix
+            encodedNameBuffer[30] = 'A' + 0;
+            encodedNameBuffer[31] = 'A' + 0;
+
+            return encodedNameBuffer;
+        }
+
+        public static IPAddress GetBroadcastAddress(IPAddress address, IPAddress subnetMask)
+        {
+            // Credit: Jean-Paul Mikkers
+            // Source: https://dhcpserver.codeplex.com/
+
+            byte[] ipAdressBytes = address.GetAddressBytes();
+            byte[] subnetMaskBytes = subnetMask.GetAddressBytes();
+
+            if (ipAdressBytes.Length != subnetMaskBytes.Length)
+                throw new ArgumentException("Lengths of IP address and subnet mask do not match.");
+
+            byte[] broadcastAddress = new byte[ipAdressBytes.Length];
+            for (int i = 0; i < broadcastAddress.Length; i++)
+            {
+                broadcastAddress[i] = (byte)(ipAdressBytes[i] | (subnetMaskBytes[i] ^ 255));
+            }
+            return new IPAddress(broadcastAddress);
+        }
+
 
         protected override void OnStop()
         {
+            if (_NamePoisionDetectionTimer != null)
+            {
+                _NamePoisionDetectionTimer.Enabled = false;
+                _NamePoisionDetectionTimer.Dispose();
+                _NamePoisionDetectionTimer = null;
+            }
+
             if (_ListenerThread != null)
             {
                 // Wait for one second for the the thread to stop.
@@ -52,12 +202,12 @@ namespace tcpTrigger
         private void StartIpListeners()
         {
             // Get all IPv4 addresses to listen on.
-            var IPv4Addresses = Dns.GetHostEntry(Dns.GetHostName())
+            var ipAddresses = Dns.GetHostEntry(Dns.GetHostName())
                 .AddressList.Where(x => x.AddressFamily == AddressFamily.InterNetwork)
                 .AsEnumerable();
             var sb = new StringBuilder();
 
-            foreach (IPAddress ip in IPv4Addresses)
+            foreach (IPAddress ip in ipAddresses)
             {
                 sb.AppendLine($"Listening on interface: {ip}");
                 RawSocketListener(ip);
@@ -65,6 +215,7 @@ namespace tcpTrigger
 
             if (_Configuration.EnableMonitorTcpPort) sb.AppendLine($"Monitoring TCP port {_Configuration.TcpPortsToListenOnAsString}");
             if (_Configuration.EnableMonitorIcmpPing) sb.AppendLine("Monitoring ICMP ping requests");
+            if (_Configuration.EnableNamePoisonDetection) sb.AppendLine("Name poisoning detection is enabled");
 
             EventLog.WriteEntry(
                 "tcpTrigger",
@@ -79,8 +230,7 @@ namespace tcpTrigger
             socket.Bind(new IPEndPoint(ip, 0));
             socket.IOControl(IOControlCode.ReceiveAll, BitConverter.GetBytes(1), null);
 
-            // Create a buffer for incoming data.  We need enough to store the IP header plus at least the first 14 bytes
-            // of a TCP header.  An IP header can be 20 - 60 bytes (typically 20), plus 14 bytes equals 74 bytes total.
+            // Buffer for incoming data.
             byte[] buffer = new byte[74];
 
             // Callback method for processing captured packets.
@@ -90,28 +240,38 @@ namespace tcpTrigger
                 // Packet received.  Extract header information and determine if the packet matches our trigger rules.
                 var packetHeader = new PacketHeader(buffer);
 
-                if (DoesPacketMatchTrigger(packetHeader, ip))
+                if (DoesPacketMatchPingRequest(packetHeader, ip))
+                    packetHeader.MatchType = PacketMatch.PingRequest;
+                else if (DoesPacketMatchMonitoredPort(packetHeader, ip))
+                    packetHeader.MatchType = PacketMatch.TcpConnect;
+                else if (DoesPacketMatchNamePoison(packetHeader, ip))
                 {
-                    if (_Configuration.EnableEventLogAction) WriteEventLog(packetHeader);
+                    // Ensure at least two unique responses.
+                    if (_NamePoisonTransactionIdResponse < 0)
+                    {
+                        _NamePoisonTransactionIdResponse = packetHeader.NetbiosTransactionId;
+                    }
+                    else if (_NamePoisonTransactionIdResponse != packetHeader.NetbiosTransactionId)
+                    {
+                        packetHeader.MatchType = PacketMatch.NamePoison;
+                    }
+                }
 
-                    if (_Configuration.EnableRunApplicationAction ||
-                        _Configuration.EnableEmailNotificationAction)
+                if (packetHeader.MatchType != PacketMatch.None)
+                {
+                    if (_Configuration.EnableEventLogAction)
+                        WriteEventLog(packetHeader);
+
+                    RateLimitDictionaryCleanup();
+
+                    if (!(_RateLimitDictionary.ContainsKey(packetHeader.SourceIP)) || _Configuration.ActionRateLimitMinutes <= 0)
                     {
                         if (_Configuration.ActionRateLimitMinutes > 0)
-                        {
-                            RateLimitDictionaryCleanup();
-                            if (!(_RateLimitDictionary.ContainsKey(packetHeader.SourceIP)))
-                            {
-                                _RateLimitDictionary.Add(packetHeader.SourceIP, DateTime.Now);
-                                if (_Configuration.EnableRunApplicationAction) LaunchApplication(packetHeader);
-                                if (_Configuration.EnableEmailNotificationAction) SendEmail(packetHeader);
-                            }
-                        }
-                        else
-                        {
-                            if (_Configuration.EnableRunApplicationAction) LaunchApplication(packetHeader);
-                            if (_Configuration.EnableEmailNotificationAction) SendEmail(packetHeader);
-                        }
+                            _RateLimitDictionary.Add(packetHeader.SourceIP, DateTime.Now);
+
+                        if (_Configuration.EnableRunApplicationAction) LaunchApplication(packetHeader);
+                        if (_Configuration.EnableEmailNotificationAction) SendEmail(packetHeader);
+                        if (_Configuration.EnablePopupMessageAction) DisplayPopupMessage(packetHeader);
                     }
                 }
 
@@ -124,7 +284,7 @@ namespace tcpTrigger
             socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(OnReceive), null);
         }
 
-        private bool DoesPacketMatchTrigger(PacketHeader header, IPAddress ip)
+        private bool DoesPacketMatchPingRequest(PacketHeader header, IPAddress ip)
         {
             if (_Configuration.EnableMonitorIcmpPing &&
                 header.ProtocolType == Protocol.ICMP &&
@@ -134,12 +294,33 @@ namespace tcpTrigger
                 return true;
             }
 
+            return false;
+        }
+
+        private bool DoesPacketMatchMonitoredPort(PacketHeader header, IPAddress ip)
+        {
             if (_Configuration.EnableMonitorTcpPort &&
                 header.ProtocolType == Protocol.TCP &&
                 header.TcpFlags == 0x2 &&
                 header.DestinationIP.Equals(ip) &&
                 (_Configuration.TcpPortsToListenOn.Contains(header.DestinationPort) ||
                 _Configuration.TcpPortsToListenOn[0] == 0))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool DoesPacketMatchNamePoison(PacketHeader header, IPAddress ip)
+        {
+            if (_Configuration.EnableNamePoisonDetection &&
+                _IsNamePoisonDetectionInProgress &&
+                header.ProtocolType == Protocol.UDP &&
+                header.DestinationIP.Equals(ip) &&
+                header.IsNetbiosResponse &&
+                (header.NetbiosTransactionId >= _NetbiosTransactionId &&
+                header.NetbiosTransactionId <= _NetbiosTransactionId + 3))
             {
                 return true;
             }
@@ -166,24 +347,37 @@ namespace tcpTrigger
 
         private void WriteEventLog(PacketHeader packetHeader)
         {
-            if (packetHeader.ProtocolType == Protocol.TCP)
-                EventLog.WriteEntry(
-                    "tcpTrigger",
-                    $"A captured packet has matched trigger rules.{Environment.NewLine}{Environment.NewLine}" +
-                    $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}" +
-                    $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}" +
-                    $"Destination port: {packetHeader.DestinationPort}{Environment.NewLine}{Environment.NewLine}" +
-                    $"TCP flags: {packetHeader.TcpFlagsAsString}",
-                    EventLogEntryType.Information,
-                    200);
-            else if (packetHeader.ProtocolType == Protocol.ICMP)
-                EventLog.WriteEntry(
-                    "tcpTrigger",
-                    $"A captured ICMP ping request has matched trigger rules.{Environment.NewLine}{Environment.NewLine}" +
-                    $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}" +
-                    $"Destination IP: {packetHeader.DestinationIP}",
-                    EventLogEntryType.Information,
-                    201);
+            switch (packetHeader.MatchType)
+            {
+                case PacketMatch.TcpConnect:
+                    EventLog.WriteEntry(
+                        "tcpTrigger",
+                        $"A captured packet has matched trigger rules.{Environment.NewLine}{Environment.NewLine}" +
+                        $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}" +
+                        $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}" +
+                        $"Destination port: {packetHeader.DestinationPort}{Environment.NewLine}{Environment.NewLine}" +
+                        $"TCP flags: {packetHeader.TcpFlagsAsString}",
+                        EventLogEntryType.Information,
+                        200);
+                    break;
+                case PacketMatch.PingRequest:
+                    EventLog.WriteEntry(
+                        "tcpTrigger",
+                        $"A captured ICMP ping request has matched trigger rules.{Environment.NewLine}{Environment.NewLine}" +
+                        $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}" +
+                        $"Destination IP: {packetHeader.DestinationIP}",
+                        EventLogEntryType.Information,
+                        201);
+                    break;
+                case PacketMatch.NamePoison:
+                    EventLog.WriteEntry(
+                        "tcpTrigger",
+                        $"NetBIOS name poisoning detected.{Environment.NewLine}{Environment.NewLine}" +
+                        $"Source IP: {packetHeader.SourceIP}",
+                        EventLogEntryType.Information,
+                        202);
+                    break;
+            }
         }
 
         private void LaunchApplication(PacketHeader packetHeader)
@@ -211,6 +405,22 @@ namespace tcpTrigger
                     $"Error launching triggered application: {ex.Message}",
                     EventLogEntryType.Error,
                     401);
+            }
+        }
+
+        private void DisplayPopupMessage(PacketHeader packetHeader)
+        {
+            try
+            {
+                Process.Start("msg", $"* /time:0 {UserVariableExpansion.GetExpandedString(GetMessageBody(packetHeader), packetHeader)}");
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry(
+                    "tcpTrigger",
+                    $"Error displaying popup message: {ex.Message}",
+                    EventLogEntryType.Error,
+                    404);
             }
         }
 
@@ -266,7 +476,7 @@ namespace tcpTrigger
                         : new MailAddress(_Configuration.EmailSenderAddress);
                     message.To.Add(_Configuration.EmailRecipientAddress);
                     message.Subject = UserVariableExpansion.GetExpandedString(_Configuration.EmailSubject, packetHeader);
-                    message.Body = UserVariableExpansion.GetExpandedString(_Configuration.EmailBody, packetHeader);
+                    message.Body = UserVariableExpansion.GetExpandedString(GetMessageBody(packetHeader), packetHeader);
 
                     //Send the email.
                     smtpClient.Send(message);
@@ -281,6 +491,26 @@ namespace tcpTrigger
                     return;
                 }
             }
+        }
+
+        private string GetMessageBody(PacketHeader packetHeader)
+        {
+            var messageBody = string.Empty;
+
+            switch (packetHeader.MatchType)
+            {
+                case PacketMatch.PingRequest:
+                    messageBody = _Configuration.MessageBodyPing;
+                    break;
+                case PacketMatch.TcpConnect:
+                    messageBody = _Configuration.MessageBodyTcpConnect;
+                    break;
+                case PacketMatch.NamePoison:
+                    messageBody = _Configuration.MessageBodyNamePoison;
+                    break;
+            }
+
+            return messageBody;
         }
     }
 }

@@ -11,7 +11,7 @@ namespace tcpTrigger
         public const string SourceHostname = "#SOURCEHOSTNAME#";
         public const string DestinationHostname = "#DESTINATIONHOSTNAME#";
         public const string TcpFlags = "#TCPFLAGS#";
-
+        
         public static string GetExpandedString(string message, PacketHeader header)
         {
             if (message.Contains(SourceIp))

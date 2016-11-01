@@ -87,6 +87,10 @@
                                              FontFamily="Lucida Console"
                                              DockPanel.Dock="Right"/>
                                 </DockPanel>
+                                <CheckBox Content="NetBIOS name poison detection"
+                                          Name="chkNamePoisonDetection"
+                                          IsChecked="True"
+                                          Margin="0,7,0,0" />
                             </StackPanel>
                         </GroupBox>
 
@@ -98,11 +102,73 @@
                                            FontSize="11"
                                            Foreground="#FF888888"/>
 
+                                <!-- Action: Send notification email -->
+                                <CheckBox Name="chkNotificationEmail"
+                                          Content="Send a notification email"
+                                          Margin="0,7,0,0"
+                                          IsChecked="True" />
+                                <Grid Margin="20,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="110" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Label Grid.Row="0" Grid.Column="0" Content="Email subject" HorizontalAlignment="Right"/>
+                                    <TextBox Name="txtMailSubject"
+                                             Grid.Row="0"
+                                             Grid.Column="1"
+                                             MaxLength="256"
+                                             Margin="0,0,0,5"
+                                             FontFamily="Lucida Console"
+                                             VerticalContentAlignment="Center"/>
+
+                                    <Button Grid.Row="1"
+                                            Grid.ColumnSpan="2"
+                                            Content="Configure mail server"
+                                            FontSize="13"
+                                            HorizontalAlignment="Left"
+                                            Margin="0,0,0,0"
+                                            Width="150"
+                                            Click="Button_Click">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border BorderThickness="0" BorderBrush="Transparent"
+                                                Background="Transparent"
+                                                Padding="{TemplateBinding Padding}">
+                                                    <TextBlock Name="button_text"
+                                                       FontWeight="Bold"
+                                                       HorizontalAlignment="Center"
+                                                       Foreground="#7777DD"
+                                                               Text="{TemplateBinding Content}" />
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="button_text" Property="Foreground" Value="#0000AA" />
+                                                        <Setter TargetName="button_text" Property="TextDecorations" Value="Underline" />
+                                                    </Trigger>
+                                                    <Trigger Property="IsPressed" Value="True">
+                                                        <Setter TargetName="button_text" Property="Foreground" Value="#DD5555" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                </Grid>
+                                
+                                <!-- Action: Display a popup message -->
+                                <CheckBox Name="chkDisplayPopupMessage"
+                                          Content="Display a popup message to all logged on users"
+                                          Margin="0,10,0,0"
+                                          IsChecked="True" />
+                                
                                 <!-- Action: Launch application -->
                                 <CheckBox Name="chkLaunchApplication"
                                           Content="Launch an external application"
                                           IsChecked="True"
-                                          Margin="0,7,0,0" />
+                                          Margin="0,10,0,0" />
                                 <Grid Margin="20,0,0,0">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
@@ -140,74 +206,6 @@
                                              Grid.Row="1"
                                              FontFamily="Lucida Console"
                                              VerticalContentAlignment="Center"/>
-                                </Grid>
-
-                                <!-- Action: Send notification email -->
-                                <CheckBox Name="chkNotificationEmail"
-                                          Content="Send a notification email"
-                                          Margin="0,10,0,0"
-                                          IsChecked="True" />
-                                <Grid Margin="20,0,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="110" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-                                    <Label Grid.Row="0" Grid.Column="0" Content="Email subject" HorizontalAlignment="Right"/>
-                                    <Label Grid.Row="1" Grid.Column="0" Content="Email body" HorizontalAlignment="Right"/>
-                                    <TextBox Name="txtMailSubject"
-                                             Grid.Row="0"
-                                             Grid.Column="1"
-                                             MaxLength="256"
-                                             Margin="0,0,0,5"
-                                             FontFamily="Lucida Console"
-                                             VerticalContentAlignment="Center"/>
-                                    <TextBox Name="txtMailBody"
-                                             Grid.Row="1"
-                                             Grid.Column="1"
-                                             Height="50"
-                                             TextWrapping="Wrap"
-                                             VerticalContentAlignment="Top"
-                                             AcceptsReturn="True"
-                                             VerticalScrollBarVisibility="Auto"
-                                             MaxLength="1024"
-                                             FontFamily="Lucida Console"/>
-                                    
-                                    <Button Grid.Row="2"
-                                            Grid.ColumnSpan="2"
-                                            Content="Configure mail server"
-                                            FontSize="13"
-                                            HorizontalAlignment="Left"
-                                            Margin="0,5,0,0"
-                                            Width="150"
-                                            Click="Button_Click">
-                                        <Button.Template>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border BorderThickness="0" BorderBrush="Transparent"
-                                                Background="Transparent"
-                                                Padding="{TemplateBinding Padding}">
-                                                    <TextBlock Name="button_text"
-                                                       FontWeight="Bold"
-                                                       HorizontalAlignment="Center"
-                                                       Foreground="#7777DD"
-                                                               Text="{TemplateBinding Content}" />
-                                                </Border>
-                                                <ControlTemplate.Triggers>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="button_text" Property="Foreground" Value="#0000AA" />
-                                                        <Setter TargetName="button_text" Property="TextDecorations" Value="Underline" />
-                                                    </Trigger>
-                                                    <Trigger Property="IsPressed" Value="True">
-                                                        <Setter TargetName="button_text" Property="Foreground" Value="#DD5555" />
-                                                    </Trigger>
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </Button.Template>
-                                    </Button>
                                 </Grid>
                             </StackPanel>
                         </GroupBox>

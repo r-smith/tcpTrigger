@@ -13,6 +13,9 @@ namespace tcpTrigger
         private bool _enableMonitorIcmpPing;
         public bool EnableMonitorIcmpPing { get { return _enableMonitorIcmpPing; } }
 
+        private bool _enableNamePoisonDetection;
+        public bool EnableNamePoisonDetection { get { return _enableNamePoisonDetection; } }
+        
         private int[] _tcpPortsToListenOn;
         public int[] TcpPortsToListenOn { get { return _tcpPortsToListenOn; } }
 
@@ -27,6 +30,9 @@ namespace tcpTrigger
 
         private bool _enableRunApplicationAction;
         public bool EnableRunApplicationAction { get { return _enableRunApplicationAction; } }
+
+        private bool _enablePopupMessageAction;
+        public bool EnablePopupMessageAction { get { return _enablePopupMessageAction; } }
 
         private int _actionRateLimitMinutes;
         public int ActionRateLimitMinutes { get { return _actionRateLimitMinutes; } }
@@ -55,10 +61,15 @@ namespace tcpTrigger
         private string _emailSubject;
         public string EmailSubject { get { return _emailSubject; } }
 
-        private string _emailBody;
-        public string EmailBody { get { return _emailBody; } }
+        private string _messageBodyPing;
+        public string MessageBodyPing { get { return _messageBodyPing; } }
 
+        private string _messageBodyTcpConnect;
+        public string MessageBodyTcpConnect { get { return _messageBodyTcpConnect; } }
 
+        private string _messageBodyNamePoison;
+        public string MessageBodyNamePoison { get { return _messageBodyNamePoison; } }
+        
         public void Load()
         {
             try
@@ -71,9 +82,11 @@ namespace tcpTrigger
                         Select(x => int.Parse(x)).ToArray();
                 }
                 bool.TryParse(ConfigurationManager.AppSettings["Trigger.EnableMonitorIcmpPing"], out _enableMonitorIcmpPing);
+                bool.TryParse(ConfigurationManager.AppSettings["Trigger.EnableNamePoisonDetection"], out _enableNamePoisonDetection);
                 bool.TryParse(ConfigurationManager.AppSettings["Action.EnableEventLog"], out _enableEventLogAction);
                 bool.TryParse(ConfigurationManager.AppSettings["Action.EnableEmailNotification"], out _enableEmailNotificationAction);
                 bool.TryParse(ConfigurationManager.AppSettings["Action.EnableRunApplication"], out _enableRunApplicationAction);
+                bool.TryParse(ConfigurationManager.AppSettings["Action.EnablePopupMessage"], out _enablePopupMessageAction);
                 if (!(int.TryParse(ConfigurationManager.AppSettings["Action.RateLimitMinutes"], out _actionRateLimitMinutes)))
                 {
                     _actionRateLimitMinutes = 0;
@@ -88,8 +101,11 @@ namespace tcpTrigger
                 _emailRecipientAddress = ConfigurationManager.AppSettings["Email.RecipientAddress"];
                 _emailSenderAddress = ConfigurationManager.AppSettings["Email.SenderAddress"];
                 _emailSenderDisplayName = ConfigurationManager.AppSettings["Email.SenderDisplayName"];
-                _emailSubject = ConfigurationManager.AppSettings["Email.Subect"];
-                _emailBody = ConfigurationManager.AppSettings["Email.Body"];
+                _emailSubject = ConfigurationManager.AppSettings["Email.Subject"];
+
+                _messageBodyPing = ConfigurationManager.AppSettings["MessageBody.Ping"];
+                _messageBodyTcpConnect = ConfigurationManager.AppSettings["MessageBody.TcpConnect"];
+                _messageBodyNamePoison = ConfigurationManager.AppSettings["MessageBody.NamePoison"];
             }
 
             catch (Exception ex)
