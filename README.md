@@ -29,7 +29,7 @@ Not interested in intrusion detection and you just want to know when someone is 
 
 Download
 --------
-### [Click here to download latest .msi installer](https://github.com/R-Smith/tcpTrigger/releases/download/v1.1.0/tcpTrigger.Setup.msi)
+### [Click here to download latest .msi installer](https://github.com/R-Smith/tcpTrigger/releases/download/v1.1.1/tcpTrigger.Setup.msi)
 
 ### [Click here to download the source](https://github.com/R-Smith/tcpTrigger/archive/master.zip)
 
