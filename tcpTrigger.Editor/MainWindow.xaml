@@ -87,7 +87,7 @@
                                              FontFamily="Lucida Console"
                                              DockPanel.Dock="Right"/>
                                 </DockPanel>
-                                <CheckBox Content="NetBIOS name poison detection"
+                                <CheckBox Content="NetBIOS / LLMNR name poison detection"
                                           Name="chkNamePoisonDetection"
                                           IsChecked="True"
                                           Margin="0,7,0,0" />

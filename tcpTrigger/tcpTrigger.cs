@@ -83,8 +83,17 @@ namespace tcpTrigger
                     randomHostnames[i] = hostname;
                 }
 
+                // Send LLMNR name queries.
+                for (int i = 0; i < 3; ++i)
+                {
+                    for (int j = 0; j < randomHostnames.Length; ++j)
+                    {
+                        SendLlmnrQuery(ip, (ushort)(_NetbiosTransactionId + j), randomHostnames[j]);
+                    }
+                    Thread.Sleep(750);
+                }
+
                 // Send NetBIOS name queries.
-                Thread.Sleep(1000);
                 for (int i = 0; i < 3; ++i)
                 {
                     for (int j = 0; j < randomHostnames.Length; ++j)
@@ -100,13 +109,55 @@ namespace tcpTrigger
             _IsNamePoisonDetectionInProgress = true;
         }
 
+        private static void SendLlmnrQuery(UnicastIPAddressInformation ip, ushort transactionId, string queryName)
+        {
+            if (queryName.Length > 255) queryName = queryName.Substring(0, 255);
+            queryName = queryName.ToLower();
+
+            var byteList = new List<byte[]>();
+            byteList.Add(BitConverter.GetBytes(transactionId));
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(byteList[0]);
+            byteList.Add(new byte[] { 0x00, 0x00, 0x00, 0x01,
+                                      0x00, 0x00, 0x00, 0x00,
+                                      0x00, 0x00 });
+            var nameLengthByte = new Byte[1];
+            nameLengthByte[0] = Convert.ToByte(queryName.Length);
+            byteList.Add(nameLengthByte);
+            byteList.Add(Encoding.ASCII.GetBytes(queryName));
+            byteList.Add(new byte[] { 0x00, 0x00, 0x01, 0x00, 0x01 });
+
+            var sendBytes = byteList.SelectMany(a => a).ToArray();
+
+            try
+            {
+                var multicastAddress = IPAddress.Parse("224.0.0.252");
+                var remoteEndpoint = new IPEndPoint(multicastAddress, 5355);
+
+                // Since this is a multicast packet, we must specify the local endpoint
+                // to ensure it is sent out on every interface on a multi-homed system.
+                var localEndpoint = new IPEndPoint(ip.Address, 0);
+                var udpClient = new UdpClient(localEndpoint);
+                udpClient.Send(sendBytes, sendBytes.Length, remoteEndpoint);
+                udpClient.Close();
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry(
+                    "tcpTrigger",
+                    $"Error transmitting LLMNR query: {ex.Message}",
+                    EventLogEntryType.Error,
+                    405);
+            }
+        }
+
         private static void SendNetbiosQuery(UnicastIPAddressInformation ip, ushort transactionId, string netbiosName)
         {
             var byteList = new List<byte[]>();
             byteList.Add(BitConverter.GetBytes(transactionId));
             if (BitConverter.IsLittleEndian)
                 Array.Reverse(byteList[0]);
-            byteList.Add(new byte[] { 0x01, 0x10, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, });
+            byteList.Add(new byte[] { 0x01, 0x10, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20 });
             byteList.Add(EncodeNetbiosName(netbiosName));
             byteList.Add(new byte[] { 0x00, 0x00, 0x20, 0x00, 0x01 });
 
@@ -318,7 +369,7 @@ namespace tcpTrigger
                 _IsNamePoisonDetectionInProgress &&
                 header.ProtocolType == Protocol.UDP &&
                 header.DestinationIP.Equals(ip) &&
-                header.IsNetbiosResponse &&
+                header.IsNameQueryResponse &&
                 (header.NetbiosTransactionId >= _NetbiosTransactionId &&
                 header.NetbiosTransactionId <= _NetbiosTransactionId + 3))
             {
