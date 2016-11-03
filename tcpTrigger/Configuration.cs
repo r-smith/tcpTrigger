@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 
 namespace tcpTrigger
 {
@@ -15,7 +17,13 @@ namespace tcpTrigger
 
         private bool _enableNamePoisonDetection;
         public bool EnableNamePoisonDetection { get { return _enableNamePoisonDetection; } }
-        
+
+        private bool _enableRogueDhcpDetection;
+        public bool EnableRogueDhcpDetection { get { return _enableRogueDhcpDetection; } }
+
+        private bool _doNotMonitorVMwareVirtualHostAdapters;
+        public bool DoNotMonitorVMwareVirtualHostAdapters { get { return _doNotMonitorVMwareVirtualHostAdapters; } }
+
         private int[] _tcpPortsToListenOn;
         public int[] TcpPortsToListenOn { get { return _tcpPortsToListenOn; } }
 
@@ -43,6 +51,9 @@ namespace tcpTrigger
         private string _triggeredApplicationArguments;
         public string TriggeredApplicationArguments { get { return _triggeredApplicationArguments; } }
 
+        private List<IPAddress> _dhcpSafeServerList;
+        public List<IPAddress> DhcpSafeServerList { get { return _dhcpSafeServerList; } }
+
         private string _emailServer;
         public string EmailServer { get { return _emailServer; } }
 
@@ -69,11 +80,16 @@ namespace tcpTrigger
 
         private string _messageBodyNamePoison;
         public string MessageBodyNamePoison { get { return _messageBodyNamePoison; } }
-        
+
+        private string _messageBodyRogueDhcp;
+        public string MessageBodyRogueDhcp { get { return _messageBodyRogueDhcp; } }
+
         public void Load()
         {
             try
             {
+                _dhcpSafeServerList = new List<IPAddress>();
+
                 bool.TryParse(ConfigurationManager.AppSettings["Trigger.EnableMonitorTcpPort"], out _enableMonitorTcpPort);
                 if (_enableMonitorTcpPort)
                 {
@@ -83,6 +99,21 @@ namespace tcpTrigger
                 }
                 bool.TryParse(ConfigurationManager.AppSettings["Trigger.EnableMonitorIcmpPing"], out _enableMonitorIcmpPing);
                 bool.TryParse(ConfigurationManager.AppSettings["Trigger.EnableNamePoisonDetection"], out _enableNamePoisonDetection);
+                bool.TryParse(ConfigurationManager.AppSettings["Trigger.EnableRogueDhcpDetection"], out _enableRogueDhcpDetection);
+                if (_enableRogueDhcpDetection)
+                {
+                    var dhcpSafeServerListAsString = ConfigurationManager.AppSettings["Dhcp.SafeServerList"];
+                    if (dhcpSafeServerListAsString.Length > 0)
+                    {
+                        var dhcpSafeServerListAsArray = dhcpSafeServerListAsString.Split(',').
+                            Select(x => IPAddress.Parse(x)).ToArray();
+                        for (int i = 0; i < dhcpSafeServerListAsArray.Length; ++i)
+                        {
+                            _dhcpSafeServerList.Add(dhcpSafeServerListAsArray[i]);
+                        }
+                    }
+                }
+                bool.TryParse(ConfigurationManager.AppSettings["DoNotMonitorVMwareVirtualHostAdapters"], out _doNotMonitorVMwareVirtualHostAdapters);
                 bool.TryParse(ConfigurationManager.AppSettings["Action.EnableEventLog"], out _enableEventLogAction);
                 bool.TryParse(ConfigurationManager.AppSettings["Action.EnableEmailNotification"], out _enableEmailNotificationAction);
                 bool.TryParse(ConfigurationManager.AppSettings["Action.EnableRunApplication"], out _enableRunApplicationAction);
@@ -106,6 +137,7 @@ namespace tcpTrigger
                 _messageBodyPing = ConfigurationManager.AppSettings["MessageBody.Ping"];
                 _messageBodyTcpConnect = ConfigurationManager.AppSettings["MessageBody.TcpConnect"];
                 _messageBodyNamePoison = ConfigurationManager.AppSettings["MessageBody.NamePoison"];
+                _messageBodyRogueDhcp = ConfigurationManager.AppSettings["MessageBody.RogueDhcp"];
             }
 
             catch (Exception ex)

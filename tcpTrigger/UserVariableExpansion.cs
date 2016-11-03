@@ -10,6 +10,8 @@ namespace tcpTrigger
         public const string DestinationPort = "#DESTINATIONPORT#";
         public const string SourceHostname = "#SOURCEHOSTNAME#";
         public const string DestinationHostname = "#DESTINATIONHOSTNAME#";
+        public const string DestinationMac = "#DESTINATIONMAC#";
+        public const string DhcpServerIp = "#DHCPSERVERIP#";
         public const string TcpFlags = "#TCPFLAGS#";
         
         public static string GetExpandedString(string message, PacketHeader header)
@@ -25,6 +27,12 @@ namespace tcpTrigger
 
             if (message.Contains(DestinationPort))
                 message = message.Replace(DestinationPort, header.DestinationPort.ToString());
+
+            if (message.Contains(DestinationMac))
+                message = message.Replace(DestinationMac, header.DestinationMacAsString);
+
+            if (message.Contains(DhcpServerIp))
+                message = message.Replace(DhcpServerIp, header.DhcpServerAddress.ToString());
 
             if (message.Contains(TcpFlags))
                 message = message.Replace(TcpFlags, header.TcpFlagsAsString);

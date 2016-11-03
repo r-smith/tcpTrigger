@@ -120,6 +120,7 @@ namespace tcpTrigger.Editor
                 var configuration = ConfigurationManager.OpenExeConfiguration(installPath);
 
                 txtListenPort.Text = config.AppSettings.Settings["Trigger.TcpPortsToListenOn"].Value;
+                txtKnownDhcpServers.Text = config.AppSettings.Settings["Dhcp.SafeServerList"].Value;
                 txtApplication.Text = config.AppSettings.Settings["Action.ApplicationPath"].Value;
                 txtArguments.Text = config.AppSettings.Settings["Action.ApplicationArguments"].Value;
                 txtMailServer.Text = config.AppSettings.Settings["Email.Server"].Value;
@@ -153,6 +154,12 @@ namespace tcpTrigger.Editor
                     chkNamePoisonDetection.IsChecked = true;
                 else
                     chkNamePoisonDetection.IsChecked = false;
+
+                bool.TryParse(config.AppSettings.Settings["Trigger.EnableRogueDhcpDetection"].Value, out checkedValue);
+                if (checkedValue == true)
+                    chkRogueDhcpServerDetection.IsChecked = true;
+                else
+                    chkRogueDhcpServerDetection.IsChecked = false;
 
                 bool.TryParse(config.AppSettings.Settings["Action.EnableEventLog"].Value, out checkedValue);
                 if (checkedValue == true)
@@ -361,11 +368,19 @@ namespace tcpTrigger.Editor
                 else
                     config.AppSettings.Settings["Trigger.EnableNamePoisonDetection"].Value = "false";
 
+                if (chkRogueDhcpServerDetection.IsChecked.Value == true)
+                {
+                    config.AppSettings.Settings["Trigger.EnableRogueDhcpDetection"].Value = "true";
+                    config.AppSettings.Settings["Dhcp.SafeServerList"].Value = txtKnownDhcpServers.Text;
+                }
+                else
+                    config.AppSettings.Settings["Trigger.EnableRogueDhcpDetection"].Value = "false";
+
                 if (chkEventLog.IsChecked == true)
                     config.AppSettings.Settings["Action.EnableEventLog"].Value = "true";
                 else
                     config.AppSettings.Settings["Action.EnableEventLog"].Value = "false";
-
+                
                 if (chkLaunchApplication.IsChecked == true)
                 {
                     config.AppSettings.Settings["Action.EnableRunApplication"].Value = "true";

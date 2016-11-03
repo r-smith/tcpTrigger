@@ -10,7 +10,7 @@
                       BorderThickness="1"
                       ResizeMode="CanMinimize"
                       Icon="tcpTrigger.ico"
-                      Title="tcpTrigger Setup" Width="775" Height="600"  WindowStartupLocation="CenterScreen">
+                      Title="tcpTrigger Setup" Width="775" Height="650"  WindowStartupLocation="CenterScreen">
     
     <Controls:MetroWindow.Resources>
         <BooleanToVisibilityConverter x:Key="b2v" />
@@ -91,6 +91,20 @@
                                           Name="chkNamePoisonDetection"
                                           IsChecked="True"
                                           Margin="0,7,0,0" />
+                                <CheckBox Content="Rogue DHCP server detection"
+                                          Name="chkRogueDhcpServerDetection"
+                                          Margin="0,7,0,0" />
+                                <DockPanel HorizontalAlignment="Stretch"
+                                           Margin="30,0,0,0">
+                                    <Label Name="lblKnownDhcpServers"
+                                           Content="Known DHCP server(s)"/>
+                                    <TextBox Name="txtKnownDhcpServers"
+                                             Grid.Column="1"
+                                             MaxLength="512"
+                                             VerticalContentAlignment="Center"
+                                             FontFamily="Lucida Console"
+                                             DockPanel.Dock="Right"/>
+                                </DockPanel>
                             </StackPanel>
                         </GroupBox>
 

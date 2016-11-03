@@ -7,7 +7,7 @@
 <?define Manufacturer = "SmithLV.com" ?>
 
 <!-- The version number of this setup package-->
-<?define Version = "1.1.1" ?>
+<?define Version = "1.2.0" ?>
 
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
