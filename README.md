@@ -10,7 +10,7 @@ tcpTrigger is a Windows service intended to notify you of incoming network conne
 
 Download
 --------
-### [Click here to download latest .msi installer](https://github.com/R-Smith/tcpTrigger/releases/download/v1.2.1/tcpTrigger.Setup.msi)
+### [Click here to download latest .msi installer](https://github.com/R-Smith/tcpTrigger/releases/download/v1.2.2/tcpTrigger.Setup.msi)
 ### [Click here to download the source](https://github.com/R-Smith/tcpTrigger/archive/master.zip)
 ##### Notes
 * .NET 3.5 or greater is required to run the service.
