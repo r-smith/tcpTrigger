@@ -11,32 +11,12 @@
                       ResizeMode="CanMinimize"
                       Icon="tcpTrigger.ico"
                       Title="tcpTrigger Setup" Width="775" Height="650"  WindowStartupLocation="CenterScreen">
-    
+
     <Controls:MetroWindow.Resources>
         <BooleanToVisibilityConverter x:Key="b2v" />
     </Controls:MetroWindow.Resources>
 
-    <!--<Controls:MetroWindow.RightWindowCommands>
-        <Controls:WindowCommands>
-            <Button Content="Help" />
-            <Button>
-                <StackPanel Orientation="Horizontal">
-                    <Rectangle Width="20"
-                   Height="20"
-                   Fill="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}">
-                        <Rectangle.OpacityMask>
-                            <VisualBrush Stretch="Fill" Visual="{StaticResource appbar_cupcake}" />
-                        </Rectangle.OpacityMask>
-                    </Rectangle>
-                    <TextBlock Margin="4 0 0 0"
-                   VerticalAlignment="Center"
-                   Text="deploy cupcakes" />
-                </StackPanel>
-            </Button>
-        </Controls:WindowCommands>
-    </Controls:MetroWindow.RightWindowCommands>-->
- 
-    
+
     <!-- Main Grid -->
     <Grid>
         <Grid.RowDefinitions>
@@ -292,6 +272,85 @@
                 </StackPanel>
             </TabItem>
 
+            <TabItem Name="tabMessages" Header="Messages" >
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Message Bodies" >
+                        <ScrollViewer>
+                        <Grid Margin="5,5,10,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0" Content="Ping request detected" HorizontalAlignment="Right" />
+                            <TextBox Name="txtMessageBodyPing"
+                                     Grid.Row="0"
+                                     Grid.Column="1"
+                                     Margin="0,0,0,5"
+                                     FontFamily="Lucida Console"
+                                     VerticalContentAlignment="Top"
+                                     VerticalScrollBarVisibility="Auto"
+                                     Height="120"
+                                     AcceptsReturn="True"
+                                     MaxLength="2048"/>
+                            <Label Grid.Row="1" Content="TCP connection detected" HorizontalAlignment="Right" />
+                            <TextBox Name="txtMessageBodyTcpConnect"
+                                     Grid.Row="1"
+                                     Grid.Column="1"
+                                     Margin="0,0,0,5"
+                                     FontFamily="Lucida Console"
+                                     VerticalContentAlignment="Top"
+                                     VerticalScrollBarVisibility="Auto"
+                                     Height="120"
+                                     AcceptsReturn="True"
+                                     MaxLength="2048"/>
+                            <Label Grid.Row="2" Content="Name poison detected" HorizontalAlignment="Right" />
+                            <TextBox Name="txtMessageBodyNamePoison"
+                                     Grid.Row="2"
+                                     Grid.Column="1"
+                                     Margin="0,0,0,5"
+                                     FontFamily="Lucida Console"
+                                     VerticalContentAlignment="Top"
+                                     VerticalScrollBarVisibility="Auto"
+                                     Height="120"
+                                     AcceptsReturn="True"
+                                     MaxLength="2048"/>
+                            <Label Grid.Row="3" Content="Rogue DHCP server detected" HorizontalAlignment="Right" />
+                            <TextBox Name="txtMessageBodyRogueDhcp"
+                                     Grid.Row="3"
+                                     Grid.Column="1"
+                                     Margin="0,0,0,5"
+                                     FontFamily="Lucida Console"
+                                     VerticalContentAlignment="Top"
+                                     VerticalScrollBarVisibility="Auto"
+                                     Height="120"
+                                     AcceptsReturn="True"
+                                     MaxLength="2048"/>
+                        </Grid>
+                        </ScrollViewer>
+                    </GroupBox>
+                    <GroupBox Header="Variables" Grid.Row="1">
+                        <UniformGrid Margin="5,5,10,5" Rows="2">
+                            <Label Content="#SOURCEIP#" />
+                            <Label Content="#SOURCEPORT#" />
+                            <Label Content="#SOURCEHOSTNAME#" />
+                            <Label Content="#DESTINATIONIP#" />
+                            <Label Content="#DESTINATIONPORT#" />
+                            <Label Content="#DESTINATIONHOSTNAME#" />
+                        </UniformGrid>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+            
             <TabItem Name="tabAdvanced" Header="Advanced" >
                 <StackPanel>
                     <GroupBox Header="Advanced Settings">

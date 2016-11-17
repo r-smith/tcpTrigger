@@ -129,6 +129,10 @@ namespace tcpTrigger.Editor
                 txtMailSender.Text = config.AppSettings.Settings["Email.SenderAddress"].Value;
                 txtMailSenderDisplay.Text = config.AppSettings.Settings["Email.SenderDisplayName"].Value;
                 txtMailSubject.Text = config.AppSettings.Settings["Email.Subject"].Value;
+                txtMessageBodyPing.Text = config.AppSettings.Settings["MessageBody.Ping"].Value;
+                txtMessageBodyTcpConnect.Text = config.AppSettings.Settings["MessageBody.TcpConnect"].Value;
+                txtMessageBodyNamePoison.Text = config.AppSettings.Settings["MessageBody.NamePoison"].Value;
+                txtMessageBodyRogueDhcp.Text = config.AppSettings.Settings["MessageBody.RogueDhcp"].Value;
 
                 txtMailRateLimitMinutes.Text = config.AppSettings.Settings["Action.RateLimitMinutes"].Value;
                 if (txtMailRateLimitMinutes.Text.Length == 0 || txtMailRateLimitMinutes.Text == "0")
@@ -424,6 +428,11 @@ namespace tcpTrigger.Editor
                 {
                     config.AppSettings.Settings["Action.RateLimitMinutes"].Value = "0";
                 }
+
+                config.AppSettings.Settings["MessageBody.Ping"].Value = txtMessageBodyPing.Text;
+                config.AppSettings.Settings["MessageBody.TcpConnect"].Value = txtMessageBodyTcpConnect.Text;
+                config.AppSettings.Settings["MessageBody.NamePoison"].Value = txtMessageBodyNamePoison.Text;
+                config.AppSettings.Settings["MessageBody.RogueDhcp"].Value = txtMessageBodyRogueDhcp.Text;
 
                 config.Save();
             }
