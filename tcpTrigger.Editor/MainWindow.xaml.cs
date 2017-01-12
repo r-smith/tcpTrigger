@@ -1,6 +1,7 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
 using System;
+using System.ComponentModel;
 using System.Configuration;
 using System.Linq;
 using System.ServiceProcess;
@@ -20,52 +21,8 @@ namespace tcpTrigger.Editor
                 App.Current.Shutdown();
                 return;
             }
-
-            //if (GetServiceStatus() == false)
-            //{
-            //    App.Current.Shutdown();
-            //    return;
-            //}
         }
 
-        private bool GetServiceStatus()
-        {
-            //var sc = new ServiceController("tcpTrigger");
-            //tbServiceStatus.Text = "tcpTrigger service is currently ";
-
-            //try
-            //{
-            //    switch (sc.Status)
-            //    {
-            //        case ServiceControllerStatus.Running:
-            //            tbServiceStatus.Text += "running";
-            //            break;
-            //        case ServiceControllerStatus.Stopped:
-            //            tbServiceStatus.Text += "stopped";
-            //            break;
-            //        case ServiceControllerStatus.Paused:
-            //            tbServiceStatus.Text += "paused";
-            //            break;
-            //        case ServiceControllerStatus.StopPending:
-            //            tbServiceStatus.Text += "stopping";
-            //            break;
-            //        case ServiceControllerStatus.StartPending:
-            //            tbServiceStatus.Text += "starting";
-            //            break;
-            //        default:
-            //            tbServiceStatus.Text += "changing status";
-            //            break;
-            //    }
-            //}
-
-            //catch
-            //{
-            //    MessageBox.Show("tcpTrigger service could not be found.");
-            //    return false;
-            //}
-
-            return true;
-        }
 
         private bool LoadConfigurationFile()
         {
@@ -201,9 +158,20 @@ namespace tcpTrigger.Editor
         private void btnBrowse_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new OpenFileDialog();
-            if (dialog.ShowDialog() == true)
+            try
             {
-                txtApplication.Text = dialog.FileName;
+                if (dialog.ShowDialog() == true)
+                {
+                    txtApplication.Text = dialog.FileName;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Unable to browse filesystem. {ex.Message}",
+                    "tcpTrigger - Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
 
@@ -214,7 +182,7 @@ namespace tcpTrigger.Editor
 
             if (chkMonitorTcpPort.IsChecked == true && !IsTcpPortsValid())
             {
-                this.ShowMessageAsync("Error", "Please enter a valid port number to monitor. Multiple port numbers should be separated with a comma.");
+                this.ShowMessageAsync("Error", "Please enter a valid port number to monitor. Multiple port numbers should be separated with a comma. Ranges should be separated with a hyphen. Example: 21,23,2000-3000");
                 tabMain.Focus();
                 return false;
             }
@@ -350,7 +318,7 @@ namespace tcpTrigger.Editor
         {
             if (ValidateConfiguration() == false)
                 return;
-
+            
             string installPath = string.Empty;
 
             try
@@ -489,6 +457,21 @@ namespace tcpTrigger.Editor
                 return;
             }
 
+            RestartTcpTriggerService();
+        }
+
+        private void RestartTcpTriggerService()
+        {
+            // Setup a background thread to restart the service.
+            gridLoading.Visibility = Visibility.Visible;
+            var bw = new BackgroundWorker();
+            bw.DoWork += new DoWorkEventHandler(bgThread_RestartService);
+            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bgThread_RestartServiceCompleted);
+            bw.RunWorkerAsync();
+        }
+
+        private void bgThread_RestartService(object sender, DoWorkEventArgs e)
+        {
             try
             {
                 var sc = new ServiceController("tcpTrigger");
@@ -502,15 +485,23 @@ namespace tcpTrigger.Editor
             }
             catch (Exception ex)
             {
-                this.ShowMessageAsync(
-                    "Error",
-                    $"Error updating the tcpTrigger service. {ex.Message}");
+                e.Result =
+                    $"Failed to restart tcpTrigger service. Configuration changes not applied. {ex.Message}";
                 return;
             }
-
-
-            this.ShowMessageAsync("Success", "Configuration file has been saved.");
         }
+
+
+        private void bgThread_RestartServiceCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            gridLoading.Visibility = Visibility.Collapsed;
+
+            if (e.Result != null)
+                this.ShowMessageAsync("Error", (string)e.Result);
+            else
+                this.ShowMessageAsync("Success", "Configuration file has been saved.");
+        }
+
 
         private void btnHelp_Click(object sender, RoutedEventArgs e)
         {

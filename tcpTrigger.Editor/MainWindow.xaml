@@ -5,6 +5,7 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:local="clr-namespace:tcpTrigger.Editor"
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                      xmlns:localControls="clr-namespace:tcpTrigger.Editor.Controls"
                       mc:Ignorable="d" 
                       BorderBrush="{DynamicResource AccentColorBrush}"
                       BorderThickness="1"
@@ -340,12 +341,12 @@
                     </GroupBox>
                     <GroupBox Header="Variables" Grid.Row="1">
                         <UniformGrid Margin="5,5,10,5" Rows="2">
-                            <Label Content="#SOURCEIP#" />
-                            <Label Content="#SOURCEPORT#" />
-                            <Label Content="#SOURCEHOSTNAME#" />
-                            <Label Content="#DESTINATIONIP#" />
-                            <Label Content="#DESTINATIONPORT#" />
-                            <Label Content="#DESTINATIONHOSTNAME#" />
+                            <Label Foreground="#666688" Content="#SOURCEIP#" />
+                            <Label Foreground="#666688" Content="#SOURCEPORT#" />
+                            <Label Foreground="#666688" Content="#SOURCEHOSTNAME#" />
+                            <Label Foreground="#666688" Content="#DESTINATIONIP#" />
+                            <Label Foreground="#666688" Content="#DESTINATIONPORT#" />
+                            <Label Foreground="#666688" Content="#DESTINATIONHOSTNAME#" />
                         </UniformGrid>
                     </GroupBox>
                 </Grid>
@@ -405,6 +406,34 @@
                     Height="30"
                     HorizontalAlignment="Right"
                     Click="btnSave_Click" />
+        </Grid>
+
+
+        <!-- Loading Overlay -->
+        <Grid Name="gridLoading" Background="#33000000" Visibility="Collapsed" Grid.RowSpan="3">
+            <localControls:CircularProgressBar Visibility="{Binding ElementName=gridLoading,Path=Visibility}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                                               SnapsToDevicePixels="False" UseLayoutRounding="False">
+                <localControls:CircularProgressBar.Style>
+                    <!-- Progress Bar Fade-In Animation -->
+                    <Style TargetType="FrameworkElement">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Setter Property="Opacity" Value="0"/>
+                        <Style.Triggers>
+                            <Trigger Property="Visibility" Value="Visible">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                             From="0.0" To="1.0" Duration="0:0:0.3"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </localControls:CircularProgressBar.Style>
+            </localControls:CircularProgressBar>
         </Grid>
     </Grid>
 </Controls:MetroWindow>
