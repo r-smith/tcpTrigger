@@ -94,8 +94,14 @@ namespace tcpTrigger
                 if (_enableMonitorTcpPort)
                 {
                     _tcpPortsToListenOnAsString = ConfigurationManager.AppSettings["Trigger.TcpPortsToListenOn"];
-                    _tcpPortsToListenOn = _tcpPortsToListenOnAsString.Split(',').
-                        Select(x => int.Parse(x)).ToArray();
+                    
+                    _tcpPortsToListenOn = (from part in _tcpPortsToListenOnAsString.Split(',')
+                                           let range = part.Split('-')
+                                           let start = int.Parse(range[0])
+                                           let end = int.Parse(range[range.Length - 1])
+                                           from i in Enumerable.Range(start, end - start + 1)
+                                           orderby i
+                                           select i).Distinct().ToArray();
                 }
                 bool.TryParse(ConfigurationManager.AppSettings["Trigger.EnableMonitorIcmpPing"], out _enableMonitorIcmpPing);
                 bool.TryParse(ConfigurationManager.AppSettings["Trigger.EnableNamePoisonDetection"], out _enableNamePoisonDetection);

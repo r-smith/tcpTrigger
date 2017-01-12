@@ -1,15 +1,10 @@
-﻿using MahApps.Metro.Controls;
-using MahApps.Metro.Controls.Dialogs;
+﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
 using System;
 using System.Configuration;
-using System.IO;
 using System.Linq;
-using System.Net.Mail;
-using System.Security.Permissions;
 using System.ServiceProcess;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using System.Text;
 using System.Windows;
 
 namespace tcpTrigger.Editor
@@ -216,14 +211,14 @@ namespace tcpTrigger.Editor
         {
             int n;
             bool isNumber;
-            
+
             if (chkMonitorTcpPort.IsChecked == true && !IsTcpPortsValid())
             {
                 this.ShowMessageAsync("Error", "Please enter a valid port number to monitor. Multiple port numbers should be separated with a comma.");
                 tabMain.Focus();
                 return false;
             }
-            
+
 
             if (chkLaunchApplication.IsChecked == true)
             {
@@ -292,8 +287,18 @@ namespace tcpTrigger.Editor
         {
             try
             {
-                txtListenPort.Text.Split(',').
-                    Select(x => int.Parse(x)).OrderBy(x => x).ToArray();
+                var portNumbers = (from part in txtListenPort.Text.Split(',')
+                                   let range = part.Split('-')
+                                   let start = int.Parse(range[0])
+                                   let end = int.Parse(range[range.Length - 1])
+                                   from i in Enumerable.Range(start, end - start + 1)
+                                   orderby i
+                                   select i).Distinct().ToArray();
+                string result = string.Join(",", portNumbers);
+
+                for (int i = 0; i < portNumbers.Length; ++i)
+                    if (portNumbers[i] < 1 || portNumbers[i] > 65535)
+                        return false;
             }
             catch
             {
@@ -302,7 +307,45 @@ namespace tcpTrigger.Editor
 
             return true;
         }
-        
+
+        private string FormatTcpPortRange(int[] range)
+        {
+            // Format an array of ints as a string.
+            // Each number is seprated by a comma.  Ranges of consecutive numbers are separated by a hyphen.
+
+            var sb = new StringBuilder();
+
+            int start = range[0];
+            int end = range[0];
+            for (int i = 1; i < range.Length; ++i)
+            {
+                if (range[i] == (range[i - 1] + 1))
+                {
+                    end = range[i];
+                }
+                else
+                {
+                    if (start == end)
+                        sb.Append($"{start},");
+                    else if (start + 1 == end)
+                        sb.Append($"{start},{end},");
+                    else
+                        sb.Append($"{start}-{end},");
+
+                    start = end = range[i];
+                }
+            }
+
+            if (start == end)
+                sb.Append(start);
+            else if (start + 1 == end)
+                sb.Append($"{start},{end}");
+            else
+                sb.Append($"{start}-{end}");
+
+            return sb.ToString();
+        }
+
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
             if (ValidateConfiguration() == false)
@@ -348,13 +391,15 @@ namespace tcpTrigger.Editor
             {
                 var configuration = ConfigurationManager.OpenExeConfiguration(installPath);
 
-                // Convert to ordered int array.
-                var portsAsOrderedInts = txtListenPort.Text.Split(',').
-                    Select(x => int.Parse(x)).OrderBy(x => x).ToArray();
-                var portsAsJoinedString = string.Join(",", Array.ConvertAll(portsAsOrderedInts, x => x.ToString()));
-                txtListenPort.Text = portsAsJoinedString;
-                config.AppSettings.Settings["Trigger.TcpPortsToListenOn"].Value = portsAsJoinedString;
-                    
+                // Convert to an ordered int array and remove duplicates.
+                var portNumbers = (from part in txtListenPort.Text.Split(',')
+                                   let range = part.Split('-')
+                                   let start = int.Parse(range[0])
+                                   let end = int.Parse(range[range.Length - 1])
+                                   from i in Enumerable.Range(start, end - start + 1)
+                                   orderby i
+                                   select i).Distinct().ToArray();
+                txtListenPort.Text = FormatTcpPortRange(portNumbers);
                 config.AppSettings.Settings["Trigger.TcpPortsToListenOn"].Value = txtListenPort.Text;
 
                 if (chkMonitorTcpPort.IsChecked.Value == true)
@@ -384,7 +429,7 @@ namespace tcpTrigger.Editor
                     config.AppSettings.Settings["Action.EnableEventLog"].Value = "true";
                 else
                     config.AppSettings.Settings["Action.EnableEventLog"].Value = "false";
-                
+
                 if (chkLaunchApplication.IsChecked == true)
                 {
                     config.AppSettings.Settings["Action.EnableRunApplication"].Value = "true";
