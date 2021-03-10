@@ -15,9 +15,9 @@ Download
 ##### Notes
 * .NET 3.5 or greater is required to run the service.
 * .NET 4.5 or greater is required to run the graphical configuration editor.
-* The installer does not do a prerequisites check, so make sure you have the required .NET frameworks.
-* The pre-compiled installer is not code-signed, so you will get a scary warning when you run it.
-* My build environment is Microsoft Visual Studio Community 2015 and WiX Toolset v3.10.
+* The installer does not perform a prerequisites check, so make sure you have the required .NET frameworks.
+* None of the executables are code-signed, so expect OS warnings.
+* My build environment is Microsoft Visual Studio Community 2019 and WiX Toolset v3.11.2.
 
 
 Features
