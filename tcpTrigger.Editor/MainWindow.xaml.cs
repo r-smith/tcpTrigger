@@ -1,5 +1,4 @@
-﻿using MahApps.Metro.Controls.Dialogs;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System;
 using System.ComponentModel;
 using System.Configuration;
@@ -182,7 +181,7 @@ namespace tcpTrigger.Editor
 
             if (chkMonitorTcpPort.IsChecked == true && !IsTcpPortsValid())
             {
-                this.ShowMessageAsync("Error", "Please enter a valid port number to monitor. Multiple port numbers should be separated with a comma. Ranges should be separated with a hyphen. Example: 21,23,2000-3000");
+                MessageBox.Show("Please enter a valid port number to monitor. Multiple port numbers should be separated with a comma. Ranges should be separated with a hyphen. Example: 21,23,2000-3000", "Error");
                 tabMain.Focus();
                 return false;
             }
@@ -192,7 +191,7 @@ namespace tcpTrigger.Editor
             {
                 if (txtApplication.Text.Length == 0)
                 {
-                    this.ShowMessageAsync("Error", "An external application is required.");
+                    MessageBox.Show("An external application is required.", "Error");
                     tabMain.Focus();
                     return false;
                 }
@@ -202,14 +201,14 @@ namespace tcpTrigger.Editor
             {
                 if (txtMailSubject.Text.Length == 0)
                 {
-                    this.ShowMessageAsync("Error", "An email subject is required.");
+                    MessageBox.Show("An email subject is required.", "Error");
                     tabMain.Focus();
                     return false;
                 }
 
                 if (txtMailServer.Text.Length == 0)
                 {
-                    this.ShowMessageAsync("Error", "An outgoing mail server is required.");
+                    MessageBox.Show("An outgoing mail server is required.", "Error");
                     tabEmail.Focus();
                     return false;
                 }
@@ -217,21 +216,21 @@ namespace tcpTrigger.Editor
                 isNumber = int.TryParse(txtMailPort.Text, out n);
                 if (txtMailPort.Text.Length == 0 || !isNumber || n <= 0 || n > 65536)
                 {
-                    this.ShowMessageAsync("Error", "Please enter a valid mail server port number.");
+                    MessageBox.Show("Please enter a valid mail server port number.", "Error");
                     tabEmail.Focus();
                     return false;
                 }
 
                 if (txtMailRecipient.Text.Length == 0)
                 {
-                    this.ShowMessageAsync("Error", "An email recipient is required.");
+                    MessageBox.Show("An email recipient is required.", "Error");
                     tabEmail.Focus();
                     return false;
                 }
 
                 if (txtMailSender.Text.Length == 0)
                 {
-                    this.ShowMessageAsync("Error", "A sender email address is required.");
+                    MessageBox.Show("A sender email address is required.", "Error");
                     tabEmail.Focus();
                     return false;
                 }
@@ -242,7 +241,7 @@ namespace tcpTrigger.Editor
                 isNumber = int.TryParse(txtMailRateLimitMinutes.Text, out n);
                 if (!isNumber || n < 0)
                 {
-                    this.ShowMessageAsync("Error", "Please enter a valid number of minutes for rate limiting.");
+                    MessageBox.Show("Please enter a valid number of minutes for rate limiting.", "Error");
                     tabAdvanced.Focus();
                     return false;
                 }
@@ -337,9 +336,7 @@ namespace tcpTrigger.Editor
             }
             catch (Exception ex)
             {
-                this.ShowMessageAsync(
-                    "Error",
-                    $"Could not retrieve registry information for the tcpTrigger service. {ex.Message}");
+                MessageBox.Show($"Could not retrieve registry information for the tcpTrigger service. {ex.Message}", "Error");
                 return;
             }
 
@@ -347,9 +344,7 @@ namespace tcpTrigger.Editor
 
             if (installPath.Length == 0)
             {
-                this.ShowMessageAsync(
-                    "Error",
-                    "Could not retrieve registry information for the tcpTrigger service.");
+                MessageBox.Show("Could not retrieve registry information for the tcpTrigger service.", "Error");
                 return;
             }
 
@@ -451,9 +446,7 @@ namespace tcpTrigger.Editor
             }
             catch (Exception ex)
             {
-                this.ShowMessageAsync(
-                    "Error",
-                    $"Error updating service configuration file. {ex.Message}");
+                MessageBox.Show($"Error updating service configuration file. {ex.Message}", "Error");
                 return;
             }
 
@@ -497,9 +490,9 @@ namespace tcpTrigger.Editor
             gridLoading.Visibility = Visibility.Collapsed;
 
             if (e.Result != null)
-                this.ShowMessageAsync("Error", (string)e.Result);
+                MessageBox.Show((string)e.Result, "Error");
             else
-                this.ShowMessageAsync("Success", "Configuration file has been saved.");
+                MessageBox.Show("Configuration file has been saved.", "Success");
         }
 
 
