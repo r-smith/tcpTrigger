@@ -6,7 +6,7 @@
     <SolidColorBrush x:Key="OptionMark.Static.Background" Color="White"/>
     <SolidColorBrush x:Key="OptionMark.Static.Border" Color="#b0b0b0"/>
     <SolidColorBrush x:Key="OptionMark.MouseOver.Background" Color="White"/>
-    <SolidColorBrush x:Key="OptionMark.MouseOver.Border" Color="#404040"/>
+    <SolidColorBrush x:Key="OptionMark.MouseOver.Border" Color="#303030"/>
     <SolidColorBrush x:Key="OptionMark.MouseOver.Glyph" Color="#086f9e"/>
     <SolidColorBrush x:Key="OptionMark.Disabled.Background" Color="#e6e6e6"/>
     <SolidColorBrush x:Key="OptionMark.Disabled.Border" Color="#bcbcbc"/>

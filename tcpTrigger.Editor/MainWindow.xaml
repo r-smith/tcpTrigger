@@ -126,7 +126,7 @@
                                 <Button Content="Browse..."
                                         Grid.Column="2"
                                         Margin="15,0,0,0"
-                                        Padding="10,0"
+                                        Padding="15,0"
                                         Click="Browse_Click"/>
                                 <Label Content="Arguments:"
                                        HorizontalAlignment="Right"
@@ -302,8 +302,8 @@
         </TabControl>
         
         <!-- Button section -->
-        <Border Grid.Row="2" BorderBrush="#dfdfdf" Background="#f0f0f0" BorderThickness="0,1,0,0">
-            <DockPanel Margin="15" HorizontalAlignment="Right">
+        <Border Grid.Row="2" BorderBrush="#888" Background="#e8e8e8" BorderThickness="0,1,0,0">
+            <DockPanel Margin="15,10" HorizontalAlignment="Right">
                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Content="Help"
                             Click="Help_Click"

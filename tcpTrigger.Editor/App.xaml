@@ -7,6 +7,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ResourceDictionaries/ButtonStyle.xaml"/>
                 <ResourceDictionary Source="ResourceDictionaries/CheckBoxStyle.xaml"/>
                 <ResourceDictionary Source="ResourceDictionaries/GroupBoxStyle.xaml"/>
                 <ResourceDictionary Source="ResourceDictionaries/TabControlStyle.xaml"/>
