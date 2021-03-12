@@ -41,7 +41,7 @@
                     HorizontalContentAlignment="Left"
                     Margin="0,0,15,15">
             <!-- Tab: Main -->
-            <TabItem Header="Main">
+            <TabItem Header="Main" Name="MainTab">
                 <DockPanel LastChildFill="False">
                     <!-- Trigger rules -->
                     <GroupBox Header="Trigger Rules"
@@ -144,7 +144,7 @@
             </TabItem>
 
             <!-- Tab: Email -->
-            <TabItem Header="Email">
+            <TabItem Header="Email" Name="EmailTab">
                 <DockPanel LastChildFill="False">
                     <GroupBox Header="Outgoing Mail Server"
                               DockPanel.Dock="Top">
@@ -192,7 +192,7 @@
             </TabItem>
 
             <!-- Tab: Messages -->
-            <TabItem Header="Messages">
+            <TabItem Header="Messages" Name="MessagesTab">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -274,7 +274,7 @@
             </TabItem>
 
             <!-- Tab: Advanced -->
-            <TabItem Header="Advanced">
+            <TabItem Header="Advanced" Name="AdvancedTab">
                 <DockPanel LastChildFill="False">
                     <GroupBox Header="Advanced Settings" DockPanel.Dock="Top">
                         <StackPanel Margin="5">
