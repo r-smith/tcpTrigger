@@ -9,35 +9,38 @@ using System.Windows;
 
 namespace tcpTrigger.Editor
 {
-    public partial class MainWindow
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
 
-            if (LoadConfigurationFile() == false)
+            if (LoadConfiguration() == false)
             {
                 App.Current.Shutdown();
                 return;
             }
         }
 
-
-        private bool LoadConfigurationFile()
+        private bool LoadConfiguration()
         {
-            string installPath = string.Empty;
-            bool didTaskSucceed = true;
+            var installPath = string.Empty;
+            var didTaskSucceed = true;
 
+            // Get service install path from registry.
             try
             {
                 using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"System\CurrentControlSet\services\tcpTrigger"))
                 {
                     if (key != null)
                     {
-                        Object o = key.GetValue("ImagePath");
-                        if (o != null)
+                        object value = key.GetValue("ImagePath");
+                        if (value != null)
                         {
-                            installPath = o as string;
+                            installPath = (value as string).Trim('"');
                         }
                     }
                 }
@@ -46,106 +49,79 @@ namespace tcpTrigger.Editor
             {
                 MessageBox.Show(
                     $"Could not retrieve registry information for the tcpTrigger service. {ex.Message}",
-                    "tcpTrigger - Error",
+                    "Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
                 return false;
             }
 
-            installPath = installPath.Trim('"');
-
+            // Ensure registry value for install path contains something.
             if (installPath.Length == 0)
             {
                 MessageBox.Show(
                     "Could not retrieve registry information for the tcpTrigger service.",
-                    "tcpTrigger - Error",
+                    "Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
                 return false;
             }
 
+            // Open configuration file.
             var config = ConfigurationManager.OpenExeConfiguration(installPath);
 
+            // Use file to populate fields and options in GUI.
             try
             {
                 var configuration = ConfigurationManager.OpenExeConfiguration(installPath);
 
-                txtListenPort.Text = config.AppSettings.Settings["Trigger.TcpPortsToListenOn"].Value;
-                txtKnownDhcpServers.Text = config.AppSettings.Settings["Dhcp.SafeServerList"].Value;
-                txtApplication.Text = config.AppSettings.Settings["Action.ApplicationPath"].Value;
-                txtArguments.Text = config.AppSettings.Settings["Action.ApplicationArguments"].Value;
-                txtMailServer.Text = config.AppSettings.Settings["Email.Server"].Value;
-                txtMailPort.Text = config.AppSettings.Settings["Email.ServerPort"].Value;
-                txtMailRecipient.Text = config.AppSettings.Settings["Email.RecipientAddress"].Value;
-                txtMailSender.Text = config.AppSettings.Settings["Email.SenderAddress"].Value;
-                txtMailSenderDisplay.Text = config.AppSettings.Settings["Email.SenderDisplayName"].Value;
-                txtMailSubject.Text = config.AppSettings.Settings["Email.Subject"].Value;
-                txtMessageBodyPing.Text = config.AppSettings.Settings["MessageBody.Ping"].Value;
-                txtMessageBodyTcpConnect.Text = config.AppSettings.Settings["MessageBody.TcpConnect"].Value;
-                txtMessageBodyNamePoison.Text = config.AppSettings.Settings["MessageBody.NamePoison"].Value;
-                txtMessageBodyRogueDhcp.Text = config.AppSettings.Settings["MessageBody.RogueDhcp"].Value;
+                TcpIncludePorts.Text = config.AppSettings.Settings["Trigger.TcpPortsToListenOn"].Value;
+                DhcpServers.Text = config.AppSettings.Settings["Dhcp.SafeServerList"].Value;
+                ApplicationPath.Text = config.AppSettings.Settings["Action.ApplicationPath"].Value;
+                ApplicationArguments.Text = config.AppSettings.Settings["Action.ApplicationArguments"].Value;
+                EmailServer.Text = config.AppSettings.Settings["Email.Server"].Value;
+                EmailPort.Text = config.AppSettings.Settings["Email.ServerPort"].Value;
+                EmailRecipient.Text = config.AppSettings.Settings["Email.RecipientAddress"].Value;
+                EmailSender.Text = config.AppSettings.Settings["Email.SenderAddress"].Value;
+                EmailSenderFriendly.Text = config.AppSettings.Settings["Email.SenderDisplayName"].Value;
+                EmailSubject.Text = config.AppSettings.Settings["Email.Subject"].Value;
+                IcmpMessageBody.Text = config.AppSettings.Settings["MessageBody.Ping"].Value;
+                TcpMessageBody.Text = config.AppSettings.Settings["MessageBody.TcpConnect"].Value;
+                NamePoisonMessageBody.Text = config.AppSettings.Settings["MessageBody.NamePoison"].Value;
+                RogueDhcpMessageBody.Text = config.AppSettings.Settings["MessageBody.RogueDhcp"].Value;
 
-                txtMailRateLimitMinutes.Text = config.AppSettings.Settings["Action.RateLimitMinutes"].Value;
-                if (txtMailRateLimitMinutes.Text.Length == 0 || txtMailRateLimitMinutes.Text == "0")
-                    chkTriggerRateLimit.IsChecked = false;
-                else
-                    chkTriggerRateLimit.IsChecked = true;
+                RateLimitMinutes.Text = config.AppSettings.Settings["Action.RateLimitMinutes"].Value;
+                RateLimitOption.IsChecked = RateLimitMinutes.Text.Length != 0 && RateLimitMinutes.Text != "0";
 
-                bool checkedValue;
-                bool.TryParse(config.AppSettings.Settings["Trigger.EnableMonitorTcpPort"].Value, out checkedValue);
-                if (checkedValue == true)
-                    chkMonitorTcpPort.IsChecked = true;
-                else
-                    chkMonitorTcpPort.IsChecked = false;
+                bool.TryParse(config.AppSettings.Settings["Trigger.EnableMonitorTcpPort"].Value, out bool checkedValue);
+                MonitorTcpOption.IsChecked = checkedValue;
 
                 bool.TryParse(config.AppSettings.Settings["Trigger.EnableMonitorIcmpPing"].Value, out checkedValue);
-                if (checkedValue == true)
-                    chkMonitorIcmp.IsChecked = true;
-                else
-                    chkMonitorIcmp.IsChecked = false;
+                MonitorIcmpOption.IsChecked = checkedValue;
 
                 bool.TryParse(config.AppSettings.Settings["Trigger.EnableNamePoisonDetection"].Value, out checkedValue);
-                if (checkedValue == true)
-                    chkNamePoisonDetection.IsChecked = true;
-                else
-                    chkNamePoisonDetection.IsChecked = false;
+                MonitorPoisonOption.IsChecked = checkedValue;
 
                 bool.TryParse(config.AppSettings.Settings["Trigger.EnableRogueDhcpDetection"].Value, out checkedValue);
-                if (checkedValue == true)
-                    chkRogueDhcpServerDetection.IsChecked = true;
-                else
-                    chkRogueDhcpServerDetection.IsChecked = false;
+                MonitorDhcpOption.IsChecked = checkedValue;
 
                 bool.TryParse(config.AppSettings.Settings["Action.EnableEventLog"].Value, out checkedValue);
-                if (checkedValue == true)
-                    chkEventLog.IsChecked = true;
-                else
-                    chkEventLog.IsChecked = false;
+                EventLogOption.IsChecked = checkedValue;
 
                 bool.TryParse(config.AppSettings.Settings["Action.EnableRunApplication"].Value, out checkedValue);
-                if (checkedValue == true)
-                    chkLaunchApplication.IsChecked = true;
-                else
-                    chkLaunchApplication.IsChecked = false;
+                LaunchAppOption.IsChecked = checkedValue;
 
                 bool.TryParse(config.AppSettings.Settings["Action.EnableEmailNotification"].Value, out checkedValue);
-                if (checkedValue == true)
-                    chkNotificationEmail.IsChecked = true;
-                else
-                    chkNotificationEmail.IsChecked = false;
+                SendEmailOption.IsChecked = checkedValue;
 
                 bool.TryParse(config.AppSettings.Settings["Action.EnablePopupMessage"].Value, out checkedValue);
-                if (checkedValue == true)
-                    chkDisplayPopupMessage.IsChecked = true;
-                else
-                    chkDisplayPopupMessage.IsChecked = false;
+                DisplayPopupOption.IsChecked = checkedValue;
             }
 
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    $"Error reading service configuration file. {ex.Message}",
-                    "tcpTrigger - Error",
+                    $"Failed to read configuration file. {ex.Message}",
+                    "Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
                 return false;
@@ -154,95 +130,75 @@ namespace tcpTrigger.Editor
             return didTaskSucceed;
         }
 
-        private void btnBrowse_Click(object sender, RoutedEventArgs e)
-        {
-            var dialog = new OpenFileDialog();
-            try
-            {
-                if (dialog.ShowDialog() == true)
-                {
-                    txtApplication.Text = dialog.FileName;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    $"Unable to browse filesystem. {ex.Message}",
-                    "tcpTrigger - Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-        }
-
-        private bool ValidateConfiguration()
+        private bool ValidateUserConfiguration()
         {
             int n;
             bool isNumber;
 
-            if (chkMonitorTcpPort.IsChecked == true && !IsTcpPortsValid())
+            if (MonitorTcpOption.IsChecked == true && !IsTcpPortsValid())
             {
                 MessageBox.Show("Please enter a valid port number to monitor. Multiple port numbers should be separated with a comma. Ranges should be separated with a hyphen. Example: 21,23,2000-3000", "Error");
-                tabMain.Focus();
+                //tabMain.Focus();
                 return false;
             }
 
 
-            if (chkLaunchApplication.IsChecked == true)
+            if (LaunchAppOption.IsChecked == true)
             {
-                if (txtApplication.Text.Length == 0)
+                if (ApplicationPath.Text.Length == 0)
                 {
                     MessageBox.Show("An external application is required.", "Error");
-                    tabMain.Focus();
+                    //tabMain.Focus();
                     return false;
                 }
             }
 
-            if (chkNotificationEmail.IsChecked == true)
+            if (SendEmailOption.IsChecked == true)
             {
-                if (txtMailSubject.Text.Length == 0)
+                if (EmailSubject.Text.Length == 0)
                 {
                     MessageBox.Show("An email subject is required.", "Error");
-                    tabMain.Focus();
+                    //tabMain.Focus();
                     return false;
                 }
 
-                if (txtMailServer.Text.Length == 0)
+                if (EmailServer.Text.Length == 0)
                 {
                     MessageBox.Show("An outgoing mail server is required.", "Error");
-                    tabEmail.Focus();
+                    //tabEmail.Focus();
                     return false;
                 }
 
-                isNumber = int.TryParse(txtMailPort.Text, out n);
-                if (txtMailPort.Text.Length == 0 || !isNumber || n <= 0 || n > 65536)
+                isNumber = int.TryParse(EmailPort.Text, out n);
+                if (EmailPort.Text.Length == 0 || !isNumber || n <= 0 || n > 65536)
                 {
                     MessageBox.Show("Please enter a valid mail server port number.", "Error");
-                    tabEmail.Focus();
+                    //tabEmail.Focus();
                     return false;
                 }
 
-                if (txtMailRecipient.Text.Length == 0)
+                if (EmailRecipient.Text.Length == 0)
                 {
                     MessageBox.Show("An email recipient is required.", "Error");
-                    tabEmail.Focus();
+                    //tabEmail.Focus();
                     return false;
                 }
 
-                if (txtMailSender.Text.Length == 0)
+                if (EmailSender.Text.Length == 0)
                 {
                     MessageBox.Show("A sender email address is required.", "Error");
-                    tabEmail.Focus();
+                    //tabEmail.Focus();
                     return false;
                 }
             }
 
-            if (txtMailRateLimitMinutes.Text.Length > 0)
+            if (RateLimitMinutes.Text.Length > 0)
             {
-                isNumber = int.TryParse(txtMailRateLimitMinutes.Text, out n);
+                isNumber = int.TryParse(RateLimitMinutes.Text, out n);
                 if (!isNumber || n < 0)
                 {
                     MessageBox.Show("Please enter a valid number of minutes for rate limiting.", "Error");
-                    tabAdvanced.Focus();
+                    //tabAdvanced.Focus();
                     return false;
                 }
             }
@@ -254,7 +210,7 @@ namespace tcpTrigger.Editor
         {
             try
             {
-                var portNumbers = (from part in txtListenPort.Text.Split(',')
+                var portNumbers = (from part in TcpIncludePorts.Text.Split(',')
                                    let range = part.Split('-')
                                    let start = int.Parse(range[0])
                                    let end = int.Parse(range[range.Length - 1])
@@ -313,23 +269,24 @@ namespace tcpTrigger.Editor
             return sb.ToString();
         }
 
-        private void btnSave_Click(object sender, RoutedEventArgs e)
+        private void Save_Click(object sender, RoutedEventArgs e)
         {
-            if (ValidateConfiguration() == false)
+            if (ValidateUserConfiguration() == false)
                 return;
-            
-            string installPath = string.Empty;
 
+            var installPath = string.Empty;
+
+            // Get service install path from registry.
             try
             {
                 using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"System\CurrentControlSet\services\tcpTrigger"))
                 {
                     if (key != null)
                     {
-                        Object o = key.GetValue("ImagePath");
-                        if (o != null)
+                        object value = key.GetValue("ImagePath");
+                        if (value != null)
                         {
-                            installPath = o as string;
+                            installPath = (value as string).Trim('"');
                         }
                     }
                 }
@@ -340,107 +297,88 @@ namespace tcpTrigger.Editor
                 return;
             }
 
-            installPath = installPath.Trim('"');
-
+            // Ensure registry value for install path contains something.
             if (installPath.Length == 0)
             {
                 MessageBox.Show("Could not retrieve registry information for the tcpTrigger service.", "Error");
                 return;
             }
 
+            // Open configuration file.
             var config = ConfigurationManager.OpenExeConfiguration(installPath);
 
+            // Use options specified in GUI to write to configuration file.
             try
             {
                 var configuration = ConfigurationManager.OpenExeConfiguration(installPath);
 
                 // Convert to an ordered int array and remove duplicates.
-                var portNumbers = (from part in txtListenPort.Text.Split(',')
+                var portNumbers = (from part in TcpIncludePorts.Text.Split(',')
                                    let range = part.Split('-')
                                    let start = int.Parse(range[0])
                                    let end = int.Parse(range[range.Length - 1])
                                    from i in Enumerable.Range(start, end - start + 1)
                                    orderby i
                                    select i).Distinct().ToArray();
-                txtListenPort.Text = FormatTcpPortRange(portNumbers);
-                config.AppSettings.Settings["Trigger.TcpPortsToListenOn"].Value = txtListenPort.Text;
+                TcpIncludePorts.Text = FormatTcpPortRange(portNumbers);
+                config.AppSettings.Settings["Trigger.TcpPortsToListenOn"].Value = TcpIncludePorts.Text;
 
-                if (chkMonitorTcpPort.IsChecked.Value == true)
-                    config.AppSettings.Settings["Trigger.EnableMonitorTcpPort"].Value = "true";
-                else
-                    config.AppSettings.Settings["Trigger.EnableMonitorTcpPort"].Value = "false";
+                config.AppSettings.Settings["Trigger.EnableMonitorTcpPort"].Value =
+                    (MonitorTcpOption.IsChecked == true) ? "true" : "false";
 
-                if (chkMonitorIcmp.IsChecked.Value == true)
-                    config.AppSettings.Settings["Trigger.EnableMonitorIcmpPing"].Value = "true";
-                else
-                    config.AppSettings.Settings["Trigger.EnableMonitorIcmpPing"].Value = "false";
+                config.AppSettings.Settings["Trigger.EnableMonitorIcmpPing"].Value =
+                    (MonitorIcmpOption.IsChecked == true) ? "true" : "false";
 
-                if (chkNamePoisonDetection.IsChecked.Value == true)
-                    config.AppSettings.Settings["Trigger.EnableNamePoisonDetection"].Value = "true";
-                else
-                    config.AppSettings.Settings["Trigger.EnableNamePoisonDetection"].Value = "false";
+                config.AppSettings.Settings["Trigger.EnableNamePoisonDetection"].Value =
+                    (MonitorPoisonOption.IsChecked == true) ? "true" : "false";
 
-                if (chkRogueDhcpServerDetection.IsChecked.Value == true)
+                if (MonitorDhcpOption.IsChecked.Value == true)
                 {
                     config.AppSettings.Settings["Trigger.EnableRogueDhcpDetection"].Value = "true";
-                    config.AppSettings.Settings["Dhcp.SafeServerList"].Value = txtKnownDhcpServers.Text;
+                    config.AppSettings.Settings["Dhcp.SafeServerList"].Value = DhcpServers.Text;
                 }
                 else
                     config.AppSettings.Settings["Trigger.EnableRogueDhcpDetection"].Value = "false";
 
-                if (chkEventLog.IsChecked == true)
-                    config.AppSettings.Settings["Action.EnableEventLog"].Value = "true";
-                else
-                    config.AppSettings.Settings["Action.EnableEventLog"].Value = "false";
+                config.AppSettings.Settings["Action.EnableEventLog"].Value =
+                    (EventLogOption.IsChecked == true) ? "true" : "false";
 
-                if (chkLaunchApplication.IsChecked == true)
+                if (LaunchAppOption.IsChecked == true)
                 {
                     config.AppSettings.Settings["Action.EnableRunApplication"].Value = "true";
-                    config.AppSettings.Settings["Action.ApplicationPath"].Value = txtApplication.Text;
-                    config.AppSettings.Settings["Action.ApplicationArguments"].Value = txtArguments.Text;
+                    config.AppSettings.Settings["Action.ApplicationPath"].Value = ApplicationPath.Text;
+                    config.AppSettings.Settings["Action.ApplicationArguments"].Value = ApplicationArguments.Text;
                 }
                 else
                 {
                     config.AppSettings.Settings["Action.EnableRunApplication"].Value = "false";
                 }
 
-                if (chkNotificationEmail.IsChecked == true)
+                if (SendEmailOption.IsChecked == true)
                 {
                     config.AppSettings.Settings["Action.EnableEmailNotification"].Value = "true";
-                    config.AppSettings.Settings["Email.Server"].Value = txtMailServer.Text;
-                    config.AppSettings.Settings["Email.ServerPort"].Value = txtMailPort.Text;
-                    config.AppSettings.Settings["Email.RecipientAddress"].Value = txtMailRecipient.Text;
-                    config.AppSettings.Settings["Email.SenderAddress"].Value = txtMailSender.Text;
-                    config.AppSettings.Settings["Email.SenderDisplayName"].Value = txtMailSenderDisplay.Text;
-                    config.AppSettings.Settings["Email.Subject"].Value = txtMailSubject.Text;
+                    config.AppSettings.Settings["Email.Server"].Value = EmailServer.Text;
+                    config.AppSettings.Settings["Email.ServerPort"].Value = EmailPort.Text;
+                    config.AppSettings.Settings["Email.RecipientAddress"].Value = EmailRecipient.Text;
+                    config.AppSettings.Settings["Email.SenderAddress"].Value = EmailSender.Text;
+                    config.AppSettings.Settings["Email.SenderDisplayName"].Value = EmailSenderFriendly.Text;
+                    config.AppSettings.Settings["Email.Subject"].Value = EmailSubject.Text;
                 }
                 else
                 {
                     config.AppSettings.Settings["Action.EnableEmailNotification"].Value = "false";
                 }
 
-                if (chkDisplayPopupMessage.IsChecked == true)
-                {
-                    config.AppSettings.Settings["Action.EnablePopupMessage"].Value = "true";
-                }
-                else
-                {
-                    config.AppSettings.Settings["Action.EnablePopupMessage"].Value = "false";
-                }
+                config.AppSettings.Settings["Action.EnablePopupMessage"].Value =
+                    (DisplayPopupOption.IsChecked == true) ? "true" : "false";
 
-                if (chkTriggerRateLimit.IsChecked == true)
-                {
-                    config.AppSettings.Settings["Action.RateLimitMinutes"].Value = txtMailRateLimitMinutes.Text;
-                }
-                else
-                {
-                    config.AppSettings.Settings["Action.RateLimitMinutes"].Value = "0";
-                }
+                config.AppSettings.Settings["Action.RateLimitMinutes"].Value =
+                    (RateLimitOption.IsChecked == true) ? RateLimitMinutes.Text : "0";
 
-                config.AppSettings.Settings["MessageBody.Ping"].Value = txtMessageBodyPing.Text;
-                config.AppSettings.Settings["MessageBody.TcpConnect"].Value = txtMessageBodyTcpConnect.Text;
-                config.AppSettings.Settings["MessageBody.NamePoison"].Value = txtMessageBodyNamePoison.Text;
-                config.AppSettings.Settings["MessageBody.RogueDhcp"].Value = txtMessageBodyRogueDhcp.Text;
+                config.AppSettings.Settings["MessageBody.Ping"].Value = IcmpMessageBody.Text;
+                config.AppSettings.Settings["MessageBody.TcpConnect"].Value = TcpMessageBody.Text;
+                config.AppSettings.Settings["MessageBody.NamePoison"].Value = NamePoisonMessageBody.Text;
+                config.AppSettings.Settings["MessageBody.RogueDhcp"].Value = RogueDhcpMessageBody.Text;
 
                 config.Save();
             }
@@ -456,14 +394,14 @@ namespace tcpTrigger.Editor
         private void RestartTcpTriggerService()
         {
             // Setup a background thread to restart the service.
-            gridLoading.Visibility = Visibility.Visible;
+            //gridLoading.Visibility = Visibility.Visible;
             var bw = new BackgroundWorker();
-            bw.DoWork += new DoWorkEventHandler(bgThread_RestartService);
-            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bgThread_RestartServiceCompleted);
+            bw.DoWork += new DoWorkEventHandler(Thread_RestartService);
+            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Thread_RestartServiceCompleted);
             bw.RunWorkerAsync();
         }
 
-        private void bgThread_RestartService(object sender, DoWorkEventArgs e)
+        private void Thread_RestartService(object sender, DoWorkEventArgs e)
         {
             try
             {
@@ -484,10 +422,9 @@ namespace tcpTrigger.Editor
             }
         }
 
-
-        private void bgThread_RestartServiceCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void Thread_RestartServiceCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            gridLoading.Visibility = Visibility.Collapsed;
+            //gridLoading.Visibility = Visibility.Collapsed;
 
             if (e.Result != null)
                 MessageBox.Show((string)e.Result, "Error");
@@ -495,8 +432,27 @@ namespace tcpTrigger.Editor
                 MessageBox.Show("Configuration file has been saved.", "Success");
         }
 
+        private void Browse_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog();
+            try
+            {
+                if (dialog.ShowDialog() == true)
+                {
+                    ApplicationPath.Text = dialog.FileName;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
 
-        private void btnHelp_Click(object sender, RoutedEventArgs e)
+        private void Help_Click(object sender, RoutedEventArgs e)
         {
             bool isWindowOpen = false;
 
@@ -514,11 +470,6 @@ namespace tcpTrigger.Editor
                 HelpWindow newWnd = new HelpWindow();
                 newWnd.Show();
             }
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            tabEmail.Focus();
         }
     }
 }

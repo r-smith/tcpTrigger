@@ -1,338 +1,266 @@
 ﻿<Window x:Class="tcpTrigger.Editor.MainWindow"
-                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                      xmlns:local="clr-namespace:tcpTrigger.Editor"
-                      xmlns:localControls="clr-namespace:tcpTrigger.Editor.Controls"
-                      mc:Ignorable="d" 
-                      BorderThickness="1"
-                      ResizeMode="CanMinimize"
-                      Icon="tcpTrigger.ico"
-                      Title="tcpTrigger Setup" Width="775" Height="650"  WindowStartupLocation="CenterScreen">
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:tcpTrigger.Editor"
+        mc:Ignorable="d"
+        Title="tcpTrigger Setup"
+        Background="#ffffff"
+        Height="650" MinHeight="650"
+        Width="750" MinWidth="650"
+        ResizeMode="CanResizeWithGrip">
+    <Window.Resources>
 
-    <!-- Main Grid -->
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Title -->
-        <StackPanel Orientation="Horizontal"
-                    HorizontalAlignment="Center" Grid.Row="0">
+        <!-- Header and logo -->
+        <StackPanel Grid.Row="0"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center">
             <Image Source="/Resources/tcpTrigger Logo.png"
                    Height="48"
                    Width="48"
-                   Margin="0,15,10,10" />
+                   Margin="0,15,10,10"/>
             <Label Content="tcpTrigger"
                    FontSize="22"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
-                   FontWeight="SemiBold" />
+                   FontWeight="SemiBold"/>
         </StackPanel>
 
-        <!-- TabControl -->
-        <TabControl Grid.Row="1" TabStripPlacement="Left">
-
-            <!-- Main tab -->
-            <TabItem Name="tabMain" Header="Main" >
-                <Grid>
-                    <StackPanel>
-
-                        <!-- Trigger Rules Section-->
-                        <GroupBox Header="Trigger Rules" Margin="5,5,10,5">
-                            <StackPanel Margin="5">
-                                <CheckBox Content="Monitor ICMP ping"
-                                          Name="chkMonitorIcmp" />
-                                <CheckBox Content="Monitor TCP port"
-                                          Name="chkMonitorTcpPort"
-                                          IsChecked="True"
-                                          Margin="0,7,0,0" />
-                                <DockPanel HorizontalAlignment="Stretch"
-                                           Margin="30,0,0,0">
-                                    <Label Name="lblListenPort"
-                                           Content="Port number(s) to trigger on"/>
-                                    <TextBox Name="txtListenPort"
-                                             Grid.Column="1"
-                                             MaxLength="512"
-                                             VerticalContentAlignment="Center"
-                                             FontFamily="Lucida Console"
-                                             DockPanel.Dock="Right"/>
-                                </DockPanel>
-                                <CheckBox Content="NetBIOS / LLMNR name poison detection"
-                                          Name="chkNamePoisonDetection"
-                                          IsChecked="True"
-                                          Margin="0,7,0,0" />
-                                <CheckBox Content="Rogue DHCP server detection"
-                                          Name="chkRogueDhcpServerDetection"
-                                          Margin="0,7,0,0" />
-                                <DockPanel HorizontalAlignment="Stretch"
-                                           Margin="30,0,0,0">
-                                    <Label Name="lblKnownDhcpServers"
-                                           Content="Known DHCP server(s)"/>
-                                    <TextBox Name="txtKnownDhcpServers"
-                                             Grid.Column="1"
-                                             MaxLength="512"
-                                             VerticalContentAlignment="Center"
-                                             FontFamily="Lucida Console"
-                                             DockPanel.Dock="Right"/>
-                                </DockPanel>
-                            </StackPanel>
-                        </GroupBox>
-
-                        <!-- Actions Section-->
-                        <GroupBox Header="Actions" Margin="5,15,10,5">
-                            <StackPanel Margin="5">
-                                <TextBlock Text="Selected actions will be carried out each time an incoming connection matches the above rules."
-                                           TextWrapping="Wrap"
-                                           FontSize="11"
-                                           Foreground="#FF888888"/>
-
-                                <!-- Action: Send notification email -->
-                                <CheckBox Name="chkNotificationEmail"
-                                          Content="Send a notification email"
-                                          Margin="0,7,0,0"
-                                          IsChecked="True" />
-                                <Grid Margin="20,0,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="110" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-                                    <Label Grid.Row="0" Grid.Column="0" Content="Email subject" HorizontalAlignment="Right"/>
-                                    <TextBox Name="txtMailSubject"
-                                             Grid.Row="0"
-                                             Grid.Column="1"
-                                             MaxLength="256"
-                                             Margin="0,0,0,5"
-                                             FontFamily="Lucida Console"
-                                             VerticalContentAlignment="Center"/>
-
-                                    <Button Grid.Row="1"
-                                            Grid.ColumnSpan="2"
-                                            Content="Configure mail server"
-                                            FontSize="13"
-                                            HorizontalAlignment="Left"
-                                            Margin="0,0,0,0"
-                                            Width="150"
-                                            Click="Button_Click">
-                                        <Button.Template>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border BorderThickness="0" BorderBrush="Transparent"
-                                                Background="Transparent"
-                                                Padding="{TemplateBinding Padding}">
-                                                    <TextBlock Name="button_text"
-                                                       FontWeight="Bold"
-                                                       HorizontalAlignment="Center"
-                                                       Foreground="#7777DD"
-                                                               Text="{TemplateBinding Content}" />
-                                                </Border>
-                                                <ControlTemplate.Triggers>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="button_text" Property="Foreground" Value="#0000AA" />
-                                                        <Setter TargetName="button_text" Property="TextDecorations" Value="Underline" />
-                                                    </Trigger>
-                                                    <Trigger Property="IsPressed" Value="True">
-                                                        <Setter TargetName="button_text" Property="Foreground" Value="#DD5555" />
-                                                    </Trigger>
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </Button.Template>
-                                    </Button>
-                                </Grid>
-
-                                <!-- Action: Display a popup message -->
-                                <CheckBox Name="chkDisplayPopupMessage"
-                                          Content="Display a popup message to all logged on users"
-                                          Margin="0,10,0,0"
-                                          IsChecked="True" />
-
-                                <!-- Action: Launch application -->
-                                <CheckBox Name="chkLaunchApplication"
-                                          Content="Launch an external application"
-                                          IsChecked="True"
-                                          Margin="0,10,0,0" />
-                                <Grid Margin="20,0,0,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="110" />
-                                        <ColumnDefinition/>
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <Label Name="lblApplication"
-                                           Content="Application"
-                                           HorizontalAlignment="Right"
-                                           Grid.Row="0"/>
-                                    <Label Name="lblArguments"
-                                           Content="Arguments"
-                                           HorizontalAlignment="Right"
-                                           Grid.Row="1"/>
-                                    <TextBox Name="txtApplication"
-                                             Grid.Row="0"
-                                             Grid.Column="1"
-                                             FontFamily="Lucida Console"
-                                             VerticalContentAlignment="Center"
-                                             Margin="0,0,0,5"/>
-                                    <Button Name="btnBrowse"
-                                            Content="Browse..."
-                                            Grid.Row="0"
-                                            Grid.Column="2"
-                                            Margin="15,0,0,5"
-                                            Padding="10,0"
-                                            Click="btnBrowse_Click" />
-                                    <TextBox Name="txtArguments"
-                                             Grid.Column="1"
-                                             Grid.ColumnSpan="2"
-                                             Grid.Row="1"
-                                             FontFamily="Lucida Console"
-                                             VerticalContentAlignment="Center"/>
-                                </Grid>
-                            </StackPanel>
-                        </GroupBox>
-                    </StackPanel>
-                </Grid>
-            </TabItem>
-
-
-
-            <TabItem Name="tabEmail" Header="Email" >
-                <StackPanel>
-                    <GroupBox Header="Outgoing Mail Server">
-                        <Grid Margin="5,5,10,5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="130" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-
-                            <Label Grid.Row="0" Content="SMTP server" HorizontalAlignment="Right" />
-                            <TextBox Name="txtMailServer"
-                                     Grid.Row="0"
-                                     Grid.Column="1"
-                                     Margin="0,0,0,5"
-                                     FontFamily="Lucida Console"
-                                     VerticalContentAlignment="Center"
-                                     MaxLength="256"/>
-                            <Label Grid.Row="1" Content="SMTP port" HorizontalAlignment="Right" />
-                            <TextBox Name="txtMailPort"
-                                     Grid.Row="1"
-                                     Grid.Column="1"
-                                     Width="100"
-                                     HorizontalAlignment="Left"
-                                     Margin="0,0,0,5"
-                                     FontFamily="Lucida Console"
-                                     VerticalContentAlignment="Center"
-                                     MaxLength="5" />
-                            <Label Grid.Row="2" Content="Recipient address" HorizontalAlignment="Right" />
-                            <TextBox Name="txtMailRecipient"
-                                     Grid.Row="2"
-                                     Grid.Column="1"
-                                     Margin="0,0,0,5"
-                                     FontFamily="Lucida Console"
-                                     VerticalContentAlignment="Center"
-                                     MaxLength="256" />
-                            <Label Grid.Row="3" Content="Sender address" HorizontalAlignment="Right" />
-                            <TextBox Name="txtMailSender"
-                                     Grid.Row="3"
-                                     Grid.Column="1"
-                                     Margin="0,0,0,5"
-                                     FontFamily="Lucida Console"
-                                     VerticalContentAlignment="Center"
-                                     MaxLength="256" />
-                            <Label Grid.Row="4" Content="Sender display name" HorizontalAlignment="Right" />
-                            <TextBox Name="txtMailSenderDisplay"
-                                     Grid.Row="4"
-                                     Grid.Column="1"
-                                     FontFamily="Lucida Console"
-                                     VerticalContentAlignment="Center"
-                                     MaxLength="256" />
-                        </Grid>
+        <!-- Tab control (main content) -->
+        <TabControl Grid.Row="1"
+                    TabStripPlacement="Left"
+                    HorizontalContentAlignment="Left"
+                    Margin="0,0,15,15">
+            <!-- Tab: Main -->
+            <TabItem Header="Main">
+                <DockPanel LastChildFill="False">
+                    <!-- Trigger rules -->
+                    <GroupBox Header="Trigger Rules"
+                              DockPanel.Dock="Top">
+                        <StackPanel Margin="5">
+                            <CheckBox Content="Monitor ICMP requests"
+                                      Name="MonitorIcmpOption"/>
+                            <CheckBox Content="Monitor TCP connections"
+                                      Name="MonitorTcpOption"
+                                      Margin="0,7,0,0"/>
+                            <DockPanel Margin="35,0,0,0">
+                                <Label Content="Port numbers"/>
+                                <TextBox Name="TcpIncludePorts"
+                                         MaxLength="512"
+                                         VerticalContentAlignment="Center"
+                                         FontFamily="Consolas"
+                                         DockPanel.Dock="Right"/>
+                            </DockPanel>
+                            <CheckBox Content="NetBIOS / LLMNR name poison detection"
+                                      Name="MonitorPoisonOption"
+                                      Margin="0,7,0,0"/>
+                            <CheckBox Content="Rogue DHCP server detection"
+                                      Name="MonitorDhcpOption"
+                                      Margin="0,7,0,0" />
+                            <DockPanel Margin="35,0,0,0">
+                                <Label Content="Known DHCP servers:"/>
+                                <TextBox Name="DhcpServers"
+                                         MaxLength="512"
+                                         VerticalContentAlignment="Center"
+                                         FontFamily="Consolas"
+                                         DockPanel.Dock="Right"/>
+                            </DockPanel>
+                        </StackPanel>
                     </GroupBox>
-                </StackPanel>
-            </TabItem>
 
-            <TabItem Name="tabMessages" Header="Messages" >
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <GroupBox Header="Message Bodies" >
-                        <ScrollViewer>
-                            <Grid Margin="5,5,10,5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
+                    <!-- Actions -->
+                    <GroupBox Header="Actions" DockPanel.Dock="Top" Margin="0,20,0,0">
+                        <StackPanel Margin="5">
+                            <TextBlock Text="Selected actions will be carried out each time an incoming connection matches the above rules."
+                                       TextWrapping="Wrap"
+                                       FontSize="11"
+                                       Foreground="#888"/>
+
+                            <!-- Send notification email -->
+                            <CheckBox Name="SendEmailOption"
+                                      Content="Send a notification email"/>
+                            <DockPanel Margin="35,0,0,0">
+                                <Label Content="Email subject:"/>
+                                <TextBox Name="EmailSubject"
+                                         MaxLength="512"
+                                         VerticalContentAlignment="Center"
+                                         FontFamily="Consolas"
+                                         DockPanel.Dock="Right"/>
+                            </DockPanel>
+
+                            <!-- Display popup message -->
+                            <CheckBox Name="DisplayPopupOption"
+                                      Content="Display a popup message to all logged on users"
+                                      Margin="0,10,0,0"/>
+
+                            <!-- Launch external application -->
+                            <CheckBox Name="LaunchAppOption"
+                                      Content="Launch an external application"
+                                      Margin="0,10,0,0" />
+                            <Grid Margin="35,0,0,0">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="6" />
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
-                                <Label Grid.Row="0" Content="Ping request detected" HorizontalAlignment="Right" />
-                                <TextBox Name="txtMessageBodyPing"
-                                     Grid.Row="0"
-                                     Grid.Column="1"
-                                     Margin="0,0,0,5"
-                                     FontFamily="Lucida Console"
-                                     VerticalContentAlignment="Top"
-                                     VerticalScrollBarVisibility="Auto"
-                                     Height="120"
-                                     AcceptsReturn="True"
-                                     MaxLength="2048"/>
-                                <Label Grid.Row="1" Content="TCP connection detected" HorizontalAlignment="Right" />
-                                <TextBox Name="txtMessageBodyTcpConnect"
-                                     Grid.Row="1"
-                                     Grid.Column="1"
-                                     Margin="0,0,0,5"
-                                     FontFamily="Lucida Console"
-                                     VerticalContentAlignment="Top"
-                                     VerticalScrollBarVisibility="Auto"
-                                     Height="120"
-                                     AcceptsReturn="True"
-                                     MaxLength="2048"/>
-                                <Label Grid.Row="2" Content="Name poison detected" HorizontalAlignment="Right" />
-                                <TextBox Name="txtMessageBodyNamePoison"
-                                     Grid.Row="2"
-                                     Grid.Column="1"
-                                     Margin="0,0,0,5"
-                                     FontFamily="Lucida Console"
-                                     VerticalContentAlignment="Top"
-                                     VerticalScrollBarVisibility="Auto"
-                                     Height="120"
-                                     AcceptsReturn="True"
-                                     MaxLength="2048"/>
-                                <Label Grid.Row="3" Content="Rogue DHCP server detected" HorizontalAlignment="Right" />
-                                <TextBox Name="txtMessageBodyRogueDhcp"
-                                     Grid.Row="3"
-                                     Grid.Column="1"
-                                     Margin="0,0,0,5"
-                                     FontFamily="Lucida Console"
-                                     VerticalContentAlignment="Top"
-                                     VerticalScrollBarVisibility="Auto"
-                                     Height="120"
-                                     AcceptsReturn="True"
-                                     MaxLength="2048"/>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="80" />
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Application:"
+                                       HorizontalAlignment="Right"/>
+                                <TextBox Name="ApplicationPath"
+                                         Grid.Column="1"
+                                         FontFamily="Consolas"
+                                         VerticalContentAlignment="Center"/>
+                                <Button Content="Browse..."
+                                        Grid.Column="2"
+                                        Margin="15,0,0,0"
+                                        Padding="10,0"
+                                        Click="Browse_Click"/>
+                                <Label Content="Arguments:"
+                                       HorizontalAlignment="Right"
+                                       Grid.Row="2"/>
+                                <TextBox Name="ApplicationArguments"
+                                         Grid.Row="2"
+                                         Grid.Column="1"
+                                         Grid.ColumnSpan="2"
+                                         FontFamily="Consolas"
+                                         VerticalContentAlignment="Center"/>
                             </Grid>
+                        </StackPanel>
+                    </GroupBox>
+                </DockPanel>
+            </TabItem>
+
+            <!-- Tab: Email -->
+            <TabItem Header="Email">
+                <DockPanel LastChildFill="False">
+                    <GroupBox Header="Outgoing Mail Server"
+                              DockPanel.Dock="Top">
+                        <StackPanel Margin="5">
+                            <DockPanel>
+                                <Label Content="SMTP server:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130"/>
+                                <TextBox Name="EmailServer"
+                                         FontFamily="Consolas"
+                                         VerticalContentAlignment="Center"
+                                         MaxLength="256"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,6,0,0">
+                                <Label Content="Port:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
+                                <TextBox Name="EmailPort"
+                                         Width="85"
+                                         FontFamily="Consolas"
+                                         HorizontalAlignment="Left"
+                                         VerticalContentAlignment="Center"
+                                         MaxLength="256"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,6,0,0">
+                                <Label Content="Recipient address:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
+                                <TextBox Name="EmailRecipient"
+                                         FontFamily="Consolas"
+                                         VerticalContentAlignment="Center"
+                                         MaxLength="256"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,6,0,0">
+                                <Label Content="Sender address:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
+                                <TextBox Name="EmailSender"
+                                         FontFamily="Consolas"
+                                         VerticalContentAlignment="Center"
+                                         MaxLength="256"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,6,0,0">
+                                <Label Content="Sender display name:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
+                                <TextBox Name="EmailSenderFriendly"
+                                         FontFamily="Consolas"
+                                         VerticalContentAlignment="Center"
+                                         MaxLength="256"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </GroupBox>
+                </DockPanel>
+            </TabItem>
+
+            <!-- Tab: Messages -->
+            <TabItem Header="Messages">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Message Bodies">
+                        <ScrollViewer>
+                            <StackPanel Margin="5">
+                                <DockPanel>
+                                    <Label Content="Ping request detected:"
+                                           HorizontalContentAlignment="Right"
+                                           VerticalContentAlignment="Top"
+                                           Width="200" />
+                                    <TextBox DockPanel.Dock="Right"
+                                             Name="IcmpMessageBody"
+                                             FontFamily="Consolas"
+                                             VerticalContentAlignment="Top"
+                                             VerticalScrollBarVisibility="Auto"
+                                             Height="120"
+                                             AcceptsReturn="True"
+                                             MaxLength="2048"/>
+                                </DockPanel>
+                                <DockPanel Margin="0,6,0,0">
+                                    <Label Content="TCP connection detected:"
+                                           HorizontalContentAlignment="Right"
+                                           VerticalContentAlignment="Top"
+                                           Width="200" />
+                                    <TextBox DockPanel.Dock="Right"
+                                             Name="TcpMessageBody"
+                                             FontFamily="Consolas"
+                                             VerticalContentAlignment="Top"
+                                             VerticalScrollBarVisibility="Auto"
+                                             Height="120"
+                                             AcceptsReturn="True"
+                                             MaxLength="2048"/>
+                                </DockPanel>
+                                <DockPanel Margin="0,6,0,0">
+                                    <Label Content="Name poison detected:"
+                                           HorizontalContentAlignment="Right"
+                                           VerticalContentAlignment="Top"
+                                           Width="200" />
+                                    <TextBox DockPanel.Dock="Right"
+                                             Name="NamePoisonMessageBody"
+                                             FontFamily="Consolas"
+                                             VerticalContentAlignment="Top"
+                                             VerticalScrollBarVisibility="Auto"
+                                             Height="120"
+                                             AcceptsReturn="True"
+                                             MaxLength="2048"/>
+                                </DockPanel>
+                                <DockPanel Margin="0,6,0,0">
+                                    <Label Content="Rogue DHCP server detected:"
+                                           HorizontalContentAlignment="Right"
+                                           VerticalContentAlignment="Top"
+                                           Width="200" />
+                                    <TextBox DockPanel.Dock="Right"
+                                             Name="RogueDhcpMessageBody"
+                                             FontFamily="Consolas"
+                                             VerticalContentAlignment="Top"
+                                             VerticalScrollBarVisibility="Auto"
+                                             Height="120"
+                                             AcceptsReturn="True"
+                                             MaxLength="2048"/>
+                                </DockPanel>
+                            </StackPanel>
                         </ScrollViewer>
                     </GroupBox>
-                    <GroupBox Header="Variables" Grid.Row="1">
+                    <GroupBox Header="Variables" Grid.Row="1" Margin="0,20,0,0">
                         <UniformGrid Margin="5,5,10,5" Rows="2">
                             <Label Foreground="#666688" Content="#SOURCEIP#" />
                             <Label Foreground="#666688" Content="#SOURCEPORT#" />
@@ -345,88 +273,47 @@
                 </Grid>
             </TabItem>
 
-            <TabItem Name="tabAdvanced" Header="Advanced" >
-                <StackPanel>
-                    <GroupBox Header="Advanced Settings">
-                        <StackPanel Margin="5,5,10,5">
-                            <!-- Rate limit section -->
-                            <CheckBox Name="chkTriggerRateLimit"
-                                      Content="Enable rate limiting on triggered actions (recommended)"
-                                      IsChecked="True"
-                                      Margin="0,5" />
-                            <StackPanel Orientation="Horizontal"
-                                        Margin="15,0,0,0">
-                                <Label Content="Limit one triggered action per source IP every" />
-                                <TextBox Name="txtMailRateLimitMinutes"
-                                         Margin="5,1"
+            <!-- Tab: Advanced -->
+            <TabItem Header="Advanced">
+                <DockPanel LastChildFill="False">
+                    <GroupBox Header="Advanced Settings" DockPanel.Dock="Top">
+                        <StackPanel Margin="5">
+                            <CheckBox Name="RateLimitOption" Content="Enable rate limiting on triggered actions (recommended)"/>
+                            <StackPanel Orientation="Horizontal" Margin="35,0,0,0">
+                                <Label Content="Limit one triggered action per source IP every"/>
+                                <TextBox Name="RateLimitMinutes"
+                                         Margin="5,0"
                                          Width="60"
-                                         MaxLength="5" />
-                                <Label Content="minute(s)" />
+                                         MaxLength="5"/>
+                                <Label Content="minute(s)"/>
                             </StackPanel>
-                            <CheckBox Name="chkEventLog"
+
+                            <CheckBox Name="EventLogOption"
                                       Content="Write matching connections to Windows event log"
-                                      IsChecked="True"
-                                      Margin="0,15,0,5" />
-                            <TextBlock Text="Any connection matching the trigger rules will be written to the event log.  This will not be affected by rate limiting."
-                                   Foreground="#888" Margin="20,0,0,0" TextWrapping="Wrap"/>
+                                      Margin="0,15,0,5"/>
+                            <TextBlock Foreground="#888" Margin="20,0,0,0" TextWrapping="Wrap">
+                                Any connection matching the trigger rules will be written to the event log.
+                                This will not be affected by rate limiting.
+                            </TextBlock>
                         </StackPanel>
                     </GroupBox>
-                </StackPanel>
+                </DockPanel>
             </TabItem>
         </TabControl>
-
-        <!-- Bottom button section -->
-        <Grid Grid.Row="2" Margin="0,0,15,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <Button Name="btnHelp"
-                    Content="Help"
-                    Grid.Column="1"
-                    Width="75"
-                    Height="30"
-                    HorizontalAlignment="Right"
-                    Margin="0,0,15,0"
-                    Click="btnHelp_Click" />
-
-            <Button Name="btnSave"
-                    Content="Save"
-                    Grid.Column="2"
-                    Width="75"
-                    Height="30"
-                    HorizontalAlignment="Right"
-                    Click="btnSave_Click" />
-        </Grid>
-
-
-        <!-- Loading Overlay -->
-        <Grid Name="gridLoading" Background="#33000000" Visibility="Collapsed" Grid.RowSpan="3">
-            <localControls:CircularProgressBar Visibility="{Binding ElementName=gridLoading,Path=Visibility}"
-                                               HorizontalAlignment="Center" VerticalAlignment="Center"
-                                               SnapsToDevicePixels="False" UseLayoutRounding="False">
-                <localControls:CircularProgressBar.Style>
-                    <!-- Progress Bar Fade-In Animation -->
-                    <Style TargetType="FrameworkElement">
-                        <Setter Property="Visibility" Value="Collapsed"/>
-                        <Setter Property="Opacity" Value="0"/>
-                        <Style.Triggers>
-                            <Trigger Property="Visibility" Value="Visible">
-                                <Trigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                             From="0.0" To="1.0" Duration="0:0:0.3"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.EnterActions>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </localControls:CircularProgressBar.Style>
-            </localControls:CircularProgressBar>
-        </Grid>
+        
+        <!-- Button section -->
+        <Border Grid.Row="2" BorderBrush="#dfdfdf" Background="#f0f0f0" BorderThickness="0,1,0,0">
+            <DockPanel Margin="15" HorizontalAlignment="Right">
+                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Help"
+                            Click="Help_Click"
+                            Width="85"
+                            Margin="0,0,9,0"/>
+                    <Button Content="Save"
+                            Click="Save_Click"
+                            Width="85"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
     </Grid>
 </Window>
