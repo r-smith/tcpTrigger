@@ -76,7 +76,7 @@
         <Setter Property="FontSize" Value="15"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Margin" Value="0,0,2,0"/>
-        <Setter Property="Padding" Value="10,8,17,8"/>
+        <Setter Property="Padding" Value="10,8,40,8"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Stretch"/>
         <Setter Property="Template">

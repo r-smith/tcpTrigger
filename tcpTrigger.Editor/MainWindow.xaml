@@ -23,14 +23,14 @@
         <!-- Header and logo -->
         <StackPanel Grid.Row="0"
                     Orientation="Horizontal"
-                    HorizontalAlignment="Center">
+                    HorizontalAlignment="Center"
+                    Margin="0,20">
             <Image Source="/Resources/tcpTrigger Logo.png"
                    Height="48"
-                   Width="48"
-                   Margin="0,15,10,10"/>
+                   Width="48"/>
             <Label Content="tcpTrigger"
                    FontSize="22"
-                   HorizontalAlignment="Center"
+                   Margin="20,0,0,0"
                    VerticalAlignment="Center"
                    FontWeight="SemiBold"/>
         </StackPanel>
