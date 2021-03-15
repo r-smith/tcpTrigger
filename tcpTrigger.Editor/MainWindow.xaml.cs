@@ -365,14 +365,14 @@ namespace tcpTrigger.Editor
         {
             try
             {
-                var portNumbers = (from part in TcpIncludePorts.Text.Split(',')
+                int[] portNumbers = (from part in TcpIncludePorts.Text.Split(',')
                                    let range = part.Split('-')
                                    let start = int.Parse(range[0])
                                    let end = int.Parse(range[range.Length - 1])
                                    from i in Enumerable.Range(start, end - start + 1)
                                    orderby i
                                    select i).Distinct().ToArray();
-                string result = string.Join(",", portNumbers);
+                string result = string.Join(",", portNumbers.Select(x => x.ToString()).ToArray());
 
                 for (int i = 0; i < portNumbers.Length; ++i)
                     if (portNumbers[i] < 1 || portNumbers[i] > 65535)
