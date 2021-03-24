@@ -50,42 +50,51 @@
         </Setter>
     </Style>
     
-    <!-- Focus visual style-->
-    <Style x:Key="FocusVisual">
-        <Setter Property="Control.Template">
-            <Setter.Value>
-                <ControlTemplate>
-                    <Rectangle Margin="2" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-    
-    <!-- TabItem style -->
+    <!-- TabItem brushes -->
     <SolidColorBrush x:Key="TabItem.Static.Background" Color="Transparent"/>
-    <SolidColorBrush x:Key="TabItem.Static.Foreground" Color="#555"/>
-    <SolidColorBrush x:Key="TabItem.MouseOver.Background" Color="#d8d8d8"/>
+    <SolidColorBrush x:Key="TabItem.Static.Foreground" Color="#303030"/>
+    <SolidColorBrush x:Key="TabItem.MouseOver.Background" Color="#eaeaeb"/>
     <SolidColorBrush x:Key="TabItem.MouseOver.Foreground" Color="Black"/>
     <SolidColorBrush x:Key="TabItem.Selected.Border" Color="#007acc"/>
     <SolidColorBrush x:Key="TabItem.Selected.Background" Color="Transparent"/>
-    <SolidColorBrush x:Key="TabItem.Selected.Foreground" Color="#007acc"/>
+    <SolidColorBrush x:Key="TabItem.Selected.Foreground" Color="#006abc"/>
+
+    <!-- TabItem header templates -->
+    <DataTemplate x:Key="TabHeader">
+        <TextBlock Text="{Binding}"
+                   FontSize="15"
+                   Foreground="{StaticResource TabItem.Static.Foreground}"/>
+    </DataTemplate>
+    <DataTemplate x:Key="TabMouseOverHeader">
+        <TextBlock Text="{Binding}"
+                   FontSize="15"
+                   Foreground="{StaticResource TabItem.MouseOver.Foreground}"/>
+    </DataTemplate>
+    <DataTemplate x:Key="TabSelectedHeader">
+        <TextBlock Text="{Binding}"
+                   FontSize="15"
+                   FontWeight="SemiBold"
+                   Foreground="{StaticResource TabItem.Selected.Foreground}"/>
+    </DataTemplate>
+    
+    <!-- TabItem style -->
     <Style TargetType="{x:Type TabItem}">
         <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
         <Setter Property="Foreground" Value="Black"/>
         <Setter Property="Background" Value="{StaticResource TabItem.Static.Background}"/>
-        <Setter Property="FontSize" Value="15"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
-        <Setter Property="Margin" Value="0,0,2,0"/>
-        <Setter Property="Padding" Value="10,8,40,8"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="10,8,20,8"/>
+        <Setter Property="MinWidth" Value="140"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+        <Setter Property="HeaderTemplate" Value="{StaticResource TabHeader}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabItem}">
                     <Border x:Name="mainBorder"
                             SnapsToDevicePixels="True"
                             BorderBrush="Transparent"
-                            BorderThickness="7,0,0,0"
+                            BorderThickness="8,0,0,0"
                             Background="{TemplateBinding Background}"
                             Margin="0">
                         <ContentPresenter x:Name="contentPresenter"
@@ -102,21 +111,20 @@
                         <Trigger Property="IsMouseOver" Value="True" SourceName="mainBorder">
                             <Setter Property="Background" Value="{StaticResource TabItem.MouseOver.Background}" TargetName="mainBorder"/>
                             <Setter Property="BorderBrush" Value="{StaticResource TabItem.MouseOver.Background}" TargetName="mainBorder"/>
-                            <Setter Property="Foreground" Value="{StaticResource TabItem.MouseOver.Foreground}"/>
                         </Trigger>
                         <Trigger Property="IsSelected" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource TabItem.Static.Foreground}"/>
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="BorderBrush" Value="{StaticResource TabItem.Selected.Border}" TargetName="mainBorder"/>
-                            <Setter Property="Foreground" Value="{StaticResource TabItem.Selected.Foreground}"/>
+                            <Setter Property="HeaderTemplate" Value="{StaticResource TabSelectedHeader}"/>
                         </Trigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsSelected" Value="False"/>
                                 <Condition Property="IsMouseOver" Value="True"/>
                             </MultiTrigger.Conditions>
-                            <Setter Property="Foreground" Value="{StaticResource TabItem.MouseOver.Foreground}"/>
+                            <Setter Property="HeaderTemplate" Value="{StaticResource TabMouseOverHeader}"/>
                         </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
