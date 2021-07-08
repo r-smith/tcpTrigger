@@ -1,7 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.ComponentModel;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.ServiceProcess;
@@ -20,19 +19,14 @@ namespace tcpTrigger.Editor
         {
             InitializeComponent();
 
-            if (LoadConfiguration() == false)
-            {
-                App.Current.Shutdown();
-                return;
-            }
+            LoadConfiguration();
         }
 
-        private bool LoadConfiguration()
+        private string GetInstallPath()
         {
-            var installPath = string.Empty;
-            var didTaskSucceed = true;
+            string installPath = string.Empty;
 
-            // Get service install path from registry.
+            // Get the install path for the tcpTrigger service from the Window registry.
             try
             {
                 using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"System\CurrentControlSet\services\tcpTrigger"))
@@ -42,7 +36,7 @@ namespace tcpTrigger.Editor
                         object value = key.GetValue("ImagePath");
                         if (value != null)
                         {
-                            installPath = (value as string).Trim('"');
+                            installPath = Path.GetDirectoryName((value as string).Trim('"'));
                         }
                     }
                 }
@@ -54,121 +48,114 @@ namespace tcpTrigger.Editor
                     "Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
-                return false;
             }
 
-            // Ensure registry value for install path contains something.
-            if (installPath.Length == 0)
-            {
-                MessageBox.Show(
-                    "Could not retrieve registry information for the tcpTrigger service.",
-                    "Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-                return false;
-            }
-
-            // Open configuration file.
-            var config = ConfigurationManager.OpenExeConfiguration(installPath);
-
-            // Use file to populate fields and options in GUI.
-            try
-            {
-                var configuration = ConfigurationManager.OpenExeConfiguration(installPath);
-
-                TcpIncludePorts.Text = config.AppSettings.Settings["Trigger.TcpPortsToListenOn"].Value;
-                DhcpServers.Text = config.AppSettings.Settings["Dhcp.SafeServerList"].Value;
-                ApplicationPath.Text = config.AppSettings.Settings["Action.ApplicationPath"].Value;
-                ApplicationArguments.Text = config.AppSettings.Settings["Action.ApplicationArguments"].Value;
-                EmailServer.Text = config.AppSettings.Settings["Email.Server"].Value;
-                EmailPort.Text = config.AppSettings.Settings["Email.ServerPort"].Value;
-                EmailRecipient.Text = config.AppSettings.Settings["Email.RecipientAddress"].Value;
-                EmailSender.Text = config.AppSettings.Settings["Email.SenderAddress"].Value;
-                EmailSenderFriendly.Text = config.AppSettings.Settings["Email.SenderDisplayName"].Value;
-                EmailSubject.Text = config.AppSettings.Settings["Email.Subject"].Value;
-                IcmpMessageBody.Text = config.AppSettings.Settings["MessageBody.Ping"].Value;
-                TcpMessageBody.Text = config.AppSettings.Settings["MessageBody.TcpConnect"].Value;
-                NamePoisonMessageBody.Text = config.AppSettings.Settings["MessageBody.NamePoison"].Value;
-                RogueDhcpMessageBody.Text = config.AppSettings.Settings["MessageBody.RogueDhcp"].Value;
-
-                RateLimitMinutes.Text = config.AppSettings.Settings["Action.RateLimitMinutes"].Value;
-                RateLimitOption.IsChecked = RateLimitMinutes.Text.Length != 0 && RateLimitMinutes.Text != "0";
-
-                bool.TryParse(config.AppSettings.Settings["Trigger.EnableMonitorTcpPort"].Value, out bool checkedValue);
-                MonitorTcpOption.IsChecked = checkedValue;
-
-                bool.TryParse(config.AppSettings.Settings["Trigger.EnableMonitorIcmpPing"].Value, out checkedValue);
-                MonitorIcmpOption.IsChecked = checkedValue;
-
-                bool.TryParse(config.AppSettings.Settings["Trigger.EnableNamePoisonDetection"].Value, out checkedValue);
-                MonitorPoisonOption.IsChecked = checkedValue;
-
-                bool.TryParse(config.AppSettings.Settings["Trigger.EnableRogueDhcpDetection"].Value, out checkedValue);
-                MonitorDhcpOption.IsChecked = checkedValue;
-
-                bool.TryParse(config.AppSettings.Settings["Action.EnableEventLog"].Value, out checkedValue);
-                EventLogOption.IsChecked = checkedValue;
-
-                bool.TryParse(config.AppSettings.Settings["Action.EnableRunApplication"].Value, out checkedValue);
-                LaunchAppOption.IsChecked = checkedValue;
-
-                bool.TryParse(config.AppSettings.Settings["Action.EnableEmailNotification"].Value, out checkedValue);
-                SendEmailOption.IsChecked = checkedValue;
-
-                bool.TryParse(config.AppSettings.Settings["Action.EnablePopupMessage"].Value, out checkedValue);
-                DisplayPopupOption.IsChecked = checkedValue;
-            }
-
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    $"Failed to read configuration file. {ex.Message}",
-                    "Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-                return false;
-            }
-
-            return didTaskSucceed;
+            return installPath;
         }
 
-        private bool WriteConfiguration()
+        private void LoadConfiguration()
         {
-            var filePath = string.Empty;
+            string configurationPath = GetInstallPath();
 
-            // Get service install path from registry.
+            if (configurationPath.Length == 0 || !Directory.Exists(configurationPath))
+            {
+                MessageBox.Show("The configuration path for the tcpTrigger service was not found.", "Error");
+                return;
+            }
+
+            configurationPath += @"\tcpTrigger.xml";
+
             try
             {
-                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"System\CurrentControlSet\services\tcpTrigger"))
+                var xd = new XmlDocument();
+                xd.Load(configurationPath);
+
+                XmlNode xn;
+                // tcpTrigger/enabledComponents
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledComponents/tcp");
+                if (xn != null) { MonitorTcpOption.IsChecked = bool.Parse(xn.InnerText); }
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledComponents/icmp");
+                if (xn != null) { MonitorIcmpOption.IsChecked = bool.Parse(xn.InnerText); }
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledComponents/namePoison");
+                if (xn != null) { MonitorPoisonOption.IsChecked = bool.Parse(xn.InnerText); }
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledComponents/rogueDhcp");
+                if (xn != null) { MonitorDhcpOption.IsChecked = bool.Parse(xn.InnerText); }
+                // tcpTrigger/monitoredPorts
+                DhcpServers.Text =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/monitoredPorts/tcp/include")?.InnerText;
+                // tcpTrigger/rogueDhcpExclude
+                DhcpServers.Text =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/rogueDhcpExclude/ipAddress")?.InnerText;
+                // tcpTrigger/enabledActions
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledActions/windowsEventLog");
+                if (xn != null) { EventLogOption.IsChecked = bool.Parse(xn.InnerText); }
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledActions/emailNotification");
+                if (xn != null) { SendEmailOption.IsChecked = bool.Parse(xn.InnerText); }
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledActions/popupNotification");
+                if (xn != null) { DisplayPopupOption.IsChecked = bool.Parse(xn.InnerText); }
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledActions/executeCommand");
+                if (xn != null) { LaunchAppOption.IsChecked = bool.Parse(xn.InnerText); }
+                // tcpTrigger/actionSettings
+                RateLimitMinutes.Text =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/actionSettings/rateLimitMinutes")?.InnerText;
+                if (RateLimitMinutes.Text.Length > 0)
+                    RateLimitOption.IsChecked = true;
+                ApplicationPath.Text =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/actionSettings/command/path")?.InnerText;
+                ApplicationArguments.Text =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/actionSettings/command/arguments")?.InnerText;
+                // tcpTrigger/emailSettings
+                EmailServer.Text =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/server")?.InnerText;
+                EmailPort.Text =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/port")?.InnerText;
+                EmailRecipient.Text =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/recipientList/address")?.InnerText;
+                EmailSender.Text =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/sender/address")?.InnerText;
+                EmailSenderFriendly.Text =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/sender/displayName")?.InnerText;
+                // tcpTrigger/customMessage
+                XmlNodeList nl = xd.DocumentElement.SelectNodes("/tcpTrigger/customMessage");
+                for (int i = 0; i < nl.Count; i++)
                 {
-                    if (key != null)
+                    if (nl[i].Attributes["type"]?.InnerText == "tcp")
                     {
-                        object value = key.GetValue("ImagePath");
-                        if (value != null)
-                            filePath = Path.GetDirectoryName((value as string).Trim('"'));
+                        TcpMessageBody.Text = nl[i].SelectSingleNode("body")?.InnerText;
+                    }
+                    if (nl[i].Attributes["type"]?.InnerText == "icmp")
+                    {
+                        IcmpMessageBody.Text = nl[i].SelectSingleNode("body")?.InnerText;
+                    }
+                    if (nl[i].Attributes["type"]?.InnerText == "namePoison")
+                    {
+                        NamePoisonMessageBody.Text = nl[i].SelectSingleNode("body")?.InnerText;
+                    }
+                    if (nl[i].Attributes["type"]?.InnerText == "rogueDhcp")
+                    {
+                        RogueDhcpMessageBody.Text = nl[i].SelectSingleNode("body")?.InnerText;
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Could not retrieve registry information for the tcpTrigger service. {ex.Message}", "Error");
-                return false;
+                MessageBox.Show(ex.Message);
             }
+        }
 
-            // Ensure path exists.
-            if (filePath.Length == 0)
+        private bool WriteConfiguration()
+        {
+            string configurationPath = GetInstallPath();
+
+            // Ensure configuration path exists.
+            if (configurationPath.Length == 0 || !Directory.Exists(configurationPath))
             {
-                MessageBox.Show("Could not retrieve registry information for the tcpTrigger service.", "Error");
-                return false;
-            }
-            if (!Directory.Exists(filePath))
-            {
-                MessageBox.Show("Could not find service directory.", "Error");
+                MessageBox.Show("The configuration path for the tcpTrigger service was not found.", "Error");
                 return false;
             }
 
             // Use options specified in GUI to write to configuration file.
-            filePath += @"\tcpTrigger.xml";
+            configurationPath += @"\tcpTrigger.xml";
             try
             {
                 // Convert port numbers to an ordered int array and remove duplicates.
@@ -181,7 +168,7 @@ namespace tcpTrigger.Editor
                                    select i).Distinct().ToArray();
                 TcpIncludePorts.Text = FormatTcpPortRange(portNumbers);
 
-                using (XmlWriter writer = XmlWriter.Create(filePath, new XmlWriterSettings() { Indent = true }))
+                using (XmlWriter writer = XmlWriter.Create(configurationPath, new XmlWriterSettings() { Indent = true }))
                 {
                     writer.WriteStartDocument();
                     writer.WriteStartElement("tcpTrigger");
@@ -204,7 +191,6 @@ namespace tcpTrigger.Editor
                     writer.WriteElementString("ipAddress", DhcpServers.Text);
                     writer.WriteEndElement();
 
-
                     writer.WriteStartElement("enabledActions");
                     writer.WriteElementString("windowsEventLog", EventLogOption.IsChecked.ToString());
                     writer.WriteElementString("emailNotification", SendEmailOption.IsChecked.ToString());
@@ -213,7 +199,7 @@ namespace tcpTrigger.Editor
                     writer.WriteEndElement();
 
                     writer.WriteStartElement("actionSettings");
-                    writer.WriteElementString("rateLimitSeconds", RateLimitMinutes.Text);
+                    writer.WriteElementString("rateLimitMinutes", RateLimitMinutes.Text);
                     writer.WriteStartElement("command");
                     writer.WriteElementString("path",
                         (LaunchAppOption.IsChecked == true)
