@@ -81,7 +81,7 @@ namespace tcpTrigger.Editor
                 xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledComponents/rogueDhcp");
                 if (xn != null) { MonitorDhcpOption.IsChecked = bool.Parse(xn.InnerText); }
                 // tcpTrigger/monitoredPorts
-                DhcpServers.Text =
+                TcpIncludePorts.Text =
                     xd.DocumentElement.SelectSingleNode("/tcpTrigger/monitoredPorts/tcp/include")?.InnerText;
                 // tcpTrigger/rogueDhcpExclude
                 DhcpServers.Text =
