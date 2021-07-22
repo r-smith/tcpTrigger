@@ -1,149 +1,176 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Xml;
 
 namespace tcpTrigger
 {
     class Configuration
     {
-        private bool _enableMonitorTcpPort;
-        public bool EnableMonitorTcpPort { get { return _enableMonitorTcpPort; } }
+        public bool IsMonitorTcpEnabled { get; private set; }
+        public bool IsMonitorIcmpEnabled { get; private set; }
+        public bool IsMonitorPoisonEnabled { get; private set; }
+        public bool IsMonitorDhcpEnabled { get; private set; }
+        public bool DoNotMonitorVMwareVirtualHostAdapters { get; private set; }
+        public int[] TcpPortsToMonitor { get; private set; }
+        public string TcpPortsToMonitorAsString { get; private set; }
+        public bool IsEventLogEnabled { get; private set; }
+        public bool IsEmailNotificationEnabled { get; private set; }
+        public bool IsExternalAppEnabled { get; private set; }
+        public bool IsPopupMessageEnabled { get; private set; }
+        public int ActionRateLimitMinutes { get; private set; }
+        public string TriggeredApplicationPath { get; private set; }
+        public string TriggeredApplicationArguments { get; private set; }
+        public List<IPAddress> DhcpSafeServerList { get; private set; } = new List<IPAddress>();
+        public string EmailServer { get; private set; }
+        public int EmailServerPort { get; private set; }
+        public string EmailRecipientAddress { get; private set; }
+        public string EmailSenderAddress { get; private set; }
+        public string EmailSenderDisplayName { get; private set; }
+        public string EmailSubject { get; private set; }
+        public string MessageBodyPing { get; private set; }
+        public string MessageBodyTcpConnect { get; private set; }
+        public string MessageBodyNamePoison { get; private set; }
+        public string MessageBodyRogueDhcp { get; private set; }
 
-        private bool _enableMonitorIcmpPing;
-        public bool EnableMonitorIcmpPing { get { return _enableMonitorIcmpPing; } }
+        private string GetConfigurationPath()
+        {
+            string installPath = string.Empty;
 
-        private bool _enableNamePoisonDetection;
-        public bool EnableNamePoisonDetection { get { return _enableNamePoisonDetection; } }
+            // Get the install path for the tcpTrigger service from the Window registry.
+            try
+            {
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"System\CurrentControlSet\services\tcpTrigger"))
+                {
+                    if (key != null)
+                    {
+                        object value = key.GetValue("ImagePath");
+                        if (value != null)
+                        {
+                            installPath = Path.GetDirectoryName((value as string).Trim('"'));
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry(
+                    "tcpTrigger",
+                    $"Error reading configuration file: {ex.Message}",
+                    EventLogEntryType.Error,
+                    400);
+            }
 
-        private bool _enableRogueDhcpDetection;
-        public bool EnableRogueDhcpDetection { get { return _enableRogueDhcpDetection; } }
-
-        private bool _doNotMonitorVMwareVirtualHostAdapters;
-        public bool DoNotMonitorVMwareVirtualHostAdapters { get { return _doNotMonitorVMwareVirtualHostAdapters; } }
-
-        private int[] _tcpPortsToListenOn;
-        public int[] TcpPortsToListenOn { get { return _tcpPortsToListenOn; } }
-
-        private string _tcpPortsToListenOnAsString;
-        public string TcpPortsToListenOnAsString { get { return _tcpPortsToListenOnAsString; } }
-
-        private bool _enableEventLogAction;
-        public bool EnableEventLogAction { get { return _enableEventLogAction; } }
-
-        private bool _enableEmailNotificationAction;
-        public bool EnableEmailNotificationAction { get { return _enableEmailNotificationAction; } }
-
-        private bool _enableRunApplicationAction;
-        public bool EnableRunApplicationAction { get { return _enableRunApplicationAction; } }
-
-        private bool _enablePopupMessageAction;
-        public bool EnablePopupMessageAction { get { return _enablePopupMessageAction; } }
-
-        private int _actionRateLimitMinutes;
-        public int ActionRateLimitMinutes { get { return _actionRateLimitMinutes; } }
-
-        private string _triggeredApplicationPath;
-        public string TriggeredApplicationPath { get { return _triggeredApplicationPath; } }
-
-        private string _triggeredApplicationArguments;
-        public string TriggeredApplicationArguments { get { return _triggeredApplicationArguments; } }
-
-        private List<IPAddress> _dhcpSafeServerList;
-        public List<IPAddress> DhcpSafeServerList { get { return _dhcpSafeServerList; } }
-
-        private string _emailServer;
-        public string EmailServer { get { return _emailServer; } }
-
-        private int _emailServerPort;
-        public int EmailServerPort { get { return _emailServerPort; } }
-
-        private string _emailRecipientAddress;
-        public string EmailRecipientAddress { get { return _emailRecipientAddress; } }
-
-        private string _emailSenderAddress;
-        public string EmailSenderAddress { get { return _emailSenderAddress; } }
-
-        private string _emailSenderDisplayName;
-        public string EmailSenderDisplayName { get { return _emailSenderDisplayName; } }
-
-        private string _emailSubject;
-        public string EmailSubject { get { return _emailSubject; } }
-
-        private string _messageBodyPing;
-        public string MessageBodyPing { get { return _messageBodyPing; } }
-
-        private string _messageBodyTcpConnect;
-        public string MessageBodyTcpConnect { get { return _messageBodyTcpConnect; } }
-
-        private string _messageBodyNamePoison;
-        public string MessageBodyNamePoison { get { return _messageBodyNamePoison; } }
-
-        private string _messageBodyRogueDhcp;
-        public string MessageBodyRogueDhcp { get { return _messageBodyRogueDhcp; } }
+            return installPath + @"\tcpTrigger.xml";
+        }
 
         public void Load()
         {
             try
             {
-                _dhcpSafeServerList = new List<IPAddress>();
+                var xd = new XmlDocument();
+                xd.Load(GetConfigurationPath());
 
-                bool.TryParse(ConfigurationManager.AppSettings["Trigger.EnableMonitorTcpPort"], out _enableMonitorTcpPort);
-                if (_enableMonitorTcpPort)
+                XmlNode xn;
+                // tcpTrigger/enabledComponents
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledComponents/tcp");
+                if (xn != null) { IsMonitorTcpEnabled = bool.Parse(xn.InnerText); }
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledComponents/icmp");
+                if (xn != null) { IsMonitorIcmpEnabled = bool.Parse(xn.InnerText); }
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledComponents/namePoison");
+                if (xn != null) { IsMonitorPoisonEnabled = bool.Parse(xn.InnerText); }
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledComponents/rogueDhcp");
+                if (xn != null) { IsMonitorDhcpEnabled = bool.Parse(xn.InnerText); }
+
+                if (IsMonitorTcpEnabled)
                 {
-                    _tcpPortsToListenOnAsString = ConfigurationManager.AppSettings["Trigger.TcpPortsToListenOn"];
-                    
-                    _tcpPortsToListenOn = (from part in _tcpPortsToListenOnAsString.Split(',')
-                                           let range = part.Split('-')
-                                           let start = int.Parse(range[0])
-                                           let end = int.Parse(range[range.Length - 1])
-                                           from i in Enumerable.Range(start, end - start + 1)
-                                           orderby i
-                                           select i).Distinct().ToArray();
+                    // tcpTrigger/monitoredPorts
+                    TcpPortsToMonitorAsString =
+                        xd.DocumentElement.SelectSingleNode("/tcpTrigger/monitoredPorts/tcp/include")?.InnerText;
+                    TcpPortsToMonitor = (from part in TcpPortsToMonitorAsString.Split(',')
+                                         let range = part.Split('-')
+                                         let start = int.Parse(range[0])
+                                         let end = int.Parse(range[range.Length - 1])
+                                         from i in Enumerable.Range(start, end - start + 1)
+                                         orderby i
+                                         select i).Distinct().ToArray();
                 }
-                bool.TryParse(ConfigurationManager.AppSettings["Trigger.EnableMonitorIcmpPing"], out _enableMonitorIcmpPing);
-                bool.TryParse(ConfigurationManager.AppSettings["Trigger.EnableNamePoisonDetection"], out _enableNamePoisonDetection);
-                bool.TryParse(ConfigurationManager.AppSettings["Trigger.EnableRogueDhcpDetection"], out _enableRogueDhcpDetection);
-                if (_enableRogueDhcpDetection)
+                if (IsMonitorDhcpEnabled)
                 {
-                    var dhcpSafeServerListAsString = ConfigurationManager.AppSettings["Dhcp.SafeServerList"];
+                    // tcpTrigger/rogueDhcpExclude
+                    string dhcpSafeServerListAsString =
+                        xd.DocumentElement.SelectSingleNode("/tcpTrigger/rogueDhcpExclude/ipAddress")?.InnerText;
                     if (dhcpSafeServerListAsString.Length > 0)
                     {
-                        var dhcpSafeServerListAsArray = dhcpSafeServerListAsString.Split(',').
+                        IPAddress[] dhcpSafeServerListAsArray = dhcpSafeServerListAsString.Split(',').
                             Select(x => IPAddress.Parse(x)).ToArray();
                         for (int i = 0; i < dhcpSafeServerListAsArray.Length; ++i)
                         {
-                            _dhcpSafeServerList.Add(dhcpSafeServerListAsArray[i]);
+                            DhcpSafeServerList.Add(dhcpSafeServerListAsArray[i]);
                         }
                     }
                 }
-                bool.TryParse(ConfigurationManager.AppSettings["DoNotMonitorVMwareVirtualHostAdapters"], out _doNotMonitorVMwareVirtualHostAdapters);
-                bool.TryParse(ConfigurationManager.AppSettings["Action.EnableEventLog"], out _enableEventLogAction);
-                bool.TryParse(ConfigurationManager.AppSettings["Action.EnableEmailNotification"], out _enableEmailNotificationAction);
-                bool.TryParse(ConfigurationManager.AppSettings["Action.EnableRunApplication"], out _enableRunApplicationAction);
-                bool.TryParse(ConfigurationManager.AppSettings["Action.EnablePopupMessage"], out _enablePopupMessageAction);
-                if (!(int.TryParse(ConfigurationManager.AppSettings["Action.RateLimitMinutes"], out _actionRateLimitMinutes)))
-                {
-                    _actionRateLimitMinutes = 0;
-                }
-                _triggeredApplicationPath = ConfigurationManager.AppSettings["Action.ApplicationPath"];
-                _triggeredApplicationArguments = ConfigurationManager.AppSettings["Action.ApplicationArguments"];
-                _emailServer = ConfigurationManager.AppSettings["Email.Server"];
-                if (!(int.TryParse(ConfigurationManager.AppSettings["Email.ServerPort"], out _emailServerPort)))
-                {
-                    _emailServerPort = 25;
-                }
-                _emailRecipientAddress = ConfigurationManager.AppSettings["Email.RecipientAddress"];
-                _emailSenderAddress = ConfigurationManager.AppSettings["Email.SenderAddress"];
-                _emailSenderDisplayName = ConfigurationManager.AppSettings["Email.SenderDisplayName"];
-                _emailSubject = ConfigurationManager.AppSettings["Email.Subject"];
 
-                _messageBodyPing = ConfigurationManager.AppSettings["MessageBody.Ping"];
-                _messageBodyTcpConnect = ConfigurationManager.AppSettings["MessageBody.TcpConnect"];
-                _messageBodyNamePoison = ConfigurationManager.AppSettings["MessageBody.NamePoison"];
-                _messageBodyRogueDhcp = ConfigurationManager.AppSettings["MessageBody.RogueDhcp"];
+                // tcpTrigger/enabledActions
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledActions/windowsEventLog");
+                if (xn != null) { IsEventLogEnabled = bool.Parse(xn.InnerText); }
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledActions/emailNotification");
+                if (xn != null) { IsEmailNotificationEnabled = bool.Parse(xn.InnerText); }
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledActions/popupNotification");
+                if (xn != null) { IsPopupMessageEnabled = bool.Parse(xn.InnerText); }
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledActions/executeCommand");
+                if (xn != null) { IsExternalAppEnabled = bool.Parse(xn.InnerText); }
+
+                // tcpTrigger/actionSettings
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/actionSettings/rateLimitMinutes");
+                if (xn != null) { ActionRateLimitMinutes = int.Parse(xn.InnerText); }
+                else { ActionRateLimitMinutes = 0; }
+                TriggeredApplicationPath =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/actionSettings/command/path")?.InnerText;
+                TriggeredApplicationArguments =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/actionSettings/command/arguments")?.InnerText;
+
+                // tcpTrigger/emailSettings
+                EmailServer =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/server")?.InnerText;
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/port");
+                if (xn != null) { EmailServerPort = int.Parse(xn.InnerText); }
+                else { EmailServerPort = 25; }
+                EmailRecipientAddress =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/recipientList/address")?.InnerText;
+                EmailSenderAddress =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/sender/address")?.InnerText;
+                EmailSenderDisplayName =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/sender/displayName")?.InnerText;
+
+                // tcpTrigger/customMessage
+                XmlNodeList nl = xd.DocumentElement.SelectNodes("/tcpTrigger/customMessage");
+                for (int i = 0; i < nl.Count; i++)
+                {
+                    if (nl[i].Attributes["type"]?.InnerText == "tcp")
+                    {
+                        MessageBodyTcpConnect = nl[i].SelectSingleNode("body")?.InnerText;
+                    }
+                    if (nl[i].Attributes["type"]?.InnerText == "icmp")
+                    {
+                        MessageBodyPing = nl[i].SelectSingleNode("body")?.InnerText;
+                    }
+                    if (nl[i].Attributes["type"]?.InnerText == "namePoison")
+                    {
+                        MessageBodyNamePoison = nl[i].SelectSingleNode("body")?.InnerText;
+                    }
+                    if (nl[i].Attributes["type"]?.InnerText == "rogueDhcp")
+                    {
+                        MessageBodyRogueDhcp = nl[i].SelectSingleNode("body")?.InnerText;
+                    }
+                }
+
+                //bool.TryParse(ConfigurationManager.AppSettings["DoNotMonitorVMwareVirtualHostAdapters"], out DoNotMonitorVMwareVirtualHostAdapters);
+                // Get subject!
             }
 
             catch (Exception ex)

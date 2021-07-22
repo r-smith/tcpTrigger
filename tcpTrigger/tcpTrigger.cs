@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -34,7 +33,7 @@ namespace tcpTrigger
         {
             _Configuration.Load();
             
-            if (_Configuration.EnableNamePoisonDetection)
+            if (_Configuration.IsMonitorPoisonEnabled)
             {
                 _NamePoisionDetectionTimer = new System.Timers.Timer();
                 _NamePoisionDetectionTimer.Interval = TimeSpan.FromMinutes(4).TotalMilliseconds;
@@ -149,10 +148,10 @@ namespace tcpTrigger
             }
 
             sb.AppendLine();
-            if (_Configuration.EnableMonitorTcpPort) sb.AppendLine($"Monitoring TCP port(s): {_Configuration.TcpPortsToListenOnAsString}");
-            if (_Configuration.EnableMonitorIcmpPing) sb.AppendLine("Monitoring ICMP ping requests");
-            if (_Configuration.EnableNamePoisonDetection) sb.AppendLine("Name poisoning detection is enabled");
-            if (_Configuration.EnableRogueDhcpDetection) sb.Append("Rogue DHCP server detection is enabled");
+            if (_Configuration.IsMonitorTcpEnabled) sb.AppendLine($"Monitoring TCP port(s): {_Configuration.TcpPortsToMonitorAsString}");
+            if (_Configuration.IsMonitorIcmpEnabled) sb.AppendLine("Monitoring ICMP ping requests");
+            if (_Configuration.IsMonitorPoisonEnabled) sb.AppendLine("Name poisoning detection is enabled");
+            if (_Configuration.IsMonitorDhcpEnabled) sb.Append("Rogue DHCP server detection is enabled");
 
             EventLog.WriteEntry(
                 "tcpTrigger",
@@ -223,7 +222,7 @@ namespace tcpTrigger
                 {
                     packetHeader.DestinationMac = netInterface.MacAddress;
 
-                    if (_Configuration.EnableEventLogAction)
+                    if (_Configuration.IsEventLogEnabled)
                         WriteEventLog(packetHeader);
 
                     netInterface.RateLimitDictionaryCleanup(_Configuration.ActionRateLimitMinutes);
@@ -233,9 +232,9 @@ namespace tcpTrigger
                         if (_Configuration.ActionRateLimitMinutes > 0)
                             netInterface.RateLimitDictionary.Add(packetHeader.SourceIP, DateTime.Now);
 
-                        if (_Configuration.EnableRunApplicationAction) LaunchApplication(packetHeader);
-                        if (_Configuration.EnableEmailNotificationAction) SendEmail(packetHeader);
-                        if (_Configuration.EnablePopupMessageAction) DisplayPopupMessage(packetHeader);
+                        if (_Configuration.IsExternalAppEnabled) LaunchApplication(packetHeader);
+                        if (_Configuration.IsEmailNotificationEnabled) SendEmail(packetHeader);
+                        if (_Configuration.IsPopupMessageEnabled) DisplayPopupMessage(packetHeader);
                     }
                 }
 
@@ -250,7 +249,7 @@ namespace tcpTrigger
 
         private bool DoesPacketMatchPingRequest(PacketHeader header, IPAddress ip)
         {
-            if (_Configuration.EnableMonitorIcmpPing &&
+            if (_Configuration.IsMonitorIcmpEnabled &&
                 header.ProtocolType == Protocol.ICMP &&
                 header.DestinationIP.Equals(ip) &&
                 header.IcmpType == 8)
@@ -263,12 +262,12 @@ namespace tcpTrigger
 
         private bool DoesPacketMatchMonitoredPort(PacketHeader header, IPAddress ip)
         {
-            if (_Configuration.EnableMonitorTcpPort &&
+            if (_Configuration.IsMonitorTcpEnabled &&
                 header.ProtocolType == Protocol.TCP &&
                 header.TcpFlags == 0x2 &&
                 header.DestinationIP.Equals(ip) &&
-                (_Configuration.TcpPortsToListenOn.Contains(header.DestinationPort) ||
-                _Configuration.TcpPortsToListenOn[0] == 0))
+                (_Configuration.TcpPortsToMonitor.Contains(header.DestinationPort) ||
+                _Configuration.TcpPortsToMonitor[0] == 0))
             {
                 return true;
             }
@@ -278,7 +277,7 @@ namespace tcpTrigger
 
         private bool DoesPacketMatchNamePoison(PacketHeader header, IPAddress ip)
         {
-            if (_Configuration.EnableNamePoisonDetection &&
+            if (_Configuration.IsMonitorPoisonEnabled &&
                 _IsNamePoisonDetectionInProgress &&
                 header.IsNameQueryResponse &&
                 header.DestinationIP.Equals(ip) &&
@@ -293,7 +292,7 @@ namespace tcpTrigger
 
         private bool DoesPacketMatchDhcpServer(PacketHeader header, IPAddress ip)
         {
-            if (_Configuration.EnableRogueDhcpDetection &&
+            if (_Configuration.IsMonitorDhcpEnabled &&
                 header.DhcpServerAddress != null)
             {
                 return true;
