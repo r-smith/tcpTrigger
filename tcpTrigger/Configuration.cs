@@ -9,7 +9,7 @@ using System.Xml;
 
 namespace tcpTrigger
 {
-    class Configuration
+    internal class Configuration
     {
         public bool IsMonitorTcpEnabled { get; private set; }
         public bool IsMonitorIcmpEnabled { get; private set; }
@@ -37,6 +37,9 @@ namespace tcpTrigger
         public string MessageBodyNamePoison { get; private set; }
         public string MessageBodyRogueDhcp { get; private set; }
 
+        private const string RegistryKey = @"System\CurrentControlSet\services\tcpTrigger";
+        private const string RegistryValue = "ImagePath";
+
         private string GetConfigurationPath()
         {
             string installPath = string.Empty;
@@ -44,11 +47,11 @@ namespace tcpTrigger
             // Get the install path for the tcpTrigger service from the Window registry.
             try
             {
-                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"System\CurrentControlSet\services\tcpTrigger"))
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegistryKey))
                 {
                     if (key != null)
                     {
-                        object value = key.GetValue("ImagePath");
+                        object value = key.GetValue(RegistryValue);
                         if (value != null)
                         {
                             installPath = Path.GetDirectoryName((value as string).Trim('"'));
@@ -60,20 +63,27 @@ namespace tcpTrigger
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
-                    $"Error reading configuration file: {ex.Message}",
+                    $"Failed to start the tcpTrigger service. Error retrieving tcpTrigger installation path from the Windows registry.{Environment.NewLine}{ex.Message}",
                     EventLogEntryType.Error,
                     400);
             }
 
-            return installPath + @"\tcpTrigger.xml";
+            return (installPath.Length > 0) ? installPath + @"\tcpTrigger.xml" : string.Empty;
         }
 
-        public void Load()
+        public bool Load()
         {
+            string configuratonPath = GetConfigurationPath();
+
+            if (string.IsNullOrEmpty(configuratonPath))
+            {
+                return false;
+            }
+
             try
             {
                 var xd = new XmlDocument();
-                xd.Load(GetConfigurationPath());
+                xd.Load(configuratonPath);
 
                 XmlNode xn;
                 // tcpTrigger/enabledComponents
@@ -171,15 +181,18 @@ namespace tcpTrigger
 
                 //bool.TryParse(ConfigurationManager.AppSettings["DoNotMonitorVMwareVirtualHostAdapters"], out DoNotMonitorVMwareVirtualHostAdapters);
                 // Get subject!
+
+                return true;
             }
 
             catch (Exception ex)
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
-                    $"Error reading configuration file: {ex.Message}",
+                    $"Failed to start the tcpTrigger service. Error parsing configuration file '{configuratonPath}'.{Environment.NewLine}{ex.Message}",
                     EventLogEntryType.Error,
                     400);
+                return false;
             }
         }
     }

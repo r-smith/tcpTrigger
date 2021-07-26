@@ -31,8 +31,14 @@ namespace tcpTrigger
 
         protected override void OnStart(string[] args)
         {
-            _Configuration.Load();
+            // Locate and read tcpTrigger configuration file.
+            if (_Configuration.Load() == false)
+            {
+                Environment.Exit(1);
+                return;
+            }
             
+            // If enabled, start name poison detection.
             if (_Configuration.IsMonitorPoisonEnabled)
             {
                 _NamePoisionDetectionTimer = new System.Timers.Timer();
