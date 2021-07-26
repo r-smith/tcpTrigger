@@ -34,6 +34,7 @@ namespace tcpTrigger
             // Locate and read tcpTrigger configuration file.
             if (_configuration.Load() == false)
             {
+                // An error was encountered while reading the configuration file. Stop the service and quit.
                 Environment.Exit(1);
                 return;
             }
@@ -50,9 +51,6 @@ namespace tcpTrigger
             // Get network settings for all connected IPv4 network adapters.
             foreach (NetworkInterface networkInterface in NetworkInterface.GetAllNetworkInterfaces())
             {
-                if (_configuration.DoNotMonitorVMwareVirtualHostAdapters &&
-                    networkInterface.Description.StartsWith("VMware Virtual Ethernet Adapter for "))
-                    continue;
                 if (networkInterface.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
                     networkInterface.OperationalStatus == OperationalStatus.Up)
                 {

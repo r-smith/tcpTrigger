@@ -15,7 +15,6 @@ namespace tcpTrigger
         public bool IsMonitorIcmpEnabled { get; private set; }
         public bool IsMonitorPoisonEnabled { get; private set; }
         public bool IsMonitorDhcpEnabled { get; private set; }
-        public bool DoNotMonitorVMwareVirtualHostAdapters { get; private set; }
         public int[] TcpPortsToMonitor { get; private set; }
         public string TcpPortsToMonitorAsString { get; private set; }
         public bool IsEventLogEnabled { get; private set; }
