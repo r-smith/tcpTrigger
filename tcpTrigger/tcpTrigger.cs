@@ -14,13 +14,13 @@ namespace tcpTrigger
 {
     partial class tcpTrigger : ServiceBase
     {
-        private Thread _ListenerThread = null;
-        private Configuration _Configuration = new Configuration();
-        private System.Timers.Timer _NamePoisionDetectionTimer;
-        private ushort _NetbiosTransactionId = 0x8000;
-        private bool _IsNamePoisonDetectionInProgress = false;
-        private int _NamePoisonTransactionIdResponse = int.MinValue;
-        private List<NetInterface> _NetInterfaces = new List<NetInterface>();
+        private Thread _listenerThread = null;
+        private Configuration _configuration = new Configuration();
+        private System.Timers.Timer _namePoisionDetectionTimer;
+        private ushort _netbiosTransactionId = 0x8000;
+        private bool _isNamePoisonDetectionInProgress = false;
+        private int _namePoisonTransactionIdResponse = int.MinValue;
+        private List<NetInterface> _netInterfaces = new List<NetInterface>();
 
         public tcpTrigger()
         {
@@ -32,25 +32,25 @@ namespace tcpTrigger
         protected override void OnStart(string[] args)
         {
             // Locate and read tcpTrigger configuration file.
-            if (_Configuration.Load() == false)
+            if (_configuration.Load() == false)
             {
                 Environment.Exit(1);
                 return;
             }
             
             // If enabled, start name poison detection.
-            if (_Configuration.IsMonitorPoisonEnabled)
+            if (_configuration.IsMonitorPoisonEnabled)
             {
-                _NamePoisionDetectionTimer = new System.Timers.Timer();
-                _NamePoisionDetectionTimer.Interval = TimeSpan.FromMinutes(4).TotalMilliseconds;
-                _NamePoisionDetectionTimer.Elapsed += _NamePoisionDetectionTimer_Elapsed;
-                _NamePoisionDetectionTimer.Enabled = true;
+                _namePoisionDetectionTimer = new System.Timers.Timer();
+                _namePoisionDetectionTimer.Interval = TimeSpan.FromMinutes(4).TotalMilliseconds;
+                _namePoisionDetectionTimer.Elapsed += _NamePoisionDetectionTimer_Elapsed;
+                _namePoisionDetectionTimer.Enabled = true;
             }
             
             // Get network settings for all connected IPv4 network adapters.
             foreach (NetworkInterface networkInterface in NetworkInterface.GetAllNetworkInterfaces())
             {
-                if (_Configuration.DoNotMonitorVMwareVirtualHostAdapters &&
+                if (_configuration.DoNotMonitorVMwareVirtualHostAdapters &&
                     networkInterface.Description.StartsWith("VMware Virtual Ethernet Adapter for "))
                     continue;
                 if (networkInterface.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
@@ -60,7 +60,7 @@ namespace tcpTrigger
                     {
                         if (address.Address.AddressFamily == AddressFamily.InterNetwork)
                         {
-                            _NetInterfaces.Add(
+                            _netInterfaces.Add(
                                 new NetInterface(
                                     address.Address,
                                     address.IPv4Mask,
@@ -71,16 +71,16 @@ namespace tcpTrigger
                 }
             }
 
-            _ListenerThread = new Thread(StartIpListeners);
-            _ListenerThread.Start();
+            _listenerThread = new Thread(StartIpListeners);
+            _listenerThread.Start();
         }
 
         private void _NamePoisionDetectionTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            _IsNamePoisonDetectionInProgress = true;
-            _NamePoisonTransactionIdResponse = int.MinValue;
+            _isNamePoisonDetectionInProgress = true;
+            _namePoisonTransactionIdResponse = int.MinValue;
 
-            foreach (var netInterface in _NetInterfaces)
+            foreach (var netInterface in _netInterfaces)
             {
                 // Generate three random hostnames between 7 and 15 characters to emulate a user opening Chrome.
                 // Chromium source: https://cs.chromium.org/chromium/src/chrome/browser/intranet_redirect_detector.cc
@@ -100,7 +100,7 @@ namespace tcpTrigger
                 for (int i = 0; i < 3; ++i)
                 {
                     for (int j = 0; j < randomHostnames.Length; ++j)
-                        PacketGenerator.SendLlmnrQuery(netInterface, (ushort)(_NetbiosTransactionId + j), randomHostnames[j]);
+                        PacketGenerator.SendLlmnrQuery(netInterface, (ushort)(_netbiosTransactionId + j), randomHostnames[j]);
                     Thread.Sleep(750);
                 }
 
@@ -108,38 +108,38 @@ namespace tcpTrigger
                 for (int i = 0; i < 3; ++i)
                 {
                     for (int j = 0; j < randomHostnames.Length; ++j)
-                        PacketGenerator.SendNetbiosQuery(netInterface, (ushort)(_NetbiosTransactionId + j), randomHostnames[j]);
+                        PacketGenerator.SendNetbiosQuery(netInterface, (ushort)(_netbiosTransactionId + j), randomHostnames[j]);
                     Thread.Sleep(750);
                 }
             }
 
             Thread.Sleep(2000);
-            _NetbiosTransactionId += 3;
-            if (_NetbiosTransactionId < 0x8000)
-                _NetbiosTransactionId += 0x8000;
-            _IsNamePoisonDetectionInProgress = true;
+            _netbiosTransactionId += 3;
+            if (_netbiosTransactionId < 0x8000)
+                _netbiosTransactionId += 0x8000;
+            _isNamePoisonDetectionInProgress = true;
         }
 
         protected override void OnStop()
         {
-            if (_NamePoisionDetectionTimer != null)
+            if (_namePoisionDetectionTimer != null)
             {
-                _NamePoisionDetectionTimer.Enabled = false;
-                _NamePoisionDetectionTimer.Dispose();
-                _NamePoisionDetectionTimer = null;
+                _namePoisionDetectionTimer.Enabled = false;
+                _namePoisionDetectionTimer.Dispose();
+                _namePoisionDetectionTimer = null;
             }
 
-            if (_ListenerThread != null)
+            if (_listenerThread != null)
             {
                 // Wait one second for the thread to stop.
-                _ListenerThread.Join(1000);
+                _listenerThread.Join(1000);
 
                 // If still alive, get rid of the thread.
-                if (_ListenerThread.IsAlive)
+                if (_listenerThread.IsAlive)
                 {
-                    _ListenerThread.Abort();
+                    _listenerThread.Abort();
                 }
-                _ListenerThread = null;
+                _listenerThread = null;
             }
         }
 
@@ -147,17 +147,17 @@ namespace tcpTrigger
         {
             var sb = new StringBuilder();
 
-            foreach (var netInterface in _NetInterfaces)
+            foreach (var netInterface in _netInterfaces)
             {
                 sb.AppendLine($"Listening on interface: {netInterface.IP} [{netInterface.MacAddressAsString}]");
                 RawSocketListener(netInterface);
             }
 
             sb.AppendLine();
-            if (_Configuration.IsMonitorTcpEnabled) sb.AppendLine($"Monitoring TCP port(s): {_Configuration.TcpPortsToMonitorAsString}");
-            if (_Configuration.IsMonitorIcmpEnabled) sb.AppendLine("Monitoring ICMP ping requests");
-            if (_Configuration.IsMonitorPoisonEnabled) sb.AppendLine("Name poisoning detection is enabled");
-            if (_Configuration.IsMonitorDhcpEnabled) sb.Append("Rogue DHCP server detection is enabled");
+            if (_configuration.IsMonitorTcpEnabled) sb.AppendLine($"Monitoring TCP port(s): {_configuration.TcpPortsToMonitorAsString}");
+            if (_configuration.IsMonitorIcmpEnabled) sb.AppendLine("Monitoring ICMP ping requests");
+            if (_configuration.IsMonitorPoisonEnabled) sb.AppendLine("Name poisoning detection is enabled");
+            if (_configuration.IsMonitorDhcpEnabled) sb.Append("Rogue DHCP server detection is enabled");
 
             EventLog.WriteEntry(
                 "tcpTrigger",
@@ -189,11 +189,11 @@ namespace tcpTrigger
                 else if (DoesPacketMatchNamePoison(packetHeader, netInterface.IP))
                 {
                     // Ensure at least two unique responses.
-                    if (_NamePoisonTransactionIdResponse < 0)
+                    if (_namePoisonTransactionIdResponse < 0)
                     {
-                        _NamePoisonTransactionIdResponse = packetHeader.NetbiosTransactionId;
+                        _namePoisonTransactionIdResponse = packetHeader.NetbiosTransactionId;
                     }
-                    else if (_NamePoisonTransactionIdResponse != packetHeader.NetbiosTransactionId)
+                    else if (_namePoisonTransactionIdResponse != packetHeader.NetbiosTransactionId)
                     {
                         packetHeader.MatchType = PacketMatch.NamePoison;
                     }
@@ -202,7 +202,7 @@ namespace tcpTrigger
                 {
                     // If no DHCP servers are specified by the user, we will do automatic detection.
                     // Auto rogue DHCP detection alerts if more than one DHCP server is discovered.
-                    if (_Configuration.DhcpSafeServerList.Count == 0)
+                    if (_configuration.DhcpSafeServerList.Count == 0)
                     {
                         if (!(netInterface.DiscoveredDhcpServerList.Contains(packetHeader.DhcpServerAddress)))
                         {
@@ -213,7 +213,7 @@ namespace tcpTrigger
                                 packetHeader.MatchType = PacketMatch.RogueDhcp;
                         }
                     }
-                    else if (!(_Configuration.DhcpSafeServerList.Contains(packetHeader.DhcpServerAddress)) &&
+                    else if (!(_configuration.DhcpSafeServerList.Contains(packetHeader.DhcpServerAddress)) &&
                         !(netInterface.DiscoveredDhcpServerList.Contains(packetHeader.DhcpServerAddress)))
                     {
                         packetHeader.DestinationIP = netInterface.IP;
@@ -228,19 +228,19 @@ namespace tcpTrigger
                 {
                     packetHeader.DestinationMac = netInterface.MacAddress;
 
-                    if (_Configuration.IsEventLogEnabled)
+                    if (_configuration.IsEventLogEnabled)
                         WriteEventLog(packetHeader);
 
-                    netInterface.RateLimitDictionaryCleanup(_Configuration.ActionRateLimitMinutes);
+                    netInterface.RateLimitDictionaryCleanup(_configuration.ActionRateLimitMinutes);
 
-                    if (!(netInterface.RateLimitDictionary.ContainsKey(packetHeader.SourceIP)) || _Configuration.ActionRateLimitMinutes <= 0)
+                    if (!(netInterface.RateLimitDictionary.ContainsKey(packetHeader.SourceIP)) || _configuration.ActionRateLimitMinutes <= 0)
                     {
-                        if (_Configuration.ActionRateLimitMinutes > 0)
+                        if (_configuration.ActionRateLimitMinutes > 0)
                             netInterface.RateLimitDictionary.Add(packetHeader.SourceIP, DateTime.Now);
 
-                        if (_Configuration.IsExternalAppEnabled) LaunchApplication(packetHeader);
-                        if (_Configuration.IsEmailNotificationEnabled) SendEmail(packetHeader);
-                        if (_Configuration.IsPopupMessageEnabled) DisplayPopupMessage(packetHeader);
+                        if (_configuration.IsExternalAppEnabled) LaunchApplication(packetHeader);
+                        if (_configuration.IsEmailNotificationEnabled) SendEmail(packetHeader);
+                        if (_configuration.IsPopupMessageEnabled) DisplayPopupMessage(packetHeader);
                     }
                 }
 
@@ -255,7 +255,7 @@ namespace tcpTrigger
 
         private bool DoesPacketMatchPingRequest(PacketHeader header, IPAddress ip)
         {
-            if (_Configuration.IsMonitorIcmpEnabled &&
+            if (_configuration.IsMonitorIcmpEnabled &&
                 header.ProtocolType == Protocol.ICMP &&
                 header.DestinationIP.Equals(ip) &&
                 header.IcmpType == 8)
@@ -268,12 +268,12 @@ namespace tcpTrigger
 
         private bool DoesPacketMatchMonitoredPort(PacketHeader header, IPAddress ip)
         {
-            if (_Configuration.IsMonitorTcpEnabled &&
+            if (_configuration.IsMonitorTcpEnabled &&
                 header.ProtocolType == Protocol.TCP &&
                 header.TcpFlags == 0x2 &&
                 header.DestinationIP.Equals(ip) &&
-                (_Configuration.TcpPortsToMonitor.Contains(header.DestinationPort) ||
-                _Configuration.TcpPortsToMonitor[0] == 0))
+                (_configuration.TcpPortsToMonitor.Contains(header.DestinationPort) ||
+                _configuration.TcpPortsToMonitor[0] == 0))
             {
                 return true;
             }
@@ -283,12 +283,12 @@ namespace tcpTrigger
 
         private bool DoesPacketMatchNamePoison(PacketHeader header, IPAddress ip)
         {
-            if (_Configuration.IsMonitorPoisonEnabled &&
-                _IsNamePoisonDetectionInProgress &&
+            if (_configuration.IsMonitorPoisonEnabled &&
+                _isNamePoisonDetectionInProgress &&
                 header.IsNameQueryResponse &&
                 header.DestinationIP.Equals(ip) &&
-                (header.NetbiosTransactionId >= _NetbiosTransactionId &&
-                header.NetbiosTransactionId <= _NetbiosTransactionId + 3))
+                (header.NetbiosTransactionId >= _netbiosTransactionId &&
+                header.NetbiosTransactionId <= _netbiosTransactionId + 3))
             {
                 return true;
             }
@@ -298,7 +298,7 @@ namespace tcpTrigger
 
         private bool DoesPacketMatchDhcpServer(PacketHeader header, IPAddress ip)
         {
-            if (_Configuration.IsMonitorDhcpEnabled &&
+            if (_configuration.IsMonitorDhcpEnabled &&
                 header.DhcpServerAddress != null)
             {
                 return true;
@@ -353,7 +353,7 @@ namespace tcpTrigger
 
         private void LaunchApplication(PacketHeader packetHeader)
         {
-            if (_Configuration.TriggeredApplicationPath.Length == 0)
+            if (_configuration.TriggeredApplicationPath.Length == 0)
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
@@ -366,8 +366,8 @@ namespace tcpTrigger
             try
             {
                 Process.Start(
-                    _Configuration.TriggeredApplicationPath,
-                    UserVariableExpansion.GetExpandedString(_Configuration.TriggeredApplicationArguments, packetHeader));
+                    _configuration.TriggeredApplicationPath,
+                    UserVariableExpansion.GetExpandedString(_configuration.TriggeredApplicationArguments, packetHeader));
             }
             catch (Exception ex)
             {
@@ -397,7 +397,7 @@ namespace tcpTrigger
 
         private void SendEmail(PacketHeader packetHeader)
         {
-            if (_Configuration.EmailRecipientAddress.Length == 0)
+            if (_configuration.EmailRecipientAddress.Length == 0)
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
@@ -406,7 +406,7 @@ namespace tcpTrigger
                     402);
                 return;
             }
-            if (_Configuration.EmailSenderAddress.Length == 0)
+            if (_configuration.EmailSenderAddress.Length == 0)
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
@@ -415,7 +415,7 @@ namespace tcpTrigger
                     402);
                 return;
             }
-            if (_Configuration.EmailServer.Length == 0)
+            if (_configuration.EmailServer.Length == 0)
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
@@ -424,7 +424,7 @@ namespace tcpTrigger
                     402);
                 return;
             }
-            if (_Configuration.EmailSubject.Length == 0)
+            if (_configuration.EmailSubject.Length == 0)
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
@@ -440,13 +440,13 @@ namespace tcpTrigger
                 try
                 {
                     var smtpClient = new SmtpClient();
-                    smtpClient.Host = _Configuration.EmailServer;
-                    smtpClient.Port = _Configuration.EmailServerPort;
-                    message.From = _Configuration.EmailSenderDisplayName.Length > 0 ?
-                        new MailAddress(_Configuration.EmailSenderAddress, _Configuration.EmailSenderDisplayName)
-                        : new MailAddress(_Configuration.EmailSenderAddress);
-                    message.To.Add(_Configuration.EmailRecipientAddress);
-                    message.Subject = UserVariableExpansion.GetExpandedString(_Configuration.EmailSubject, packetHeader);
+                    smtpClient.Host = _configuration.EmailServer;
+                    smtpClient.Port = _configuration.EmailServerPort;
+                    message.From = _configuration.EmailSenderDisplayName.Length > 0 ?
+                        new MailAddress(_configuration.EmailSenderAddress, _configuration.EmailSenderDisplayName)
+                        : new MailAddress(_configuration.EmailSenderAddress);
+                    message.To.Add(_configuration.EmailRecipientAddress);
+                    message.Subject = UserVariableExpansion.GetExpandedString(_configuration.EmailSubject, packetHeader);
                     message.Body = UserVariableExpansion.GetExpandedString(GetMessageBody(packetHeader), packetHeader);
 
                     //Send the email.
@@ -471,16 +471,16 @@ namespace tcpTrigger
             switch (packetHeader.MatchType)
             {
                 case PacketMatch.PingRequest:
-                    messageBody = _Configuration.MessageBodyPing;
+                    messageBody = _configuration.MessageBodyPing;
                     break;
                 case PacketMatch.TcpConnect:
-                    messageBody = _Configuration.MessageBodyTcpConnect;
+                    messageBody = _configuration.MessageBodyTcpConnect;
                     break;
                 case PacketMatch.NamePoison:
-                    messageBody = _Configuration.MessageBodyNamePoison;
+                    messageBody = _configuration.MessageBodyNamePoison;
                     break;
                 case PacketMatch.RogueDhcp:
-                    messageBody = _Configuration.MessageBodyRogueDhcp;
+                    messageBody = _configuration.MessageBodyRogueDhcp;
                     break;
                 default:
                     messageBody = "Not defined.";
