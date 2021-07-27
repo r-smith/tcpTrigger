@@ -85,6 +85,8 @@ namespace tcpTrigger.Editor
                 // tcpTrigger/monitoredPorts
                 TcpIncludePorts.Text =
                     xd.DocumentElement.SelectSingleNode("/tcpTrigger/monitoredPorts/tcp/include")?.InnerText;
+                TcpExcludePorts.Text =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/monitoredPorts/tcp/exclude")?.InnerText;
                 // tcpTrigger/dhcpServerIgnoreList
                 nl = xd.DocumentElement.SelectNodes("/tcpTrigger/dhcpServerIgnoreList/ipAddress");
                 List<string> ignoredDhcpServers = new List<string>();
@@ -171,14 +173,22 @@ namespace tcpTrigger.Editor
             {
                 // Convert port numbers to an ordered int array and remove duplicates.
                 // Port numbers can be entered comma-separated and also specified using ranges with '-'.
-                var portNumbers = (from part in TcpIncludePorts.Text.Split(',')
-                                   let range = part.Split('-')
-                                   let start = int.Parse(range[0])
-                                   let end = int.Parse(range[range.Length - 1])
-                                   from i in Enumerable.Range(start, end - start + 1)
-                                   orderby i
-                                   select i).Distinct().ToArray();
+                int[] portNumbers = (from part in TcpIncludePorts.Text.Split(',')
+                                     let range = part.Split('-')
+                                     let start = int.Parse(range[0])
+                                     let end = int.Parse(range[range.Length - 1])
+                                     from i in Enumerable.Range(start, end - start + 1)
+                                     orderby i
+                                     select i).Distinct().ToArray();
                 TcpIncludePorts.Text = FormatTcpPortRange(portNumbers);
+                portNumbers = (from part in TcpExcludePorts.Text.Split(',')
+                               let range = part.Split('-')
+                               let start = int.Parse(range[0])
+                               let end = int.Parse(range[range.Length - 1])
+                               from i in Enumerable.Range(start, end - start + 1)
+                               orderby i
+                               select i).Distinct().ToArray();
+                TcpExcludePorts.Text = FormatTcpPortRange(portNumbers);
 
                 using (XmlWriter writer = XmlWriter.Create(configurationPath, new XmlWriterSettings() { Indent = true }))
                 {
@@ -195,7 +205,7 @@ namespace tcpTrigger.Editor
                     writer.WriteStartElement("monitoredPorts");
                     writer.WriteStartElement("tcp");
                     writer.WriteElementString("include", TcpIncludePorts.Text);
-                    writer.WriteElementString("exclude", string.Empty);
+                    writer.WriteElementString("exclude", TcpExcludePorts.Text);
                     writer.WriteEndElement();
                     writer.WriteEndElement();
 
