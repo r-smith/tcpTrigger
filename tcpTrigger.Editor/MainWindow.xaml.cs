@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -71,6 +72,7 @@ namespace tcpTrigger.Editor
                 xd.Load(configurationPath);
 
                 XmlNode xn;
+                XmlNodeList nl;
                 // tcpTrigger/enabledComponents
                 xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledComponents/tcp");
                 if (xn != null) { MonitorTcpOption.IsChecked = bool.Parse(xn.InnerText); }
@@ -83,9 +85,16 @@ namespace tcpTrigger.Editor
                 // tcpTrigger/monitoredPorts
                 TcpIncludePorts.Text =
                     xd.DocumentElement.SelectSingleNode("/tcpTrigger/monitoredPorts/tcp/include")?.InnerText;
-                // tcpTrigger/rogueDhcpExclude
-                DhcpServers.Text =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/rogueDhcpExclude/ipAddress")?.InnerText;
+                // tcpTrigger/dhcpServerIgnoreList
+                nl = xd.DocumentElement.SelectNodes("/tcpTrigger/dhcpServerIgnoreList/ipAddress");
+                List<string> ignoredDhcpServers = new List<string>();
+                for (int i = 0; i < nl.Count; i++)
+                {
+                    if (!string.IsNullOrEmpty(nl[i].InnerText))
+                        ignoredDhcpServers.Add(nl[i].InnerText);
+                }
+                DhcpServers.Text = string.Join(", ", ignoredDhcpServers.ToArray());
+
                 // tcpTrigger/enabledActions
                 xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledActions/windowsEventLog");
                 if (xn != null) { EventLogOption.IsChecked = bool.Parse(xn.InnerText); }
@@ -116,7 +125,7 @@ namespace tcpTrigger.Editor
                 EmailSenderFriendly.Text =
                     xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/sender/displayName")?.InnerText;
                 // tcpTrigger/customMessage
-                XmlNodeList nl = xd.DocumentElement.SelectNodes("/tcpTrigger/customMessage");
+                nl = xd.DocumentElement.SelectNodes("/tcpTrigger/customMessage");
                 for (int i = 0; i < nl.Count; i++)
                 {
                     if (nl[i].Attributes["type"]?.InnerText == "tcp")
@@ -139,13 +148,15 @@ namespace tcpTrigger.Editor
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show($"Error reading configuration '{configurationPath}'. {ex.Message}");
             }
         }
 
         private bool WriteConfiguration()
         {
             string configurationPath = GetInstallPath();
+            const string t = "true";
+            const string f = "false";
 
             // Ensure configuration path exists.
             if (configurationPath.Length == 0 || !Directory.Exists(configurationPath))
@@ -159,6 +170,7 @@ namespace tcpTrigger.Editor
             try
             {
                 // Convert port numbers to an ordered int array and remove duplicates.
+                // Port numbers can be entered comma-separated and also specified using ranges with '-'.
                 var portNumbers = (from part in TcpIncludePorts.Text.Split(',')
                                    let range = part.Split('-')
                                    let start = int.Parse(range[0])
@@ -174,10 +186,10 @@ namespace tcpTrigger.Editor
                     writer.WriteStartElement("tcpTrigger");
 
                     writer.WriteStartElement("enabledComponents");
-                    writer.WriteElementString("tcp", MonitorTcpOption.IsChecked.ToString());
-                    writer.WriteElementString("icmp", MonitorIcmpOption.IsChecked.ToString());
-                    writer.WriteElementString("namePoison", MonitorPoisonOption.IsChecked.ToString());
-                    writer.WriteElementString("rogueDhcp", MonitorDhcpOption.IsChecked.ToString());
+                    writer.WriteElementString("tcp", MonitorTcpOption.IsChecked == true ? t : f);
+                    writer.WriteElementString("icmp", MonitorIcmpOption.IsChecked == true ? t : f);
+                    writer.WriteElementString("namePoison", MonitorPoisonOption.IsChecked == true ? t : f);
+                    writer.WriteElementString("rogueDhcp", MonitorDhcpOption.IsChecked == true ? t : f);
                     writer.WriteEndElement();
 
                     writer.WriteStartElement("monitoredPorts");
@@ -187,15 +199,22 @@ namespace tcpTrigger.Editor
                     writer.WriteEndElement();
                     writer.WriteEndElement();
 
-                    writer.WriteStartElement("rogueDhcpExclude");
-                    writer.WriteElementString("ipAddress", DhcpServers.Text);
+                    writer.WriteStartElement("dhcpServerIgnoreList");
+                    string[] dhcpServers = DhcpServers.Text.Split(',');
+                    for (int i = 0; i < dhcpServers.Length; i++)
+                    {
+                        if (!string.IsNullOrEmpty(dhcpServers[i]))
+                        {
+                            writer.WriteElementString("ipAddress", dhcpServers[i].Trim());
+                        }
+                    }
                     writer.WriteEndElement();
 
                     writer.WriteStartElement("enabledActions");
-                    writer.WriteElementString("windowsEventLog", EventLogOption.IsChecked.ToString());
-                    writer.WriteElementString("emailNotification", SendEmailOption.IsChecked.ToString());
-                    writer.WriteElementString("popupNotification", DisplayPopupOption.IsChecked.ToString());
-                    writer.WriteElementString("executeCommand", LaunchAppOption.IsChecked.ToString());
+                    writer.WriteElementString("windowsEventLog", EventLogOption.IsChecked == true ? t : f);
+                    writer.WriteElementString("emailNotification", SendEmailOption.IsChecked == true ? t : f);
+                    writer.WriteElementString("popupNotification", DisplayPopupOption.IsChecked == true ? t : f);
+                    writer.WriteElementString("executeCommand", LaunchAppOption.IsChecked == true ? t : f);
                     writer.WriteEndElement();
 
                     writer.WriteStartElement("actionSettings");

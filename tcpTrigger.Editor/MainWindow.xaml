@@ -52,22 +52,30 @@
                             <CheckBox Content="Monitor TCP connections"
                                       Name="MonitorTcpOption"
                                       Margin="0,7,0,0"/>
-                            <DockPanel Margin="35,0,0,0">
-                                <Label Content="Port numbers"/>
+                            <DockPanel Margin="35,3,0,0">
+                                <Label Content="Include ports" Width="100" HorizontalContentAlignment="Right"/>
                                 <TextBox Name="TcpIncludePorts"
                                          MaxLength="512"
                                          VerticalContentAlignment="Center"
                                          FontFamily="Consolas"
                                          DockPanel.Dock="Right"/>
                             </DockPanel>
-                            <CheckBox Content="NetBIOS / LLMNR name poison detection"
+                            <DockPanel Margin="35,5,0,0">
+                                <Label Content="Exclude ports" Width="100" HorizontalContentAlignment="Right"/>
+                                <TextBox Name="TcpExcludePorts"
+                                         MaxLength="512"
+                                         VerticalContentAlignment="Center"
+                                         FontFamily="Consolas"
+                                         DockPanel.Dock="Right"/>
+                            </DockPanel>
+                            <CheckBox Content="Name poison detection (NetBIOS and LLMNR)"
                                       Name="MonitorPoisonOption"
                                       Margin="0,7,0,0"/>
                             <CheckBox Content="Rogue DHCP server detection"
                                       Name="MonitorDhcpOption"
                                       Margin="0,7,0,0" />
-                            <DockPanel Margin="35,0,0,0">
-                                <Label Content="Known DHCP servers:"/>
+                            <DockPanel Margin="35,3,0,0">
+                                <Label Content="Known DHCP servers"/>
                                 <TextBox Name="DhcpServers"
                                          MaxLength="512"
                                          VerticalContentAlignment="Center"
