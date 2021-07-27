@@ -3,10 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 
 namespace tcpTrigger
 {
-    class NetInterface
+    public class NetInterfaceComparer : IEqualityComparer<NetInterface>
+    {
+        public bool Equals(NetInterface x, NetInterface y)
+        {
+            return x.IP.Equals(y.IP) && x.SubnetMask.Equals(y.SubnetMask) && x.MacAddress.Equals(y.MacAddress);
+        }
+
+        public int GetHashCode(NetInterface obj)
+        {
+            return obj.IP.GetHashCode();
+        }
+    }
+
+    public class NetInterface
     {
         public IPAddress IP { get; }
         public IPAddress SubnetMask { get; }
@@ -20,6 +34,7 @@ namespace tcpTrigger
             }
         }
         public string Description { get; }
+        public Socket NetworkSocket { get; set; }
         public Dictionary<IPAddress, DateTime> RateLimitDictionary { get; set; }
         public List<IPAddress> DiscoveredDhcpServerList { get; set; }
         
@@ -32,6 +47,8 @@ namespace tcpTrigger
             MacAddress = macAddress;
             RateLimitDictionary = new Dictionary<IPAddress, DateTime>();
             DiscoveredDhcpServerList = new List<IPAddress>();
+
+            NetworkSocket = new Socket(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.IP);
         }
 
         private IPAddress GetBroadcastAddress(IPAddress address, IPAddress subnetMask)

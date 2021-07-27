@@ -14,13 +14,12 @@ namespace tcpTrigger
 {
     partial class tcpTrigger : ServiceBase
     {
-        private Thread _listenerThread = null;
         private Configuration _configuration = new Configuration();
+        private List<NetInterface> _tcpTriggerInterfaces;
         private System.Timers.Timer _namePoisionDetectionTimer;
         private ushort _netbiosTransactionId = 0x8000;
         private bool _isNamePoisonDetectionInProgress = false;
         private int _namePoisonTransactionIdResponse = int.MinValue;
-        private List<NetInterface> _netInterfaces = new List<NetInterface>();
 
         public tcpTrigger()
         {
@@ -31,6 +30,8 @@ namespace tcpTrigger
 
         protected override void OnStart(string[] args)
         {
+            // The tcpTrigger Windows service is starting.
+
             // Locate and read tcpTrigger configuration file.
             if (_configuration.Load() == false)
             {
@@ -38,17 +39,50 @@ namespace tcpTrigger
                 Environment.Exit(1);
                 return;
             }
-            
+
             // If enabled, start name poison detection.
             if (_configuration.IsMonitorPoisonEnabled)
             {
                 _namePoisionDetectionTimer = new System.Timers.Timer();
                 _namePoisionDetectionTimer.Interval = TimeSpan.FromMinutes(4).TotalMilliseconds;
-                _namePoisionDetectionTimer.Elapsed += _NamePoisionDetectionTimer_Elapsed;
+                _namePoisionDetectionTimer.Elapsed += NamePoisionDetectionTimer_Elapsed;
                 _namePoisionDetectionTimer.Enabled = true;
             }
-            
-            // Get network settings for all connected IPv4 network adapters.
+
+            // Retrieve network interfaces and start IP listener threads.
+            // This is done on a timer so that the listener thread can automatically restart
+            // if any changes to network interfaces are detected.
+            var networkInterfaceInitializeTimer = new System.Timers.Timer();
+            networkInterfaceInitializeTimer.Interval = TimeSpan.FromMinutes(1).TotalMilliseconds;
+            networkInterfaceInitializeTimer.Elapsed += InitializeNetworkListeners_Elapsed;
+            networkInterfaceInitializeTimer.Enabled = true;
+            InitializeNetworkListeners_Elapsed(null, null);
+        }
+
+        protected override void OnStop()
+        {
+            // The tcpTrigger Windows service is stopping.
+
+            // Stop and dispose timers and threads.
+            if (_namePoisionDetectionTimer != null)
+            {
+                _namePoisionDetectionTimer.Enabled = false;
+                _namePoisionDetectionTimer.Dispose();
+                _namePoisionDetectionTimer = null;
+            }
+
+            // Close (and dispose) all existing listeners.
+            for (int i = 0; i < _tcpTriggerInterfaces.Count; i++)
+            {
+                _tcpTriggerInterfaces[i].NetworkSocket.Close();
+            }
+        }
+
+        private void InitializeNetworkListeners_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            var networkInterfaces = new List<NetInterface>();
+
+            // Enumerate network interfaces. Determine and record which interfaces to listen on.
             foreach (NetworkInterface networkInterface in NetworkInterface.GetAllNetworkInterfaces())
             {
                 if (networkInterface.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
@@ -58,7 +92,7 @@ namespace tcpTrigger
                     {
                         if (address.Address.AddressFamily == AddressFamily.InterNetwork)
                         {
-                            _netInterfaces.Add(
+                            networkInterfaces.Add(
                                 new NetInterface(
                                     address.Address,
                                     address.IPv4Mask,
@@ -69,83 +103,44 @@ namespace tcpTrigger
                 }
             }
 
-            _listenerThread = new Thread(StartIpListeners);
-            _listenerThread.Start();
-        }
-
-        private void _NamePoisionDetectionTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            _isNamePoisonDetectionInProgress = true;
-            _namePoisonTransactionIdResponse = int.MinValue;
-
-            foreach (var netInterface in _netInterfaces)
+            // Check if tcpTrigger service is already running (_tcpTriggerInterfaces won't be null).
+            if (_tcpTriggerInterfaces != null)
             {
-                // Generate three random hostnames between 7 and 15 characters to emulate a user opening Chrome.
-                // Chromium source: https://cs.chromium.org/chromium/src/chrome/browser/intranet_redirect_detector.cc
-
-                var randomHostnames = new string[3];
-                var r = new Random();
-                for (int i = 0; i < randomHostnames.Length; ++i)
+                // Compares list of network interfaces to previously stored list of network interfaces.
+                if (networkInterfaces.SequenceEqual(_tcpTriggerInterfaces, new NetInterfaceComparer()))
                 {
-                    var hostname = string.Empty;
-                    int numberOfCharacters = r.Next(7, 16);
-                    for (int j = 0; j < numberOfCharacters; ++j)
-                        hostname += (char)('a' + r.Next(0, 26));
-                    randomHostnames[i] = hostname;
+                    // Lists are equal. Nothing to do; quit.
+                    return;
                 }
-
-                // Send LLMNR name queries.
-                for (int i = 0; i < 3; ++i)
+                else
                 {
-                    for (int j = 0; j < randomHostnames.Length; ++j)
-                        PacketGenerator.SendLlmnrQuery(netInterface, (ushort)(_netbiosTransactionId + j), randomHostnames[j]);
-                    Thread.Sleep(750);
-                }
+                    // Network interfaces have changed. Record to event log that a change was detected.
+                    EventLog.WriteEntry(
+                        "tcpTrigger",
+                        "tcpTrigger detected changes to network interfaces in Windows. Restarting listeners.",
+                        EventLogEntryType.Information,
+                        101);
 
-                // Send NetBIOS name queries.
-                for (int i = 0; i < 3; ++i)
-                {
-                    for (int j = 0; j < randomHostnames.Length; ++j)
-                        PacketGenerator.SendNetbiosQuery(netInterface, (ushort)(_netbiosTransactionId + j), randomHostnames[j]);
-                    Thread.Sleep(750);
+                    // Close (and dispose) all existing listeners.
+                    for (int i = 0; i < _tcpTriggerInterfaces.Count; i++)
+                    {
+                        _tcpTriggerInterfaces[i].NetworkSocket.Close();
+                    }
                 }
             }
 
-            Thread.Sleep(2000);
-            _netbiosTransactionId += 3;
-            if (_netbiosTransactionId < 0x8000)
-                _netbiosTransactionId += 0x8000;
-            _isNamePoisonDetectionInProgress = true;
-        }
+            // Clone retrieved list of network interfaces to global var.
+            _tcpTriggerInterfaces = new List<NetInterface>(networkInterfaces);
 
-        protected override void OnStop()
-        {
-            if (_namePoisionDetectionTimer != null)
-            {
-                _namePoisionDetectionTimer.Enabled = false;
-                _namePoisionDetectionTimer.Dispose();
-                _namePoisionDetectionTimer = null;
-            }
-
-            if (_listenerThread != null)
-            {
-                // Wait one second for the thread to stop.
-                _listenerThread.Join(1000);
-
-                // If still alive, get rid of the thread.
-                if (_listenerThread.IsAlive)
-                {
-                    _listenerThread.Abort();
-                }
-                _listenerThread = null;
-            }
+            // Start listeners.
+            StartIpListeners();
         }
 
         private void StartIpListeners()
         {
             var sb = new StringBuilder();
 
-            foreach (var netInterface in _netInterfaces)
+            foreach (var netInterface in _tcpTriggerInterfaces)
             {
                 sb.AppendLine($"Listening on interface: {netInterface.IP} [{netInterface.MacAddressAsString}]");
                 RawSocketListener(netInterface);
@@ -166,12 +161,12 @@ namespace tcpTrigger
 
         private void RawSocketListener(NetInterface netInterface)
         {
-            var socket = new Socket(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.IP);
-            socket.Bind(new IPEndPoint(netInterface.IP, 0));
-            socket.IOControl(IOControlCode.ReceiveAll, BitConverter.GetBytes(1), null);
-
             // Buffer for incoming data.
             byte[] buffer = new byte[512];
+
+            // Bind socket to IP endpoint.
+            netInterface.NetworkSocket.Bind(new IPEndPoint(netInterface.IP, 0));
+            netInterface.NetworkSocket.IOControl(IOControlCode.ReceiveAll, BitConverter.GetBytes(1), null);
 
             // Callback method for processing captured packets.
             Action<IAsyncResult> OnReceive = null;
@@ -241,14 +236,21 @@ namespace tcpTrigger
                         if (_configuration.IsPopupMessageEnabled) DisplayPopupMessage(packetHeader);
                     }
                 }
-
                 // Reset buffer and continue listening for new data.
                 buffer = new byte[512];
-                socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(OnReceive), null);
+                try
+                {
+                    netInterface.NetworkSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(OnReceive), null);
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Listener has been disposed by calling thread.
+                    // This is expected behavior for cleanup. Do nothing.
+                }
             };
 
             // Begin listening for data.
-            socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(OnReceive), null);
+            netInterface.NetworkSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(OnReceive), null);
         }
 
         private bool DoesPacketMatchPingRequest(PacketHeader header, IPAddress ip)
@@ -304,7 +306,7 @@ namespace tcpTrigger
 
             return false;
         }
-        
+
         private void WriteEventLog(PacketHeader packetHeader)
         {
             switch (packetHeader.MatchType)
@@ -486,6 +488,51 @@ namespace tcpTrigger
             }
 
             return messageBody;
+        }
+
+        private void NamePoisionDetectionTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            _isNamePoisonDetectionInProgress = true;
+            _namePoisonTransactionIdResponse = int.MinValue;
+
+            foreach (var netInterface in _tcpTriggerInterfaces)
+            {
+                // Generate three random hostnames between 7 and 15 characters to emulate a user opening Chrome.
+                // Chromium source: https://cs.chromium.org/chromium/src/chrome/browser/intranet_redirect_detector.cc
+
+                var randomHostnames = new string[3];
+                var r = new Random();
+                for (int i = 0; i < randomHostnames.Length; ++i)
+                {
+                    var hostname = string.Empty;
+                    int numberOfCharacters = r.Next(7, 16);
+                    for (int j = 0; j < numberOfCharacters; ++j)
+                        hostname += (char)('a' + r.Next(0, 26));
+                    randomHostnames[i] = hostname;
+                }
+
+                // Send LLMNR name queries.
+                for (int i = 0; i < 3; ++i)
+                {
+                    for (int j = 0; j < randomHostnames.Length; ++j)
+                        PacketGenerator.SendLlmnrQuery(netInterface, (ushort)(_netbiosTransactionId + j), randomHostnames[j]);
+                    Thread.Sleep(750);
+                }
+
+                // Send NetBIOS name queries.
+                for (int i = 0; i < 3; ++i)
+                {
+                    for (int j = 0; j < randomHostnames.Length; ++j)
+                        PacketGenerator.SendNetbiosQuery(netInterface, (ushort)(_netbiosTransactionId + j), randomHostnames[j]);
+                    Thread.Sleep(750);
+                }
+            }
+
+            Thread.Sleep(2000);
+            _netbiosTransactionId += 3;
+            if (_netbiosTransactionId < 0x8000)
+                _netbiosTransactionId += 0x8000;
+            _isNamePoisonDetectionInProgress = true;
         }
     }
 }
