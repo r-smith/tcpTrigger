@@ -53,7 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration.cs" />
-    <Compile Include="NetInterface.cs" />
+    <Compile Include="TcpTriggerInterface.cs" />
     <Compile Include="PacketGenerator.cs" />
     <Compile Include="PacketHeader.cs" />
     <Compile Include="ProjectInstaller.cs">

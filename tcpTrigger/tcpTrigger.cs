@@ -15,7 +15,7 @@ namespace tcpTrigger
     partial class tcpTrigger : ServiceBase
     {
         private Configuration _configuration = new Configuration();
-        private List<NetInterface> _tcpTriggerInterfaces;
+        private List<TcpTriggerInterface> _tcpTriggerInterfaces;
         private System.Timers.Timer _namePoisionDetectionTimer;
         private ushort _netbiosTransactionId = 0x8000;
         private bool _isNamePoisonDetectionInProgress = false;
@@ -80,7 +80,7 @@ namespace tcpTrigger
 
         private void InitializeNetworkListeners_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            var networkInterfaces = new List<NetInterface>();
+            var networkInterfaces = new List<TcpTriggerInterface>();
 
             // Enumerate network interfaces. Determine and record which interfaces to listen on.
             foreach (NetworkInterface networkInterface in NetworkInterface.GetAllNetworkInterfaces())
@@ -93,7 +93,7 @@ namespace tcpTrigger
                         if (address.Address.AddressFamily == AddressFamily.InterNetwork)
                         {
                             networkInterfaces.Add(
-                                new NetInterface(
+                                new TcpTriggerInterface(
                                     address.Address,
                                     address.IPv4Mask,
                                     networkInterface.Description,
@@ -107,7 +107,7 @@ namespace tcpTrigger
             if (_tcpTriggerInterfaces != null)
             {
                 // Compares list of network interfaces to previously stored list of network interfaces.
-                if (networkInterfaces.SequenceEqual(_tcpTriggerInterfaces, new NetInterfaceComparer()))
+                if (networkInterfaces.SequenceEqual(_tcpTriggerInterfaces, new TcpTriggerInterfaceComparer()))
                 {
                     // Lists are equal. Nothing to do; quit.
                     return;
@@ -130,7 +130,7 @@ namespace tcpTrigger
             }
 
             // Clone retrieved list of network interfaces to global var.
-            _tcpTriggerInterfaces = new List<NetInterface>(networkInterfaces);
+            _tcpTriggerInterfaces = new List<TcpTriggerInterface>(networkInterfaces);
 
             // Start listeners.
             StartIpListeners();
@@ -140,10 +140,10 @@ namespace tcpTrigger
         {
             var sb = new StringBuilder();
 
-            foreach (var netInterface in _tcpTriggerInterfaces)
+            foreach (TcpTriggerInterface ipInterface in _tcpTriggerInterfaces)
             {
-                sb.AppendLine($"Listening on interface: {netInterface.IP} [{netInterface.MacAddressAsString}]");
-                RawSocketListener(netInterface);
+                sb.AppendLine($"Listening on interface: {ipInterface.IP} [{ipInterface.MacAddressAsString}]");
+                RawSocketListener(ipInterface);
             }
 
             sb.AppendLine();
@@ -159,14 +159,14 @@ namespace tcpTrigger
                 100);
         }
 
-        private void RawSocketListener(NetInterface netInterface)
+        private void RawSocketListener(TcpTriggerInterface ipInterface)
         {
             // Buffer for incoming data.
             byte[] buffer = new byte[512];
 
             // Bind socket to IP endpoint.
-            netInterface.NetworkSocket.Bind(new IPEndPoint(netInterface.IP, 0));
-            netInterface.NetworkSocket.IOControl(IOControlCode.ReceiveAll, BitConverter.GetBytes(1), null);
+            ipInterface.NetworkSocket.Bind(new IPEndPoint(ipInterface.IP, 0));
+            ipInterface.NetworkSocket.IOControl(IOControlCode.ReceiveAll, BitConverter.GetBytes(1), null);
 
             // Callback method for processing captured packets.
             Action<IAsyncResult> OnReceive = null;
@@ -175,11 +175,11 @@ namespace tcpTrigger
                 // Packet received.  Extract header information and determine if the packet matches our trigger rules.
                 var packetHeader = new PacketHeader(buffer);
 
-                if (DoesPacketMatchPingRequest(packetHeader, netInterface.IP))
+                if (DoesPacketMatchPingRequest(packetHeader, ipInterface.IP))
                     packetHeader.MatchType = PacketMatch.PingRequest;
-                else if (DoesPacketMatchMonitoredPort(packetHeader, netInterface.IP))
+                else if (DoesPacketMatchMonitoredPort(packetHeader, ipInterface.IP))
                     packetHeader.MatchType = PacketMatch.TcpConnect;
-                else if (DoesPacketMatchNamePoison(packetHeader, netInterface.IP))
+                else if (DoesPacketMatchNamePoison(packetHeader, ipInterface.IP))
                 {
                     // Ensure at least two unique responses.
                     if (_namePoisonTransactionIdResponse < 0)
@@ -191,27 +191,27 @@ namespace tcpTrigger
                         packetHeader.MatchType = PacketMatch.NamePoison;
                     }
                 }
-                else if (DoesPacketMatchDhcpServer(packetHeader, netInterface.IP))
+                else if (DoesPacketMatchDhcpServer(packetHeader, ipInterface.IP))
                 {
                     // If no DHCP servers are specified by the user, we will do automatic detection.
                     // Auto rogue DHCP detection alerts if more than one DHCP server is discovered.
                     if (_configuration.DhcpSafeServerList.Count == 0)
                     {
-                        if (!(netInterface.DiscoveredDhcpServerList.Contains(packetHeader.DhcpServerAddress)))
+                        if (!(ipInterface.DiscoveredDhcpServerList.Contains(packetHeader.DhcpServerAddress)))
                         {
-                            packetHeader.DestinationIP = netInterface.IP;
+                            packetHeader.DestinationIP = ipInterface.IP;
                             packetHeader.SourceIP = packetHeader.DhcpServerAddress;
-                            netInterface.DiscoveredDhcpServerList.Add(packetHeader.DhcpServerAddress);
-                            if (netInterface.DiscoveredDhcpServerList.Count > 1)
+                            ipInterface.DiscoveredDhcpServerList.Add(packetHeader.DhcpServerAddress);
+                            if (ipInterface.DiscoveredDhcpServerList.Count > 1)
                                 packetHeader.MatchType = PacketMatch.RogueDhcp;
                         }
                     }
                     else if (!(_configuration.DhcpSafeServerList.Contains(packetHeader.DhcpServerAddress)) &&
-                        !(netInterface.DiscoveredDhcpServerList.Contains(packetHeader.DhcpServerAddress)))
+                        !(ipInterface.DiscoveredDhcpServerList.Contains(packetHeader.DhcpServerAddress)))
                     {
-                        packetHeader.DestinationIP = netInterface.IP;
+                        packetHeader.DestinationIP = ipInterface.IP;
                         packetHeader.SourceIP = packetHeader.DhcpServerAddress;
-                        netInterface.DiscoveredDhcpServerList.Add(packetHeader.DhcpServerAddress);
+                        ipInterface.DiscoveredDhcpServerList.Add(packetHeader.DhcpServerAddress);
                         packetHeader.MatchType = PacketMatch.RogueDhcp;
                     }
                 }
@@ -219,17 +219,17 @@ namespace tcpTrigger
                 // Process actions.
                 if (packetHeader.MatchType != PacketMatch.None)
                 {
-                    packetHeader.DestinationMac = netInterface.MacAddress;
+                    packetHeader.DestinationMac = ipInterface.MacAddress;
 
                     if (_configuration.IsEventLogEnabled)
                         WriteEventLog(packetHeader);
 
-                    netInterface.RateLimitDictionaryCleanup(_configuration.ActionRateLimitMinutes);
+                    ipInterface.RateLimitDictionaryCleanup(_configuration.ActionRateLimitMinutes);
 
-                    if (!(netInterface.RateLimitDictionary.ContainsKey(packetHeader.SourceIP)) || _configuration.ActionRateLimitMinutes <= 0)
+                    if (!(ipInterface.RateLimitDictionary.ContainsKey(packetHeader.SourceIP)) || _configuration.ActionRateLimitMinutes <= 0)
                     {
                         if (_configuration.ActionRateLimitMinutes > 0)
-                            netInterface.RateLimitDictionary.Add(packetHeader.SourceIP, DateTime.Now);
+                            ipInterface.RateLimitDictionary.Add(packetHeader.SourceIP, DateTime.Now);
 
                         if (_configuration.IsExternalAppEnabled) LaunchApplication(packetHeader);
                         if (_configuration.IsEmailNotificationEnabled) SendEmail(packetHeader);
@@ -240,7 +240,7 @@ namespace tcpTrigger
                 buffer = new byte[512];
                 try
                 {
-                    netInterface.NetworkSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(OnReceive), null);
+                    ipInterface.NetworkSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(OnReceive), null);
                 }
                 catch (ObjectDisposedException)
                 {
@@ -250,7 +250,7 @@ namespace tcpTrigger
             };
 
             // Begin listening for data.
-            netInterface.NetworkSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(OnReceive), null);
+            ipInterface.NetworkSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(OnReceive), null);
         }
 
         private bool DoesPacketMatchPingRequest(PacketHeader header, IPAddress ip)
@@ -495,7 +495,7 @@ namespace tcpTrigger
             _isNamePoisonDetectionInProgress = true;
             _namePoisonTransactionIdResponse = int.MinValue;
 
-            foreach (var netInterface in _tcpTriggerInterfaces)
+            foreach (TcpTriggerInterface ipInterface in _tcpTriggerInterfaces)
             {
                 // Generate three random hostnames between 7 and 15 characters to emulate a user opening Chrome.
                 // Chromium source: https://cs.chromium.org/chromium/src/chrome/browser/intranet_redirect_detector.cc
@@ -515,7 +515,7 @@ namespace tcpTrigger
                 for (int i = 0; i < 3; ++i)
                 {
                     for (int j = 0; j < randomHostnames.Length; ++j)
-                        PacketGenerator.SendLlmnrQuery(netInterface, (ushort)(_netbiosTransactionId + j), randomHostnames[j]);
+                        PacketGenerator.SendLlmnrQuery(ipInterface, (ushort)(_netbiosTransactionId + j), randomHostnames[j]);
                     Thread.Sleep(750);
                 }
 
@@ -523,7 +523,7 @@ namespace tcpTrigger
                 for (int i = 0; i < 3; ++i)
                 {
                     for (int j = 0; j < randomHostnames.Length; ++j)
-                        PacketGenerator.SendNetbiosQuery(netInterface, (ushort)(_netbiosTransactionId + j), randomHostnames[j]);
+                        PacketGenerator.SendNetbiosQuery(ipInterface, (ushort)(_netbiosTransactionId + j), randomHostnames[j]);
                     Thread.Sleep(750);
                 }
             }

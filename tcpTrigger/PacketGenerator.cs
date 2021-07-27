@@ -10,7 +10,7 @@ namespace tcpTrigger
 {
     class PacketGenerator
     {
-        public static void SendLlmnrQuery(NetInterface netInterface, ushort transactionId, string queryName)
+        public static void SendLlmnrQuery(TcpTriggerInterface ipInterface, ushort transactionId, string queryName)
         {
             if (queryName.Length > 255) queryName = queryName.Substring(0, 255);
             queryName = queryName.ToLower();
@@ -37,7 +37,7 @@ namespace tcpTrigger
 
                 // Since this is a multicast packet, we must specify the local endpoint
                 // to ensure it is sent out on every interface on a multi-homed system.
-                var localEndpoint = new IPEndPoint(netInterface.IP, 0);
+                var localEndpoint = new IPEndPoint(ipInterface.IP, 0);
                 var udpClient = new UdpClient(localEndpoint);
                 udpClient.Send(sendBytes, sendBytes.Length, remoteEndpoint);
                 udpClient.Close();
@@ -52,7 +52,7 @@ namespace tcpTrigger
             }
         }
 
-        public static void SendNetbiosQuery(NetInterface netInterface, ushort transactionId, string netbiosName)
+        public static void SendNetbiosQuery(TcpTriggerInterface ipInterface, ushort transactionId, string netbiosName)
         {
             var byteList = new List<byte[]>();
             byteList.Add(BitConverter.GetBytes(transactionId));
@@ -66,7 +66,7 @@ namespace tcpTrigger
 
             try
             {
-                var endpoint = new IPEndPoint(netInterface.BroadcastAddress, 137);
+                var endpoint = new IPEndPoint(ipInterface.BroadcastAddress, 137);
                 var udpClient = new UdpClient(137);
                 udpClient.Send(sendBytes, sendBytes.Length, endpoint);
                 udpClient.Close();

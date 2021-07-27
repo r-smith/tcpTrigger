@@ -7,20 +7,20 @@ using System.Net.Sockets;
 
 namespace tcpTrigger
 {
-    public class NetInterfaceComparer : IEqualityComparer<NetInterface>
+    public class TcpTriggerInterfaceComparer : IEqualityComparer<TcpTriggerInterface>
     {
-        public bool Equals(NetInterface x, NetInterface y)
+        public bool Equals(TcpTriggerInterface x, TcpTriggerInterface y)
         {
             return x.IP.Equals(y.IP) && x.SubnetMask.Equals(y.SubnetMask) && x.MacAddress.Equals(y.MacAddress);
         }
 
-        public int GetHashCode(NetInterface obj)
+        public int GetHashCode(TcpTriggerInterface obj)
         {
             return obj.IP.GetHashCode();
         }
     }
 
-    public class NetInterface
+    public class TcpTriggerInterface
     {
         public IPAddress IP { get; }
         public IPAddress SubnetMask { get; }
@@ -38,7 +38,7 @@ namespace tcpTrigger
         public Dictionary<IPAddress, DateTime> RateLimitDictionary { get; set; }
         public List<IPAddress> DiscoveredDhcpServerList { get; set; }
         
-        public NetInterface(IPAddress address, IPAddress subnetMask, string description, PhysicalAddress macAddress)
+        public TcpTriggerInterface(IPAddress address, IPAddress subnetMask, string description, PhysicalAddress macAddress)
         {
             IP = address;
             SubnetMask = subnetMask;
