@@ -24,7 +24,8 @@ namespace tcpTrigger
         public int ActionRateLimitMinutes { get; private set; }
         public string TriggeredApplicationPath { get; private set; }
         public string TriggeredApplicationArguments { get; private set; }
-        public List<IPAddress> DhcpSafeServerList { get; private set; } = new List<IPAddress>();
+        public HashSet<IPAddress> IgnoredDhcpServers { get; private set; } = new HashSet<IPAddress>();
+        public HashSet<IPAddress> IgnoredEndpoints { get; private set; } = new HashSet<IPAddress>();
         public string EmailServer { get; private set; }
         public int EmailServerPort { get; private set; }
         public string EmailRecipientAddress { get; private set; }
@@ -85,6 +86,7 @@ namespace tcpTrigger
                 xd.Load(configuratonPath);
 
                 XmlNode xn;
+                XmlNodeList nl;
                 // tcpTrigger/enabledComponents
                 xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledComponents/tcp");
                 if (xn != null) { IsMonitorTcpEnabled = bool.Parse(xn.InnerText); }
@@ -110,18 +112,19 @@ namespace tcpTrigger
                 }
                 if (IsMonitorDhcpEnabled)
                 {
-                    // tcpTrigger/rogueDhcpExclude
-                    string dhcpSafeServerListAsString =
-                        xd.DocumentElement.SelectSingleNode("/tcpTrigger/rogueDhcpExclude/ipAddress")?.InnerText;
-                    if (dhcpSafeServerListAsString.Length > 0)
+                    // tcpTrigger/dhcpServerIgnoreList
+                    nl = xd.DocumentElement.SelectNodes("/tcpTrigger/dhcpServerIgnoreList/ipAddress");
+                    for (int i = 0; i < nl.Count; i++)
                     {
-                        IPAddress[] dhcpSafeServerListAsArray = dhcpSafeServerListAsString.Split(',').
-                            Select(x => IPAddress.Parse(x)).ToArray();
-                        for (int i = 0; i < dhcpSafeServerListAsArray.Length; ++i)
-                        {
-                            DhcpSafeServerList.Add(dhcpSafeServerListAsArray[i]);
-                        }
+                        IgnoredDhcpServers.Add(IPAddress.Parse(nl[i].InnerText));
                     }
+                }
+
+                // tcpTrigger/endpointIgnoreList
+                nl = xd.DocumentElement.SelectNodes("/tcpTrigger/endpointIgnoreList/ipAddress");
+                for (int i = 0; i < nl.Count; i++)
+                {
+                    IgnoredEndpoints.Add(IPAddress.Parse(nl[i].InnerText));
                 }
 
                 // tcpTrigger/enabledActions
@@ -157,7 +160,7 @@ namespace tcpTrigger
                     xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/sender/displayName")?.InnerText;
 
                 // tcpTrigger/customMessage
-                XmlNodeList nl = xd.DocumentElement.SelectNodes("/tcpTrigger/customMessage");
+                nl = xd.DocumentElement.SelectNodes("/tcpTrigger/customMessage");
                 for (int i = 0; i < nl.Count; i++)
                 {
                     if (nl[i].Attributes["type"]?.InnerText == "tcp")

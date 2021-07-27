@@ -146,11 +146,33 @@ namespace tcpTrigger
                 RawSocketListener(ipInterface);
             }
 
+            // Log monitoring configuration.
             sb.AppendLine();
-            if (_configuration.IsMonitorTcpEnabled) sb.AppendLine($"Monitoring TCP port(s): {_configuration.TcpPortsToMonitorAsString}");
-            if (_configuration.IsMonitorIcmpEnabled) sb.AppendLine("Monitoring ICMP ping requests");
-            if (_configuration.IsMonitorPoisonEnabled) sb.AppendLine("Name poisoning detection is enabled");
-            if (_configuration.IsMonitorDhcpEnabled) sb.Append("Rogue DHCP server detection is enabled");
+            sb.AppendLine("Monitor TCP: " + (_configuration.IsMonitorTcpEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Monitor ICMP: " + (_configuration.IsMonitorIcmpEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Monitor name poison: " + (_configuration.IsMonitorPoisonEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Monitor rogue DHCP: " + (_configuration.IsMonitorDhcpEnabled ? "Enabled" : "Disabled"));
+            if (_configuration.IsMonitorTcpEnabled) sb.AppendLine($"{Environment.NewLine}Monitoring TCP port(s): {_configuration.TcpPortsToMonitorAsString}");
+
+            // Log endpoint ignore list.
+            if (_configuration.IgnoredEndpoints.Count > 0)
+            {
+                sb.AppendLine();
+                foreach (IPAddress ip in _configuration.IgnoredEndpoints)
+                {
+                    sb.AppendLine("Ignore source IP: " + ip.ToString());
+                }
+            }
+
+            // Log DHCP server ignore list.
+            if (_configuration.IgnoredDhcpServers.Count > 0)
+            {
+                sb.AppendLine();
+                foreach (IPAddress ip in _configuration.IgnoredDhcpServers)
+                {
+                    sb.AppendLine("Ignore DHCP server: " + ip.ToString());
+                }
+            }
 
             EventLog.WriteEntry(
                 "tcpTrigger",
@@ -195,9 +217,9 @@ namespace tcpTrigger
                 {
                     // If no DHCP servers are specified by the user, we will do automatic detection.
                     // Auto rogue DHCP detection alerts if more than one DHCP server is discovered.
-                    if (_configuration.DhcpSafeServerList.Count == 0)
+                    if (_configuration.IgnoredDhcpServers.Count == 0)
                     {
-                        if (!(ipInterface.DiscoveredDhcpServerList.Contains(packetHeader.DhcpServerAddress)))
+                        if (!ipInterface.DiscoveredDhcpServerList.Contains(packetHeader.DhcpServerAddress))
                         {
                             packetHeader.DestinationIP = ipInterface.IP;
                             packetHeader.SourceIP = packetHeader.DhcpServerAddress;
@@ -206,8 +228,8 @@ namespace tcpTrigger
                                 packetHeader.MatchType = PacketMatch.RogueDhcp;
                         }
                     }
-                    else if (!(_configuration.DhcpSafeServerList.Contains(packetHeader.DhcpServerAddress)) &&
-                        !(ipInterface.DiscoveredDhcpServerList.Contains(packetHeader.DhcpServerAddress)))
+                    else if (!_configuration.IgnoredDhcpServers.Contains(packetHeader.DhcpServerAddress) &&
+                        !ipInterface.DiscoveredDhcpServerList.Contains(packetHeader.DhcpServerAddress))
                     {
                         packetHeader.DestinationIP = ipInterface.IP;
                         packetHeader.SourceIP = packetHeader.DhcpServerAddress;
@@ -224,16 +246,19 @@ namespace tcpTrigger
                     if (_configuration.IsEventLogEnabled)
                         WriteEventLog(packetHeader);
 
-                    ipInterface.RateLimitDictionaryCleanup(_configuration.ActionRateLimitMinutes);
-
-                    if (!(ipInterface.RateLimitDictionary.ContainsKey(packetHeader.SourceIP)) || _configuration.ActionRateLimitMinutes <= 0)
+                    if (!_configuration.IgnoredEndpoints.Contains(packetHeader.SourceIP))
                     {
-                        if (_configuration.ActionRateLimitMinutes > 0)
-                            ipInterface.RateLimitDictionary.Add(packetHeader.SourceIP, DateTime.Now);
+                        ipInterface.RateLimitDictionaryCleanup(_configuration.ActionRateLimitMinutes);
 
-                        if (_configuration.IsExternalAppEnabled) LaunchApplication(packetHeader);
-                        if (_configuration.IsEmailNotificationEnabled) SendEmail(packetHeader);
-                        if (_configuration.IsPopupMessageEnabled) DisplayPopupMessage(packetHeader);
+                        if (!ipInterface.RateLimitDictionary.ContainsKey(packetHeader.SourceIP) || _configuration.ActionRateLimitMinutes <= 0)
+                        {
+                            if (_configuration.ActionRateLimitMinutes > 0)
+                                ipInterface.RateLimitDictionary.Add(packetHeader.SourceIP, DateTime.Now);
+
+                            if (_configuration.IsExternalAppEnabled) LaunchApplication(packetHeader);
+                            if (_configuration.IsEmailNotificationEnabled) SendEmail(packetHeader);
+                            if (_configuration.IsPopupMessageEnabled) DisplayPopupMessage(packetHeader);
+                        }
                     }
                 }
                 // Reset buffer and continue listening for new data.
@@ -287,8 +312,8 @@ namespace tcpTrigger
                 _isNamePoisonDetectionInProgress &&
                 header.IsNameQueryResponse &&
                 header.DestinationIP.Equals(ip) &&
-                (header.NetbiosTransactionId >= _netbiosTransactionId &&
-                header.NetbiosTransactionId <= _netbiosTransactionId + 3))
+                header.NetbiosTransactionId >= _netbiosTransactionId &&
+                header.NetbiosTransactionId <= _netbiosTransactionId + 3)
             {
                 return true;
             }
@@ -357,7 +382,7 @@ namespace tcpTrigger
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
-                    "An application has been triggered to launch, but no application path has been specified.",
+                    "An external application has been triggered to launch, but no application path has been specified.",
                     EventLogEntryType.Warning,
                     401);
                 return;
@@ -373,7 +398,7 @@ namespace tcpTrigger
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
-                    $"Error launching triggered application: {ex.Message}",
+                    $"Error launching external triggered application.{Environment.NewLine}{ex.Message}",
                     EventLogEntryType.Error,
                     401);
             }
@@ -389,7 +414,7 @@ namespace tcpTrigger
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
-                    $"Error displaying popup message: {ex.Message}",
+                    $"Error displaying popup message.{Environment.NewLine}{ex.Message}",
                     EventLogEntryType.Error,
                     404);
             }
@@ -456,7 +481,7 @@ namespace tcpTrigger
                 {
                     EventLog.WriteEntry(
                         "tcpTrigger",
-                        $"Email event triggered, but the message failed to send. {ex.Message}",
+                        $"Email event triggered, but the message failed to send.{Environment.NewLine}{ex.Message}",
                         EventLogEntryType.Warning,
                         403);
                     return;
@@ -466,8 +491,7 @@ namespace tcpTrigger
 
         private string GetMessageBody(PacketHeader packetHeader)
         {
-            var messageBody = string.Empty;
-
+            string messageBody;
             switch (packetHeader.MatchType)
             {
                 case PacketMatch.PingRequest:
