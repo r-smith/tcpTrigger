@@ -24,6 +24,7 @@ namespace tcpTrigger
         public int ActionRateLimitMinutes { get; private set; }
         public string TriggeredApplicationPath { get; private set; }
         public string TriggeredApplicationArguments { get; private set; }
+        public HashSet<string> ExcludedNetworkInterfaces { get; private set; } = new HashSet<string>();
         public HashSet<IPAddress> IgnoredDhcpServers { get; private set; } = new HashSet<IPAddress>();
         public HashSet<IPAddress> IgnoredEndpoints { get; private set; } = new HashSet<IPAddress>();
         public string EmailServer { get; private set; }
@@ -116,7 +117,8 @@ namespace tcpTrigger
                     nl = xd.DocumentElement.SelectNodes("/tcpTrigger/dhcpServerIgnoreList/ipAddress");
                     for (int i = 0; i < nl.Count; i++)
                     {
-                        IgnoredDhcpServers.Add(IPAddress.Parse(nl[i].InnerText));
+                        if (!string.IsNullOrEmpty(nl[i].InnerText))
+                            IgnoredDhcpServers.Add(IPAddress.Parse(nl[i].InnerText));
                     }
                 }
 
@@ -124,7 +126,16 @@ namespace tcpTrigger
                 nl = xd.DocumentElement.SelectNodes("/tcpTrigger/endpointIgnoreList/ipAddress");
                 for (int i = 0; i < nl.Count; i++)
                 {
-                    IgnoredEndpoints.Add(IPAddress.Parse(nl[i].InnerText));
+                    if (!string.IsNullOrEmpty(nl[i].InnerText))
+                        IgnoredEndpoints.Add(IPAddress.Parse(nl[i].InnerText));
+                }
+
+                // tcpTrigger/networkInterfaceExcludeList
+                nl = xd.DocumentElement.SelectNodes("/tcpTrigger/networkInterfaceExcludeList/deviceGuid");
+                for (int i = 0; i < nl.Count; i++)
+                {
+                    if (!string.IsNullOrEmpty(nl[i].InnerText))
+                        ExcludedNetworkInterfaces.Add(nl[i].InnerText);
                 }
 
                 // tcpTrigger/enabledActions

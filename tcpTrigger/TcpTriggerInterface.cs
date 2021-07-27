@@ -22,6 +22,7 @@ namespace tcpTrigger
 
     public class TcpTriggerInterface
     {
+        public string Guid { get; }
         public IPAddress IP { get; }
         public IPAddress SubnetMask { get; }
         public IPAddress BroadcastAddress { get; }
@@ -34,17 +35,18 @@ namespace tcpTrigger
             }
         }
         public string Description { get; }
-        public Socket NetworkSocket { get; set; }
+        public Socket NetworkSocket { get; }
         public Dictionary<IPAddress, DateTime> RateLimitDictionary { get; set; }
         public List<IPAddress> DiscoveredDhcpServerList { get; set; }
         
-        public TcpTriggerInterface(IPAddress address, IPAddress subnetMask, string description, PhysicalAddress macAddress)
+        public TcpTriggerInterface(IPAddress address, IPAddress subnetMask, string description, PhysicalAddress macAddress, string guid)
         {
             IP = address;
             SubnetMask = subnetMask;
             BroadcastAddress = GetBroadcastAddress(address, subnetMask);
             Description = description;
             MacAddress = macAddress;
+            Guid = guid;
             RateLimitDictionary = new Dictionary<IPAddress, DateTime>();
             DiscoveredDhcpServerList = new List<IPAddress>();
 

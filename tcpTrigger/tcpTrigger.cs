@@ -85,6 +85,10 @@ namespace tcpTrigger
             // Enumerate network interfaces. Determine and record which interfaces to listen on.
             foreach (NetworkInterface networkInterface in NetworkInterface.GetAllNetworkInterfaces())
             {
+                if (_configuration.ExcludedNetworkInterfaces.Contains(networkInterface.Id))
+                {
+                    continue;
+                }
                 if (networkInterface.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
                     networkInterface.OperationalStatus == OperationalStatus.Up)
                 {
@@ -94,10 +98,12 @@ namespace tcpTrigger
                         {
                             networkInterfaces.Add(
                                 new TcpTriggerInterface(
-                                    address.Address,
-                                    address.IPv4Mask,
-                                    networkInterface.Description,
-                                    networkInterface.GetPhysicalAddress()));
+                                    address: address.Address,
+                                    subnetMask: address.IPv4Mask,
+                                    description: networkInterface.Description,
+                                    macAddress: networkInterface.GetPhysicalAddress(),
+                                    guid: networkInterface.Id)
+                                );
                         }
                     }
                 }
@@ -140,10 +146,17 @@ namespace tcpTrigger
         {
             var sb = new StringBuilder();
 
+            // Log interfaces.
             foreach (TcpTriggerInterface ipInterface in _tcpTriggerInterfaces)
             {
-                sb.AppendLine($"Listening on interface: {ipInterface.IP} [{ipInterface.MacAddressAsString}]");
-                RawSocketListener(ipInterface);
+                sb.AppendLine($"Listening on interface: {ipInterface.IP} --> [{ipInterface.MacAddressAsString}] --> {ipInterface.Guid}");
+            }
+            if (_configuration.ExcludedNetworkInterfaces.Count > 0)
+            {
+                foreach (string guid in _configuration.ExcludedNetworkInterfaces)
+                {
+                    sb.AppendLine("Exclude network interface: " + guid);
+                }
             }
 
             // Log monitoring configuration.
@@ -152,12 +165,11 @@ namespace tcpTrigger
             sb.AppendLine("Monitor ICMP: " + (_configuration.IsMonitorIcmpEnabled ? "Enabled" : "Disabled"));
             sb.AppendLine("Monitor name poison: " + (_configuration.IsMonitorPoisonEnabled ? "Enabled" : "Disabled"));
             sb.AppendLine("Monitor rogue DHCP: " + (_configuration.IsMonitorDhcpEnabled ? "Enabled" : "Disabled"));
-            if (_configuration.IsMonitorTcpEnabled) sb.AppendLine($"{Environment.NewLine}Monitoring TCP port(s): {_configuration.TcpPortsToMonitorAsString}");
+            if (_configuration.IsMonitorTcpEnabled) sb.AppendLine($"Monitoring TCP port(s): {_configuration.TcpPortsToMonitorAsString}");
 
             // Log endpoint ignore list.
             if (_configuration.IgnoredEndpoints.Count > 0)
             {
-                sb.AppendLine();
                 foreach (IPAddress ip in _configuration.IgnoredEndpoints)
                 {
                     sb.AppendLine("Ignore source IP: " + ip.ToString());
@@ -167,18 +179,24 @@ namespace tcpTrigger
             // Log DHCP server ignore list.
             if (_configuration.IgnoredDhcpServers.Count > 0)
             {
-                sb.AppendLine();
                 foreach (IPAddress ip in _configuration.IgnoredDhcpServers)
                 {
                     sb.AppendLine("Ignore DHCP server: " + ip.ToString());
                 }
             }
 
+            // Write to event log.
             EventLog.WriteEntry(
                 "tcpTrigger",
                 sb.ToString(),
                 EventLogEntryType.Information,
                 100);
+
+            // Start listeners.
+            for (int i = 0; i < _tcpTriggerInterfaces.Count; i++)
+            {
+                RawSocketListener(_tcpTriggerInterfaces[i]);
+            }
         }
 
         private void RawSocketListener(TcpTriggerInterface ipInterface)
