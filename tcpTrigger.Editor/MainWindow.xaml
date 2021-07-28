@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="tcpTrigger Setup"
         Background="#ffffff"
-        Height="650" MinHeight="650"
+        Height="540" MinHeight="500"
         Width="750" MinWidth="650"
         ResizeMode="CanResizeWithGrip">
     <Window.Resources>
@@ -53,7 +53,7 @@
                                       Name="MonitorTcpOption"
                                       Margin="0,7,0,0"/>
                             <DockPanel Margin="35,3,0,0">
-                                <Label Content="Include ports" Width="100" HorizontalContentAlignment="Right"/>
+                                <Label Content="Include ports" MinWidth="100" HorizontalContentAlignment="Right"/>
                                 <TextBox Name="TcpIncludePorts"
                                          MaxLength="512"
                                          VerticalContentAlignment="Center"
@@ -61,7 +61,7 @@
                                          DockPanel.Dock="Right"/>
                             </DockPanel>
                             <DockPanel Margin="35,5,0,0">
-                                <Label Content="Exclude ports" Width="100" HorizontalContentAlignment="Right"/>
+                                <Label Content="Exclude ports" MinWidth="100" HorizontalContentAlignment="Right"/>
                                 <TextBox Name="TcpExcludePorts"
                                          MaxLength="512"
                                          VerticalContentAlignment="Center"
@@ -84,20 +84,31 @@
                             </DockPanel>
                         </StackPanel>
                     </GroupBox>
+                </DockPanel>
+            </TabItem>
 
+            <!-- Tab: Actions -->
+            <TabItem Header="Actions" Name="ActionsTab">
+                <DockPanel LastChildFill="False">
                     <!-- Actions -->
-                    <GroupBox Header="Actions" DockPanel.Dock="Top" Margin="0,20,0,0">
+                    <GroupBox Header="Actions" DockPanel.Dock="Top">
                         <StackPanel Margin="5">
-                            <TextBlock Text="Selected actions will be carried out each time an incoming connection matches the above rules."
+                            <TextBlock Text="Selected actions will be carried out each time an incoming connection matches a trigger rule."
                                        TextWrapping="Wrap"
-                                       FontSize="11"
+                                       FontSize="12"
                                        Foreground="#888"/>
-
+                            
+                            <!-- Write to event log -->
+                            <CheckBox Name="EventLogOption"
+                                      Content="Write to Windows event log"
+                                      Margin="0,15,0,0"/>
+                            
                             <!-- Send notification email -->
                             <CheckBox Name="SendEmailOption"
-                                      Content="Send a notification email"/>
-                            <DockPanel Margin="35,0,0,0">
-                                <Label Content="Email subject:"/>
+                                      Content="Send a notification email"
+                                      Margin="0,10,0,0"/>
+                            <DockPanel Margin="35,3,0,0">
+                                <Label Content="Email subject" MinWidth="100" HorizontalContentAlignment="Right"/>
                                 <TextBox Name="EmailSubject"
                                          MaxLength="512"
                                          VerticalContentAlignment="Center"
@@ -114,18 +125,18 @@
                             <CheckBox Name="LaunchAppOption"
                                       Content="Launch an external application"
                                       Margin="0,10,0,0" />
-                            <Grid Margin="35,0,0,0">
+                            <Grid Margin="35,3,0,0">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="6" />
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="80" />
+                                    <ColumnDefinition Width="100" />
                                     <ColumnDefinition/>
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Label Content="Application:"
+                                <Label Content="Application"
                                        HorizontalAlignment="Right"/>
                                 <TextBox Name="ApplicationPath"
                                          Grid.Column="1"
@@ -136,7 +147,7 @@
                                         Margin="15,0,0,0"
                                         Padding="15,0"
                                         Click="Browse_Click"/>
-                                <Label Content="Arguments:"
+                                <Label Content="Arguments"
                                        HorizontalAlignment="Right"
                                        Grid.Row="2"/>
                                 <TextBox Name="ApplicationArguments"
@@ -158,14 +169,14 @@
                               DockPanel.Dock="Top">
                         <StackPanel Margin="5">
                             <DockPanel>
-                                <Label Content="SMTP server:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130"/>
+                                <Label Content="SMTP server" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130"/>
                                 <TextBox Name="EmailServer"
                                          FontFamily="Consolas"
                                          VerticalContentAlignment="Center"
                                          MaxLength="256"/>
                             </DockPanel>
                             <DockPanel Margin="0,6,0,0">
-                                <Label Content="Port:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
+                                <Label Content="Port" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
                                 <TextBox Name="EmailPort"
                                          Width="85"
                                          FontFamily="Consolas"
@@ -174,21 +185,21 @@
                                          MaxLength="256"/>
                             </DockPanel>
                             <DockPanel Margin="0,6,0,0">
-                                <Label Content="Recipient address:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
+                                <Label Content="Recipient address" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
                                 <TextBox Name="EmailRecipient"
                                          FontFamily="Consolas"
                                          VerticalContentAlignment="Center"
                                          MaxLength="256"/>
                             </DockPanel>
                             <DockPanel Margin="0,6,0,0">
-                                <Label Content="Sender address:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
+                                <Label Content="Sender address" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
                                 <TextBox Name="EmailSender"
                                          FontFamily="Consolas"
                                          VerticalContentAlignment="Center"
                                          MaxLength="256"/>
                             </DockPanel>
                             <DockPanel Margin="0,6,0,0">
-                                <Label Content="Sender display name:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
+                                <Label Content="Sender display name" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
                                 <TextBox Name="EmailSenderFriendly"
                                          FontFamily="Consolas"
                                          VerticalContentAlignment="Center"
@@ -210,7 +221,7 @@
                         <ScrollViewer>
                             <StackPanel Margin="5">
                                 <DockPanel>
-                                    <Label Content="Ping request detected:"
+                                    <Label Content="Ping request detected"
                                            HorizontalContentAlignment="Right"
                                            VerticalContentAlignment="Top"
                                            Width="200" />
@@ -224,7 +235,7 @@
                                              MaxLength="2048"/>
                                 </DockPanel>
                                 <DockPanel Margin="0,6,0,0">
-                                    <Label Content="TCP connection detected:"
+                                    <Label Content="TCP connection detected"
                                            HorizontalContentAlignment="Right"
                                            VerticalContentAlignment="Top"
                                            Width="200" />
@@ -238,7 +249,7 @@
                                              MaxLength="2048"/>
                                 </DockPanel>
                                 <DockPanel Margin="0,6,0,0">
-                                    <Label Content="Name poison detected:"
+                                    <Label Content="Name poison detected"
                                            HorizontalContentAlignment="Right"
                                            VerticalContentAlignment="Top"
                                            Width="200" />
@@ -252,7 +263,7 @@
                                              MaxLength="2048"/>
                                 </DockPanel>
                                 <DockPanel Margin="0,6,0,0">
-                                    <Label Content="Rogue DHCP server detected:"
+                                    <Label Content="Rogue DHCP server detected"
                                            HorizontalContentAlignment="Right"
                                            VerticalContentAlignment="Top"
                                            Width="200" />
@@ -287,7 +298,7 @@
                     <GroupBox Header="Advanced Settings" DockPanel.Dock="Top">
                         <StackPanel Margin="5">
                             <CheckBox Name="RateLimitOption" Content="Enable rate limiting on triggered actions (recommended)"/>
-                            <StackPanel Orientation="Horizontal" Margin="35,0,0,0">
+                            <StackPanel Orientation="Horizontal" Margin="35,3,0,0">
                                 <Label Content="Limit one triggered action per source IP every"/>
                                 <TextBox Name="RateLimitMinutes"
                                          Margin="5,0"
@@ -295,14 +306,6 @@
                                          MaxLength="5"/>
                                 <Label Content="minute(s)"/>
                             </StackPanel>
-
-                            <CheckBox Name="EventLogOption"
-                                      Content="Write matching connections to Windows event log"
-                                      Margin="0,15,0,5"/>
-                            <TextBlock Foreground="#888" Margin="20,0,0,0" TextWrapping="Wrap">
-                                Any connection matching the trigger rules will be written to the event log.
-                                This will not be affected by rate limiting.
-                            </TextBlock>
                         </StackPanel>
                     </GroupBox>
                 </DockPanel>
