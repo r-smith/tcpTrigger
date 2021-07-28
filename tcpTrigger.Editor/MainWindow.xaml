@@ -56,16 +56,16 @@
                                 <Label Content="Include ports" MinWidth="100" HorizontalContentAlignment="Right"/>
                                 <TextBox Name="TcpIncludePorts"
                                          MaxLength="512"
-                                         VerticalContentAlignment="Center"
                                          FontFamily="Consolas"
+                                         PreviewTextInput="TcpPorts_PreviewTextInput"
                                          DockPanel.Dock="Right"/>
                             </DockPanel>
                             <DockPanel Margin="35,5,0,0">
                                 <Label Content="Exclude ports" MinWidth="100" HorizontalContentAlignment="Right"/>
                                 <TextBox Name="TcpExcludePorts"
                                          MaxLength="512"
-                                         VerticalContentAlignment="Center"
                                          FontFamily="Consolas"
+                                         PreviewTextInput="TcpPorts_PreviewTextInput"
                                          DockPanel.Dock="Right"/>
                             </DockPanel>
                             <CheckBox Content="Name poison detection (NetBIOS and LLMNR)"
@@ -78,7 +78,6 @@
                                 <Label Content="Known DHCP servers"/>
                                 <TextBox Name="DhcpServers"
                                          MaxLength="512"
-                                         VerticalContentAlignment="Center"
                                          FontFamily="Consolas"
                                          DockPanel.Dock="Right"/>
                             </DockPanel>
@@ -111,7 +110,6 @@
                                 <Label Content="Email subject" MinWidth="100" HorizontalContentAlignment="Right"/>
                                 <TextBox Name="EmailSubject"
                                          MaxLength="512"
-                                         VerticalContentAlignment="Center"
                                          FontFamily="Consolas"
                                          DockPanel.Dock="Right"/>
                             </DockPanel>
@@ -140,8 +138,7 @@
                                        HorizontalAlignment="Right"/>
                                 <TextBox Name="ApplicationPath"
                                          Grid.Column="1"
-                                         FontFamily="Consolas"
-                                         VerticalContentAlignment="Center"/>
+                                         FontFamily="Consolas"/>
                                 <Button Content="Browse..."
                                         Grid.Column="2"
                                         Margin="15,0,0,0"
@@ -154,8 +151,7 @@
                                          Grid.Row="2"
                                          Grid.Column="1"
                                          Grid.ColumnSpan="2"
-                                         FontFamily="Consolas"
-                                         VerticalContentAlignment="Center"/>
+                                         FontFamily="Consolas"/>
                             </Grid>
                         </StackPanel>
                     </GroupBox>
@@ -168,42 +164,48 @@
                     <GroupBox Header="Outgoing Mail Server"
                               DockPanel.Dock="Top">
                         <StackPanel Margin="5">
+                            <TextBlock Text="Server Information"
+                                       Foreground="#268bd2"
+                                       FontSize="13"
+                                       Margin="0,0,0,5"
+                                       FontWeight="SemiBold"/>
                             <DockPanel>
                                 <Label Content="SMTP server" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130"/>
                                 <TextBox Name="EmailServer"
                                          FontFamily="Consolas"
-                                         VerticalContentAlignment="Center"
-                                         MaxLength="256"/>
+                                         MaxLength="512"/>
                             </DockPanel>
                             <DockPanel Margin="0,6,0,0">
                                 <Label Content="Port" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
                                 <TextBox Name="EmailPort"
-                                         Width="85"
+                                         Width="75"
                                          FontFamily="Consolas"
                                          HorizontalAlignment="Left"
-                                         VerticalContentAlignment="Center"
-                                         MaxLength="256"/>
+                                         PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                         MaxLength="5"/>
                             </DockPanel>
-                            <DockPanel Margin="0,6,0,0">
+                            <TextBlock Text="Email Addresses"
+                                       Foreground="#268bd2"
+                                       FontSize="13"
+                                       Margin="0,12,0,5"
+                                       FontWeight="SemiBold"/>
+                            <DockPanel Margin="0,0,0,0">
                                 <Label Content="Recipient address" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
                                 <TextBox Name="EmailRecipient"
                                          FontFamily="Consolas"
-                                         VerticalContentAlignment="Center"
-                                         MaxLength="256"/>
+                                         MaxLength="512"/>
                             </DockPanel>
                             <DockPanel Margin="0,6,0,0">
                                 <Label Content="Sender address" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
                                 <TextBox Name="EmailSender"
                                          FontFamily="Consolas"
-                                         VerticalContentAlignment="Center"
-                                         MaxLength="256"/>
+                                         MaxLength="512"/>
                             </DockPanel>
                             <DockPanel Margin="0,6,0,0">
                                 <Label Content="Sender display name" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
                                 <TextBox Name="EmailSenderFriendly"
                                          FontFamily="Consolas"
-                                         VerticalContentAlignment="Center"
-                                         MaxLength="256"/>
+                                         MaxLength="512"/>
                             </DockPanel>
                         </StackPanel>
                     </GroupBox>
@@ -303,6 +305,8 @@
                                 <TextBox Name="RateLimitMinutes"
                                          Margin="5,0"
                                          Width="60"
+                                         PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                         FontFamily="Consolas"
                                          MaxLength="5"/>
                                 <Label Content="minute(s)"/>
                             </StackPanel>

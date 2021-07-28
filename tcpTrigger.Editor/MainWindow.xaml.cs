@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Xml;
 
@@ -529,6 +530,20 @@ namespace tcpTrigger.Editor
                 HelpWindow newWnd = new HelpWindow();
                 newWnd.Show();
             }
+        }
+
+        private void NumericTextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            var regex = new Regex("[^0-9.-]+");
+            if (regex.IsMatch(e.Text))
+                e.Handled = true;
+        }
+
+        private void TcpPorts_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            var regex = new Regex("[^0-9,\\-\\s.-]+");
+            if (regex.IsMatch(e.Text))
+                e.Handled = true;
         }
     }
 }
