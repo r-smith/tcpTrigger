@@ -7,11 +7,20 @@
         mc:Ignorable="d"
         Title="tcpTrigger Setup"
         Background="#ffffff"
-        Height="540" MinHeight="500"
-        Width="750" MinWidth="650"
+        Height="570" MinHeight="550"
+        Width="750" MinWidth="600"
         ResizeMode="CanResizeWithGrip">
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Regular"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Margin" Value="0,0,5,0"/>
+            <Setter Property="Foreground" Value="#484848"/>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -24,7 +33,7 @@
         <StackPanel Grid.Row="0"
                     Orientation="Horizontal"
                     HorizontalAlignment="Center"
-                    Margin="0,20">
+                    Margin="0,15">
             <Image Source="/Resources/tcpTrigger Logo.png"
                    Height="48"
                    Width="48"/>
@@ -53,7 +62,9 @@
                                       Name="MonitorTcpOption"
                                       Margin="0,7,0,0"/>
                             <DockPanel Margin="35,3,0,0">
-                                <Label Content="Include ports" MinWidth="100" HorizontalContentAlignment="Right"/>
+                                <Grid MinWidth="100">
+                                    <TextBlock Text="Include ports"/>
+                                </Grid>
                                 <TextBox Name="TcpIncludePorts"
                                          MaxLength="512"
                                          FontFamily="Consolas"
@@ -61,7 +72,9 @@
                                          DockPanel.Dock="Right"/>
                             </DockPanel>
                             <DockPanel Margin="35,5,0,0">
-                                <Label Content="Exclude ports" MinWidth="100" HorizontalContentAlignment="Right"/>
+                                <Grid MinWidth="100">
+                                    <TextBlock Text="Exclude ports"/>
+                                </Grid>
                                 <TextBox Name="TcpExcludePorts"
                                          MaxLength="512"
                                          FontFamily="Consolas"
@@ -75,7 +88,9 @@
                                       Name="MonitorDhcpOption"
                                       Margin="0,7,0,0" />
                             <DockPanel Margin="35,3,0,0">
-                                <Label Content="Known DHCP servers"/>
+                                <Grid MinWidth="100">
+                                    <TextBlock Text="Known DHCP servers"/>
+                                </Grid>
                                 <TextBox Name="DhcpServers"
                                          MaxLength="512"
                                          FontFamily="Consolas"
@@ -93,6 +108,7 @@
                     <GroupBox Header="Actions" DockPanel.Dock="Top">
                         <StackPanel Margin="5">
                             <TextBlock Text="Selected actions will be carried out each time an incoming connection matches a trigger rule."
+                                       HorizontalAlignment="Left"
                                        TextWrapping="Wrap"
                                        FontSize="12"
                                        Foreground="#888"/>
@@ -107,7 +123,9 @@
                                       Content="Send a notification email"
                                       Margin="0,10,0,0"/>
                             <DockPanel Margin="35,3,0,0">
-                                <Label Content="Email subject" MinWidth="100" HorizontalContentAlignment="Right"/>
+                                <Grid MinWidth="100">
+                                    <TextBlock Text="Email subject" HorizontalAlignment="Right"/>
+                                </Grid>
                                 <TextBox Name="EmailSubject"
                                          MaxLength="512"
                                          FontFamily="Consolas"
@@ -134,8 +152,7 @@
                                     <ColumnDefinition/>
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Label Content="Application"
-                                       HorizontalAlignment="Right"/>
+                                <TextBlock Text="Application"/>
                                 <TextBox Name="ApplicationPath"
                                          Grid.Column="1"
                                          FontFamily="Consolas"/>
@@ -144,9 +161,8 @@
                                         Margin="15,0,0,0"
                                         Padding="15,0"
                                         Click="Browse_Click"/>
-                                <Label Content="Arguments"
-                                       HorizontalAlignment="Right"
-                                       Grid.Row="2"/>
+                                <TextBlock Text="Arguments"
+                                           Grid.Row="2"/>
                                 <TextBox Name="ApplicationArguments"
                                          Grid.Row="2"
                                          Grid.Column="1"
@@ -165,44 +181,70 @@
                               DockPanel.Dock="Top">
                         <StackPanel Margin="5">
                             <TextBlock Text="Server Information"
+                                       HorizontalAlignment="Left"
                                        Foreground="#268bd2"
                                        FontSize="13"
                                        Margin="0,0,0,5"
                                        FontWeight="SemiBold"/>
-                            <DockPanel>
-                                <Label Content="SMTP server" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130"/>
+                            <!-- Email server and port -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <!-- Email server -->
+                                <Grid Width="140">
+                                    <TextBlock Text="SMTP server"/>
+                                </Grid>
                                 <TextBox Name="EmailServer"
+                                         Grid.Column="1"
                                          FontFamily="Consolas"
                                          MaxLength="512"/>
-                            </DockPanel>
-                            <DockPanel Margin="0,6,0,0">
-                                <Label Content="Port" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
-                                <TextBox Name="EmailPort"
-                                         Width="75"
-                                         FontFamily="Consolas"
-                                         HorizontalAlignment="Left"
-                                         PreviewTextInput="NumericTextBox_PreviewTextInput"
-                                         MaxLength="5"/>
-                            </DockPanel>
+                                <!-- Port -->
+                                <DockPanel Grid.Column="2">
+                                    <Grid Width="70">
+                                        <TextBlock Text="Port"/>
+                                    </Grid>
+                                    <TextBox Name="EmailPort"
+                                             Width="75"
+                                             FontFamily="Consolas"
+                                             HorizontalAlignment="Left"
+                                             PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                             MaxLength="5"/>
+                                </DockPanel>
+                                
+                            </Grid>
+                            
                             <TextBlock Text="Email Addresses"
                                        Foreground="#268bd2"
                                        FontSize="13"
+                                       HorizontalAlignment="Left"
                                        Margin="0,12,0,5"
                                        FontWeight="SemiBold"/>
+                            <!-- Recipient -->
                             <DockPanel Margin="0,0,0,0">
-                                <Label Content="Recipient address" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
+                                <Grid Width="140">
+                                    <TextBlock Text="Recipient address"/>
+                                </Grid>
                                 <TextBox Name="EmailRecipient"
                                          FontFamily="Consolas"
                                          MaxLength="512"/>
                             </DockPanel>
+                            <!-- Sender -->
                             <DockPanel Margin="0,6,0,0">
-                                <Label Content="Sender address" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
+                                <Grid Width="140">
+                                    <TextBlock Text="Sender address"/>
+                                </Grid>
                                 <TextBox Name="EmailSender"
                                          FontFamily="Consolas"
                                          MaxLength="512"/>
                             </DockPanel>
+                            <!-- Sender friendly -->
                             <DockPanel Margin="0,6,0,0">
-                                <Label Content="Sender display name" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Width="130" />
+                                <Grid Width="140">
+                                    <TextBlock Text="Sender display name"/>
+                                </Grid>
                                 <TextBox Name="EmailSenderFriendly"
                                          FontFamily="Consolas"
                                          MaxLength="512"/>
