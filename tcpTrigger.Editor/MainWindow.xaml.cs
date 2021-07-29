@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.ServiceProcess;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -116,17 +118,28 @@ namespace tcpTrigger.Editor
                     xd.DocumentElement.SelectSingleNode("/tcpTrigger/actionSettings/command/path")?.InnerText;
                 ApplicationArguments.Text =
                     xd.DocumentElement.SelectSingleNode("/tcpTrigger/actionSettings/command/arguments")?.InnerText;
-                // tcpTrigger/emailSettings
+                // tcpTrigger/emailConfiguration
                 EmailServer.Text =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/server")?.InnerText;
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/server")?.InnerText;
                 EmailPort.Text =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/port")?.InnerText;
-                EmailRecipient.Text =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/recipientList/address")?.InnerText;
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/port")?.InnerText;
+                SmtpUsername.Text =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/username")?.InnerText;
+                SmtpPassword.Password =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/password")?.InnerText;
+                // Join recipient list to single string.
+                nl = xd.DocumentElement.SelectNodes("/tcpTrigger/emailConfiguration/recipientList/address");
+                List<string> recipients = new List<string>();
+                for (int i = 0; i < nl.Count; i++)
+                {
+                    if (!string.IsNullOrEmpty(nl[i].InnerText))
+                        recipients.Add(nl[i].InnerText);
+                }
+                EmailRecipient.Text = string.Join(", ", recipients.ToArray());
                 EmailSender.Text =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/sender/address")?.InnerText;
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/sender/address")?.InnerText;
                 EmailSenderFriendly.Text =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/sender/displayName")?.InnerText;
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/sender/displayName")?.InnerText;
                 // tcpTrigger/customMessage
                 nl = xd.DocumentElement.SelectNodes("/tcpTrigger/customMessage");
                 for (int i = 0; i < nl.Count; i++)
@@ -193,9 +206,11 @@ namespace tcpTrigger.Editor
 
                 using (XmlWriter writer = XmlWriter.Create(configurationPath, new XmlWriterSettings() { Indent = true }))
                 {
+                    // Start tags.
                     writer.WriteStartDocument();
                     writer.WriteStartElement("tcpTrigger");
 
+                    // Enabled components.
                     writer.WriteStartElement("enabledComponents");
                     writer.WriteElementString("tcp", MonitorTcpOption.IsChecked == true ? t : f);
                     writer.WriteElementString("icmp", MonitorIcmpOption.IsChecked == true ? t : f);
@@ -203,6 +218,7 @@ namespace tcpTrigger.Editor
                     writer.WriteElementString("rogueDhcp", MonitorDhcpOption.IsChecked == true ? t : f);
                     writer.WriteEndElement();
 
+                    // Monitored ports.
                     writer.WriteStartElement("monitoredPorts");
                     writer.WriteStartElement("tcp");
                     writer.WriteElementString("include", TcpIncludePorts.Text);
@@ -210,6 +226,7 @@ namespace tcpTrigger.Editor
                     writer.WriteEndElement();
                     writer.WriteEndElement();
 
+                    // DHCP ignore list.
                     writer.WriteStartElement("dhcpServerIgnoreList");
                     string[] dhcpServers = DhcpServers.Text.Split(',');
                     for (int i = 0; i < dhcpServers.Length; i++)
@@ -221,6 +238,7 @@ namespace tcpTrigger.Editor
                     }
                     writer.WriteEndElement();
 
+                    // Enabled actions.
                     writer.WriteStartElement("enabledActions");
                     writer.WriteElementString("windowsEventLog", EventLogOption.IsChecked == true ? t : f);
                     writer.WriteElementString("emailNotification", SendEmailOption.IsChecked == true ? t : f);
@@ -228,47 +246,49 @@ namespace tcpTrigger.Editor
                     writer.WriteElementString("executeCommand", LaunchAppOption.IsChecked == true ? t : f);
                     writer.WriteEndElement();
 
+                    // Action settings.
                     writer.WriteStartElement("actionSettings");
                     writer.WriteElementString("rateLimitMinutes", RateLimitMinutes.Text);
                     writer.WriteStartElement("command");
-                    writer.WriteElementString("path",
-                        (LaunchAppOption.IsChecked == true)
-                        ? ApplicationPath.Text
-                        : string.Empty);
-                    writer.WriteElementString("arguments",
-                        (LaunchAppOption.IsChecked == true)
-                        ? ApplicationArguments.Text
-                        : string.Empty);
+                    writer.WriteElementString("path", ApplicationPath.Text);
+                    writer.WriteElementString("arguments", ApplicationArguments.Text);
                     writer.WriteEndElement();
                     writer.WriteEndElement();
 
-                    writer.WriteStartElement("emailSettings");
-                    writer.WriteElementString("server",
-                        (SendEmailOption.IsChecked == true)
-                        ? EmailServer.Text
-                        : string.Empty);
-                    writer.WriteElementString("port",
-                        (SendEmailOption.IsChecked == true)
-                        ? EmailPort.Text
-                        : string.Empty);
+                    // Email configuration.
+                    writer.WriteStartElement("emailConfiguration");
+                    writer.WriteElementString("server", EmailServer.Text);
+                    writer.WriteElementString("port", EmailPort.Text);
+                    writer.WriteElementString("isAuthRequired", IsSmtpAuthenticationRequired.IsChecked == true ? t : f);
+                    writer.WriteElementString("username", SmtpUsername.Text);
+                    writer.WriteElementString("password", SmtpPassword.Password.ToString());
                     writer.WriteStartElement("recipientList");
-                    writer.WriteElementString("address",
-                        (SendEmailOption.IsChecked == true)
-                        ? EmailRecipient.Text
-                        : string.Empty);
+                    // Check if multiple recipients were provided.
+                    if (EmailRecipient.Text.Contains(","))
+                    {
+                        // Multiple recipients. Split and add each to configuration.
+                        string[] recips = EmailRecipient.Text.Split(',');
+                        for (int i = 0; i < recips.Length; i++)
+                        {
+                            if (!string.IsNullOrEmpty(recips[i]))
+                            {
+                                writer.WriteElementString("address", recips[i].Trim());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Single recipient. Add to configuration.
+                        writer.WriteElementString("address", EmailRecipient.Text);
+                    }
                     writer.WriteEndElement();
                     writer.WriteStartElement("sender");
-                    writer.WriteElementString("address",
-                        (SendEmailOption.IsChecked == true)
-                        ? EmailSender.Text
-                        : string.Empty);
-                    writer.WriteElementString("displayName",
-                        (SendEmailOption.IsChecked == true)
-                        ? EmailSenderFriendly.Text
-                        : string.Empty);
+                    writer.WriteElementString("address", EmailSender.Text);
+                    writer.WriteElementString("displayName", EmailSenderFriendly.Text);
                     writer.WriteEndElement();
                     writer.WriteEndElement();
 
+                    // Custom messages.
                     writer.WriteStartElement("customMessage");
                     writer.WriteAttributeString("type", "tcp");
                     writer.WriteElementString("subject", EmailSubject.Text);
@@ -290,6 +310,7 @@ namespace tcpTrigger.Editor
                     writer.WriteElementString("body", RogueDhcpMessageBody.Text);
                     writer.WriteEndElement();
 
+                    // End tags.
                     writer.WriteEndElement();
                     writer.WriteEndDocument();
                 }
@@ -340,7 +361,7 @@ namespace tcpTrigger.Editor
                 }
 
                 if (EmailPort.Text.Length == 0
-                    || !(int.TryParse(EmailPort.Text, out int n))
+                    || !int.TryParse(EmailPort.Text, out int n)
                     || n <= 0
                     || n > 65535)
                 {
@@ -366,7 +387,7 @@ namespace tcpTrigger.Editor
 
             if (RateLimitMinutes.Text.Length > 0)
             {
-                if (!(int.TryParse(RateLimitMinutes.Text, out int n)) || n < 0)
+                if (!int.TryParse(RateLimitMinutes.Text, out int n) || n < 0)
                 {
                     AdvancedTab.Focus();
                     MessageBox.Show("Please enter a valid number of minutes for rate limiting.", "Error");
@@ -382,12 +403,12 @@ namespace tcpTrigger.Editor
             try
             {
                 int[] portNumbers = (from part in TcpIncludePorts.Text.Split(',')
-                                   let range = part.Split('-')
-                                   let start = int.Parse(range[0])
-                                   let end = int.Parse(range[range.Length - 1])
-                                   from i in Enumerable.Range(start, end - start + 1)
-                                   orderby i
-                                   select i).Distinct().ToArray();
+                                     let range = part.Split('-')
+                                     let start = int.Parse(range[0])
+                                     let end = int.Parse(range[range.Length - 1])
+                                     from i in Enumerable.Range(start, end - start + 1)
+                                     orderby i
+                                     select i).Distinct().ToArray();
                 string result = string.Join(",", portNumbers.Select(x => x.ToString()).ToArray());
 
                 for (int i = 0; i < portNumbers.Length; ++i)
@@ -454,7 +475,6 @@ namespace tcpTrigger.Editor
         private void RestartTcpTriggerService()
         {
             // Setup a background thread to restart the service.
-            //gridLoading.Visibility = Visibility.Visible;
             var bw = new BackgroundWorker();
             bw.DoWork += new DoWorkEventHandler(Thread_RestartService);
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Thread_RestartServiceCompleted);
@@ -484,8 +504,6 @@ namespace tcpTrigger.Editor
 
         private void Thread_RestartServiceCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            //gridLoading.Visibility = Visibility.Collapsed;
-
             if (e.Result != null)
                 MessageBox.Show((string)e.Result, "Error");
             else
@@ -544,6 +562,95 @@ namespace tcpTrigger.Editor
             var regex = new Regex("[^0-9,\\-\\s.-]+");
             if (regex.IsMatch(e.Text))
                 e.Handled = true;
+        }
+
+        private void IsSmtpAuthenticationRequired_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsSmtpAuthenticationRequired.IsChecked == true)
+                SmtpUsername.Focus();
+        }
+
+        private void TestEmail_Click(object sender, RoutedEventArgs e)
+        {
+            TestEmail.IsEnabled = false;
+            TestEmail.Content = "Testing...";
+
+            // Setup background worker to send test email in separate thread.
+            var emailTester = new BackgroundWorker();
+            emailTester.DoWork += EmailTester_DoWork;
+            emailTester.RunWorkerCompleted += EmailTester_RunWorkerCompleted;
+            emailTester.RunWorkerAsync(new EmailConfiguration()
+            {
+                Server = EmailServer.Text,
+                Port = EmailPort.Text,
+                IsAuthRequired = IsSmtpAuthenticationRequired.IsChecked == true,
+                Username = SmtpUsername.Text,
+                Password = SmtpPassword.SecurePassword,
+                From = EmailSender.Text,
+                FromFriendly = EmailSenderFriendly.Text,
+                Recipient = EmailRecipient.Text
+            });
+        }
+
+        private void EmailTester_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Result != null)
+                MessageBox.Show("Failed to send test email. " + (string)e.Result, "Error");
+            else
+                MessageBox.Show("Message sent.", "Email Test");
+
+            TestEmail.IsEnabled = true;
+            TestEmail.Content = "Test";
+        }
+
+        private void EmailTester_DoWork(object sender, DoWorkEventArgs e)
+        {
+            try
+            {
+                EmailConfiguration parameters = e.Argument as EmailConfiguration;
+                SmtpClient smtpClient = new SmtpClient();
+                smtpClient.Host = parameters.Server;
+                if (parameters.Port.Length > 0)
+                {
+                    smtpClient.Port = int.Parse(parameters.Port);
+                }
+                if (parameters.IsAuthRequired)
+                {
+                    smtpClient.Credentials = new NetworkCredential(parameters.Username, parameters.Password.ToString());
+                }
+
+                using (MailMessage message = new MailMessage())
+                {
+                    message.From = new MailAddress(parameters.From, parameters.FromFriendly); ;
+                    message.Subject = "tcpTrigger Test Email";
+                    message.Body = $"This is a test email notification sent by tcpTrigger on {DateTime.Now.ToLongDateString()} at {DateTime.Now.ToLongTimeString()}.";
+                    // Check if multiple recipients were provided.
+                    if (parameters.Recipient.Contains(","))
+                    {
+                        // Multiple recipients. Split and add each to mail message.
+                        string[] recips = parameters.Recipient.Split(',');
+                        for (int i = 0; i < recips.Length; i++)
+                        {
+                            if (!string.IsNullOrEmpty(recips[i]))
+                            {
+                                message.To.Add(recips[i].Trim());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Single recipient. Add to mail message.
+                        message.To.Add(parameters.Recipient);
+                    }
+
+                    //Send the email.
+                    smtpClient.Send(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                e.Result = ex.Message;
+            }
         }
     }
 }

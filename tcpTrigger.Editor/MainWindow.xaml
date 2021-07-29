@@ -177,7 +177,7 @@
             <!-- Tab: Email -->
             <TabItem Header="Email" Name="EmailTab">
                 <DockPanel LastChildFill="False">
-                    <GroupBox Header="Outgoing Mail Server"
+                    <GroupBox Header="Mail Server Settings"
                               DockPanel.Dock="Top">
                         <StackPanel Margin="5">
                             <TextBlock Text="Server Information"
@@ -215,6 +215,35 @@
                                 </DockPanel>
                                 
                             </Grid>
+                            <!-- Authentication option -->
+                            <DockPanel Margin="140,6,0,0">
+                                <CheckBox Name="IsSmtpAuthenticationRequired"
+                                          Content="This server requires authentication"
+                                          Click="IsSmtpAuthenticationRequired_Click"
+                                          Foreground="#777"
+                                          FontSize="13"
+                                          Margin="0,0,0,0"/>
+                            </DockPanel>
+
+                            <!-- Username and password section -->
+                            <StackPanel DockPanel.Dock="Top"
+                                        Visibility="{Binding IsChecked, ElementName=IsSmtpAuthenticationRequired, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <!-- Smtp User -->
+                                <DockPanel Margin="0,6,0,0">
+                                    <Grid Width="140">
+                                        <TextBlock Text="Username"/>
+                                    </Grid>
+                                    <TextBox Name="SmtpUsername"/>
+                                </DockPanel>
+
+                                <!-- Smtp Password -->
+                                <DockPanel Margin="0,6,0,0">
+                                    <Grid Width="140">
+                                        <TextBlock Text="Password"/>
+                                    </Grid>
+                                    <PasswordBox Name="SmtpPassword"/>
+                                </DockPanel>
+                            </StackPanel>
                             
                             <TextBlock Text="Email Addresses"
                                        Foreground="#268bd2"
@@ -249,6 +278,17 @@
                                          FontFamily="Consolas"
                                          MaxLength="512"/>
                             </DockPanel>
+
+                            <!-- Email test button -->
+                            <Button Style="{StaticResource ButtonSecondaryStyle}"
+                                    Name="TestEmail"
+                                    DockPanel.Dock="Top"
+                                    Click="TestEmail_Click"
+                                    Width="100"
+                                    Margin="0,18,0,0"
+                                    Padding="0,1"
+                                    Content="Test"
+                                    HorizontalAlignment="Left"/>
                         </StackPanel>
                     </GroupBox>
                 </DockPanel>
