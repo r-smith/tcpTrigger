@@ -440,7 +440,7 @@ namespace tcpTrigger
 
         private void SendEmail(PacketHeader packetHeader)
         {
-            if (_configuration.EmailRecipientAddress.Length == 0)
+            if (_configuration.EmailRecipients.Count == 0)
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
@@ -449,7 +449,7 @@ namespace tcpTrigger
                     402);
                 return;
             }
-            if (_configuration.EmailSenderAddress.Length == 0)
+            if (_configuration.EmailSender.Length == 0)
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
@@ -486,9 +486,15 @@ namespace tcpTrigger
                     smtpClient.Host = _configuration.EmailServer;
                     smtpClient.Port = _configuration.EmailServerPort;
                     message.From = _configuration.EmailSenderDisplayName.Length > 0 ?
-                        new MailAddress(_configuration.EmailSenderAddress, _configuration.EmailSenderDisplayName)
-                        : new MailAddress(_configuration.EmailSenderAddress);
-                    message.To.Add(_configuration.EmailRecipientAddress);
+                        new MailAddress(_configuration.EmailSender, _configuration.EmailSenderDisplayName)
+                        : new MailAddress(_configuration.EmailSender);
+                    for (int i = 0; i < _configuration.EmailRecipients.Count; i++)
+                    {
+                        if (!string.IsNullOrEmpty(_configuration.EmailRecipients[i]))
+                        {
+                            message.To.Add(_configuration.EmailRecipients[i].Trim());
+                        }
+                    }
                     message.Subject = UserVariableExpansion.GetExpandedString(_configuration.EmailSubject, packetHeader);
                     message.Body = UserVariableExpansion.GetExpandedString(GetMessageBody(packetHeader), packetHeader);
 
@@ -499,7 +505,7 @@ namespace tcpTrigger
                 {
                     EventLog.WriteEntry(
                         "tcpTrigger",
-                        $"Email event triggered, but the message failed to send.{Environment.NewLine}{ex.Message}",
+                        $"Email action triggered, but the message failed to send.{Environment.NewLine}{ex.Message}",
                         EventLogEntryType.Warning,
                         403);
                     return;

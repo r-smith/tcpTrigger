@@ -29,8 +29,8 @@ namespace tcpTrigger
         public HashSet<IPAddress> IgnoredEndpoints { get; private set; } = new HashSet<IPAddress>();
         public string EmailServer { get; private set; }
         public int EmailServerPort { get; private set; }
-        public string EmailRecipientAddress { get; private set; }
-        public string EmailSenderAddress { get; private set; }
+        public List<string> EmailRecipients { get; private set; } = new List<string>();
+        public string EmailSender { get; private set; }
         public string EmailSenderDisplayName { get; private set; }
         public string EmailSubject { get; private set; }
         public string MessageBodyPing { get; private set; }
@@ -157,18 +157,22 @@ namespace tcpTrigger
                 TriggeredApplicationArguments =
                     xd.DocumentElement.SelectSingleNode("/tcpTrigger/actionSettings/command/arguments")?.InnerText;
 
-                // tcpTrigger/emailSettings
+                // tcpTrigger/emailConfiguration
                 EmailServer =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/server")?.InnerText;
-                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/port");
-                if (xn != null) { EmailServerPort = int.Parse(xn.InnerText); }
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/server")?.InnerText;
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/port");
+                if (xn != null && !string.IsNullOrEmpty(xn.InnerText)) { EmailServerPort = int.Parse(xn.InnerText); }
                 else { EmailServerPort = 25; }
-                EmailRecipientAddress =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/recipientList/address")?.InnerText;
-                EmailSenderAddress =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/sender/address")?.InnerText;
+                nl = xd.DocumentElement.SelectNodes("/tcpTrigger/emailConfiguration/recipientList/address");
+                for (int i = 0; i < nl.Count; i++)
+                {
+                    if (!string.IsNullOrEmpty(nl[i].InnerText))
+                        EmailRecipients.Add(nl[i].InnerText);
+                }
+                EmailSender =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/sender/address")?.InnerText;
                 EmailSenderDisplayName =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailSettings/sender/displayName")?.InnerText;
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/sender/displayName")?.InnerText;
 
                 // tcpTrigger/customMessage
                 nl = xd.DocumentElement.SelectNodes("/tcpTrigger/customMessage");
