@@ -91,6 +91,7 @@ namespace tcpTrigger
 
                 XmlNode xn;
                 XmlNodeList nl;
+                string encryptedValue;
                 // tcpTrigger/enabledComponents
                 xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledComponents/tcp");
                 if (xn != null) { IsMonitorTcpEnabled = bool.Parse(xn.InnerText); }
@@ -168,10 +169,34 @@ namespace tcpTrigger
                 else { EmailServerPort = 25; }
                 xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/isAuthRequired");
                 if (xn != null) { IsEmailAuthRequired = bool.Parse(xn.InnerText); }
-                EmailUsername =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/username")?.InnerText;
-                EmailPassword =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/password")?.InnerText;
+                // Decrypt username.
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/username");
+                if (xn.Attributes["encrypted"]?.InnerText == "true")
+                {
+                    encryptedValue = xn.InnerText;
+                    if (!string.IsNullOrEmpty(encryptedValue))
+                        EmailUsername = StringCipher.Decrypt(encryptedValue);
+                    encryptedValue = null;
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(xn.InnerText))
+                        EmailUsername = xn.InnerText;
+                }
+                // Decrypt password.
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/password");
+                if (xn.Attributes["encrypted"]?.InnerText == "true")
+                {
+                    encryptedValue = xn.InnerText;
+                    if (!string.IsNullOrEmpty(encryptedValue))
+                        EmailPassword = StringCipher.Decrypt(encryptedValue);
+                    encryptedValue = null;
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(xn.InnerText))
+                        EmailPassword = xn.InnerText;
+                }
 
                 nl = xd.DocumentElement.SelectNodes("/tcpTrigger/emailConfiguration/recipientList/address");
                 for (int i = 0; i < nl.Count; i++)

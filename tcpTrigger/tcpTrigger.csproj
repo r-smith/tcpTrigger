@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration.cs" />
+    <Compile Include="StringCipher.cs" />
     <Compile Include="TcpTriggerInterface.cs" />
     <Compile Include="PacketGenerator.cs" />
     <Compile Include="PacketHeader.cs" />

@@ -76,6 +76,7 @@ namespace tcpTrigger.Editor
 
                 XmlNode xn;
                 XmlNodeList nl;
+                string encryptedValue;
                 // tcpTrigger/enabledComponents
                 xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledComponents/tcp");
                 if (xn != null) { MonitorTcpOption.IsChecked = bool.Parse(xn.InnerText); }
@@ -123,10 +124,36 @@ namespace tcpTrigger.Editor
                     xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/server")?.InnerText;
                 EmailPort.Text =
                     xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/port")?.InnerText;
-                SmtpUsername.Text =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/username")?.InnerText;
-                SmtpPassword.Password =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/password")?.InnerText;
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/isAuthRequired");
+                if (xn != null) { IsSmtpAuthenticationRequired.IsChecked = bool.Parse(xn.InnerText); }
+                // Decrypt username.
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/username");
+                if (xn.Attributes["encrypted"]?.InnerText == "true")
+                {
+                    encryptedValue = xn.InnerText;
+                    if (!string.IsNullOrEmpty(encryptedValue))
+                        SmtpUsername.Text = StringCipher.Decrypt(encryptedValue);
+                    encryptedValue = null;
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(xn.InnerText))
+                        SmtpUsername.Text = xn.InnerText;
+                }
+                // Decrypt password.
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/password");
+                if (xn.Attributes["encrypted"]?.InnerText == "true")
+                {
+                    encryptedValue = xn.InnerText;
+                    if (!string.IsNullOrEmpty(encryptedValue))
+                        SmtpPassword.Password = StringCipher.Decrypt(encryptedValue);
+                    encryptedValue = null;
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(xn.InnerText))
+                        SmtpPassword.Password = xn.InnerText;
+                }
                 // Join recipient list to single string.
                 nl = xd.DocumentElement.SelectNodes("/tcpTrigger/emailConfiguration/recipientList/address");
                 List<string> recipients = new List<string>();
@@ -260,8 +287,30 @@ namespace tcpTrigger.Editor
                     writer.WriteElementString("server", EmailServer.Text);
                     writer.WriteElementString("port", EmailPort.Text);
                     writer.WriteElementString("isAuthRequired", IsSmtpAuthenticationRequired.IsChecked == true ? t : f);
-                    writer.WriteElementString("username", SmtpUsername.Text);
-                    writer.WriteElementString("password", SmtpPassword.Password.ToString());
+                    // Encrypt username.
+                    if (!string.IsNullOrEmpty(SmtpUsername.Text))
+                    {
+                        writer.WriteStartElement("username");
+                        writer.WriteAttributeString("encrypted", t);
+                        writer.WriteString(StringCipher.Encrypt(SmtpUsername.Text));
+                        writer.WriteEndElement();
+                    }
+                    else
+                    {
+                        writer.WriteElementString("username", null);
+                    }
+                    // Encrypt password.
+                    if (!string.IsNullOrEmpty(SmtpPassword.Password.ToString()))
+                    {
+                        writer.WriteStartElement("password");
+                        writer.WriteAttributeString("encrypted", t);
+                        writer.WriteString(StringCipher.Encrypt(SmtpPassword.Password.ToString()));
+                        writer.WriteEndElement();
+                    }
+                    else
+                    {
+                        writer.WriteElementString("password", null);
+                    }
                     writer.WriteStartElement("recipientList");
                     // Check if multiple recipients were provided.
                     if (EmailRecipient.Text.Contains(","))
