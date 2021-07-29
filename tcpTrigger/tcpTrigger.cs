@@ -485,6 +485,10 @@ namespace tcpTrigger
                     var smtpClient = new SmtpClient();
                     smtpClient.Host = _configuration.EmailServer;
                     smtpClient.Port = _configuration.EmailServerPort;
+                    if (_configuration.IsEmailAuthRequired)
+                    {
+                        smtpClient.Credentials = new NetworkCredential(_configuration.EmailUsername, _configuration.EmailPassword);
+                    }
                     message.From = _configuration.EmailSenderDisplayName.Length > 0 ?
                         new MailAddress(_configuration.EmailSender, _configuration.EmailSenderDisplayName)
                         : new MailAddress(_configuration.EmailSender);

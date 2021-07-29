@@ -29,6 +29,9 @@ namespace tcpTrigger
         public HashSet<IPAddress> IgnoredEndpoints { get; private set; } = new HashSet<IPAddress>();
         public string EmailServer { get; private set; }
         public int EmailServerPort { get; private set; }
+        public bool IsEmailAuthRequired { get; private set; }
+        public string EmailUsername { get; private set; }
+        public string EmailPassword { get; private set; }
         public List<string> EmailRecipients { get; private set; } = new List<string>();
         public string EmailSender { get; private set; }
         public string EmailSenderDisplayName { get; private set; }
@@ -163,6 +166,13 @@ namespace tcpTrigger
                 xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/port");
                 if (xn != null && !string.IsNullOrEmpty(xn.InnerText)) { EmailServerPort = int.Parse(xn.InnerText); }
                 else { EmailServerPort = 25; }
+                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/isAuthRequired");
+                if (xn != null) { IsEmailAuthRequired = bool.Parse(xn.InnerText); }
+                EmailUsername =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/username")?.InnerText;
+                EmailPassword =
+                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/password")?.InnerText;
+
                 nl = xd.DocumentElement.SelectNodes("/tcpTrigger/emailConfiguration/recipientList/address");
                 for (int i = 0; i < nl.Count; i++)
                 {
