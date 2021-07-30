@@ -144,6 +144,15 @@ namespace tcpTrigger.Editor
                         ignoredDhcpServers.Add(nl[i].InnerText);
                 }
                 DhcpServers.Text = string.Join(", ", ignoredDhcpServers.ToArray());
+                // tcpTrigger/endpointIgnoreList
+                nl = xd.DocumentElement.SelectNodes("/tcpTrigger/endpointIgnoreList/ipAddress");
+                var sb = new StringBuilder();
+                for (int i = 0; i < nl.Count; i++)
+                {
+                    if (!string.IsNullOrEmpty(nl[i].InnerText))
+                        sb.AppendLine(nl[i].InnerText.Trim());
+                }
+                Whitelist.Text = sb.ToString();
                 // tcpTrigger/networkInterfaceExcludeList
                 nl = xd.DocumentElement.SelectNodes("/tcpTrigger/networkInterfaceExcludeList/deviceGuid");
                 for (int i = 0; i < nl.Count; i++)
@@ -312,6 +321,21 @@ namespace tcpTrigger.Editor
                         if (!string.IsNullOrEmpty(dhcpServers[i]))
                         {
                             writer.WriteElementString("ipAddress", dhcpServers[i].Trim());
+                        }
+                    }
+                    writer.WriteEndElement();
+
+                    // Ignored endpoints.
+                    writer.WriteStartElement("endpointIgnoreList");
+                    // Split whitelist to string array (split by both commas and newlines) and then trim each item,
+                    string[] ignoredEndpoints = Whitelist.Text.Trim().Split(new char[] { ',', '\n' }).Select(ip => ip.Trim()).ToArray();
+                    // Sort IPs.
+                    ignoredEndpoints = ignoredEndpoints.OrderBy(i => new Version(i.ToString())).ToArray();
+                    for (int i = 0; i < ignoredEndpoints.Length; i++)
+                    {
+                        if (!string.IsNullOrEmpty(ignoredEndpoints[i]))
+                        {
+                            writer.WriteElementString("ipAddress", ignoredEndpoints[i].Trim());
                         }
                     }
                     writer.WriteEndElement();
