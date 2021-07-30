@@ -13,6 +13,7 @@
                 <ResourceDictionary Source="ResourceDictionaries/GroupBoxStyle.xaml"/>
                 <ResourceDictionary Source="ResourceDictionaries/TabControlStyle.xaml"/>
                 <ResourceDictionary Source="ResourceDictionaries/TextBoxStyle.xaml"/>
+                <ResourceDictionary Source="ResourceDictionaries/Icons.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

@@ -1,0 +1,20 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Font Awesome: exclamation-circle-solid -->
+    <DrawingImage x:Key="icon.exclamation-circle">
+        <DrawingImage.Drawing>
+            <DrawingGroup ClipGeometry="M0,0 V512 H512 V0 H0 Z">
+                <GeometryDrawing Brush="#c0392b" Geometry="F1 M512,512z M0,0z M504,256C504,392.997 392.957,504 256,504 119.043,504 8,392.997 8,256 8,119.083 119.043,8 256,8 392.957,8 504,119.083 504,256z M256,306C230.595,306 210,326.595 210,352 210,377.405 230.595,398 256,398 281.405,398 302,377.405 302,352 302,326.595 281.405,306 256,306z M212.327,140.654L219.745,276.654C220.092,283.018,225.354,288,231.727,288L280.273,288C286.646,288,291.908,283.018,292.255,276.654L299.673,140.654C300.048,133.78,294.575,128,287.691,128L224.308,128C217.424,128,211.952,133.78,212.327,140.654z" />
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+    
+    <!-- Font Awesome: check-circle-solid -->
+    <DrawingImage x:Key="icon.check-circle">
+        <DrawingImage.Drawing>
+            <DrawingGroup ClipGeometry="M0,0 V512 H512 V0 H0 Z">
+                <GeometryDrawing Brush="#07702f" Geometry="F1 M512,512z M0,0z M504,256C504,392.967 392.967,504 256,504 119.033,504 8,392.967 8,256 8,119.033 119.033,8 256,8 392.967,8 504,119.033 504,256z M227.314,387.314L411.314,203.314C417.562,197.066,417.562,186.935,411.314,180.687L388.687,158.06C382.439,151.811,372.308,151.811,366.059,158.06L216,308.118 145.941,238.059C139.693,231.811,129.562,231.811,123.313,238.059L100.686,260.686C94.438,266.934,94.438,277.065,100.686,283.313L204.686,387.313C210.935,393.562,221.065,393.562,227.314,387.314z" />
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+</ResourceDictionary>

@@ -12,6 +12,9 @@
         ResizeMode="CanResizeWithGrip">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <local:IsCheckedToImageConverter x:Key="IsCheckedToImageConverter" />
+        <local:BoolToStringConverter x:Key="BoolToStringConverter" FalseValue="Monitored" TrueValue="Excluded" />
+        <local:BoolToBrushConverter x:Key="BoolToBrushConverter" FalseValue="#00600f" TrueValue="#a0190b" />
 
         <Style TargetType="{x:Type TextBlock}">
             <Setter Property="FontSize" Value="13"/>
@@ -112,12 +115,12 @@
                                        TextWrapping="Wrap"
                                        FontSize="12"
                                        Foreground="#888"/>
-                            
+
                             <!-- Write to event log -->
                             <CheckBox Name="EventLogOption"
                                       Content="Write to Windows event log"
                                       Margin="0,15,0,0"/>
-                            
+
                             <!-- Send notification email -->
                             <CheckBox Name="SendEmailOption"
                                       Content="Send a notification email"
@@ -213,7 +216,7 @@
                                              PreviewTextInput="NumericTextBox_PreviewTextInput"
                                              MaxLength="5"/>
                                 </DockPanel>
-                                
+
                             </Grid>
                             <!-- Authentication option -->
                             <DockPanel Margin="140,6,0,0">
@@ -244,7 +247,7 @@
                                     <PasswordBox Name="SmtpPassword"/>
                                 </DockPanel>
                             </StackPanel>
-                            
+
                             <TextBlock Text="Email Addresses"
                                        Foreground="#268bd2"
                                        FontSize="13"
@@ -376,6 +379,96 @@
                 </Grid>
             </TabItem>
 
+            <!-- Tab: Devices -->
+            <TabItem Header="Devices" Name="DevicesTab">
+                <DockPanel>
+                    <GroupBox Header="Exclude Network Interfaces"
+                              DockPanel.Dock="Top">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <!-- Info banner -->
+                            <Border Background="#1e1e1e" Margin="10,0" CornerRadius="8" BorderThickness="0">
+                                <TextBlock Foreground="#bbb"
+                                           FontSize="14"
+                                           Margin="18,4"
+                                           TextWrapping="Wrap"
+                                           HorizontalAlignment="Left">
+                                    tcpTrigger monitors all available network interfaces.
+                                    <LineBreak/>
+                                    To exclude a device, select it from the list below.
+                                </TextBlock>
+                            </Border>
+                            <!-- Custom selectable list to display network interfaces and their IPs -->
+                            <ListView x:Name="Devices"
+                                      Grid.Row="1"
+                                      SelectionMode="Single"
+                                      ScrollViewer.CanContentScroll="False"
+                                      Margin="-5,5,-5,0"
+                                      BorderThickness="0">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#20336699"/>
+                                                <Setter Property="BorderBrush" Value="#888"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                        <Setter Property="Focusable" Value="False"/>
+                                        <Setter Property="BorderThickness" Value="0,1"/>
+                                        <Setter Property="BorderBrush" Value="Transparent"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel>
+                                            <!-- Checkbox and NIC description -->
+                                            <CheckBox Name="IsDeviceExcluded"
+                                                      Content="{Binding Description, Mode=OneTime}"
+                                                      IsChecked="{Binding IsExcluded, Mode=TwoWay}"
+                                                      Margin="5,0,0,0"
+                                                      FontSize="17"
+                                                      IsTabStop="False"/>
+                                            <!-- Image and text (reflecting monitored or excluded) -->
+                                            <StackPanel Orientation="Horizontal" Margin="45,0,0,0" HorizontalAlignment="Left">
+                                                <Image Source="{Binding IsChecked, ElementName=IsDeviceExcluded, Converter={StaticResource IsCheckedToImageConverter}}"
+                                                       HorizontalAlignment="Left"
+                                                       Width="14" Height="14"/>
+                                                <TextBlock Text="{Binding IsChecked, ElementName=IsDeviceExcluded, Converter={StaticResource BoolToStringConverter}}"
+                                                           Foreground="{Binding IsChecked, ElementName=IsDeviceExcluded, Converter={StaticResource BoolToBrushConverter}}"
+                                                           FontSize="13"
+                                                           FontWeight="SemiBold"
+                                                           HorizontalAlignment="Left"
+                                                           VerticalAlignment="Center"
+                                                           Margin="8,0,0,0"/>
+                                            </StackPanel>
+                                            <!-- IP addresses -->
+                                            <ItemsControl ItemsSource="{Binding IPAddresses, Mode=OneTime}"
+                                                          Margin="45,1,0,4"
+                                                          IsTabStop="False"
+                                                          BorderThickness="0"
+                                                          Background="Transparent">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding}"
+                                                                   Foreground="#666"
+                                                                   HorizontalAlignment="Left"
+                                                                   FontFamily="Consolas"
+                                                                   FontSize="14"/>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Grid>
+                    </GroupBox>
+                </DockPanel>
+            </TabItem>
+
             <!-- Tab: Advanced -->
             <TabItem Header="Advanced" Name="AdvancedTab">
                 <DockPanel LastChildFill="False">
@@ -397,7 +490,7 @@
                 </DockPanel>
             </TabItem>
         </TabControl>
-        
+
         <!-- Button section -->
         <Border Grid.Row="2" BorderBrush="#888" Background="#e8e8e8" BorderThickness="0,1,0,0">
             <DockPanel Margin="15,10" HorizontalAlignment="Right">

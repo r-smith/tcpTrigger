@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.ServiceProcess;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -19,11 +21,53 @@ namespace tcpTrigger.Editor
     /// </summary>
     public partial class MainWindow : Window
     {
+        private HashSet<string> ExcludedNetworkInterfaces = new HashSet<string>();
+        private List<TcpTriggerInterface> AllNetworkInterfaces;
+
         public MainWindow()
         {
             InitializeComponent();
 
             LoadConfiguration();
+            AllNetworkInterfaces = GetNetworkInterfaces();
+            AllNetworkInterfaces.Sort((x, y) => x.Description.CompareTo(y.Description));
+            Devices.ItemsSource = AllNetworkInterfaces;
+        }
+
+        private List<TcpTriggerInterface> GetNetworkInterfaces()
+        {
+            List<TcpTriggerInterface> networkInterfaces = new List<TcpTriggerInterface>();
+
+            // Enumerate network interfaces.
+            foreach (NetworkInterface networkInterface in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                if (networkInterface.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
+                    networkInterface.OperationalStatus == OperationalStatus.Up)
+                {
+                    List<IPAddress> ipAddresses = new List<IPAddress>();
+                    foreach (UnicastIPAddressInformation address in networkInterface.GetIPProperties().UnicastAddresses)
+                    {
+                        if (address.Address.AddressFamily == AddressFamily.InterNetwork || address.Address.AddressFamily == AddressFamily.InterNetworkV6)
+                        {
+                            ipAddresses.Add(address.Address);
+                        }
+                    }
+                    if (ipAddresses.Count > 0)
+                    {
+                        ipAddresses.Sort(new IPAddressComparer());
+                        networkInterfaces.Add(
+                                new TcpTriggerInterface(
+                                    guid: networkInterface.Id,
+                                    description: networkInterface.Description,
+                                    isExcluded: ExcludedNetworkInterfaces.Contains(networkInterface.Id),
+                                    ipAddresses: ipAddresses,
+                                    macAddress: networkInterface.GetPhysicalAddress())
+                                );
+                    }
+                }
+            }
+
+            return networkInterfaces;
         }
 
         private string GetInstallPath()
@@ -100,6 +144,13 @@ namespace tcpTrigger.Editor
                         ignoredDhcpServers.Add(nl[i].InnerText);
                 }
                 DhcpServers.Text = string.Join(", ", ignoredDhcpServers.ToArray());
+                // tcpTrigger/networkInterfaceExcludeList
+                nl = xd.DocumentElement.SelectNodes("/tcpTrigger/networkInterfaceExcludeList/deviceGuid");
+                for (int i = 0; i < nl.Count; i++)
+                {
+                    if (!string.IsNullOrEmpty(nl[i].InnerText))
+                        ExcludedNetworkInterfaces.Add(nl[i].InnerText);
+                }
 
                 // tcpTrigger/enabledActions
                 xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledActions/windowsEventLog");
@@ -261,6 +312,17 @@ namespace tcpTrigger.Editor
                         if (!string.IsNullOrEmpty(dhcpServers[i]))
                         {
                             writer.WriteElementString("ipAddress", dhcpServers[i].Trim());
+                        }
+                    }
+                    writer.WriteEndElement();
+
+                    // Excluded network interfaces.
+                    writer.WriteStartElement("networkInterfaceExcludeList");
+                    for (int i = 0; i < AllNetworkInterfaces.Count; i++)
+                    {
+                        if (AllNetworkInterfaces[i].IsExcluded)
+                        {
+                            writer.WriteElementString("deviceGuid", AllNetworkInterfaces[i].Guid);
                         }
                     }
                     writer.WriteEndElement();
