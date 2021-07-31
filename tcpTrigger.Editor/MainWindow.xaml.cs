@@ -70,48 +70,28 @@ namespace tcpTrigger.Editor
             return networkInterfaces;
         }
 
-        private string GetInstallPath()
+        private string GetConfigurationPath()
         {
-            string installPath = string.Empty;
-
-            // Get the install path for the tcpTrigger service from the Window registry.
-            try
-            {
-                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"System\CurrentControlSet\services\tcpTrigger"))
-                {
-                    if (key != null)
-                    {
-                        object value = key.GetValue("ImagePath");
-                        if (value != null)
-                        {
-                            installPath = Path.GetDirectoryName((value as string).Trim('"'));
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    $"Could not retrieve registry information for the tcpTrigger service. {ex.Message}",
-                    "Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-
-            return installPath;
+            // Locate the tcpTrigger.xml configuration file.
+            // First check the current directory. If not found, use ProgramData, regardless if the file exists or not.
+            const string fileName = "tcpTrigger.xml";
+            if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + fileName))
+                return AppDomain.CurrentDomain.BaseDirectory + fileName;
+            else
+                return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\" + fileName;
         }
 
         private void LoadConfiguration()
         {
-            string configurationPath = GetInstallPath();
+            string configurationPath = GetConfigurationPath();
 
-            if (configurationPath.Length == 0 || !Directory.Exists(configurationPath))
+            if (!File.Exists(configurationPath))
             {
-                MessageBox.Show("The configuration path for the tcpTrigger service was not found.", "Error");
+                // No configuration was found. This is expected on new installations.
+                // Should any defaults get set or should a warning be displayed?
+                // At the moment, abort loading and do nothing.
                 return;
             }
-
-            configurationPath += @"\tcpTrigger.xml";
 
             try
             {
@@ -257,19 +237,18 @@ namespace tcpTrigger.Editor
 
         private bool WriteConfiguration()
         {
-            string configurationPath = GetInstallPath();
+            string configurationPath = GetConfigurationPath();
             const string t = "true";
             const string f = "false";
 
-            // Ensure configuration path exists.
-            if (configurationPath.Length == 0 || !Directory.Exists(configurationPath))
+            // Ensure the base directory for the configuration file exists before attempting to write.
+            if (!Directory.Exists(Path.GetDirectoryName(configurationPath)))
             {
-                MessageBox.Show("The configuration path for the tcpTrigger service was not found.", "Error");
+                MessageBox.Show("A folder for the tcpTrigger configuration file was not found.", "Error");
                 return false;
             }
 
             // Use options specified in GUI to write to configuration file.
-            configurationPath += @"\tcpTrigger.xml";
             try
             {
                 // Convert port numbers to an ordered int array and remove duplicates.
