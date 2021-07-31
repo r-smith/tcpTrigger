@@ -253,22 +253,28 @@ namespace tcpTrigger.Editor
             {
                 // Convert port numbers to an ordered int array and remove duplicates.
                 // Port numbers can be entered comma-separated and also specified using ranges with '-'.
-                int[] portNumbers = (from part in TcpIncludePorts.Text.Split(',')
-                                     let range = part.Split('-')
-                                     let start = int.Parse(range[0])
-                                     let end = int.Parse(range[range.Length - 1])
-                                     from i in Enumerable.Range(start, end - start + 1)
-                                     orderby i
-                                     select i).Distinct().ToArray();
-                TcpIncludePorts.Text = FormatTcpPortRange(portNumbers);
-                portNumbers = (from part in TcpExcludePorts.Text.Split(',')
-                               let range = part.Split('-')
-                               let start = int.Parse(range[0])
-                               let end = int.Parse(range[range.Length - 1])
-                               from i in Enumerable.Range(start, end - start + 1)
-                               orderby i
-                               select i).Distinct().ToArray();
-                TcpExcludePorts.Text = FormatTcpPortRange(portNumbers);
+                if (TcpIncludePorts.Text.Length > 0)
+                {
+                    int[] portNumbers = (from part in TcpIncludePorts.Text.Split(',')
+                                         let range = part.Split('-')
+                                         let start = int.Parse(range[0])
+                                         let end = int.Parse(range[range.Length - 1])
+                                         from i in Enumerable.Range(start, end - start + 1)
+                                         orderby i
+                                         select i).Distinct().ToArray();
+                    TcpIncludePorts.Text = FormatTcpPortRange(portNumbers);
+                }
+                if (TcpExcludePorts.Text.Length > 0)
+                {
+                    int[] portNumbers = (from part in TcpExcludePorts.Text.Split(',')
+                                         let range = part.Split('-')
+                                         let start = int.Parse(range[0])
+                                         let end = int.Parse(range[range.Length - 1])
+                                         from i in Enumerable.Range(start, end - start + 1)
+                                         orderby i
+                                         select i).Distinct().ToArray();
+                    TcpExcludePorts.Text = FormatTcpPortRange(portNumbers);
+                }
 
                 using (XmlWriter writer = XmlWriter.Create(configurationPath, new XmlWriterSettings() { Indent = true }))
                 {
@@ -294,27 +300,33 @@ namespace tcpTrigger.Editor
 
                     // DHCP ignore list.
                     writer.WriteStartElement("dhcpServerIgnoreList");
-                    string[] dhcpServers = DhcpServers.Text.Split(',');
-                    for (int i = 0; i < dhcpServers.Length; i++)
+                    if (DhcpServers.Text.Trim().Length > 0)
                     {
-                        if (!string.IsNullOrEmpty(dhcpServers[i]))
+                        string[] dhcpServers = DhcpServers.Text.Split(',');
+                        for (int i = 0; i < dhcpServers.Length; i++)
                         {
-                            writer.WriteElementString("ipAddress", dhcpServers[i].Trim());
+                            if (!string.IsNullOrEmpty(dhcpServers[i]))
+                            {
+                                writer.WriteElementString("ipAddress", dhcpServers[i].Trim());
+                            }
                         }
                     }
                     writer.WriteEndElement();
 
                     // Ignored endpoints.
                     writer.WriteStartElement("endpointIgnoreList");
-                    // Split whitelist to string array (split by both commas and newlines) and then trim each item,
-                    string[] ignoredEndpoints = Whitelist.Text.Trim().Split(new char[] { ',', '\n' }).Select(ip => ip.Trim()).ToArray();
-                    // Sort IPs.
-                    ignoredEndpoints = ignoredEndpoints.OrderBy(i => new Version(i.ToString())).ToArray();
-                    for (int i = 0; i < ignoredEndpoints.Length; i++)
+                    if (Whitelist.Text.Trim().Length > 0)
                     {
-                        if (!string.IsNullOrEmpty(ignoredEndpoints[i]))
+                        // Split whitelist to string array (split by both commas and newlines) and then trim each item.
+                        string[] ignoredEndpoints = Whitelist.Text.Trim().Split(new char[] { ',', '\n' }).Select(ip => ip.Trim()).ToArray();
+                        // Sort IPs.
+                        ignoredEndpoints = ignoredEndpoints.OrderBy(i => new Version(i.ToString())).ToArray();
+                        for (int i = 0; i < ignoredEndpoints.Length; i++)
                         {
-                            writer.WriteElementString("ipAddress", ignoredEndpoints[i].Trim());
+                            if (!string.IsNullOrEmpty(ignoredEndpoints[i]))
+                            {
+                                writer.WriteElementString("ipAddress", ignoredEndpoints[i].Trim());
+                            }
                         }
                     }
                     writer.WriteEndElement();
