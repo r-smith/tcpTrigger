@@ -1,5 +1,4 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -41,50 +40,44 @@ namespace tcpTrigger
         public string MessageBodyNamePoison { get; private set; }
         public string MessageBodyRogueDhcp { get; private set; }
 
-        private const string RegistryKey = @"System\CurrentControlSet\services\tcpTrigger";
-        private const string RegistryValue = "ImagePath";
-
         private string GetConfigurationPath()
         {
-            string installPath = string.Empty;
-
-            // Get the install path for the tcpTrigger service from the Window registry.
-            try
-            {
-                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegistryKey))
-                {
-                    if (key != null)
-                    {
-                        object value = key.GetValue(RegistryValue);
-                        if (value != null)
-                        {
-                            installPath = Path.GetDirectoryName((value as string).Trim('"'));
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                EventLog.WriteEntry(
-                    "tcpTrigger",
-                    $"Failed to start the tcpTrigger service. Error retrieving tcpTrigger installation path from the Windows registry.{Environment.NewLine}{ex.Message}",
-                    EventLogEntryType.Error,
-                    400);
-            }
-
-            return (installPath.Length > 0) ? installPath + @"\tcpTrigger.xml" : string.Empty;
+            // Locate the tcpTrigger.xml configuration file.
+            // First check the current directory. If not found, check ProgramData.
+            // A typical installation will have the configuration stored in ProgramData.
+            const string fileName = "tcpTrigger.xml";
+            if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + fileName))
+                return AppDomain.CurrentDomain.BaseDirectory + fileName;
+            else if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\" + fileName))
+                return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\" + fileName;
+            else
+                return string.Empty;
         }
 
         public bool Load()
         {
             string configuratonPath = GetConfigurationPath();
-            string currentNode = string.Empty;
-
+            
             if (string.IsNullOrEmpty(configuratonPath))
             {
-                return false;
+                // No configuration was found. Log a warning in the Windows event log and
+                // return true (successful load) to allow the tcpTrigger service to start.
+                // In this state, the tcpTrigger service will start and run with everything disabled.
+                EventLog.WriteEntry(
+                    "tcpTrigger",
+                    "Could not locate a configuration file for the tcpTrigger service."
+                    + $" The service will start and run with everything disabled.{Environment.NewLine}{Environment.NewLine}"
+                    + $" First path checked: {AppDomain.CurrentDomain.BaseDirectory + "tcpTrigger.xml"}{Environment.NewLine}"
+                    + $" Second path checked: {Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\tcpTrigger.xml"}",
+                    EventLogEntryType.Warning,
+                    400);
+                return true;
             }
 
+            // currentNode is updated with the XML node path for every element that is read
+            // from the configuration file. This aids in debugging and provides more useful
+            // error messages when something goes wrong.
+            string currentNode = string.Empty;
             try
             {
                 var xd = new XmlDocument();
@@ -285,6 +278,7 @@ namespace tcpTrigger
 
     internal class ConfigurationNode
     {
+        // XML node paths for the tcpTrigger configuration file.
         public const string enabledComponents_tcp = "/tcpTrigger/enabledComponents/tcp";
         public const string enabledComponents_icmp = "/tcpTrigger/enabledComponents/icmp";
         public const string enabledComponents_namePoison = "/tcpTrigger/enabledComponents/namePoison";
