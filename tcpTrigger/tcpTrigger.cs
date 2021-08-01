@@ -15,7 +15,6 @@ namespace tcpTrigger
 {
     partial class tcpTrigger : ServiceBase
     {
-        private Configuration _configuration = new Configuration();
         private List<TcpTriggerInterface> _tcpTriggerInterfaces;
         private System.Timers.Timer _namePoisionDetectionTimer;
         private ushort _netbiosTransactionId = 0x8000;
@@ -34,7 +33,7 @@ namespace tcpTrigger
             // The tcpTrigger Windows service is starting.
 
             // Locate and read tcpTrigger configuration file.
-            if (_configuration.Load() == false)
+            if (Configuration.Load() == false)
             {
                 // An error was encountered while reading the configuration file. Stop the service and quit.
                 Environment.Exit(1);
@@ -42,7 +41,7 @@ namespace tcpTrigger
             }
 
             // If enabled, start name poison detection.
-            if (_configuration.IsMonitorPoisonEnabled)
+            if (Configuration.IsMonitorPoisonEnabled)
             {
                 _namePoisionDetectionTimer = new System.Timers.Timer();
                 _namePoisionDetectionTimer.Interval = TimeSpan.FromMinutes(4).TotalMilliseconds;
@@ -86,7 +85,7 @@ namespace tcpTrigger
             // Enumerate network interfaces. Determine and record which interfaces to listen on.
             foreach (NetworkInterface networkInterface in NetworkInterface.GetAllNetworkInterfaces())
             {
-                if (_configuration.ExcludedNetworkInterfaces.Contains(networkInterface.Id))
+                if (Configuration.ExcludedNetworkInterfaces.Contains(networkInterface.Id))
                 {
                     continue;
                 }
@@ -152,9 +151,9 @@ namespace tcpTrigger
             {
                 sb.AppendLine($"Listening on interface: {ipInterface.IP} --> [{ipInterface.MacAddressAsString}] --> {ipInterface.Guid}");
             }
-            if (_configuration.ExcludedNetworkInterfaces.Count > 0)
+            if (Configuration.ExcludedNetworkInterfaces.Count > 0)
             {
-                foreach (string guid in _configuration.ExcludedNetworkInterfaces)
+                foreach (string guid in Configuration.ExcludedNetworkInterfaces)
                 {
                     sb.AppendLine("Exclude network interface: " + guid);
                 }
@@ -162,25 +161,25 @@ namespace tcpTrigger
 
             // Log monitoring configuration.
             sb.AppendLine();
-            sb.AppendLine("Monitor TCP: " + (_configuration.IsMonitorTcpEnabled ? "Enabled" : "Disabled"));
-            sb.AppendLine("Monitor ICMP: " + (_configuration.IsMonitorIcmpEnabled ? "Enabled" : "Disabled"));
-            sb.AppendLine("Monitor name poison: " + (_configuration.IsMonitorPoisonEnabled ? "Enabled" : "Disabled"));
-            sb.AppendLine("Monitor rogue DHCP: " + (_configuration.IsMonitorDhcpEnabled ? "Enabled" : "Disabled"));
-            if (_configuration.IsMonitorTcpEnabled) sb.AppendLine($"Monitoring TCP port(s): {_configuration.TcpPortsToMonitorAsString}");
+            sb.AppendLine("Monitor TCP: " + (Configuration.IsMonitorTcpEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Monitor ICMP: " + (Configuration.IsMonitorIcmpEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Monitor name poison: " + (Configuration.IsMonitorPoisonEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Monitor rogue DHCP: " + (Configuration.IsMonitorDhcpEnabled ? "Enabled" : "Disabled"));
+            if (Configuration.IsMonitorTcpEnabled) sb.AppendLine($"Monitoring TCP port(s): {Configuration.TcpPortsToMonitorAsString}");
 
             // Log endpoint ignore list.
-            if (_configuration.IgnoredEndpoints.Count > 0)
+            if (Configuration.IgnoredEndpoints.Count > 0)
             {
-                foreach (IPAddress ip in _configuration.IgnoredEndpoints)
+                foreach (IPAddress ip in Configuration.IgnoredEndpoints)
                 {
                     sb.AppendLine("Ignore source IP: " + ip.ToString());
                 }
             }
 
             // Log DHCP server ignore list.
-            if (_configuration.IgnoredDhcpServers.Count > 0)
+            if (Configuration.IgnoredDhcpServers.Count > 0)
             {
-                foreach (IPAddress ip in _configuration.IgnoredDhcpServers)
+                foreach (IPAddress ip in Configuration.IgnoredDhcpServers)
                 {
                     sb.AppendLine("Ignore DHCP server: " + ip.ToString());
                 }
@@ -236,7 +235,7 @@ namespace tcpTrigger
                 {
                     // If no DHCP servers are specified by the user, we will do automatic detection.
                     // Auto rogue DHCP detection alerts if more than one DHCP server is discovered.
-                    if (_configuration.IgnoredDhcpServers.Count == 0)
+                    if (Configuration.IgnoredDhcpServers.Count == 0)
                     {
                         if (!ipInterface.DiscoveredDhcpServerList.Contains(packetHeader.DhcpServerAddress))
                         {
@@ -247,7 +246,7 @@ namespace tcpTrigger
                                 packetHeader.MatchType = PacketMatch.RogueDhcp;
                         }
                     }
-                    else if (!_configuration.IgnoredDhcpServers.Contains(packetHeader.DhcpServerAddress) &&
+                    else if (!Configuration.IgnoredDhcpServers.Contains(packetHeader.DhcpServerAddress) &&
                         !ipInterface.DiscoveredDhcpServerList.Contains(packetHeader.DhcpServerAddress))
                     {
                         packetHeader.DestinationIP = ipInterface.IP;
@@ -262,22 +261,22 @@ namespace tcpTrigger
                 {
                     packetHeader.DestinationMac = ipInterface.MacAddress;
 
-                    if (_configuration.IsLogEnabled)
+                    if (Configuration.IsLogEnabled)
                         WriteLog(packetHeader);
-                    if (_configuration.IsEventLogEnabled)
+                    if (Configuration.IsEventLogEnabled)
                         WriteEventLog(packetHeader);
 
-                    if (!_configuration.IgnoredEndpoints.Contains(packetHeader.SourceIP))
+                    if (!Configuration.IgnoredEndpoints.Contains(packetHeader.SourceIP))
                     {
-                        ipInterface.RateLimitDictionaryCleanup(_configuration.ActionRateLimitMinutes);
+                        ipInterface.RateLimitDictionaryCleanup(Configuration.ActionRateLimitMinutes);
 
-                        if (!ipInterface.RateLimitDictionary.ContainsKey(packetHeader.SourceIP) || _configuration.ActionRateLimitMinutes <= 0)
+                        if (!ipInterface.RateLimitDictionary.ContainsKey(packetHeader.SourceIP) || Configuration.ActionRateLimitMinutes <= 0)
                         {
-                            if (_configuration.ActionRateLimitMinutes > 0)
+                            if (Configuration.ActionRateLimitMinutes > 0)
                                 ipInterface.RateLimitDictionary.Add(packetHeader.SourceIP, DateTime.Now);
 
-                            if (_configuration.IsExternalAppEnabled) LaunchApplication(packetHeader);
-                            if (_configuration.IsEmailNotificationEnabled) SendEmail(packetHeader);
+                            if (Configuration.IsExternalAppEnabled) LaunchApplication(packetHeader);
+                            if (Configuration.IsEmailNotificationEnabled) SendEmail(packetHeader);
                         }
                     }
                 }
@@ -300,7 +299,7 @@ namespace tcpTrigger
 
         private bool DoesPacketMatchPingRequest(PacketHeader header, IPAddress ip)
         {
-            if (_configuration.IsMonitorIcmpEnabled &&
+            if (Configuration.IsMonitorIcmpEnabled &&
                 header.ProtocolType == Protocol.ICMP &&
                 header.DestinationIP.Equals(ip) &&
                 header.IcmpType == 8)
@@ -313,12 +312,12 @@ namespace tcpTrigger
 
         private bool DoesPacketMatchMonitoredPort(PacketHeader header, IPAddress ip)
         {
-            if (_configuration.IsMonitorTcpEnabled &&
+            if (Configuration.IsMonitorTcpEnabled &&
                 header.ProtocolType == Protocol.TCP &&
                 header.TcpFlags == 0x2 &&
                 header.DestinationIP.Equals(ip) &&
-                (_configuration.TcpPortsToMonitor.Contains(header.DestinationPort) ||
-                _configuration.TcpPortsToMonitor[0] == 0))
+                (Configuration.TcpPortsToMonitor.Contains(header.DestinationPort) ||
+                Configuration.TcpPortsToMonitor[0] == 0))
             {
                 return true;
             }
@@ -328,7 +327,7 @@ namespace tcpTrigger
 
         private bool DoesPacketMatchNamePoison(PacketHeader header, IPAddress ip)
         {
-            if (_configuration.IsMonitorPoisonEnabled &&
+            if (Configuration.IsMonitorPoisonEnabled &&
                 _isNamePoisonDetectionInProgress &&
                 header.IsNameQueryResponse &&
                 header.DestinationIP.Equals(ip) &&
@@ -343,7 +342,7 @@ namespace tcpTrigger
 
         private bool DoesPacketMatchDhcpServer(PacketHeader header, IPAddress ip)
         {
-            if (_configuration.IsMonitorDhcpEnabled &&
+            if (Configuration.IsMonitorDhcpEnabled &&
                 header.DhcpServerAddress != null)
             {
                 return true;
@@ -356,7 +355,7 @@ namespace tcpTrigger
         {
             try
             {
-                using (StreamWriter outputFile = new StreamWriter(_configuration.LogPath, true))
+                using (StreamWriter outputFile = new StreamWriter(Configuration.LogPath, true))
                 {
                     string logText;
                     switch (packetHeader.MatchType)
@@ -384,10 +383,10 @@ namespace tcpTrigger
             }
             catch (Exception ex)
             {
-                _configuration.IsLogEnabled = false;
+                Configuration.IsLogEnabled = false;
                 EventLog.WriteEntry(
                     "tcpTrigger",
-                    $"Error writing to log file '{_configuration.LogPath}'. Logging has been disabled.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                    $"Error writing to log file '{Configuration.LogPath}'. Logging has been disabled.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                     EventLogEntryType.Error,
                     401);
             }
@@ -439,7 +438,7 @@ namespace tcpTrigger
 
         private void LaunchApplication(PacketHeader packetHeader)
         {
-            if (_configuration.TriggeredApplicationPath.Length == 0)
+            if (Configuration.TriggeredApplicationPath.Length == 0)
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
@@ -452,8 +451,8 @@ namespace tcpTrigger
             try
             {
                 Process.Start(
-                    _configuration.TriggeredApplicationPath,
-                    UserVariableExpansion.GetExpandedString(_configuration.TriggeredApplicationArguments, packetHeader));
+                    Configuration.TriggeredApplicationPath,
+                    UserVariableExpansion.GetExpandedString(Configuration.TriggeredApplicationArguments, packetHeader));
             }
             catch (Exception ex)
             {
@@ -467,7 +466,7 @@ namespace tcpTrigger
 
         private void SendEmail(PacketHeader packetHeader)
         {
-            if (_configuration.EmailRecipients.Count == 0)
+            if (Configuration.EmailRecipients.Count == 0)
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
@@ -476,7 +475,7 @@ namespace tcpTrigger
                     402);
                 return;
             }
-            if (_configuration.EmailSender.Length == 0)
+            if (Configuration.EmailSender.Length == 0)
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
@@ -485,7 +484,7 @@ namespace tcpTrigger
                     402);
                 return;
             }
-            if (_configuration.EmailServer.Length == 0)
+            if (Configuration.EmailServer.Length == 0)
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
@@ -494,7 +493,7 @@ namespace tcpTrigger
                     402);
                 return;
             }
-            if (_configuration.EmailSubject.Length == 0)
+            if (Configuration.EmailSubject.Length == 0)
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
@@ -510,23 +509,23 @@ namespace tcpTrigger
                 try
                 {
                     var smtpClient = new SmtpClient();
-                    smtpClient.Host = _configuration.EmailServer;
-                    smtpClient.Port = _configuration.EmailServerPort;
-                    if (_configuration.IsEmailAuthRequired)
+                    smtpClient.Host = Configuration.EmailServer;
+                    smtpClient.Port = Configuration.EmailServerPort;
+                    if (Configuration.IsEmailAuthRequired)
                     {
-                        smtpClient.Credentials = new NetworkCredential(_configuration.EmailUsername, _configuration.EmailPassword);
+                        smtpClient.Credentials = new NetworkCredential(Configuration.EmailUsername, Configuration.EmailPassword);
                     }
-                    message.From = _configuration.EmailSenderDisplayName.Length > 0 ?
-                        new MailAddress(_configuration.EmailSender, _configuration.EmailSenderDisplayName)
-                        : new MailAddress(_configuration.EmailSender);
-                    for (int i = 0; i < _configuration.EmailRecipients.Count; i++)
+                    message.From = Configuration.EmailSenderDisplayName.Length > 0 ?
+                        new MailAddress(Configuration.EmailSender, Configuration.EmailSenderDisplayName)
+                        : new MailAddress(Configuration.EmailSender);
+                    for (int i = 0; i < Configuration.EmailRecipients.Count; i++)
                     {
-                        if (!string.IsNullOrEmpty(_configuration.EmailRecipients[i]))
+                        if (!string.IsNullOrEmpty(Configuration.EmailRecipients[i]))
                         {
-                            message.To.Add(_configuration.EmailRecipients[i].Trim());
+                            message.To.Add(Configuration.EmailRecipients[i].Trim());
                         }
                     }
-                    message.Subject = UserVariableExpansion.GetExpandedString(_configuration.EmailSubject, packetHeader);
+                    message.Subject = UserVariableExpansion.GetExpandedString(Configuration.EmailSubject, packetHeader);
                     message.Body = UserVariableExpansion.GetExpandedString(GetMessageBody(packetHeader), packetHeader);
 
                     //Send the email.
@@ -550,16 +549,16 @@ namespace tcpTrigger
             switch (packetHeader.MatchType)
             {
                 case PacketMatch.PingRequest:
-                    messageBody = _configuration.MessageBodyPing;
+                    messageBody = Configuration.MessageBodyPing;
                     break;
                 case PacketMatch.TcpConnect:
-                    messageBody = _configuration.MessageBodyTcpConnect;
+                    messageBody = Configuration.MessageBodyTcpConnect;
                     break;
                 case PacketMatch.NamePoison:
-                    messageBody = _configuration.MessageBodyNamePoison;
+                    messageBody = Configuration.MessageBodyNamePoison;
                     break;
                 case PacketMatch.RogueDhcp:
-                    messageBody = _configuration.MessageBodyRogueDhcp;
+                    messageBody = Configuration.MessageBodyRogueDhcp;
                     break;
                 default:
                     messageBody = "Not defined.";

@@ -8,40 +8,40 @@ using System.Xml;
 
 namespace tcpTrigger
 {
-    public class Configuration
+    public static class Configuration
     {
-        public bool IsMonitorTcpEnabled { get; private set; }
-        public bool IsMonitorIcmpEnabled { get; private set; }
-        public bool IsMonitorPoisonEnabled { get; private set; }
-        public bool IsMonitorDhcpEnabled { get; private set; }
-        public int[] TcpPortsToMonitor { get; private set; }
-        public string TcpPortsToMonitorAsString { get; private set; }
-        public bool IsLogEnabled { get; set; }
-        public bool IsEventLogEnabled { get; private set; }
-        public bool IsEmailNotificationEnabled { get; private set; }
-        public bool IsExternalAppEnabled { get; private set; }
-        public int ActionRateLimitMinutes { get; private set; }
-        public string LogPath { get; private set; }
-        public string TriggeredApplicationPath { get; private set; }
-        public string TriggeredApplicationArguments { get; private set; }
-        public HashSet<string> ExcludedNetworkInterfaces { get; private set; } = new HashSet<string>();
-        public HashSet<IPAddress> IgnoredDhcpServers { get; private set; } = new HashSet<IPAddress>();
-        public HashSet<IPAddress> IgnoredEndpoints { get; private set; } = new HashSet<IPAddress>();
-        public string EmailServer { get; private set; }
-        public int EmailServerPort { get; private set; }
-        public bool IsEmailAuthRequired { get; private set; }
-        public string EmailUsername { get; private set; }
-        public string EmailPassword { get; private set; }
-        public List<string> EmailRecipients { get; private set; } = new List<string>();
-        public string EmailSender { get; private set; }
-        public string EmailSenderDisplayName { get; private set; }
-        public string EmailSubject { get; private set; }
-        public string MessageBodyPing { get; private set; }
-        public string MessageBodyTcpConnect { get; private set; }
-        public string MessageBodyNamePoison { get; private set; }
-        public string MessageBodyRogueDhcp { get; private set; }
+        public static bool IsMonitorTcpEnabled { get; private set; }
+        public static bool IsMonitorIcmpEnabled { get; private set; }
+        public static bool IsMonitorPoisonEnabled { get; private set; }
+        public static bool IsMonitorDhcpEnabled { get; private set; }
+        public static int[] TcpPortsToMonitor { get; private set; }
+        public static string TcpPortsToMonitorAsString { get; private set; }
+        public static bool IsLogEnabled { get; set; }
+        public static bool IsEventLogEnabled { get; private set; }
+        public static bool IsEmailNotificationEnabled { get; private set; }
+        public static bool IsExternalAppEnabled { get; private set; }
+        public static int ActionRateLimitMinutes { get; private set; }
+        public static string LogPath { get; private set; }
+        public static string TriggeredApplicationPath { get; private set; }
+        public static string TriggeredApplicationArguments { get; private set; }
+        public static HashSet<string> ExcludedNetworkInterfaces { get; private set; } = new HashSet<string>();
+        public static HashSet<IPAddress> IgnoredDhcpServers { get; private set; } = new HashSet<IPAddress>();
+        public static HashSet<IPAddress> IgnoredEndpoints { get; private set; } = new HashSet<IPAddress>();
+        public static string EmailServer { get; private set; }
+        public static int EmailServerPort { get; private set; }
+        public static bool IsEmailAuthRequired { get; private set; }
+        public static string EmailUsername { get; private set; }
+        public static string EmailPassword { get; private set; }
+        public static List<string> EmailRecipients { get; private set; } = new List<string>();
+        public static string EmailSender { get; private set; }
+        public static string EmailSenderDisplayName { get; private set; }
+        public static string EmailSubject { get; private set; }
+        public static string MessageBodyPing { get; private set; }
+        public static string MessageBodyTcpConnect { get; private set; }
+        public static string MessageBodyNamePoison { get; private set; }
+        public static string MessageBodyRogueDhcp { get; private set; }
 
-        private string GetConfigurationPath()
+        private static string GetConfigurationPath()
         {
             // Locate the tcpTrigger.xml configuration file.
             // First check the current directory. If not found, check ProgramData.
@@ -55,7 +55,7 @@ namespace tcpTrigger
                 return string.Empty;
         }
 
-        public bool Load()
+        public static bool Load()
         {
             string configuratonPath = GetConfigurationPath();
             
