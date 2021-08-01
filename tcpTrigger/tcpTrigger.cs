@@ -275,7 +275,6 @@ namespace tcpTrigger
 
                             if (_configuration.IsExternalAppEnabled) LaunchApplication(packetHeader);
                             if (_configuration.IsEmailNotificationEnabled) SendEmail(packetHeader);
-                            if (_configuration.IsPopupMessageEnabled) DisplayPopupMessage(packetHeader);
                         }
                     }
                 }
@@ -419,22 +418,6 @@ namespace tcpTrigger
                     $"Error launching external triggered application.{Environment.NewLine}{ex.Message}",
                     EventLogEntryType.Error,
                     401);
-            }
-        }
-
-        private void DisplayPopupMessage(PacketHeader packetHeader)
-        {
-            try
-            {
-                Process.Start("msg", $"* /time:0 {UserVariableExpansion.GetExpandedString(GetMessageBody(packetHeader), packetHeader)}");
-            }
-            catch (Exception ex)
-            {
-                EventLog.WriteEntry(
-                    "tcpTrigger",
-                    $"Error displaying popup message.{Environment.NewLine}{ex.Message}",
-                    EventLogEntryType.Error,
-                    404);
             }
         }
 

@@ -19,7 +19,6 @@ namespace tcpTrigger
         public bool IsEventLogEnabled { get; private set; }
         public bool IsEmailNotificationEnabled { get; private set; }
         public bool IsExternalAppEnabled { get; private set; }
-        public bool IsPopupMessageEnabled { get; private set; }
         public int ActionRateLimitMinutes { get; private set; }
         public string TriggeredApplicationPath { get; private set; }
         public string TriggeredApplicationArguments { get; private set; }
@@ -154,10 +153,6 @@ namespace tcpTrigger
                 currentNode = ConfigurationNode.enabledActions_emailNotification;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { IsEmailNotificationEnabled = bool.Parse(xn.InnerText); }
-
-                currentNode = ConfigurationNode.enabledActions_popupNotification;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null) { IsPopupMessageEnabled = bool.Parse(xn.InnerText); }
 
                 currentNode = ConfigurationNode.enabledActions_executeCommand;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
