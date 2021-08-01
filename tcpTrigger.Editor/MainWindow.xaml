@@ -134,12 +134,7 @@
                                          FontFamily="Consolas"
                                          DockPanel.Dock="Right"/>
                             </DockPanel>
-
-                            <!-- Display popup message -->
-                            <CheckBox Name="DisplayPopupOption"
-                                      Content="Display a popup message to all logged on users"
-                                      Margin="0,10,0,0"/>
-
+                            
                             <!-- Launch external application -->
                             <CheckBox Name="LaunchAppOption"
                                       Content="Launch an external application"

@@ -168,9 +168,9 @@ namespace tcpTrigger.Editor
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { SendEmailOption.IsChecked = bool.Parse(xn.InnerText); }
 
-                currentNode = ConfigurationNode.enabledActions_popupNotification;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null) { DisplayPopupOption.IsChecked = bool.Parse(xn.InnerText); }
+                //currentNode = ConfigurationNode.enabledActions_popupNotification;
+                //xn = xd.DocumentElement.SelectSingleNode(currentNode);
+                //if (xn != null) { DisplayPopupOption.IsChecked = bool.Parse(xn.InnerText); }
 
                 currentNode = ConfigurationNode.enabledActions_executeCommand;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
@@ -391,7 +391,7 @@ namespace tcpTrigger.Editor
                     writer.WriteStartElement("enabledActions");
                     writer.WriteElementString("windowsEventLog", EventLogOption.IsChecked == true ? t : f);
                     writer.WriteElementString("emailNotification", SendEmailOption.IsChecked == true ? t : f);
-                    writer.WriteElementString("popupNotification", DisplayPopupOption.IsChecked == true ? t : f);
+                    //writer.WriteElementString("popupNotification", DisplayPopupOption.IsChecked == true ? t : f);
                     writer.WriteElementString("executeCommand", LaunchAppOption.IsChecked == true ? t : f);
                     writer.WriteEndElement();
 
