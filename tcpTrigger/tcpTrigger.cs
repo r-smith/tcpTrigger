@@ -40,6 +40,20 @@ namespace tcpTrigger
                 return;
             }
 
+            // Validate log file path. Disable logging if inaccessible.
+            if (Configuration.IsLogEnabled)
+            {
+                if (string.IsNullOrEmpty(Configuration.LogPath) || !Directory.Exists(Path.GetDirectoryName(Configuration.LogPath)))
+                {
+                    Configuration.IsLogEnabled = false;
+                    EventLog.WriteEntry(
+                        "tcpTrigger",
+                        $"Log file path '{Configuration.LogPath}' is inaccessible. Logging has been disabled. Update your tcpTrigger configuration with a valid path.",
+                        EventLogEntryType.Error,
+                        401);
+                }
+            }
+
             // If enabled, start name poison detection.
             if (Configuration.IsMonitorPoisonEnabled)
             {
