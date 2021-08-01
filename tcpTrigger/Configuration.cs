@@ -190,33 +190,39 @@ namespace tcpTrigger
                 // Decrypt username.
                 currentNode = ConfigurationNode.emailConfiguration_username;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn.Attributes["encrypted"]?.InnerText == "true")
+                if (xn != null)
                 {
-                    encryptedValue = xn.InnerText;
-                    if (!string.IsNullOrEmpty(encryptedValue))
-                        EmailUsername = StringCipher.Decrypt(encryptedValue);
-                    encryptedValue = null;
-                }
-                else
-                {
-                    if (!string.IsNullOrEmpty(xn.InnerText))
-                        EmailUsername = xn.InnerText;
+                    if (xn.Attributes["encrypted"]?.InnerText == "true")
+                    {
+                        encryptedValue = xn.InnerText;
+                        if (!string.IsNullOrEmpty(encryptedValue))
+                            EmailUsername = StringCipher.Decrypt(encryptedValue);
+                        encryptedValue = null;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(xn.InnerText))
+                            EmailUsername = xn.InnerText;
+                    }
                 }
 
                 // Decrypt password.
                 currentNode = ConfigurationNode.emailConfiguration_password;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn.Attributes["encrypted"]?.InnerText == "true")
+                if (xn != null)
                 {
-                    encryptedValue = xn.InnerText;
-                    if (!string.IsNullOrEmpty(encryptedValue))
-                        EmailPassword = StringCipher.Decrypt(encryptedValue);
-                    encryptedValue = null;
-                }
-                else
-                {
-                    if (!string.IsNullOrEmpty(xn.InnerText))
-                        EmailPassword = xn.InnerText;
+                    if (xn.Attributes["encrypted"]?.InnerText == "true")
+                    {
+                        encryptedValue = xn.InnerText;
+                        if (!string.IsNullOrEmpty(encryptedValue))
+                            EmailPassword = StringCipher.Decrypt(encryptedValue);
+                        encryptedValue = null;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(xn.InnerText))
+                            EmailPassword = xn.InnerText;
+                    }
                 }
 
                 currentNode = ConfigurationNode.emailConfiguration_recipientList_address;
