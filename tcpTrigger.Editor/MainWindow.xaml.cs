@@ -93,6 +93,10 @@ namespace tcpTrigger.Editor
                 return;
             }
 
+            // currentNode is updated with the XML node path for every element that is read
+            // from the configuration file. This aids in debugging and provides more useful
+            // error messages when something goes wrong.
+            string currentNode = string.Empty;
             try
             {
                 var xd = new XmlDocument();
@@ -102,21 +106,31 @@ namespace tcpTrigger.Editor
                 XmlNodeList nl;
                 string encryptedValue;
                 // tcpTrigger/enabledComponents
-                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledComponents/tcp");
+                currentNode = ConfigurationNode.enabledComponents_tcp;
+                xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { MonitorTcpOption.IsChecked = bool.Parse(xn.InnerText); }
-                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledComponents/icmp");
+
+                currentNode = ConfigurationNode.enabledComponents_icmp;
+                xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { MonitorIcmpOption.IsChecked = bool.Parse(xn.InnerText); }
-                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledComponents/namePoison");
+
+                currentNode = ConfigurationNode.enabledComponents_namePoison;
+                xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { MonitorPoisonOption.IsChecked = bool.Parse(xn.InnerText); }
-                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledComponents/rogueDhcp");
+
+                currentNode = ConfigurationNode.enabledComponents_rogueDhcp;
+                xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { MonitorDhcpOption.IsChecked = bool.Parse(xn.InnerText); }
+
                 // tcpTrigger/monitoredPorts
-                TcpIncludePorts.Text =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/monitoredPorts/tcp/include")?.InnerText;
-                TcpExcludePorts.Text =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/monitoredPorts/tcp/exclude")?.InnerText;
+                currentNode = ConfigurationNode.monitoredPorts_tcp_include;
+                TcpIncludePorts.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                currentNode = ConfigurationNode.monitoredPorts_tcp_exclude;
+                TcpExcludePorts.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+
                 // tcpTrigger/dhcpServerIgnoreList
-                nl = xd.DocumentElement.SelectNodes("/tcpTrigger/dhcpServerIgnoreList/ipAddress");
+                currentNode = ConfigurationNode.dhcpServerIgnoreList_ipAddress;
+                nl = xd.DocumentElement.SelectNodes(currentNode);
                 List<string> ignoredDhcpServers = new List<string>();
                 for (int i = 0; i < nl.Count; i++)
                 {
@@ -124,8 +138,10 @@ namespace tcpTrigger.Editor
                         ignoredDhcpServers.Add(nl[i].InnerText);
                 }
                 DhcpServers.Text = string.Join(", ", ignoredDhcpServers.ToArray());
+
                 // tcpTrigger/endpointIgnoreList
-                nl = xd.DocumentElement.SelectNodes("/tcpTrigger/endpointIgnoreList/ipAddress");
+                currentNode = ConfigurationNode.endpointIgnoreList_ipAddress;
+                nl = xd.DocumentElement.SelectNodes(currentNode);
                 var sb = new StringBuilder();
                 for (int i = 0; i < nl.Count; i++)
                 {
@@ -133,8 +149,10 @@ namespace tcpTrigger.Editor
                         sb.AppendLine(nl[i].InnerText.Trim());
                 }
                 Whitelist.Text = sb.ToString();
+
                 // tcpTrigger/networkInterfaceExcludeList
-                nl = xd.DocumentElement.SelectNodes("/tcpTrigger/networkInterfaceExcludeList/deviceGuid");
+                currentNode = ConfigurationNode.networkInterfaceExcludeList_deviceGuid;
+                nl = xd.DocumentElement.SelectNodes(currentNode);
                 for (int i = 0; i < nl.Count; i++)
                 {
                     if (!string.IsNullOrEmpty(nl[i].InnerText))
@@ -142,73 +160,100 @@ namespace tcpTrigger.Editor
                 }
 
                 // tcpTrigger/enabledActions
-                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledActions/windowsEventLog");
+                currentNode = ConfigurationNode.enabledActions_windowsEventLog;
+                xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { EventLogOption.IsChecked = bool.Parse(xn.InnerText); }
-                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledActions/emailNotification");
+
+                currentNode = ConfigurationNode.enabledActions_emailNotification;
+                xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { SendEmailOption.IsChecked = bool.Parse(xn.InnerText); }
-                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledActions/popupNotification");
+
+                currentNode = ConfigurationNode.enabledActions_popupNotification;
+                xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { DisplayPopupOption.IsChecked = bool.Parse(xn.InnerText); }
-                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/enabledActions/executeCommand");
+
+                currentNode = ConfigurationNode.enabledActions_executeCommand;
+                xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { LaunchAppOption.IsChecked = bool.Parse(xn.InnerText); }
+
                 // tcpTrigger/actionSettings
-                RateLimitMinutes.Text =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/actionSettings/rateLimitMinutes")?.InnerText;
+                currentNode = ConfigurationNode.actionsSettings_rateLimitMinutes;
+                RateLimitMinutes.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
                 if (RateLimitMinutes.Text.Length > 0)
                     RateLimitOption.IsChecked = true;
-                ApplicationPath.Text =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/actionSettings/command/path")?.InnerText;
-                ApplicationArguments.Text =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/actionSettings/command/arguments")?.InnerText;
+
+                currentNode = ConfigurationNode.actionsSettings_command_path;
+                ApplicationPath.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                currentNode = ConfigurationNode.actionsSettings_command_arguments;
+                ApplicationArguments.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+
                 // tcpTrigger/emailConfiguration
-                EmailServer.Text =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/server")?.InnerText;
-                EmailPort.Text =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/port")?.InnerText;
-                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/isAuthRequired");
+                currentNode = ConfigurationNode.emailConfiguration_server;
+                EmailServer.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                currentNode = ConfigurationNode.emailConfiguration_port;
+                EmailPort.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+
+                currentNode = ConfigurationNode.emailConfiguration_isAuthRequired;
+                xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { IsSmtpAuthenticationRequired.IsChecked = bool.Parse(xn.InnerText); }
+
                 // Decrypt username.
-                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/username");
-                if (xn.Attributes["encrypted"]?.InnerText == "true")
+                currentNode = ConfigurationNode.emailConfiguration_username;
+                xn = xd.DocumentElement.SelectSingleNode(currentNode);
+                if (xn != null)
                 {
-                    encryptedValue = xn.InnerText;
-                    if (!string.IsNullOrEmpty(encryptedValue))
-                        SmtpUsername.Text = StringCipher.Decrypt(encryptedValue);
-                    encryptedValue = null;
+                    if (xn.Attributes["encrypted"]?.InnerText == "true")
+                    {
+                        encryptedValue = xn.InnerText;
+                        if (!string.IsNullOrEmpty(encryptedValue))
+                            SmtpUsername.Text = StringCipher.Decrypt(encryptedValue);
+                        encryptedValue = null;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(xn.InnerText))
+                            SmtpUsername.Text = xn.InnerText;
+                    }
                 }
-                else
-                {
-                    if (!string.IsNullOrEmpty(xn.InnerText))
-                        SmtpUsername.Text = xn.InnerText;
-                }
+
                 // Decrypt password.
-                xn = xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/password");
-                if (xn.Attributes["encrypted"]?.InnerText == "true")
+                currentNode = ConfigurationNode.emailConfiguration_password;
+                xn = xd.DocumentElement.SelectSingleNode(currentNode);
+                if (xn != null)
                 {
-                    encryptedValue = xn.InnerText;
-                    if (!string.IsNullOrEmpty(encryptedValue))
-                        SmtpPassword.Password = StringCipher.Decrypt(encryptedValue);
-                    encryptedValue = null;
+                    if (xn.Attributes["encrypted"]?.InnerText == "true")
+                    {
+                        encryptedValue = xn.InnerText;
+                        if (!string.IsNullOrEmpty(encryptedValue))
+                            SmtpPassword.Password = StringCipher.Decrypt(encryptedValue);
+                        encryptedValue = null;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(xn.InnerText))
+                            SmtpPassword.Password = xn.InnerText;
+                    }
                 }
-                else
-                {
-                    if (!string.IsNullOrEmpty(xn.InnerText))
-                        SmtpPassword.Password = xn.InnerText;
-                }
-                // Join recipient list to single string.
-                nl = xd.DocumentElement.SelectNodes("/tcpTrigger/emailConfiguration/recipientList/address");
+
+                currentNode = ConfigurationNode.emailConfiguration_recipientList_address;
+                nl = xd.DocumentElement.SelectNodes(currentNode);
                 List<string> recipients = new List<string>();
                 for (int i = 0; i < nl.Count; i++)
                 {
                     if (!string.IsNullOrEmpty(nl[i].InnerText))
                         recipients.Add(nl[i].InnerText);
                 }
+                // Join recipients list to single string.
                 EmailRecipient.Text = string.Join(", ", recipients.ToArray());
-                EmailSender.Text =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/sender/address")?.InnerText;
-                EmailSenderFriendly.Text =
-                    xd.DocumentElement.SelectSingleNode("/tcpTrigger/emailConfiguration/sender/displayName")?.InnerText;
+
+                currentNode = ConfigurationNode.emailConfiguration_sender_address;
+                EmailSender.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                currentNode = ConfigurationNode.emailConfiguration_sender_displayName;
+                EmailSenderFriendly.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+
                 // tcpTrigger/customMessage
-                nl = xd.DocumentElement.SelectNodes("/tcpTrigger/customMessage");
+                currentNode = ConfigurationNode.customMessage;
+                nl = xd.DocumentElement.SelectNodes(currentNode);
                 for (int i = 0; i < nl.Count; i++)
                 {
                     if (nl[i].Attributes["type"]?.InnerText == "tcp")
@@ -231,7 +276,7 @@ namespace tcpTrigger.Editor
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error reading configuration '{configurationPath}'. {ex.Message}");
+                MessageBox.Show($"Error reading configuration '{configurationPath}'. Unable to parse XML node: {currentNode}{Environment.NewLine}{Environment.NewLine}{ex.Message}");
             }
         }
 
