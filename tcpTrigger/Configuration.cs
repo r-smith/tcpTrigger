@@ -8,7 +8,7 @@ using System.Xml;
 
 namespace tcpTrigger
 {
-    internal class Configuration
+    public class Configuration
     {
         public bool IsMonitorTcpEnabled { get; private set; }
         public bool IsMonitorIcmpEnabled { get; private set; }
@@ -16,10 +16,12 @@ namespace tcpTrigger
         public bool IsMonitorDhcpEnabled { get; private set; }
         public int[] TcpPortsToMonitor { get; private set; }
         public string TcpPortsToMonitorAsString { get; private set; }
+        public bool IsLogEnabled { get; set; }
         public bool IsEventLogEnabled { get; private set; }
         public bool IsEmailNotificationEnabled { get; private set; }
         public bool IsExternalAppEnabled { get; private set; }
         public int ActionRateLimitMinutes { get; private set; }
+        public string LogPath { get; private set; }
         public string TriggeredApplicationPath { get; private set; }
         public string TriggeredApplicationArguments { get; private set; }
         public HashSet<string> ExcludedNetworkInterfaces { get; private set; } = new HashSet<string>();
@@ -146,6 +148,10 @@ namespace tcpTrigger
                 }
 
                 // tcpTrigger/enabledActions
+                currentNode = ConfigurationNode.enabledActions_log;
+                xn = xd.DocumentElement.SelectSingleNode(currentNode);
+                if (xn != null) { IsLogEnabled = bool.Parse(xn.InnerText); }
+
                 currentNode = ConfigurationNode.enabledActions_windowsEventLog;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { IsEventLogEnabled = bool.Parse(xn.InnerText); }
@@ -164,6 +170,8 @@ namespace tcpTrigger
                 if (xn != null && !string.IsNullOrEmpty(xn.InnerText)) { ActionRateLimitMinutes = int.Parse(xn.InnerText); }
                 else { ActionRateLimitMinutes = 0; }
 
+                currentNode = ConfigurationNode.actionsSettings_logPath;
+                LogPath = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
                 currentNode = ConfigurationNode.actionsSettings_command_path;
                 TriggeredApplicationPath = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
                 currentNode = ConfigurationNode.actionsSettings_command_arguments;
@@ -288,11 +296,13 @@ namespace tcpTrigger
         public const string dhcpServerIgnoreList_ipAddress = "/tcpTrigger/dhcpServerIgnoreList/ipAddress";
         public const string endpointIgnoreList_ipAddress = "/tcpTrigger/endpointIgnoreList/ipAddress";
         public const string networkInterfaceExcludeList_deviceGuid = "/tcpTrigger/networkInterfaceExcludeList/deviceGuid";
+        public const string enabledActions_log = "/tcpTrigger/enabledActions/log";
         public const string enabledActions_windowsEventLog = "/tcpTrigger/enabledActions/windowsEventLog";
         public const string enabledActions_emailNotification = "/tcpTrigger/enabledActions/emailNotification";
         public const string enabledActions_popupNotification = "/tcpTrigger/enabledActions/popupNotification";
         public const string enabledActions_executeCommand = "/tcpTrigger/enabledActions/executeCommand";
         public const string actionsSettings_rateLimitMinutes = "/tcpTrigger/actionSettings/rateLimitMinutes";
+        public const string actionsSettings_logPath = "/tcpTrigger/actionSettings/logPath";
         public const string actionsSettings_command_path = "/tcpTrigger/actionSettings/command/path";
         public const string actionsSettings_command_arguments = "/tcpTrigger/actionSettings/command/arguments";
         public const string emailConfiguration_server = "/tcpTrigger/emailConfiguration/server";

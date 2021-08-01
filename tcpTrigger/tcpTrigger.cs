@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
@@ -261,6 +262,8 @@ namespace tcpTrigger
                 {
                     packetHeader.DestinationMac = ipInterface.MacAddress;
 
+                    if (_configuration.IsLogEnabled)
+                        WriteLog(packetHeader);
                     if (_configuration.IsEventLogEnabled)
                         WriteEventLog(packetHeader);
 
@@ -349,6 +352,47 @@ namespace tcpTrigger
             return false;
         }
 
+        private void WriteLog(PacketHeader packetHeader)
+        {
+            try
+            {
+                using (StreamWriter outputFile = new StreamWriter(_configuration.LogPath, true))
+                {
+                    string logText;
+                    switch (packetHeader.MatchType)
+                    {
+                        case PacketMatch.TcpConnect:
+                            logText = $"TCP connection to port {packetHeader.DestinationPort} from {packetHeader.SourceIP}";
+                            break;
+                        case PacketMatch.PingRequest:
+                            logText = $"ICMP ping request from {packetHeader.SourceIP}";
+                            break;
+                        case PacketMatch.NamePoison:
+                            logText = $"Name poison attempt from {packetHeader.SourceIP}";
+                            break;
+                        case PacketMatch.RogueDhcp:
+                            logText = $"Unrecognized DHCP server at {packetHeader.DhcpServerAddress}";
+                            break;
+                        default:
+                            logText = string.Empty;
+                            break;
+                    }
+                    outputFile.WriteLine(
+                        DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToLongTimeString()
+                        + " [" + packetHeader.DestinationIP + " ] " + logText);
+                }
+            }
+            catch (Exception ex)
+            {
+                _configuration.IsLogEnabled = false;
+                EventLog.WriteEntry(
+                    "tcpTrigger",
+                    $"Error writing to log file '{_configuration.LogPath}'. Logging has been disabled.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                    EventLogEntryType.Error,
+                    401);
+            }
+        }
+
         private void WriteEventLog(PacketHeader packetHeader)
         {
             switch (packetHeader.MatchType)
@@ -356,7 +400,7 @@ namespace tcpTrigger
                 case PacketMatch.TcpConnect:
                     EventLog.WriteEntry(
                         "tcpTrigger",
-                        $"A captured packet has matched trigger rules.{Environment.NewLine}{Environment.NewLine}" +
+                        $"TCP connection detected.{Environment.NewLine}{Environment.NewLine}" +
                         $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}" +
                         $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}" +
                         $"Destination port: {packetHeader.DestinationPort}{Environment.NewLine}{Environment.NewLine}" +
@@ -367,7 +411,7 @@ namespace tcpTrigger
                 case PacketMatch.PingRequest:
                     EventLog.WriteEntry(
                         "tcpTrigger",
-                        $"A captured ICMP ping request has matched trigger rules.{Environment.NewLine}{Environment.NewLine}" +
+                        $"ICMP ping request detected.{Environment.NewLine}{Environment.NewLine}" +
                         $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}" +
                         $"Destination IP: {packetHeader.DestinationIP}",
                         EventLogEntryType.Information,
@@ -376,7 +420,7 @@ namespace tcpTrigger
                 case PacketMatch.NamePoison:
                     EventLog.WriteEntry(
                         "tcpTrigger",
-                        $"NetBIOS name poisoning detected.{Environment.NewLine}{Environment.NewLine}" +
+                        $"Name poison attempt detected.{Environment.NewLine}{Environment.NewLine}" +
                         $"Source IP: {packetHeader.SourceIP}",
                         EventLogEntryType.Information,
                         202);
@@ -384,7 +428,7 @@ namespace tcpTrigger
                 case PacketMatch.RogueDhcp:
                     EventLog.WriteEntry(
                         "tcpTrigger",
-                        $"Possible rogue DHCP server discovered.{Environment.NewLine}{Environment.NewLine}" +
+                        $"Unrecognized DHCP server detected.{Environment.NewLine}{Environment.NewLine}" +
                         $"DHCP Server IP: {packetHeader.DhcpServerAddress}{Environment.NewLine}" +
                         $"Interface: {packetHeader.DestinationIP}",
                         EventLogEntryType.Information,
