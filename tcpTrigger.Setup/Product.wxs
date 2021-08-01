@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="utf-8"?>
 
 <?define ProductName = "tcpTrigger" ?>
 <?define ProductManufacturer = "Ryan Smith" ?>
@@ -19,21 +19,22 @@
 <!--                                                                                       -->
 <!-- ************************************************************************************* -->
 <?if $(var.Platform) = x64 ?>
-  <?define ProductId = "{F1F91D9A-FC63-450F-9EDC-0CEC584EFC13}" ?>
-  <?define ProductUpgradeCode = "{68A80CF7-645A-48A6-9B13-BE7D639D519B}" ?>
-  <?define Win64 = "yes" ?>
-  <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
-  <?define ProductDisplayName = "$(var.ProductName)" ?>
+<?define ProductId = "{F1F91D9A-FC63-450F-9EDC-0CEC584EFC13}" ?>
+<?define ProductUpgradeCode = "{68A80CF7-645A-48A6-9B13-BE7D639D519B}" ?>
+<?define Win64 = "yes" ?>
+<?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+<?define ProductDisplayName = "$(var.ProductName)" ?>
 <?else ?>
-  <?define ProductId = "{24BD9DA2-2ED3-46CD-879A-5AD12763035B}"?>
-  <?define ProductUpgradeCode = "{7FEBF1AD-0417-4A10-A6EF-8046C5BBB8EB}" ?>
-  <?define Win64 = "no" ?>
-  <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
-  <?define ProductDisplayName = "$(var.ProductName) 32-bit" ?>
+<?define ProductId = "{24BD9DA2-2ED3-46CD-879A-5AD12763035B}"?>
+<?define ProductUpgradeCode = "{7FEBF1AD-0417-4A10-A6EF-8046C5BBB8EB}" ?>
+<?define Win64 = "no" ?>
+<?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+<?define ProductDisplayName = "$(var.ProductName) 32-bit" ?>
 <?endif ?>
 
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
-     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 
   <Product Name="$(var.ProductDisplayName)"
            Manufacturer="$(var.ProductManufacturer)"
@@ -41,7 +42,7 @@
            Id="$(var.ProductId)"
            UpgradeCode="$(var.ProductUpgradeCode)"
            Language="1033" Codepage="1252">
-    
+
     <Package Id="*" Keywords="Installer" InstallerVersion="300" Compressed="yes"
              Languages="1033" SummaryCodepage="1252"
              InstallPrivileges="elevated" InstallScope="perMachine" />
@@ -49,9 +50,9 @@
     <!-- Allow upgrades and prevent downgrades -->
     <MajorUpgrade DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."
                   Schedule="afterInstallFinalize" />
-    
+
     <Media Id="1" Cabinet="tcptrigger.cab" EmbedCab="yes" />
-    
+
     <!-- WiX UI -->
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch the tcpTrigger configuration manager" />
@@ -83,20 +84,20 @@
         <FileSearch Name="EventLogMessages.dll"/>
       </DirectorySearch>
     </Property>
-    
+
     <!-- Define the directory structure -->
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="$(var.PlatformProgramFilesFolder)">
         <Directory Id="INSTALLFOLDER" Name="$(var.ProductName)">
-          
+
           <!-- Installation components -->
           <Component Id="MainExecutable" Guid="{F4E5590B-B4A7-4A74-A5D8-E91AB7A05014}" Win64="$(var.Win64)">
             <File Id="tcpTrigger.exe" Source="$(var.tcpTrigger.TargetPath)" Vital="yes" KeyPath="yes">
-              
+
               <!-- Add a Windows firewall exception for tcpTrigger.exe -->
               <fire:FirewallException Id="FirewallException" Name="$(var.ProductName)" Scope="any" IgnoreFailure="yes" />
             </File>
-            
+
             <!-- Install tcpTrigger as a Windows service -->
             <ServiceInstall Name="$(var.ProductName)"
                             DisplayName="$(var.ProductName)"
@@ -115,15 +116,14 @@
                             Name="tcpTrigger"
                             Wait="yes" />
           </Component>
-          
-          
+
+
           <!-- Register Windows event log source -->
           <Component Id="CreateEventSourceDotNet4" Guid="{BC256F58-832A-4F03-806A-3B86D730EF21}" Win64="$(var.Win64)">
             <!-- If the .NET 4.x EventLogMessages.dll exists, use it to register the EventSource -->
             <Condition>DOTNET4EVENTLOGMESSAGES_EXISTS</Condition>
             <CreateFolder/>
-            <Util:EventSource xmlns:Util="http://schemas.microsoft.com/wix/UtilExtension"
-                              Name="$(var.ProductName)"
+            <util:EventSource Name="$(var.ProductName)"
                               Log="Application"
                               EventMessageFile="%SystemRoot%\Microsoft.NET\Framework\v4.0.30319\EventLogMessages.dll" />
           </Component>
@@ -131,12 +131,11 @@
             <!-- If the .NET 4.x EventLogMessage.dll does not exist, use the .NET 2.x dll to register the EventSource -->
             <Condition>NOT DOTNET4EVENTLOGMESSAGES_EXISTS</Condition>
             <CreateFolder/>
-            <Util:EventSource xmlns:Util="http://schemas.microsoft.com/wix/UtilExtension"
-                              Name="$(var.ProductName)"
+            <util:EventSource Name="$(var.ProductName)"
                               Log="Application"
                               EventMessageFile="%SystemRoot%\Microsoft.NET\Framework\v2.0.50727\EventLogMessages.dll" />
           </Component>
-          
+
           <!-- Install the graphical configuration editor -->
           <Component Id="ConfigurationEditor" Guid="{E326FFDE-ED02-4C1D-AF5D-C2BFD002C2CB}" Win64="$(var.Win64)">
             <File Id="tcpTrigger.Editor.exe" Source="$(var.tcpTrigger.Editor.TargetPath)" KeyPath="yes">
@@ -149,17 +148,31 @@
                         Advertise="yes" />
             </File>
           </Component>
-          
+
         </Directory>
       </Directory>
 
       <Directory Id="DesktopFolder" Name="Desktop" />
+
+      <!-- Define ProgramData folders for storing tcpTrigger config and logs -->
+      <Directory Id="CommonAppDataFolder">
+        <Directory Id="ProgramDataTcpTriggerFolder" Name="tcpTrigger">
+          <!-- Create ProgramData\tcpTrigger folder and set permissions -->
+          <Component Id="CreateProgramDataFolder" Guid="{9D4FBF18-254D-4CBD-87D2-406EF81B9E95}" Win64="$(var.Win64)">
+            <CreateFolder>
+              <Permission User="Administrators" FileAllRights="yes"/>
+              <Permission User="Users" GenericRead="yes" GenericExecute="yes" />
+            </CreateFolder>
+          </Component>
+        </Directory>
+      </Directory>
     </Directory>
-    
+
     <!-- Install the components -->
     <Feature Id="FullInstallation" Level="1">
       <ComponentRef Id="MainExecutable" />
       <ComponentRef Id="ConfigurationEditor" />
+      <ComponentRef Id="CreateProgramDataFolder" />
       <ComponentRef Id="CreateEventSourceDotNet35" />
       <ComponentRef Id="CreateEventSourceDotNet4" />
     </Feature>
@@ -167,6 +180,6 @@
     <!-- Add the icon used for add/remove programs and the desktop shortcut -->
     <Icon Id="tcpTrigger.ico" SourceFile="tcpTrigger.ico"/>
     <Property Id="ARPPRODUCTICON" Value="tcpTrigger.ico" />
-    
+
   </Product>
 </Wix>
