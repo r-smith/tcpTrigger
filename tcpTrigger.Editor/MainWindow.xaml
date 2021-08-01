@@ -115,17 +115,40 @@
                                        TextWrapping="Wrap"
                                        FontSize="12"
                                        Foreground="#888"/>
+                            
+                            <!-- Write to text log -->
+                            <CheckBox Name="LogOption"
+                                      Content="Write to standard log"
+                                      Click="LogOption_Click"
+                                      Margin="0,15,0,0" />
+                            <Grid Margin="35,3,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="90" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Path"/>
+                                <TextBox Name="LogPath"
+                                         Grid.Column="1"
+                                         FontSize="13"
+                                         FontFamily="Consolas"/>
+                                <Button Content="Browse..."
+                                        Grid.Column="2"
+                                        Margin="15,0,0,0"
+                                        Padding="15,0"
+                                        Click="BrowseLogPath_Click"/>
+                            </Grid>
 
                             <!-- Write to event log -->
                             <CheckBox Name="EventLogOption"
                                       Content="Write to Windows event log"
-                                      Margin="0,15,0,0"/>
-
+                                      Margin="0,10,0,0"/>
+                            
                             <!-- Send notification email -->
                             <CheckBox Name="SendEmailOption"
                                       Content="Send a notification email"
                                       Margin="0,10,0,0"/>
-                            <DockPanel Margin="35,3,0,0">
+                            <DockPanel Margin="35,3,0,0" Visibility="Collapsed">
                                 <Grid MinWidth="100">
                                     <TextBlock Text="Email subject" HorizontalAlignment="Right"/>
                                 </Grid>
@@ -146,13 +169,14 @@
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100" />
-                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="90" />
+                                    <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Application"/>
                                 <TextBox Name="ApplicationPath"
                                          Grid.Column="1"
+                                         FontSize="13"
                                          FontFamily="Consolas"/>
                                 <Button Content="Browse..."
                                         Grid.Column="2"
@@ -165,6 +189,7 @@
                                          Grid.Row="2"
                                          Grid.Column="1"
                                          Grid.ColumnSpan="2"
+                                         FontSize="13"
                                          FontFamily="Consolas"/>
                             </Grid>
                         </StackPanel>

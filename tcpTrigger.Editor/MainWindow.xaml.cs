@@ -160,6 +160,10 @@ namespace tcpTrigger.Editor
                 }
 
                 // tcpTrigger/enabledActions
+                currentNode = ConfigurationNode.enabledActions_log;
+                xn = xd.DocumentElement.SelectSingleNode(currentNode);
+                if (xn != null) { LogOption.IsChecked = bool.Parse(xn.InnerText); }
+
                 currentNode = ConfigurationNode.enabledActions_windowsEventLog;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { EventLogOption.IsChecked = bool.Parse(xn.InnerText); }
@@ -182,6 +186,8 @@ namespace tcpTrigger.Editor
                 if (RateLimitMinutes.Text.Length > 0)
                     RateLimitOption.IsChecked = true;
 
+                currentNode = ConfigurationNode.actionsSettings_logPath;
+                LogPath.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
                 currentNode = ConfigurationNode.actionsSettings_command_path;
                 ApplicationPath.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
                 currentNode = ConfigurationNode.actionsSettings_command_arguments;
@@ -389,6 +395,7 @@ namespace tcpTrigger.Editor
 
                     // Enabled actions.
                     writer.WriteStartElement("enabledActions");
+                    writer.WriteElementString("log", LogOption.IsChecked == true ? t : f);
                     writer.WriteElementString("windowsEventLog", EventLogOption.IsChecked == true ? t : f);
                     writer.WriteElementString("emailNotification", SendEmailOption.IsChecked == true ? t : f);
                     //writer.WriteElementString("popupNotification", DisplayPopupOption.IsChecked == true ? t : f);
@@ -398,6 +405,7 @@ namespace tcpTrigger.Editor
                     // Action settings.
                     writer.WriteStartElement("actionSettings");
                     writer.WriteElementString("rateLimitMinutes", RateLimitMinutes.Text);
+                    writer.WriteElementString("logPath", LogPath.Text);
                     writer.WriteStartElement("command");
                     writer.WriteElementString("path", ApplicationPath.Text);
                     writer.WriteElementString("arguments", ApplicationArguments.Text);
@@ -681,24 +689,56 @@ namespace tcpTrigger.Editor
                 MessageBox.Show("Configuration file has been saved.", "Success");
         }
 
-        private void Browse_Click(object sender, RoutedEventArgs e)
+        private void BrowseLogPath_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new OpenFileDialog();
-            try
+            using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
             {
-                if (dialog.ShowDialog() == true)
+                try
                 {
-                    ApplicationPath.Text = dialog.FileName;
+                    dialog.Description = "Select a folder for the log file.";
+                    dialog.ShowNewFolderButton = true;
+                    if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                        LogPath.Text = dialog.SelectedPath + @"\connections.log";
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        ex.Message,
+                        "Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
                 }
             }
-            catch (Exception ex)
+        }
+
+        private void Browse_Click(object sender, RoutedEventArgs e)
+        {
+            using (var dialog = new System.Windows.Forms.OpenFileDialog())
             {
-                MessageBox.Show(
-                    ex.Message,
-                    "Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                try
+                {
+                    if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                        ApplicationPath.Text = dialog.FileName;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        ex.Message,
+                        "Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                }
             }
+        }
+
+        private void LogOption_Click(object sender, RoutedEventArgs e)
+        {
+            // When checked, set default log path if there isn't already a path set.
+            string defaultLogPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\connections.log";
+            if (LogOption.IsChecked == true && LogPath.Text.Length == 0)
+                LogPath.Text = defaultLogPath;
+            else if (LogOption.IsChecked == false && LogPath.Text == defaultLogPath)
+                LogPath.Text = string.Empty;
         }
 
         private void Help_Click(object sender, RoutedEventArgs e)
