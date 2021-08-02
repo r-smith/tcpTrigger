@@ -161,9 +161,10 @@ namespace tcpTrigger
             var sb = new StringBuilder();
 
             // Log interfaces.
+            sb.AppendLine("[Starting listeners]");
             foreach (TcpTriggerInterface ipInterface in _tcpTriggerInterfaces)
             {
-                sb.AppendLine($"Listening on interface: {ipInterface.IP} --> [{ipInterface.MacAddressAsString}] --> {ipInterface.Guid}");
+                sb.AppendLine($"Listening on: {ipInterface.Description} [{ipInterface.IP}]");
             }
             if (Configuration.ExcludedNetworkInterfaces.Count > 0)
             {
@@ -175,28 +176,61 @@ namespace tcpTrigger
 
             // Log monitoring configuration.
             sb.AppendLine();
-            sb.AppendLine("Monitor TCP: " + (Configuration.IsMonitorTcpEnabled ? "Enabled" : "Disabled"));
-            sb.AppendLine("Monitor ICMP: " + (Configuration.IsMonitorIcmpEnabled ? "Enabled" : "Disabled"));
-            sb.AppendLine("Monitor name poison: " + (Configuration.IsMonitorPoisonEnabled ? "Enabled" : "Disabled"));
-            sb.AppendLine("Monitor rogue DHCP: " + (Configuration.IsMonitorDhcpEnabled ? "Enabled" : "Disabled"));
-            if (Configuration.IsMonitorTcpEnabled) sb.AppendLine($"Monitoring TCP port(s): {Configuration.TcpPortsToMonitorAsString}");
-
-            // Log endpoint ignore list.
-            if (Configuration.IgnoredEndpoints.Count > 0)
+            sb.AppendLine("[Monitoring configuration]");
+            sb.AppendLine("Detect incoming ICMP pings: " + (Configuration.IsMonitorIcmpEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Detect incoming TCP connections: " + (Configuration.IsMonitorTcpEnabled ? "Enabled" : "Disabled"));
+            if (Configuration.IsMonitorTcpEnabled)
             {
-                foreach (IPAddress ip in Configuration.IgnoredEndpoints)
-                {
-                    sb.AppendLine("Ignore source IP: " + ip.ToString());
-                }
+                sb.AppendLine($"[+] Including TCP port(s): {Configuration.TcpPortsToIncludeAsString}");
+                sb.AppendLine($"[+] Excluding TCP port(s): {Configuration.TcpPortsToExcludeAsString}");
             }
+            sb.AppendLine("Detect name poison attempts: " + (Configuration.IsMonitorPoisonEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Detect rogue DHCP servers: " + (Configuration.IsMonitorDhcpEnabled ? "Enabled" : "Disabled"));
 
             // Log DHCP server ignore list.
             if (Configuration.IgnoredDhcpServers.Count > 0)
             {
                 foreach (IPAddress ip in Configuration.IgnoredDhcpServers)
                 {
-                    sb.AppendLine("Ignore DHCP server: " + ip.ToString());
+                    sb.AppendLine("[+] Ignore DHCP server: " + ip.ToString());
                 }
+            }
+
+            // Log endpoint ignore list.
+            if (Configuration.IgnoredEndpoints.Count > 0)
+            {
+                foreach (IPAddress ip in Configuration.IgnoredEndpoints)
+                {
+                    sb.AppendLine("[+] Ignore source IP: " + ip.ToString());
+                }
+            }
+
+            // Log enabled actions and settings.
+            sb.AppendLine();
+            sb.AppendLine("[Actions]");
+            sb.AppendLine("Write to text log: " + (Configuration.IsLogEnabled ? "Enabled" : "Disabled"));
+            if (Configuration.IsLogEnabled)
+                sb.AppendLine($"[+] Log path: {Configuration.LogPath}");
+            sb.AppendLine("Write to Windows event log: " + (Configuration.IsEventLogEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Email notifications: " + (Configuration.IsEmailNotificationEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Launch external application: " + (Configuration.IsExternalAppEnabled ? "Enabled" : "Disabled"));
+            if (Configuration.IsExternalAppEnabled)
+            {
+                sb.AppendLine($"[+] App path: {Configuration.ExternalAppPath}");
+                sb.AppendLine($"[+] App args: {Configuration.ExternalAppArguments}");
+            }
+
+            // Log email configuration.
+            if (Configuration.IsEmailNotificationEnabled)
+            {
+                sb.AppendLine();
+                sb.AppendLine("[Email configuration]");
+                sb.AppendLine($"Server: {Configuration.EmailServer}");
+                sb.AppendLine($"Port: {Configuration.EmailServerPort}");
+                sb.AppendLine("Use authentication? " + (Configuration.IsEmailAuthRequired ? "Yes" : "No"));
+                sb.AppendLine("Recipient(s): " + string.Join(", ", Configuration.EmailRecipients.ToArray()));
+                sb.AppendLine($"Sender address: {Configuration.EmailSender}");
+                sb.AppendLine($"Sender display name: {Configuration.EmailSenderDisplayName}");
             }
 
             // Write to event log.
@@ -330,8 +364,7 @@ namespace tcpTrigger
                 header.ProtocolType == Protocol.TCP &&
                 header.TcpFlags == 0x2 &&
                 header.DestinationIP.Equals(ip) &&
-                (Configuration.TcpPortsToMonitor.Contains(header.DestinationPort) ||
-                Configuration.TcpPortsToMonitor[0] == 0))
+                Configuration.TcpPortsToMonitor.Contains(header.DestinationPort))
             {
                 return true;
             }
@@ -452,7 +485,7 @@ namespace tcpTrigger
 
         private void LaunchApplication(PacketHeader packetHeader)
         {
-            if (Configuration.TriggeredApplicationPath.Length == 0)
+            if (Configuration.ExternalAppPath.Length == 0)
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
@@ -465,8 +498,8 @@ namespace tcpTrigger
             try
             {
                 Process.Start(
-                    Configuration.TriggeredApplicationPath,
-                    UserVariableExpansion.GetExpandedString(Configuration.TriggeredApplicationArguments, packetHeader));
+                    Configuration.ExternalAppPath,
+                    UserVariableExpansion.GetExpandedString(Configuration.ExternalAppArguments, packetHeader));
             }
             catch (Exception ex)
             {

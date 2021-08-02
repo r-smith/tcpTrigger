@@ -14,16 +14,17 @@ namespace tcpTrigger
         public static bool IsMonitorIcmpEnabled { get; private set; }
         public static bool IsMonitorPoisonEnabled { get; private set; }
         public static bool IsMonitorDhcpEnabled { get; private set; }
-        public static int[] TcpPortsToMonitor { get; private set; }
-        public static string TcpPortsToMonitorAsString { get; private set; }
+        public static HashSet<ushort> TcpPortsToMonitor { get; private set; }
+        public static string TcpPortsToIncludeAsString { get; private set; }
+        public static string TcpPortsToExcludeAsString { get; private set; }
         public static bool IsLogEnabled { get; set; }
         public static bool IsEventLogEnabled { get; private set; }
         public static bool IsEmailNotificationEnabled { get; private set; }
         public static bool IsExternalAppEnabled { get; private set; }
         public static int ActionRateLimitMinutes { get; private set; }
         public static string LogPath { get; private set; }
-        public static string TriggeredApplicationPath { get; private set; }
-        public static string TriggeredApplicationArguments { get; private set; }
+        public static string ExternalAppPath { get; private set; }
+        public static string ExternalAppArguments { get; private set; }
         public static HashSet<string> ExcludedNetworkInterfaces { get; private set; } = new HashSet<string>();
         public static HashSet<IPAddress> IgnoredDhcpServers { get; private set; } = new HashSet<IPAddress>();
         public static HashSet<IPAddress> IgnoredEndpoints { get; private set; } = new HashSet<IPAddress>();
@@ -107,15 +108,36 @@ namespace tcpTrigger
                 if (IsMonitorTcpEnabled)
                 {
                     // tcpTrigger/monitoredPorts
+                    List<ushort> includePorts = new List<ushort>();
+                    List<ushort> excludePorts = new List<ushort>();
+                    // Included ports.
                     currentNode = ConfigurationNode.monitoredPorts_tcp_include;
-                    TcpPortsToMonitorAsString = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
-                    TcpPortsToMonitor = (from part in TcpPortsToMonitorAsString.Split(',')
-                                         let range = part.Split('-')
-                                         let start = int.Parse(range[0])
-                                         let end = int.Parse(range[range.Length - 1])
-                                         from i in Enumerable.Range(start, end - start + 1)
-                                         orderby i
-                                         select i).Distinct().ToArray();
+                    TcpPortsToIncludeAsString = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                    if (!string.IsNullOrEmpty(TcpPortsToIncludeAsString))
+                    {
+                        includePorts = (from part in TcpPortsToIncludeAsString.Split(',')
+                                        let range = part.Split('-')
+                                        let start = ushort.Parse(range[0])
+                                        let end = ushort.Parse(range[range.Length - 1])
+                                        from i in Enumerable.Range(start, end - start + 1)
+                                        orderby i
+                                        select (ushort)i).Distinct().ToList();
+                    }
+                    // Excluded ports.
+                    currentNode = ConfigurationNode.monitoredPorts_tcp_exclude;
+                    TcpPortsToExcludeAsString = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                    if (!string.IsNullOrEmpty(TcpPortsToExcludeAsString))
+                    {
+                        excludePorts = (from part in TcpPortsToExcludeAsString.Split(',')
+                                        let range = part.Split('-')
+                                        let start = ushort.Parse(range[0])
+                                        let end = ushort.Parse(range[range.Length - 1])
+                                        from i in Enumerable.Range(start, end - start + 1)
+                                        orderby i
+                                        select (ushort)i).Distinct().ToList();
+                    }
+                    // Final HashSet will contain all included ports except those excluded.
+                    TcpPortsToMonitor = new HashSet<ushort>(includePorts.Except(excludePorts));
                 }
                 if (IsMonitorDhcpEnabled)
                 {
@@ -173,9 +195,9 @@ namespace tcpTrigger
                 currentNode = ConfigurationNode.actionsSettings_logPath;
                 LogPath = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
                 currentNode = ConfigurationNode.actionsSettings_command_path;
-                TriggeredApplicationPath = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                ExternalAppPath = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
                 currentNode = ConfigurationNode.actionsSettings_command_arguments;
-                TriggeredApplicationArguments = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                ExternalAppArguments = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
 
                 // tcpTrigger/emailConfiguration
                 currentNode = ConfigurationNode.emailConfiguration_server;
@@ -293,6 +315,7 @@ namespace tcpTrigger
         public const string enabledComponents_namePoison = "/tcpTrigger/enabledComponents/namePoison";
         public const string enabledComponents_rogueDhcp = "/tcpTrigger/enabledComponents/rogueDhcp";
         public const string monitoredPorts_tcp_include = "/tcpTrigger/monitoredPorts/tcp/include";
+        public const string monitoredPorts_tcp_exclude = "/tcpTrigger/monitoredPorts/tcp/exclude";
         public const string dhcpServerIgnoreList_ipAddress = "/tcpTrigger/dhcpServerIgnoreList/ipAddress";
         public const string endpointIgnoreList_ipAddress = "/tcpTrigger/endpointIgnoreList/ipAddress";
         public const string networkInterfaceExcludeList_deviceGuid = "/tcpTrigger/networkInterfaceExcludeList/deviceGuid";
