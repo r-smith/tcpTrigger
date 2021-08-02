@@ -1,5 +1,4 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -88,8 +87,8 @@ namespace tcpTrigger.Editor
             if (!File.Exists(configurationPath))
             {
                 // No configuration was found. This is expected on new installations.
-                // Should any defaults get set or should a warning be displayed?
-                // At the moment, abort loading and do nothing.
+                // Load defaults and abort reading config file.
+                LoadDefaults();
                 return;
             }
 
@@ -862,6 +861,15 @@ namespace tcpTrigger.Editor
             {
                 e.Result = ex.Message;
             }
+        }
+
+        private void LoadDefaults()
+        {
+            MonitorIcmpOption.IsChecked = true;
+            MonitorTcpOption.IsChecked = true;
+            TcpIncludePorts.Text = "1-65535";
+            LogOption.IsChecked = true;
+            LogPath.Text = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\connections.log";
         }
     }
 }
