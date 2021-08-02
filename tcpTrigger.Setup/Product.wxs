@@ -160,8 +160,10 @@
           <!-- Create ProgramData\tcpTrigger folder and set permissions -->
           <Component Id="CreateProgramDataFolder" Guid="{9D4FBF18-254D-4CBD-87D2-406EF81B9E95}" Win64="$(var.Win64)">
             <CreateFolder>
+              <!--
               <Permission User="Administrators" FileAllRights="yes"/>
               <Permission User="Users" GenericRead="yes" GenericExecute="yes" />
+              -->
             </CreateFolder>
           </Component>
         </Directory>
