@@ -400,6 +400,40 @@ namespace tcpTrigger
 
         private void WriteLog(PacketHeader packetHeader)
         {
+            // Log files have a defined maximum file size and will rotate one time if reached.
+            const int _maxFileSizeInBytes = 15 * 1024 * 1024;
+
+            // Check if log file already exists.
+            if (File.Exists(Configuration.LogPath))
+            {
+                try
+                {
+                    // Get current file size.
+                    long currentFileSize = new FileInfo(Configuration.LogPath).Length;
+                    if (currentFileSize >= _maxFileSizeInBytes)
+                    {
+                        // Log reached max size.
+                        // Rotate by copying current log to .1 suffix, overwriting if exists.
+                        File.Copy(Configuration.LogPath, Configuration.LogPath + ".1", true);
+                        // Clear contents of original log.
+                        using (FileStream fileStream = File.Open(Configuration.LogPath, FileMode.Open))
+                        {
+                            fileStream.SetLength(0);
+                            fileStream.Close();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Configuration.IsLogEnabled = false;
+                    EventLog.WriteEntry(
+                        "tcpTrigger",
+                        $"Maximum log size {_maxFileSizeInBytes} bytes has been reached. Error rotating log file '{Configuration.LogPath}'. Logging has been disabled.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                        EventLogEntryType.Error,
+                        401);
+                }
+            }
+            
             try
             {
                 using (StreamWriter outputFile = new StreamWriter(Configuration.LogPath, true))
@@ -425,7 +459,7 @@ namespace tcpTrigger
                     }
                     outputFile.WriteLine(
                         DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToLongTimeString()
-                        + " [" + packetHeader.DestinationIP + " ] " + logText);
+                        + " [" + packetHeader.DestinationIP + "] " + logText);
                 }
             }
             catch (Exception ex)
