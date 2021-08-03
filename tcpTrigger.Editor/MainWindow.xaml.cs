@@ -46,7 +46,7 @@ namespace tcpTrigger.Editor
                     List<IPAddress> ipAddresses = new List<IPAddress>();
                     foreach (UnicastIPAddressInformation address in networkInterface.GetIPProperties().UnicastAddresses)
                     {
-                        if (address.Address.AddressFamily == AddressFamily.InterNetwork || address.Address.AddressFamily == AddressFamily.InterNetworkV6)
+                        if (address.Address.AddressFamily == AddressFamily.InterNetwork)
                         {
                             ipAddresses.Add(address.Address);
                         }
