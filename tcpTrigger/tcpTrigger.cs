@@ -54,6 +54,19 @@ namespace tcpTrigger
                 }
             }
 
+            // If enabled, validate external app path and disable if not found.
+            if (Configuration.IsExternalAppEnabled)
+            {
+                if (string.IsNullOrEmpty(Configuration.ExternalAppPath) || !File.Exists(Configuration.ExternalAppPath))
+                {
+                    EventLog.WriteEntry(
+                        "tcpTrigger",
+                        $"The specified external application path '{Configuration.ExternalAppPath}' was not found. Update your tcpTrigger configuration to point to a valid executable.",
+                        EventLogEntryType.Error,
+                        401);
+                }
+            }
+
             // If enabled, start name poison detection.
             if (Configuration.IsMonitorPoisonEnabled)
             {
@@ -519,11 +532,11 @@ namespace tcpTrigger
 
         private void LaunchApplication(PacketHeader packetHeader)
         {
-            if (Configuration.ExternalAppPath.Length == 0)
+            if (string.IsNullOrEmpty(Configuration.ExternalAppPath) || !File.Exists(Configuration.ExternalAppPath))
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
-                    "An external application has been triggered to launch, but no application path has been specified.",
+                    $"An external application has been triggered to launch, but the specified application path '{Configuration.ExternalAppPath}' was not found. Update your tcpTrigger configuration to point to a valid executable.",
                     EventLogEntryType.Warning,
                     401);
                 return;
@@ -539,7 +552,7 @@ namespace tcpTrigger
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
-                    $"Error launching external triggered application.{Environment.NewLine}{ex.Message}",
+                    $"Error launching external triggered application '{Configuration.ExternalAppPath}'.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                     EventLogEntryType.Error,
                     401);
             }
