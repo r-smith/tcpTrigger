@@ -329,11 +329,11 @@ namespace tcpTrigger
 
                     if (!Settings.IgnoredEndpoints.Contains(packetHeader.SourceIP))
                     {
-                        ipInterface.RateLimitDictionaryCleanup(Settings.ActionRateLimitMinutes);
+                        ipInterface.RateLimitDictionaryCleanup(Settings.ActionRateLimitSeconds);
 
-                        if (!ipInterface.RateLimitDictionary.ContainsKey(packetHeader.SourceIP) || Settings.ActionRateLimitMinutes <= 0)
+                        if (!ipInterface.RateLimitDictionary.ContainsKey(packetHeader.SourceIP) || Settings.ActionRateLimitSeconds <= 0)
                         {
-                            if (Settings.ActionRateLimitMinutes > 0)
+                            if (Settings.ActionRateLimitSeconds > 0)
                                 ipInterface.RateLimitDictionary.Add(packetHeader.SourceIP, DateTime.Now);
 
                             if (Settings.IsExternalAppEnabled) LaunchApplication(packetHeader);

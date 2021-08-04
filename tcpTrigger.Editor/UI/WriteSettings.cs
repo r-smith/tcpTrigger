@@ -145,7 +145,7 @@ namespace tcpTrigger.Editor
 
                     // Action settings.
                     writer.WriteStartElement("actionSettings");
-                    writer.WriteElementString("rateLimitMinutes", RateLimitMinutes.Text);
+                    writer.WriteElementString("rateLimitSeconds", RateLimitSeconds.Text);
                     writer.WriteElementString("logPath", LogPath.Text);
                     writer.WriteStartElement("command");
                     writer.WriteElementString("path", ApplicationPath.Text);

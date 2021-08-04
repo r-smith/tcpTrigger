@@ -105,9 +105,9 @@ namespace tcpTrigger.Editor
                 if (xn != null) { LaunchAppOption.IsChecked = bool.Parse(xn.InnerText); }
 
                 // tcpTrigger/actionSettings
-                currentNode = SettingsNode.actionsSettings_rateLimitMinutes;
-                RateLimitMinutes.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
-                if (RateLimitMinutes.Text.Length > 0)
+                currentNode = SettingsNode.actionsSettings_rateLimitSeconds;
+                RateLimitSeconds.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                if (RateLimitSeconds.Text.Length > 0)
                     RateLimitOption.IsChecked = true;
 
                 currentNode = SettingsNode.actionsSettings_logPath;

@@ -17,7 +17,7 @@
         public const string enabledActions_emailNotification = "/tcpTrigger/enabledActions/emailNotification";
         public const string enabledActions_popupNotification = "/tcpTrigger/enabledActions/popupNotification";
         public const string enabledActions_executeCommand = "/tcpTrigger/enabledActions/executeCommand";
-        public const string actionsSettings_rateLimitMinutes = "/tcpTrigger/actionSettings/rateLimitMinutes";
+        public const string actionsSettings_rateLimitSeconds = "/tcpTrigger/actionSettings/rateLimitSeconds";
         public const string actionsSettings_logPath = "/tcpTrigger/actionSettings/logPath";
         public const string actionsSettings_command_path = "/tcpTrigger/actionSettings/command/path";
         public const string actionsSettings_command_arguments = "/tcpTrigger/actionSettings/command/arguments";

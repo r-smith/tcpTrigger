@@ -532,13 +532,13 @@
                             <CheckBox Name="RateLimitOption" Content="Enable rate limiting on triggered actions (recommended)"/>
                             <StackPanel Orientation="Horizontal" Margin="35,3,0,0">
                                 <Label Content="Limit one triggered action per source IP every"/>
-                                <TextBox Name="RateLimitMinutes"
+                                <TextBox Name="RateLimitSeconds"
                                          Margin="5,0"
                                          Width="60"
                                          PreviewTextInput="NumericTextBox_PreviewTextInput"
                                          FontFamily="Consolas"
                                          MaxLength="5"/>
-                                <Label Content="minute(s)"/>
+                                <Label Content="seconds(s)"/>
                             </StackPanel>
                         </StackPanel>
                     </GroupBox>

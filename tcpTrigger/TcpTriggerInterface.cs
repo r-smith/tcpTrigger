@@ -72,15 +72,15 @@ namespace tcpTrigger
             return new IPAddress(broadcastAddress);
         }
 
-        public void RateLimitDictionaryCleanup(int rateLimitMinutes)
+        public void RateLimitDictionaryCleanup(int rateLimitSeconds)
         {
-            if (rateLimitMinutes <= 0)
+            if (rateLimitSeconds <= 0)
                 return;
 
             var ipAddressToDelete = new List<IPAddress>();
             foreach (KeyValuePair<IPAddress, DateTime> entry in RateLimitDictionary)
             {
-                if (entry.Value <= DateTime.Now.AddMinutes(-rateLimitMinutes))
+                if (entry.Value <= DateTime.Now.AddSeconds(-rateLimitSeconds))
                 {
                     ipAddressToDelete.Add(entry.Key);
                 }

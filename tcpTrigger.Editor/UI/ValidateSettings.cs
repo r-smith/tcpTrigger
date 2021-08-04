@@ -138,16 +138,16 @@ namespace tcpTrigger.Editor
                 return false;
             }
 
-            if (RateLimitMinutes.Text.Length > 0)
+            if (RateLimitSeconds.Text.Length > 0)
             {
-                if (!int.TryParse(RateLimitMinutes.Text, out int n) || n <= 0 || n > 3600)
+                if (!int.TryParse(RateLimitSeconds.Text, out int n) || n <= 0 || n > 3600)
                 {
                     ShowMessageBox(
                         message: "The number of seconds used for rate limiting must be between 1 and 3600.",
                         title: "Invalid rate limit",
                         type: DialogWindow.Type.Error,
                         tab: AdvancedTab,
-                        control: RateLimitMinutes);
+                        control: RateLimitSeconds);
                     return false;
                 }
             }
