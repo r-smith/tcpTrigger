@@ -1,6 +1,6 @@
 ﻿namespace tcpTrigger.Editor
 {
-    class ConfigurationNode
+    class SettingsNode
     {
         // XML node paths for the tcpTrigger configuration file.
         public const string enabledComponents_tcp = "/tcpTrigger/enabledComponents/tcp";
@@ -21,14 +21,14 @@
         public const string actionsSettings_logPath = "/tcpTrigger/actionSettings/logPath";
         public const string actionsSettings_command_path = "/tcpTrigger/actionSettings/command/path";
         public const string actionsSettings_command_arguments = "/tcpTrigger/actionSettings/command/arguments";
-        public const string emailConfiguration_server = "/tcpTrigger/emailConfiguration/server";
-        public const string emailConfiguration_port = "/tcpTrigger/emailConfiguration/port";
-        public const string emailConfiguration_isAuthRequired = "/tcpTrigger/emailConfiguration/isAuthRequired";
-        public const string emailConfiguration_username = "/tcpTrigger/emailConfiguration/username";
-        public const string emailConfiguration_password = "/tcpTrigger/emailConfiguration/password";
-        public const string emailConfiguration_recipientList_address = "/tcpTrigger/emailConfiguration/recipientList/address";
-        public const string emailConfiguration_sender_address = "/tcpTrigger/emailConfiguration/sender/address";
-        public const string emailConfiguration_sender_displayName = "/tcpTrigger/emailConfiguration/sender/displayName";
+        public const string emailSettings_server = "/tcpTrigger/emailSettings/server";
+        public const string emailSettings_port = "/tcpTrigger/emailSettings/port";
+        public const string emailSettings_isAuthRequired = "/tcpTrigger/emailSettings/isAuthRequired";
+        public const string emailSettings_username = "/tcpTrigger/emailSettings/username";
+        public const string emailSettings_password = "/tcpTrigger/emailSettings/password";
+        public const string emailSettings_recipientList_address = "/tcpTrigger/emailSettings/recipientList/address";
+        public const string emailSettings_sender_address = "/tcpTrigger/emailSettings/sender/address";
+        public const string emailSettings_sender_displayName = "/tcpTrigger/emailSettings/sender/displayName";
         public const string customMessage = "/tcpTrigger/customMessage";
     }
 }

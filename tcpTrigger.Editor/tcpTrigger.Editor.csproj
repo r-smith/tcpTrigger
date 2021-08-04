@@ -78,13 +78,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Classes\ConfigurationNode.cs" />
+    <Compile Include="Classes\SettingsNode.cs" />
+    <Compile Include="UI\ValidateSettings.cs" />
     <Compile Include="UI\DialogWindow.xaml.cs">
       <DependentUpon>DialogWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\StringCipher.cs" />
     <Compile Include="Classes\TcpTriggerInterface.cs" />
     <Compile Include="Classes\ValueConverters.cs" />
+    <Compile Include="UI\ReadSettings.cs" />
+    <Compile Include="UI\WriteSettings.cs" />
     <Page Include="Controls\CircularProgressBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -108,7 +111,7 @@
     <Compile Include="Controls\CircularProgressBar.xaml.cs">
       <DependentUpon>CircularProgressBar.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Classes\EmailConfiguration.cs" />
+    <Compile Include="Classes\EmailSettings.cs" />
     <Compile Include="UI\HelpWindow.xaml.cs">
       <DependentUpon>HelpWindow.xaml</DependentUpon>
     </Compile>

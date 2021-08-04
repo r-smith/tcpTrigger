@@ -33,7 +33,7 @@ namespace tcpTrigger
             // The tcpTrigger Windows service is starting.
 
             // Locate and read tcpTrigger configuration file.
-            if (Configuration.Load() == false)
+            if (Settings.Load() == false)
             {
                 // An error was encountered while reading the configuration file. Stop the service and quit.
                 Environment.Exit(1);
@@ -41,34 +41,34 @@ namespace tcpTrigger
             }
 
             // Validate log file path. Disable logging if inaccessible.
-            if (Configuration.IsLogEnabled)
+            if (Settings.IsLogEnabled)
             {
-                if (string.IsNullOrEmpty(Configuration.LogPath) || !Directory.Exists(Path.GetDirectoryName(Configuration.LogPath)))
+                if (string.IsNullOrEmpty(Settings.LogPath) || !Directory.Exists(Path.GetDirectoryName(Settings.LogPath)))
                 {
-                    Configuration.IsLogEnabled = false;
+                    Settings.IsLogEnabled = false;
                     EventLog.WriteEntry(
                         "tcpTrigger",
-                        $"Log file path '{Configuration.LogPath}' is inaccessible. Logging has been disabled. Update your tcpTrigger configuration with a valid path.",
+                        $"Log file path '{Settings.LogPath}' is inaccessible. Logging has been disabled. Update your tcpTrigger configuration with a valid path.",
                         EventLogEntryType.Error,
                         401);
                 }
             }
 
             // If enabled, validate external app path and disable if not found.
-            if (Configuration.IsExternalAppEnabled)
+            if (Settings.IsExternalAppEnabled)
             {
-                if (string.IsNullOrEmpty(Configuration.ExternalAppPath) || !File.Exists(Configuration.ExternalAppPath))
+                if (string.IsNullOrEmpty(Settings.ExternalAppPath) || !File.Exists(Settings.ExternalAppPath))
                 {
                     EventLog.WriteEntry(
                         "tcpTrigger",
-                        $"The specified external application path '{Configuration.ExternalAppPath}' was not found. Update your tcpTrigger configuration to point to a valid executable.",
+                        $"The specified external application path '{Settings.ExternalAppPath}' was not found. Update your tcpTrigger configuration to point to a valid executable.",
                         EventLogEntryType.Error,
                         401);
                 }
             }
 
             // If enabled, start name poison detection.
-            if (Configuration.IsMonitorPoisonEnabled)
+            if (Settings.IsMonitorPoisonEnabled)
             {
                 _namePoisionDetectionTimer = new System.Timers.Timer();
                 _namePoisionDetectionTimer.Interval = TimeSpan.FromMinutes(4).TotalMilliseconds;
@@ -112,7 +112,7 @@ namespace tcpTrigger
             // Enumerate network interfaces. Determine and record which interfaces to listen on.
             foreach (NetworkInterface networkInterface in NetworkInterface.GetAllNetworkInterfaces())
             {
-                if (Configuration.ExcludedNetworkInterfaces.Contains(networkInterface.Id))
+                if (Settings.ExcludedNetworkInterfaces.Contains(networkInterface.Id))
                 {
                     continue;
                 }
@@ -179,9 +179,9 @@ namespace tcpTrigger
             {
                 sb.AppendLine($"Listening on: {ipInterface.Description} [{ipInterface.IP}]");
             }
-            if (Configuration.ExcludedNetworkInterfaces.Count > 0)
+            if (Settings.ExcludedNetworkInterfaces.Count > 0)
             {
-                foreach (string guid in Configuration.ExcludedNetworkInterfaces)
+                foreach (string guid in Settings.ExcludedNetworkInterfaces)
                 {
                     sb.AppendLine("Exclude network interface: " + guid);
                 }
@@ -190,29 +190,29 @@ namespace tcpTrigger
             // Log monitoring configuration.
             sb.AppendLine();
             sb.AppendLine("[Monitoring configuration]");
-            sb.AppendLine("Detect incoming ICMP pings: " + (Configuration.IsMonitorIcmpEnabled ? "Enabled" : "Disabled"));
-            sb.AppendLine("Detect incoming TCP connections: " + (Configuration.IsMonitorTcpEnabled ? "Enabled" : "Disabled"));
-            if (Configuration.IsMonitorTcpEnabled)
+            sb.AppendLine("Detect incoming ICMP pings: " + (Settings.IsMonitorIcmpEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Detect incoming TCP connections: " + (Settings.IsMonitorTcpEnabled ? "Enabled" : "Disabled"));
+            if (Settings.IsMonitorTcpEnabled)
             {
-                sb.AppendLine($"[+] Including TCP port(s): {Configuration.TcpPortsToIncludeAsString}");
-                sb.AppendLine($"[+] Excluding TCP port(s): {Configuration.TcpPortsToExcludeAsString}");
+                sb.AppendLine($"[+] Including TCP port(s): {Settings.TcpPortsToIncludeAsString}");
+                sb.AppendLine($"[+] Excluding TCP port(s): {Settings.TcpPortsToExcludeAsString}");
             }
-            sb.AppendLine("Detect name poison attempts: " + (Configuration.IsMonitorPoisonEnabled ? "Enabled" : "Disabled"));
-            sb.AppendLine("Detect rogue DHCP servers: " + (Configuration.IsMonitorDhcpEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Detect name poison attempts: " + (Settings.IsMonitorPoisonEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Detect rogue DHCP servers: " + (Settings.IsMonitorDhcpEnabled ? "Enabled" : "Disabled"));
 
             // Log DHCP server ignore list.
-            if (Configuration.IgnoredDhcpServers.Count > 0)
+            if (Settings.IgnoredDhcpServers.Count > 0)
             {
-                foreach (IPAddress ip in Configuration.IgnoredDhcpServers)
+                foreach (IPAddress ip in Settings.IgnoredDhcpServers)
                 {
                     sb.AppendLine("[+] Ignore DHCP server: " + ip.ToString());
                 }
             }
 
             // Log endpoint ignore list.
-            if (Configuration.IgnoredEndpoints.Count > 0)
+            if (Settings.IgnoredEndpoints.Count > 0)
             {
-                foreach (IPAddress ip in Configuration.IgnoredEndpoints)
+                foreach (IPAddress ip in Settings.IgnoredEndpoints)
                 {
                     sb.AppendLine("[+] Ignore source IP: " + ip.ToString());
                 }
@@ -221,29 +221,29 @@ namespace tcpTrigger
             // Log enabled actions and settings.
             sb.AppendLine();
             sb.AppendLine("[Actions]");
-            sb.AppendLine("Write to text log: " + (Configuration.IsLogEnabled ? "Enabled" : "Disabled"));
-            if (Configuration.IsLogEnabled)
-                sb.AppendLine($"[+] Log path: {Configuration.LogPath}");
-            sb.AppendLine("Write to Windows event log: " + (Configuration.IsEventLogEnabled ? "Enabled" : "Disabled"));
-            sb.AppendLine("Email notifications: " + (Configuration.IsEmailNotificationEnabled ? "Enabled" : "Disabled"));
-            sb.AppendLine("Launch external application: " + (Configuration.IsExternalAppEnabled ? "Enabled" : "Disabled"));
-            if (Configuration.IsExternalAppEnabled)
+            sb.AppendLine("Write to text log: " + (Settings.IsLogEnabled ? "Enabled" : "Disabled"));
+            if (Settings.IsLogEnabled)
+                sb.AppendLine($"[+] Log path: {Settings.LogPath}");
+            sb.AppendLine("Write to Windows event log: " + (Settings.IsEventLogEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Email notifications: " + (Settings.IsEmailNotificationEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Launch external application: " + (Settings.IsExternalAppEnabled ? "Enabled" : "Disabled"));
+            if (Settings.IsExternalAppEnabled)
             {
-                sb.AppendLine($"[+] App path: {Configuration.ExternalAppPath}");
-                sb.AppendLine($"[+] App args: {Configuration.ExternalAppArguments}");
+                sb.AppendLine($"[+] App path: {Settings.ExternalAppPath}");
+                sb.AppendLine($"[+] App args: {Settings.ExternalAppArguments}");
             }
 
             // Log email configuration.
-            if (Configuration.IsEmailNotificationEnabled)
+            if (Settings.IsEmailNotificationEnabled)
             {
                 sb.AppendLine();
                 sb.AppendLine("[Email configuration]");
-                sb.AppendLine($"Server: {Configuration.EmailServer}");
-                sb.AppendLine($"Port: {Configuration.EmailServerPort}");
-                sb.AppendLine("Use authentication? " + (Configuration.IsEmailAuthRequired ? "Yes" : "No"));
-                sb.AppendLine("Recipient(s): " + string.Join(", ", Configuration.EmailRecipients.ToArray()));
-                sb.AppendLine($"Sender address: {Configuration.EmailSender}");
-                sb.AppendLine($"Sender display name: {Configuration.EmailSenderDisplayName}");
+                sb.AppendLine($"Server: {Settings.EmailServer}");
+                sb.AppendLine($"Port: {Settings.EmailServerPort}");
+                sb.AppendLine("Use authentication? " + (Settings.IsEmailAuthRequired ? "Yes" : "No"));
+                sb.AppendLine("Recipient(s): " + string.Join(", ", Settings.EmailRecipients.ToArray()));
+                sb.AppendLine($"Sender address: {Settings.EmailSender}");
+                sb.AppendLine($"Sender display name: {Settings.EmailSenderDisplayName}");
             }
 
             // Write to event log.
@@ -296,7 +296,7 @@ namespace tcpTrigger
                 {
                     // If no DHCP servers are specified by the user, we will do automatic detection.
                     // Auto rogue DHCP detection alerts if more than one DHCP server is discovered.
-                    if (Configuration.IgnoredDhcpServers.Count == 0)
+                    if (Settings.IgnoredDhcpServers.Count == 0)
                     {
                         if (!ipInterface.DiscoveredDhcpServerList.Contains(packetHeader.DhcpServerAddress))
                         {
@@ -307,7 +307,7 @@ namespace tcpTrigger
                                 packetHeader.MatchType = PacketMatch.RogueDhcp;
                         }
                     }
-                    else if (!Configuration.IgnoredDhcpServers.Contains(packetHeader.DhcpServerAddress) &&
+                    else if (!Settings.IgnoredDhcpServers.Contains(packetHeader.DhcpServerAddress) &&
                         !ipInterface.DiscoveredDhcpServerList.Contains(packetHeader.DhcpServerAddress))
                     {
                         packetHeader.DestinationIP = ipInterface.IP;
@@ -322,22 +322,22 @@ namespace tcpTrigger
                 {
                     packetHeader.DestinationMac = ipInterface.MacAddress;
 
-                    if (Configuration.IsLogEnabled)
+                    if (Settings.IsLogEnabled)
                         WriteLog(packetHeader);
-                    if (Configuration.IsEventLogEnabled)
+                    if (Settings.IsEventLogEnabled)
                         WriteEventLog(packetHeader);
 
-                    if (!Configuration.IgnoredEndpoints.Contains(packetHeader.SourceIP))
+                    if (!Settings.IgnoredEndpoints.Contains(packetHeader.SourceIP))
                     {
-                        ipInterface.RateLimitDictionaryCleanup(Configuration.ActionRateLimitMinutes);
+                        ipInterface.RateLimitDictionaryCleanup(Settings.ActionRateLimitMinutes);
 
-                        if (!ipInterface.RateLimitDictionary.ContainsKey(packetHeader.SourceIP) || Configuration.ActionRateLimitMinutes <= 0)
+                        if (!ipInterface.RateLimitDictionary.ContainsKey(packetHeader.SourceIP) || Settings.ActionRateLimitMinutes <= 0)
                         {
-                            if (Configuration.ActionRateLimitMinutes > 0)
+                            if (Settings.ActionRateLimitMinutes > 0)
                                 ipInterface.RateLimitDictionary.Add(packetHeader.SourceIP, DateTime.Now);
 
-                            if (Configuration.IsExternalAppEnabled) LaunchApplication(packetHeader);
-                            if (Configuration.IsEmailNotificationEnabled) SendEmail(packetHeader);
+                            if (Settings.IsExternalAppEnabled) LaunchApplication(packetHeader);
+                            if (Settings.IsEmailNotificationEnabled) SendEmail(packetHeader);
                         }
                     }
                 }
@@ -360,7 +360,7 @@ namespace tcpTrigger
 
         private bool DoesPacketMatchPingRequest(PacketHeader header, IPAddress ip)
         {
-            if (Configuration.IsMonitorIcmpEnabled &&
+            if (Settings.IsMonitorIcmpEnabled &&
                 header.ProtocolType == Protocol.ICMP &&
                 header.DestinationIP.Equals(ip) &&
                 header.IcmpType == 8)
@@ -373,11 +373,11 @@ namespace tcpTrigger
 
         private bool DoesPacketMatchMonitoredPort(PacketHeader header, IPAddress ip)
         {
-            if (Configuration.IsMonitorTcpEnabled &&
+            if (Settings.IsMonitorTcpEnabled &&
                 header.ProtocolType == Protocol.TCP &&
                 header.TcpFlags == 0x2 &&
                 header.DestinationIP.Equals(ip) &&
-                Configuration.TcpPortsToMonitor.Contains(header.DestinationPort))
+                Settings.TcpPortsToMonitor.Contains(header.DestinationPort))
             {
                 return true;
             }
@@ -387,7 +387,7 @@ namespace tcpTrigger
 
         private bool DoesPacketMatchNamePoison(PacketHeader header, IPAddress ip)
         {
-            if (Configuration.IsMonitorPoisonEnabled &&
+            if (Settings.IsMonitorPoisonEnabled &&
                 _isNamePoisonDetectionInProgress &&
                 header.IsNameQueryResponse &&
                 header.DestinationIP.Equals(ip) &&
@@ -402,7 +402,7 @@ namespace tcpTrigger
 
         private bool DoesPacketMatchDhcpServer(PacketHeader header, IPAddress ip)
         {
-            if (Configuration.IsMonitorDhcpEnabled &&
+            if (Settings.IsMonitorDhcpEnabled &&
                 header.DhcpServerAddress != null)
             {
                 return true;
@@ -417,19 +417,19 @@ namespace tcpTrigger
             const int _maxFileSizeInBytes = 15 * 1024 * 1024;
 
             // Check if log file already exists.
-            if (File.Exists(Configuration.LogPath))
+            if (File.Exists(Settings.LogPath))
             {
                 try
                 {
                     // Get current file size.
-                    long currentFileSize = new FileInfo(Configuration.LogPath).Length;
+                    long currentFileSize = new FileInfo(Settings.LogPath).Length;
                     if (currentFileSize >= _maxFileSizeInBytes)
                     {
                         // Log reached max size.
                         // Rotate by copying current log to .1 suffix, overwriting if exists.
-                        File.Copy(Configuration.LogPath, Configuration.LogPath + ".1", true);
+                        File.Copy(Settings.LogPath, Settings.LogPath + ".1", true);
                         // Clear contents of original log.
-                        using (FileStream fileStream = File.Open(Configuration.LogPath, FileMode.Open))
+                        using (FileStream fileStream = File.Open(Settings.LogPath, FileMode.Open))
                         {
                             fileStream.SetLength(0);
                             fileStream.Close();
@@ -438,10 +438,10 @@ namespace tcpTrigger
                 }
                 catch (Exception ex)
                 {
-                    Configuration.IsLogEnabled = false;
+                    Settings.IsLogEnabled = false;
                     EventLog.WriteEntry(
                         "tcpTrigger",
-                        $"Maximum log size {_maxFileSizeInBytes} bytes has been reached. Error rotating log file '{Configuration.LogPath}'. Logging has been disabled.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                        $"Maximum log size {_maxFileSizeInBytes} bytes has been reached. Error rotating log file '{Settings.LogPath}'. Logging has been disabled.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                         EventLogEntryType.Error,
                         401);
                 }
@@ -449,7 +449,7 @@ namespace tcpTrigger
             
             try
             {
-                using (StreamWriter outputFile = new StreamWriter(Configuration.LogPath, true))
+                using (StreamWriter outputFile = new StreamWriter(Settings.LogPath, true))
                 {
                     string logText;
                     switch (packetHeader.MatchType)
@@ -477,10 +477,10 @@ namespace tcpTrigger
             }
             catch (Exception ex)
             {
-                Configuration.IsLogEnabled = false;
+                Settings.IsLogEnabled = false;
                 EventLog.WriteEntry(
                     "tcpTrigger",
-                    $"Error writing to log file '{Configuration.LogPath}'. Logging has been disabled.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                    $"Error writing to log file '{Settings.LogPath}'. Logging has been disabled.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                     EventLogEntryType.Error,
                     401);
             }
@@ -532,11 +532,11 @@ namespace tcpTrigger
 
         private void LaunchApplication(PacketHeader packetHeader)
         {
-            if (string.IsNullOrEmpty(Configuration.ExternalAppPath) || !File.Exists(Configuration.ExternalAppPath))
+            if (string.IsNullOrEmpty(Settings.ExternalAppPath) || !File.Exists(Settings.ExternalAppPath))
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
-                    $"An external application has been triggered to launch, but the specified application path '{Configuration.ExternalAppPath}' was not found. Update your tcpTrigger configuration to point to a valid executable.",
+                    $"An external application has been triggered to launch, but the specified application path '{Settings.ExternalAppPath}' was not found. Update your tcpTrigger configuration to point to a valid executable.",
                     EventLogEntryType.Warning,
                     401);
                 return;
@@ -545,14 +545,14 @@ namespace tcpTrigger
             try
             {
                 Process.Start(
-                    Configuration.ExternalAppPath,
-                    UserVariableExpansion.GetExpandedString(Configuration.ExternalAppArguments, packetHeader));
+                    Settings.ExternalAppPath,
+                    UserVariableExpansion.GetExpandedString(Settings.ExternalAppArguments, packetHeader));
             }
             catch (Exception ex)
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
-                    $"Error launching external triggered application '{Configuration.ExternalAppPath}'.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                    $"Error launching external triggered application '{Settings.ExternalAppPath}'.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                     EventLogEntryType.Error,
                     401);
             }
@@ -560,7 +560,7 @@ namespace tcpTrigger
 
         private void SendEmail(PacketHeader packetHeader)
         {
-            if (Configuration.EmailRecipients.Count == 0)
+            if (Settings.EmailRecipients.Count == 0)
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
@@ -569,7 +569,7 @@ namespace tcpTrigger
                     402);
                 return;
             }
-            if (Configuration.EmailSender.Length == 0)
+            if (Settings.EmailSender.Length == 0)
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
@@ -578,7 +578,7 @@ namespace tcpTrigger
                     402);
                 return;
             }
-            if (Configuration.EmailServer.Length == 0)
+            if (Settings.EmailServer.Length == 0)
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
@@ -587,7 +587,7 @@ namespace tcpTrigger
                     402);
                 return;
             }
-            if (Configuration.EmailSubject.Length == 0)
+            if (Settings.EmailSubject.Length == 0)
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
@@ -603,23 +603,23 @@ namespace tcpTrigger
                 try
                 {
                     var smtpClient = new SmtpClient();
-                    smtpClient.Host = Configuration.EmailServer;
-                    smtpClient.Port = Configuration.EmailServerPort;
-                    if (Configuration.IsEmailAuthRequired)
+                    smtpClient.Host = Settings.EmailServer;
+                    smtpClient.Port = Settings.EmailServerPort;
+                    if (Settings.IsEmailAuthRequired)
                     {
-                        smtpClient.Credentials = new NetworkCredential(Configuration.EmailUsername, Configuration.EmailPassword);
+                        smtpClient.Credentials = new NetworkCredential(Settings.EmailUsername, Settings.EmailPassword);
                     }
-                    message.From = Configuration.EmailSenderDisplayName.Length > 0 ?
-                        new MailAddress(Configuration.EmailSender, Configuration.EmailSenderDisplayName)
-                        : new MailAddress(Configuration.EmailSender);
-                    for (int i = 0; i < Configuration.EmailRecipients.Count; i++)
+                    message.From = Settings.EmailSenderDisplayName.Length > 0 ?
+                        new MailAddress(Settings.EmailSender, Settings.EmailSenderDisplayName)
+                        : new MailAddress(Settings.EmailSender);
+                    for (int i = 0; i < Settings.EmailRecipients.Count; i++)
                     {
-                        if (!string.IsNullOrEmpty(Configuration.EmailRecipients[i]))
+                        if (!string.IsNullOrEmpty(Settings.EmailRecipients[i]))
                         {
-                            message.To.Add(Configuration.EmailRecipients[i].Trim());
+                            message.To.Add(Settings.EmailRecipients[i].Trim());
                         }
                     }
-                    message.Subject = UserVariableExpansion.GetExpandedString(Configuration.EmailSubject, packetHeader);
+                    message.Subject = UserVariableExpansion.GetExpandedString(Settings.EmailSubject, packetHeader);
                     message.Body = UserVariableExpansion.GetExpandedString(GetMessageBody(packetHeader), packetHeader);
 
                     //Send the email.
@@ -643,16 +643,16 @@ namespace tcpTrigger
             switch (packetHeader.MatchType)
             {
                 case PacketMatch.PingRequest:
-                    messageBody = Configuration.MessageBodyPing;
+                    messageBody = Settings.MessageBodyPing;
                     break;
                 case PacketMatch.TcpConnect:
-                    messageBody = Configuration.MessageBodyTcpConnect;
+                    messageBody = Settings.MessageBodyTcpConnect;
                     break;
                 case PacketMatch.NamePoison:
-                    messageBody = Configuration.MessageBodyNamePoison;
+                    messageBody = Settings.MessageBodyNamePoison;
                     break;
                 case PacketMatch.RogueDhcp:
-                    messageBody = Configuration.MessageBodyRogueDhcp;
+                    messageBody = Settings.MessageBodyRogueDhcp;
                     break;
                 default:
                     messageBody = "Not defined.";

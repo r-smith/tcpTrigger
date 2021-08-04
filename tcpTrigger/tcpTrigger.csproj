@@ -52,7 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="StringCipher.cs" />
     <Compile Include="TcpTriggerInterface.cs" />
     <Compile Include="PacketGenerator.cs" />

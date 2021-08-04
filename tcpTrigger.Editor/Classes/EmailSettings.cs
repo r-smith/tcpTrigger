@@ -2,7 +2,7 @@
 
 namespace tcpTrigger.Editor
 {
-    internal class EmailConfiguration
+    internal class EmailSettings
     {
         public string Server { get; set; }
         public string Port { get; set; }
