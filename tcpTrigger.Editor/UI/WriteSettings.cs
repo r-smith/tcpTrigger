@@ -16,8 +16,8 @@ namespace tcpTrigger.Editor
             string settingsPath = GetSettingsPath();
             const string t = "true";
             const string f = "false";
-
-            // Ensure the base directory for the configuration file exists before attempting to write.
+            
+            // Ensure the base directory for the settings file exists before attempting to write.
             if (!Directory.Exists(Path.GetDirectoryName(settingsPath)))
             {
                 ShowMessageBox(
@@ -27,7 +27,7 @@ namespace tcpTrigger.Editor
                 return false;
             }
 
-            // Use options specified in GUI to write to configuration file.
+            // Use options specified in GUI to write to settings file.
             try
             {
                 // Convert port numbers to an ordered int array and remove duplicates.
@@ -186,7 +186,7 @@ namespace tcpTrigger.Editor
                     // Check if multiple recipients were provided.
                     if (EmailRecipient.Text.Contains(","))
                     {
-                        // Multiple recipients. Split and add each to configuration.
+                        // Multiple recipients. Split and add each to settings.
                         string[] recips = EmailRecipient.Text.Split(',');
                         for (int i = 0; i < recips.Length; i++)
                         {
@@ -198,7 +198,7 @@ namespace tcpTrigger.Editor
                     }
                     else
                     {
-                        // Single recipient. Add to configuration.
+                        // Single recipient. Add to settings.
                         writer.WriteElementString("address", EmailRecipient.Text);
                     }
                     writer.WriteEndElement();
@@ -235,11 +235,21 @@ namespace tcpTrigger.Editor
                     writer.WriteEndDocument();
                 }
             }
+            catch (UnauthorizedAccessException)
+            {
+                ShowMessageBox(
+                    message: "You don't have access to write to your settings file."
+                             + Environment.NewLine + "Try relaunching this application as an administrator."
+                             + Environment.NewLine + Environment.NewLine
+                             + "Settings location: " + settingsPath,
+                    title: "Failed to save your settings",
+                    type: DialogWindow.Type.Error);
+                return false;
+            }
             catch (Exception ex)
             {
                 ShowMessageBox(
-                    message: "A problem was encountered while saving your configuration file."
-                             + Environment.NewLine + Environment.NewLine + ex.Message,
+                    message: ex.Message,
                     title: "Failed to save your settings",
                     type: DialogWindow.Type.Error);
                 return false;

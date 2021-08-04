@@ -15,14 +15,14 @@ namespace tcpTrigger.Editor
 
             if (!File.Exists(settingsPath))
             {
-                // No configuration was found. This is expected on new installations.
-                // Load defaults and abort reading config file.
+                // No settings file found. This is expected on new installations.
+                // Load defaults and abort reading settings.
                 LoadDefaults();
                 return;
             }
 
             // currentNode is updated with the XML node path for every element that is read
-            // from the configuration file. This aids in debugging and provides more useful
+            // from the settings file. This aids in debugging and provides more useful
             // error messages when something goes wrong.
             string currentNode = string.Empty;
             try
@@ -204,10 +204,22 @@ namespace tcpTrigger.Editor
                     }
                 }
             }
+            catch (UnauthorizedAccessException)
+            {
+                ShowMessageBox(
+                    message: "You don't have access to read your settings file."
+                             + Environment.NewLine + "Try relaunching this application as an administrator."
+                             + Environment.NewLine + Environment.NewLine
+                             + "Settings location: " + settingsPath,
+                    title: "Failed to open your settings",
+                    type: DialogWindow.Type.Error);
+            }
             catch (Exception ex)
             {
                 ShowMessageBox(
-                    message: $"Your configuration file is: '{settingsPath}'{Environment.NewLine}Unable to parse XML node: {currentNode}{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                    message: $"Your settings location is '{settingsPath}'.{Environment.NewLine}{Environment.NewLine}"
+                             + (currentNode.Length > 0 ? $"Failed parsing XML node '{currentNode}'.{Environment.NewLine}" : "")
+                             + ex.Message,
                     title: "Failed to read your settings",
                     type: DialogWindow.Type.Error);
             }
