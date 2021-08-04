@@ -11,6 +11,7 @@ using System.ServiceProcess;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Controls;
 using System.Xml;
 
 namespace tcpTrigger.Editor
@@ -171,10 +172,6 @@ namespace tcpTrigger.Editor
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { SendEmailOption.IsChecked = bool.Parse(xn.InnerText); }
 
-                //currentNode = ConfigurationNode.enabledActions_popupNotification;
-                //xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                //if (xn != null) { DisplayPopupOption.IsChecked = bool.Parse(xn.InnerText); }
-
                 currentNode = ConfigurationNode.enabledActions_executeCommand;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { LaunchAppOption.IsChecked = bool.Parse(xn.InnerText); }
@@ -281,7 +278,10 @@ namespace tcpTrigger.Editor
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error reading configuration '{configurationPath}'. Unable to parse XML node: {currentNode}{Environment.NewLine}{Environment.NewLine}{ex.Message}");
+                ShowMessageBox(
+                    message: $"Your configuration file is: '{configurationPath}'{Environment.NewLine}Unable to parse XML node: {currentNode}{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                    title: "Failed to read your settings",
+                    type: DialogWindow.Type.Error);
             }
         }
 
@@ -294,7 +294,10 @@ namespace tcpTrigger.Editor
             // Ensure the base directory for the configuration file exists before attempting to write.
             if (!Directory.Exists(Path.GetDirectoryName(configurationPath)))
             {
-                MessageBox.Show("A folder for the tcpTrigger configuration file was not found.", "Error");
+                ShowMessageBox(
+                    message: $"The folder '{Path.GetDirectoryName(configurationPath)}' was not found.",
+                    title: "Failed to save your settings",
+                    type: DialogWindow.Type.Error);
                 return false;
             }
 
@@ -367,17 +370,31 @@ namespace tcpTrigger.Editor
                     writer.WriteStartElement("endpointIgnoreList");
                     if (Whitelist.Text.Trim().Length > 0)
                     {
-                        // Split whitelist to string array (split by both commas and newlines) and then trim each item.
-                        string[] ignoredEndpoints = Whitelist.Text.Trim().Split(new char[] { ',', '\n' }).Select(ip => ip.Trim()).ToArray();
-                        // Sort IPs.
-                        ignoredEndpoints = ignoredEndpoints.OrderBy(i => new Version(i.ToString())).ToArray();
-                        for (int i = 0; i < ignoredEndpoints.Length; i++)
+                        try
                         {
-                            if (!string.IsNullOrEmpty(ignoredEndpoints[i]))
+                            // Split whitelist by both commas and newlines. Parse each item to IPAddress. Store end result in a List<IPAddress>.
+                            List<IPAddress> ignoredEndpoints =
+                                Whitelist.Text
+                                .Trim()
+                                .Split(new string[] { ",", "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)
+                                .Select(ip => IPAddress.Parse(ip.Trim()))
+                                .ToList();
+                            // Sort IPs using custom sorter.
+                            ignoredEndpoints.Sort(new IPAddressComparer());
+                            // Write each IP to config.
+                            for (int i = 0; i < ignoredEndpoints.Count; i++)
                             {
-                                writer.WriteElementString("ipAddress", ignoredEndpoints[i].Trim());
+                                writer.WriteElementString("ipAddress", ignoredEndpoints[i].ToString().Trim());
                             }
                         }
+                        catch
+                        {
+                            ShowMessageBox(
+                                message: "Check to ensure the IP addresses you entered are valid.",
+                                title: "Failed to save your whitelist settings",
+                                type: DialogWindow.Type.Error);
+                        }
+                        
                     }
                     writer.WriteEndElement();
 
@@ -397,7 +414,6 @@ namespace tcpTrigger.Editor
                     writer.WriteElementString("log", LogOption.IsChecked == true ? t : f);
                     writer.WriteElementString("windowsEventLog", EventLogOption.IsChecked == true ? t : f);
                     writer.WriteElementString("emailNotification", SendEmailOption.IsChecked == true ? t : f);
-                    //writer.WriteElementString("popupNotification", DisplayPopupOption.IsChecked == true ? t : f);
                     writer.WriteElementString("executeCommand", LaunchAppOption.IsChecked == true ? t : f);
                     writer.WriteEndElement();
 
@@ -495,7 +511,11 @@ namespace tcpTrigger.Editor
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowMessageBox(
+                    message: "A problem was encountered while saving your configuration file."
+                             + Environment.NewLine + Environment.NewLine + ex.Message,
+                    title: "Failed to save your settings",
+                    type: DialogWindow.Type.Error);
                 return false;
             }
 
@@ -504,37 +524,80 @@ namespace tcpTrigger.Editor
 
         private bool ValidateUserSettings()
         {
-            if (MonitorTcpOption.IsChecked == true && !IsTcpPortsValid())
+            if (MonitorTcpOption.IsChecked == true)
             {
-                MainTab.Focus();
-                MessageBox.Show("Please enter a valid port number to monitor. Multiple port numbers should be separated with a comma. Ranges should be separated with a hyphen. Example: 21,23,2000-3000", "Error");
-                return false;
+                if (
+                    (TcpIncludePorts.Text.Length > 0 && !IsTcpPortsValid(TcpIncludePorts.Text))
+                    || (TcpExcludePorts.Text.Length > 0 && !IsTcpPortsValid(TcpExcludePorts.Text)))
+                {
+                    ShowMessageBox(
+                        message: "A port must be a number between 1-65535." + Environment.NewLine
+                                 + "Use a comma to specify multiple ports." + Environment.NewLine
+                                 + "Use a hyphen to specify ranges." + Environment.NewLine + Environment.NewLine
+                                 + "Example: 21,23,400-450,3389",
+                        title: "Invalid port number(s)",
+                        type: DialogWindow.Type.Error,
+                        tab: MainTab);
+                    return false;
+                }
             }
 
+            if (MonitorDhcpOption.IsChecked == true && DhcpServers.Text.Length > 0)
+            {
+                if (!IsIpAddressListValid(DhcpServers.Text))
+                {
+                    ShowMessageBox(
+                        message: "DHCP servers must be entered by IP address. If you have more than one server, use a comma to separate them.",
+                        title: "Invalid DHCP server(s)",
+                        type: DialogWindow.Type.Error,
+                        tab: MainTab,
+                        control: DhcpServers);
+                    return false;
+                }
+            }
+
+            if (LogOption.IsChecked == true)
+            {
+                if (LogPath.Text.Length == 0)
+                {
+                    ShowMessageBox(
+                        message: "You have the option to write to a log file enabled, but no path was entered.",
+                        title: "No log path specified",
+                        type: DialogWindow.Type.Error,
+                        tab: ActionsTab,
+                        control: LogPath);
+                    return false;
+                }
+            }
 
             if (LaunchAppOption.IsChecked == true)
             {
                 if (ApplicationPath.Text.Length == 0)
                 {
-                    MainTab.Focus();
-                    MessageBox.Show("An external application is required.", "Error");
+                    ShowMessageBox(
+                        message: "You have the option to launch an external application enabled, but no path was entered.",
+                        title: "No application path specified",
+                        type: DialogWindow.Type.Error,
+                        tab: ActionsTab,
+                        control: ApplicationPath);
                     return false;
                 }
             }
 
             if (SendEmailOption.IsChecked == true)
             {
-                if (EmailSubject.Text.Length == 0)
-                {
-                    MainTab.Focus();
-                    MessageBox.Show("An email subject is required.", "Error");
-                    return false;
-                }
+                //if (EmailSubject.Text.Length == 0)
+                //{
+                //    return false;
+                //}
 
                 if (EmailServer.Text.Length == 0)
                 {
-                    EmailTab.Focus();
-                    MessageBox.Show("An outgoing mail server is required.", "Error");
+                    ShowMessageBox(
+                        message: "You have email notifications enabled, but no email server was entered.",
+                        title: "Missing email server",
+                        tab: EmailTab,
+                        control: EmailServer);
                     return false;
                 }
 
@@ -543,32 +606,62 @@ namespace tcpTrigger.Editor
                     || n <= 0
                     || n > 65535)
                 {
-                    EmailTab.Focus();
-                    MessageBox.Show("Please enter a valid mail server port number.", "Error");
+                    ShowMessageBox(
+                        message: "Enter the port number used by your email server."
+                                 + Environment.NewLine + "Typical port numbers include: 25, 465, and 587.",
+                        title: "Missing email server port",
+                        type: DialogWindow.Type.Error,
+                        tab: EmailTab,
+                        control: EmailPort);
                     return false;
                 }
 
-                if (EmailRecipient.Text.Length == 0)
+                if (EmailRecipient.Text.Length == 0 || !IsEmailAddressListValid(EmailRecipient.Text))
                 {
-                    EmailTab.Focus();
-                    MessageBox.Show("An email recipient is required.", "Error");
+                    ShowMessageBox(
+                        message: "Check to ensure the recipient you entered is formatted like a standard email address. "
+                                 + Environment.NewLine + "If you have more than one recipient, use a comma to separate them.",
+                        title: "Invalid email recipient(s)",
+                        type: DialogWindow.Type.Error,
+                        tab: EmailTab,
+                        control: EmailRecipient);
                     return false;
                 }
 
-                if (EmailSender.Text.Length == 0)
+                if (EmailSender.Text.Length == 0 || !IsEmailAddressListValid(EmailSender.Text) || EmailSender.Text.Contains(','))
                 {
-                    EmailTab.Focus();
-                    MessageBox.Show("A sender email address is required.", "Error");
+                    ShowMessageBox(
+                        message: "Check to ensure the sender address you entered is formatted like a standard email address.",
+                        title: "Invalid email sender",
+                        type: DialogWindow.Type.Error,
+                        tab: EmailTab,
+                        control: EmailSender);
                     return false;
                 }
             }
 
+            if (Whitelist.Text.Length > 0 && !IsIpAddressListValid(Whitelist.Text))
+            {
+                ShowMessageBox(
+                        message: "Check to ensure the IP addresses you entered are formatted properly."
+                                 + Environment.NewLine + "IP addresses can be entered one per line, or comma-separated.",
+                        title: "Invalid whitelist",
+                        type: DialogWindow.Type.Error,
+                        tab: WhitelistTab,
+                        control: Whitelist);
+                return false;
+            }
+
             if (RateLimitMinutes.Text.Length > 0)
             {
-                if (!int.TryParse(RateLimitMinutes.Text, out int n) || n < 0)
+                if (!int.TryParse(RateLimitMinutes.Text, out int n) || n <= 0 || n > 3600)
                 {
-                    AdvancedTab.Focus();
-                    MessageBox.Show("Please enter a valid number of minutes for rate limiting.", "Error");
+                    ShowMessageBox(
+                        message: "The number of seconds used for rate limiting must be between 1 and 3600.",
+                        title: "Invalid rate limit",
+                        type: DialogWindow.Type.Error,
+                        tab: AdvancedTab,
+                        control: RateLimitMinutes);
                     return false;
                 }
             }
@@ -576,11 +669,11 @@ namespace tcpTrigger.Editor
             return true;
         }
 
-        private bool IsTcpPortsValid()
+        private bool IsTcpPortsValid(string ports)
         {
             try
             {
-                int[] portNumbers = (from part in TcpIncludePorts.Text.Split(',')
+                int[] portNumbers = (from part in ports.Split(',')
                                      let range = part.Split('-')
                                      let start = int.Parse(range[0])
                                      let end = int.Parse(range[range.Length - 1])
@@ -599,6 +692,43 @@ namespace tcpTrigger.Editor
             }
 
             return true;
+        }
+
+        private bool IsIpAddressListValid(string ipAddresses)
+        {
+            // Validate list of IP addresses in a string. IP addresses can be separated by commas or newlines.
+            // Note: The IPAddress.TryParse() method used here returns true for any string that can be parsed as an Int64.
+
+            // Split string to array, split by both commas and newlines, then trim each item.
+            string[] ipArray =
+                ipAddresses
+                .Trim()
+                .Split(new string[] { ",", "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(ip => ip.Trim()).ToArray();
+            for (int i = 0; i < ipArray.Length; i++)
+            {
+                if (!IPAddress.TryParse(ipArray[i], out _))
+                    return false;
+            }
+            return true;
+        }
+
+        private bool IsEmailAddressListValid(string emails)
+        {
+            // Validate a comma-separated list of email addresses.
+            try
+            {
+                string[] emailArray = emails.Trim().Split(',');
+                for (int i = 0; i < emailArray.Length; i++)
+                {
+                    _ = new MailAddress(emailArray[i].Trim());
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private string FormatTcpPortRange(int[] range)
@@ -675,7 +805,7 @@ namespace tcpTrigger.Editor
             catch (Exception ex)
             {
                 e.Result =
-                    $"Failed to restart tcpTrigger service. Configuration changes not applied. {ex.Message}";
+                    $"Failed to restart tcpTrigger service. Configuration changes not applied.{Environment.NewLine}{Environment.NewLine}{ex.Message}";
                 return;
             }
         }
@@ -683,9 +813,16 @@ namespace tcpTrigger.Editor
         private void Thread_RestartServiceCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Result != null)
-                MessageBox.Show((string)e.Result, "Error");
+            {
+                ShowMessageBox((string)e.Result);
+            }
             else
-                MessageBox.Show("Configuration file has been saved.", "Success");
+            {
+                ShowMessageBox(
+                    message: "Your settings were saved.",
+                    title: "Success",
+                    type: DialogWindow.Type.Info);
+            }
         }
 
         private void BrowseLogPath_Click(object sender, RoutedEventArgs e)
@@ -701,11 +838,7 @@ namespace tcpTrigger.Editor
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(
-                        ex.Message,
-                        "Error",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Error);
+                    ShowMessageBox(ex.Message);
                 }
             }
         }
@@ -721,11 +854,7 @@ namespace tcpTrigger.Editor
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(
-                        ex.Message,
-                        "Error",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Error);
+                    ShowMessageBox(ex.Message);
                 }
             }
         }
@@ -805,9 +934,19 @@ namespace tcpTrigger.Editor
         private void EmailTester_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Result != null)
-                MessageBox.Show("Failed to send test email. " + (string)e.Result, "Error");
+            {
+                ShowMessageBox(
+                    message: (string)e.Result,
+                    title: "Failed to send test email",
+                    type: DialogWindow.Type.Error);
+            }
             else
-                MessageBox.Show("Message sent.", "Email Test");
+            {
+                ShowMessageBox(
+                    message: "A test message was sent.",
+                    title: "Email test",
+                    type: DialogWindow.Type.Info);
+            }
 
             TestEmail.IsEnabled = true;
             TestEmail.Content = "Test";
@@ -861,6 +1000,43 @@ namespace tcpTrigger.Editor
             {
                 e.Result = ex.Message;
             }
+        }
+
+        private void ShowMessageBox(string message, string title = "Error", DialogWindow.Type type = DialogWindow.Type.Error, TabItem tab = null, Control control = null)
+        {
+            DialogWindow wnd;
+            switch (type)
+            {
+                case DialogWindow.Type.Error:
+                    wnd = DialogWindow.Error(message, title);
+                    break;
+                case DialogWindow.Type.Info:
+                    wnd = DialogWindow.Info(message, title);
+                    break;
+                default:
+                    wnd = DialogWindow.Error(message, title);
+                    break;
+            }
+            
+            if (IsLoaded)
+            {
+                wnd.Owner = this;
+                tab?.Focus();
+            }
+            else
+            {
+                // Don't set owner because the application hasn't yet loaded.
+                wnd.ShowInTaskbar = true;
+                wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            }
+
+            // Blur main window, show dialog, then restore opacity.
+            Opacity = 0.65;
+            wnd.ShowDialog();
+            Opacity = 1;
+
+            // Set focus to control, if passed in.
+            control?.Focus();
         }
 
         private void LoadDefaults()

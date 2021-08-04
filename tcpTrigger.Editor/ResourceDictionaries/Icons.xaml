@@ -17,4 +17,30 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
+    
+    <!-- Font Awesome: exclamation-triangle-solid [Custom edit: added solid backing behind exclamation mark] -->
+    <DrawingImage x:Key="icon.exclamation-triangle">
+        <DrawingImage.Drawing>
+            <DrawingGroup ClipGeometry="M0,0 V512 H576 V0 H0 Z">
+                <DrawingGroup.Transform>
+                    <TranslateTransform X="0.0002864852431230247" Y="4.871224064117996E-06" />
+                </DrawingGroup.Transform>
+                <GeometryDrawing Brush="#222">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry RadiusX="0" RadiusY="0" Rect="212.6102,162.7119,146.4407,299.3898" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#ffd43b" Geometry="F1 M576,512z M0,0z M569.517,440.013C587.975,472.007,564.806,512,527.94,512L48.054,512C11.117,512,-11.945,471.945,6.477,440.013L246.423,23.985C264.89,-8.024,311.143,-7.966,329.577,23.985z M288,354C262.595,354 242,374.595 242,400 242,425.405 262.595,446 288,446 313.405,446 334,425.405 334,400 334,374.595 313.405,354 288,354z M244.327,188.654L251.745,324.654C252.092,331.018,257.354,334,263.727,334L312.273,334C318.646,334,323.908,331.018,324.255,324.654L331.673,188.654C332.048,181.78,326.575,176,319.691,176L256.308,176C249.424,176,243.952,181.78,244.327,188.654z" />
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Font Awesome: info-circle-solid -->
+    <DrawingImage x:Key="icon.info-circle">
+        <DrawingImage.Drawing>
+            <DrawingGroup ClipGeometry="M0,0 V512 H512 V0 H0 Z">
+                <GeometryDrawing Brush="#3c97d7" Geometry="F1 M512,512z M0,0z M256,8C119.043,8 8,119.083 8,256 8,392.997 119.043,504 256,504 392.957,504 504,392.997 504,256 504,119.083 392.957,8 256,8z M256,118C279.196,118 298,136.804 298,160 298,183.196 279.196,202 256,202 232.804,202 214,183.196 214,160 214,136.804 232.804,118 256,118z M312,372C312,378.627,306.627,384,300,384L212,384C205.373,384,200,378.627,200,372L200,348C200,341.373,205.373,336,212,336L224,336 224,272 212,272C205.373,272,200,266.627,200,260L200,236C200,229.373,205.373,224,212,224L276,224C282.627,224,288,229.373,288,236L288,336 300,336C306.627,336,312,341.373,312,348L312,372z" />
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
 </ResourceDictionary>
