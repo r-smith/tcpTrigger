@@ -78,26 +78,26 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ConfigurationNode.cs" />
-    <Compile Include="DialogWindow.xaml.cs">
+    <Compile Include="Classes\ConfigurationNode.cs" />
+    <Compile Include="UI\DialogWindow.xaml.cs">
       <DependentUpon>DialogWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="StringCipher.cs" />
-    <Compile Include="TcpTriggerInterface.cs" />
-    <Compile Include="ValueConverters.cs" />
+    <Compile Include="Classes\StringCipher.cs" />
+    <Compile Include="Classes\TcpTriggerInterface.cs" />
+    <Compile Include="Classes\ValueConverters.cs" />
     <Page Include="Controls\CircularProgressBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DialogWindow.xaml">
+    <Page Include="UI\DialogWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="HelpWindow.xaml">
+    <Page Include="UI\HelpWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainWindow.xaml">
+    <Page Include="UI\MainWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -108,11 +108,11 @@
     <Compile Include="Controls\CircularProgressBar.xaml.cs">
       <DependentUpon>CircularProgressBar.xaml</DependentUpon>
     </Compile>
-    <Compile Include="EmailConfiguration.cs" />
-    <Compile Include="HelpWindow.xaml.cs">
+    <Compile Include="Classes\EmailConfiguration.cs" />
+    <Compile Include="UI\HelpWindow.xaml.cs">
       <DependentUpon>HelpWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="UI\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="ResourceDictionaries\ButtonStyle.xaml">
