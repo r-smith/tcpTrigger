@@ -78,7 +78,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\Elevate.cs" />
     <Compile Include="Classes\SettingsNode.cs" />
+    <Compile Include="UI\ApplySettingsWindow.xaml.cs">
+      <DependentUpon>ApplySettingsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\RestartServiceWindow.xaml.cs">
+      <DependentUpon>RestartServiceWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ValidateSettings.cs" />
     <Compile Include="UI\DialogWindow.xaml.cs">
       <DependentUpon>DialogWindow.xaml</DependentUpon>
@@ -89,6 +96,10 @@
     <Compile Include="UI\ReadSettings.cs" />
     <Compile Include="UI\WriteSettings.cs" />
     <Page Include="Controls\CircularProgressBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ApplySettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -147,6 +158,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ResourceDictionaries\TextBoxStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\RestartServiceWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

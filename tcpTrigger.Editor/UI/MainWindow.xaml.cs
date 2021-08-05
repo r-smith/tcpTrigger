@@ -6,10 +6,10 @@ using System.Net;
 using System.Net.Mail;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.ServiceProcess;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Effects;
 
 namespace tcpTrigger.Editor
 {
@@ -86,52 +86,18 @@ namespace tcpTrigger.Editor
             if (WriteSettings() == false)
                 return;
 
-            RestartTcpTriggerService();
-        }
-
-        private void RestartTcpTriggerService()
-        {
-            // Setup a background thread to restart the service.
-            var bw = new BackgroundWorker();
-            bw.DoWork += new DoWorkEventHandler(Thread_RestartService);
-            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Thread_RestartServiceCompleted);
-            bw.RunWorkerAsync();
-        }
-
-        private void Thread_RestartService(object sender, DoWorkEventArgs e)
-        {
-            try
+            ApplySettingsWindow applyWindow = new ApplySettingsWindow();
+            applyWindow.Owner = this;
+            Opacity = 0.65;
+            Effect = new BlurEffect();
+            if (applyWindow.ShowDialog() == true)
             {
-                var sc = new ServiceController("tcpTrigger");
-                if (sc.Status == ServiceControllerStatus.Running)
-                {
-                    sc.Stop();
-                    sc.WaitForStatus(ServiceControllerStatus.Stopped);
-                    sc.Start();
-                    sc.WaitForStatus(ServiceControllerStatus.Running);
-                }
+                RestartServiceWindow restartWindow = new RestartServiceWindow();
+                restartWindow.Owner = this;
+                _ = restartWindow.ShowDialog();
             }
-            catch (Exception ex)
-            {
-                e.Result =
-                    $"Failed to restart tcpTrigger service. Configuration changes not applied.{Environment.NewLine}{Environment.NewLine}{ex.Message}";
-                return;
-            }
-        }
-
-        private void Thread_RestartServiceCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (e.Result != null)
-            {
-                ShowMessageBox((string)e.Result);
-            }
-            else
-            {
-                ShowMessageBox(
-                    message: "Your settings were saved.",
-                    title: "Success",
-                    type: DialogWindow.Type.Info);
-            }
+            Effect = null;
+            Opacity = 1;
         }
 
         private void BrowseLogPath_Click(object sender, RoutedEventArgs e)

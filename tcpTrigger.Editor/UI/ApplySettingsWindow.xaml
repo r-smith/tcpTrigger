@@ -1,0 +1,83 @@
+﻿<Window x:Class="tcpTrigger.Editor.ApplySettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:tcpTrigger.Editor"
+        mc:Ignorable="d"
+        Title="tcpTrigger"
+        Height="300"
+        Width="500"
+        SnapsToDevicePixels="True"
+        Background="White"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        BorderBrush="Black"
+        BorderThickness="2"
+        SizeToContent="Height"
+        ShowInTaskbar="False">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Margin="20,20,20,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Border Background="#2263e6be" CornerRadius="15" BorderBrush="#ccc" BorderThickness="1" Padding="25,15">
+                <DockPanel>
+                    <Grid DockPanel.Dock="Left">
+                        <Ellipse Width="34" Height="34" Fill="White" VerticalAlignment="Center"/>
+                        <Image DockPanel.Dock="Left" Source="{StaticResource icon.check-circle}"
+                               VerticalAlignment="Center"
+                               Width="36"
+                               Height="36"/>
+                    </Grid>
+                    <TextBlock DockPanel.Dock="Right"
+                               Margin="15,0,0,0"
+                               Text="Your settings were saved"
+                               Foreground="#000000"
+                               VerticalAlignment="Center"
+                               FontSize="18"
+                               FontWeight="SemiBold"/>
+                </DockPanel>
+            </Border>
+            
+            <TextBlock Grid.Row="1"
+                       Name="Message"
+                       VerticalAlignment="Top"
+                       Margin="45,30,45,45"
+                       Text="Placeholder text. This will be set when the window loads and vary depending on the status of the tcpTrigger service."
+                       TextWrapping="Wrap"
+                       Foreground="#000000"
+                       FontWeight="Regular"
+                       FontSize="15"/>
+        </Grid>
+
+        <!-- Buttons -->
+        <Border Grid.Row="1" Background="#f0f1f3" BorderBrush="#666" BorderThickness="0,1,0,0">
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+                <Button Name="OK"
+                        Click="OK_Click"
+                        Width="130"
+                        IsDefault="True">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Name="ElevateImage"
+                               Stretch="None"
+                               Margin="0,0,8,0" />
+                        <TextBlock Name="OKText" Text="OK" />
+                    </StackPanel>
+                </Button>
+                <Button Name="Cancel"
+                        Margin="8,0,0,0"
+                        Width="130"
+                        IsCancel="True"
+                        Content="Cancel" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
