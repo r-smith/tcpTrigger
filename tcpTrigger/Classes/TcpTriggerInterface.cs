@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace tcpTrigger
 {
@@ -22,6 +23,7 @@ namespace tcpTrigger
 
     public class TcpTriggerInterface
     {
+        public Mutex Mutex { get; private set; } = new Mutex();
         public string Guid { get; }
         public IPAddress IP { get; }
         public PhysicalAddress MacAddress { get; }
@@ -34,9 +36,12 @@ namespace tcpTrigger
         }
         public string Description { get; }
         public Socket NetworkSocket { get; }
-        public Dictionary<IPAddress, DateTime> RateLimitDictionary { get; set; }
         public List<IPAddress> DiscoveredDhcpServers { get; set; }
-        
+        public DateTime EmailLastSentTimestamp { get; private set; }
+        public string EmailLogBuffer { get; set; }
+        public System.Timers.Timer EmailSendTimer { get; private set; }
+
+        // Constructor.
         public TcpTriggerInterface(IPAddress address, string description, PhysicalAddress macAddress, string guid)
         {
             IP = address;
@@ -44,26 +49,27 @@ namespace tcpTrigger
             MacAddress = macAddress;
             Guid = guid;
 
-            RateLimitDictionary = new Dictionary<IPAddress, DateTime>();
             DiscoveredDhcpServers = new List<IPAddress>();
             NetworkSocket = new Socket(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.IP);
+            EmailSendTimer = new System.Timers.Timer();
+            EmailSendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailBufferSeconds).TotalMilliseconds;
+            EmailSendTimer.Elapsed += EmailBufferTimer_Elapsed;
+            EmailSendTimer.Enabled = false;
         }
 
-        public void RateLimitDictionaryCleanup(int rateLimitSeconds)
+        // Methods.
+        private void EmailBufferTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (rateLimitSeconds <= 0)
-                return;
+            // Send email using current log buffer.
+            tcpTrigger.SendEmail(this);
 
-            var ipAddressToDelete = new List<IPAddress>();
-            foreach (KeyValuePair<IPAddress, DateTime> entry in RateLimitDictionary)
-            {
-                if (entry.Value <= DateTime.Now.AddSeconds(-rateLimitSeconds))
-                {
-                    ipAddressToDelete.Add(entry.Key);
-                }
-            }
-
-            ipAddressToDelete.ForEach(x => RateLimitDictionary.Remove(x));
+            // Email sent. Record current timestamp, reset log buffer, and reset timer settings.
+            Mutex.WaitOne();
+            EmailLastSentTimestamp = DateTime.Now;
+            EmailLogBuffer = string.Empty;
+            EmailSendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailBufferSeconds).TotalMilliseconds;
+            EmailSendTimer.Enabled = false;
+            Mutex.ReleaseMutex();
         }
     }
 }

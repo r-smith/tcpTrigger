@@ -24,7 +24,8 @@ namespace tcpTrigger
         public static bool IsEventLogEnabled { get; private set; }
         public static bool IsEmailNotificationEnabled { get; private set; }
         public static bool IsExternalAppEnabled { get; private set; }
-        public static int ActionRateLimitSeconds { get; private set; }
+        public static int EmailRateLimitSeconds { get; private set; }
+        public static int EmailBufferSeconds { get; private set; } = 10;
         public static string LogPath { get; private set; }
         public static string ExternalAppPath { get; private set; }
         public static string ExternalAppArguments { get; private set; }
@@ -225,8 +226,8 @@ namespace tcpTrigger
                 // tcpTrigger/actionSettings
                 currentNode = SettingsNode.actionsSettings_rateLimitSeconds;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null && !string.IsNullOrEmpty(xn.InnerText)) { ActionRateLimitSeconds = int.Parse(xn.InnerText); }
-                else { ActionRateLimitSeconds = 0; }
+                if (xn != null && !string.IsNullOrEmpty(xn.InnerText)) { EmailRateLimitSeconds = int.Parse(xn.InnerText); }
+                else { EmailRateLimitSeconds = 0; }
 
                 currentNode = SettingsNode.actionsSettings_logPath;
                 LogPath = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;

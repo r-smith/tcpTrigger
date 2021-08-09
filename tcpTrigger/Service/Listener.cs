@@ -57,25 +57,19 @@ namespace tcpTrigger
                 // Process actions.
                 if (packetHeader.MatchType != PacketMatch.None)
                 {
+                    // A match was detected. Perform enabled actions.
+
                     packetHeader.DestinationMac = ipInterface.MacAddress;
-
-                    if (Settings.IsLogEnabled)
-                        WriteLog(packetHeader);
-                    if (Settings.IsEventLogEnabled)
-                        WriteEventLog(packetHeader);
-
                     if (!Settings.IgnoredEndpoints.Contains(packetHeader.SourceIP))
                     {
-                        ipInterface.RateLimitDictionaryCleanup(Settings.ActionRateLimitSeconds);
-
-                        if (!ipInterface.RateLimitDictionary.ContainsKey(packetHeader.SourceIP) || Settings.ActionRateLimitSeconds <= 0)
-                        {
-                            if (Settings.ActionRateLimitSeconds > 0)
-                                ipInterface.RateLimitDictionary.Add(packetHeader.SourceIP, DateTime.Now);
-
-                            if (Settings.IsExternalAppEnabled) LaunchApplication(packetHeader);
-                            if (Settings.IsEmailNotificationEnabled) SendEmail(packetHeader);
-                        }
+                        if (Settings.IsLogEnabled)
+                            WriteLog(packetHeader);
+                        if (Settings.IsEventLogEnabled)
+                            WriteEventLog(packetHeader);
+                        if (Settings.IsExternalAppEnabled)
+                            LaunchApplication(packetHeader);
+                        if (Settings.IsEmailNotificationEnabled)
+                            TriggerEmail(packetHeader, ipInterface);
                     }
                 }
                 // Reset buffer and continue listening for new data.

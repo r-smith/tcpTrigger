@@ -49,28 +49,7 @@ namespace tcpTrigger
             {
                 using (StreamWriter outputFile = new StreamWriter(Settings.LogPath, true))
                 {
-                    string logText;
-                    switch (packetHeader.MatchType)
-                    {
-                        case PacketMatch.TcpConnect:
-                            logText = $"TCP connection to port {packetHeader.DestinationPort} from {packetHeader.SourceIP}";
-                            break;
-                        case PacketMatch.UdpCommunication:
-                            logText = $"UDP communication to port {packetHeader.DestinationPort} from {packetHeader.SourceIP}";
-                            break;
-                        case PacketMatch.PingRequest:
-                            logText = $"ICMP ping request from {packetHeader.SourceIP}";
-                            break;
-                        case PacketMatch.RogueDhcp:
-                            logText = $"Unrecognized DHCP server at {packetHeader.DhcpServerAddress}";
-                            break;
-                        default:
-                            logText = string.Empty;
-                            break;
-                    }
-                    outputFile.WriteLine(
-                        DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToLongTimeString()
-                        + " [" + packetHeader.DestinationIP + "] " + logText);
+                    outputFile.WriteLine(GetLogText(packetHeader));
                 }
             }
             catch (Exception ex)
@@ -82,6 +61,32 @@ namespace tcpTrigger
                     EventLogEntryType.Error,
                     401);
             }
+        }
+
+        private string GetLogText(PacketHeader packetHeader)
+        {
+            string logText;
+            switch (packetHeader.MatchType)
+            {
+                case PacketMatch.TcpConnect:
+                    logText = $"TCP connection to port {packetHeader.DestinationPort} from {packetHeader.SourceIP}";
+                    break;
+                case PacketMatch.UdpCommunication:
+                    logText = $"UDP communication to port {packetHeader.DestinationPort} from {packetHeader.SourceIP}";
+                    break;
+                case PacketMatch.PingRequest:
+                    logText = $"ICMP ping request from {packetHeader.SourceIP}";
+                    break;
+                case PacketMatch.RogueDhcp:
+                    logText = $"Unrecognized DHCP server at {packetHeader.DhcpServerAddress}";
+                    break;
+                default:
+                    logText = string.Empty;
+                    break;
+            }
+            return
+                DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToString("HH:mm:ss")
+                + " [" + packetHeader.DestinationIP + "] " + logText;
         }
 
         private void WriteEventLog(PacketHeader packetHeader)
@@ -158,7 +163,26 @@ namespace tcpTrigger
             }
         }
 
-        private void SendEmail(PacketHeader packetHeader)
+        private void TriggerEmail(PacketHeader packetHeader, TcpTriggerInterface ipInterface)
+        {
+            // Record matched connection to log buffer.
+            ipInterface.Mutex.WaitOne();
+            ipInterface.EmailLogBuffer += GetLogText(packetHeader) + Environment.NewLine;
+            
+            if (ipInterface.EmailLastSentTimestamp != null
+                && ipInterface.EmailLastSentTimestamp > DateTime.Now.AddSeconds(-Settings.EmailRateLimitSeconds))
+            {
+                ipInterface.EmailSendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailRateLimitSeconds).TotalMilliseconds;
+            }
+            else
+            {
+                ipInterface.EmailSendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailBufferSeconds).TotalMilliseconds;
+            }
+            ipInterface.EmailSendTimer.Enabled = true;
+            ipInterface.Mutex.ReleaseMutex();
+        }
+
+        public static void SendEmail(TcpTriggerInterface ipInterface)
         {
             if (Settings.EmailRecipients.Count == 0)
             {
@@ -197,12 +221,11 @@ namespace tcpTrigger
                 return;
             }
 
-            using (var message = new MailMessage())
+            using (MailMessage message = new MailMessage())
             {
-
                 try
                 {
-                    var smtpClient = new SmtpClient();
+                    SmtpClient smtpClient = new SmtpClient();
                     smtpClient.Host = Settings.EmailServer;
                     smtpClient.Port = Settings.EmailServerPort;
                     if (Settings.IsEmailAuthRequired)
@@ -219,8 +242,11 @@ namespace tcpTrigger
                             message.To.Add(Settings.EmailRecipients[i].Trim());
                         }
                     }
-                    message.Subject = UserVariableExpansion.GetExpandedString(Settings.EmailSubject, packetHeader);
-                    message.Body = UserVariableExpansion.GetExpandedString(GetMessageBody(packetHeader), packetHeader);
+                    // TODO: REPLACE SUBJECT/BODY.
+                    //message.Subject = UserVariableExpansion.GetExpandedString(Settings.EmailSubject, packetHeader);
+                    //message.Body = UserVariableExpansion.GetExpandedString(GetMessageBody(packetHeader), packetHeader);
+                    message.Subject = "ALERT: Suspicious network activity detected by tcpTrigger";
+                    message.Body = ipInterface.EmailLogBuffer;
 
                     //Send the email.
                     smtpClient.Send(message);
@@ -235,28 +261,6 @@ namespace tcpTrigger
                     return;
                 }
             }
-        }
-
-        private string GetMessageBody(PacketHeader packetHeader)
-        {
-            string messageBody;
-            switch (packetHeader.MatchType)
-            {
-                case PacketMatch.PingRequest:
-                    messageBody = Settings.MessageBodyPing;
-                    break;
-                case PacketMatch.TcpConnect:
-                    messageBody = Settings.MessageBodyTcpConnect;
-                    break;
-                case PacketMatch.RogueDhcp:
-                    messageBody = Settings.MessageBodyRogueDhcp;
-                    break;
-                default:
-                    messageBody = "Not defined.";
-                    break;
-            }
-
-            return messageBody;
         }
     }
 }
