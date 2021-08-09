@@ -4,10 +4,13 @@
     {
         // XML node paths for the tcpTrigger configuration file.
         public const string enabledComponents_tcp = "/tcpTrigger/enabledComponents/tcp";
+        public const string enabledComponents_udp = "/tcpTrigger/enabledComponents/udp";
         public const string enabledComponents_icmp = "/tcpTrigger/enabledComponents/icmp";
         public const string enabledComponents_rogueDhcp = "/tcpTrigger/enabledComponents/rogueDhcp";
         public const string monitoredPorts_tcp_include = "/tcpTrigger/monitoredPorts/tcp/include";
         public const string monitoredPorts_tcp_exclude = "/tcpTrigger/monitoredPorts/tcp/exclude";
+        public const string monitoredPorts_udp_include = "/tcpTrigger/monitoredPorts/udp/include";
+        public const string monitoredPorts_udp_exclude = "/tcpTrigger/monitoredPorts/udp/exclude";
         public const string dhcpServerIgnoreList_ipAddress = "/tcpTrigger/dhcpServerIgnoreList/ipAddress";
         public const string endpointIgnoreList_ipAddress = "/tcpTrigger/endpointIgnoreList/ipAddress";
         public const string networkInterfaceExcludeList_deviceGuid = "/tcpTrigger/networkInterfaceExcludeList/deviceGuid";

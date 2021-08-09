@@ -34,25 +34,19 @@ namespace tcpTrigger.Editor
                 // Port numbers can be entered comma-separated and also specified using ranges with '-'.
                 if (TcpIncludePorts.Text.Length > 0)
                 {
-                    int[] portNumbers = (from part in TcpIncludePorts.Text.Split(',')
-                                         let range = part.Split('-')
-                                         let start = int.Parse(range[0])
-                                         let end = int.Parse(range[range.Length - 1])
-                                         from i in Enumerable.Range(start, end - start + 1)
-                                         orderby i
-                                         select i).Distinct().ToArray();
-                    TcpIncludePorts.Text = FormatTcpPortRange(portNumbers);
+                    TcpIncludePorts.Text = FormatTcpPortRange(PortStringToArray(TcpIncludePorts.Text));
                 }
                 if (TcpExcludePorts.Text.Length > 0)
                 {
-                    int[] portNumbers = (from part in TcpExcludePorts.Text.Split(',')
-                                         let range = part.Split('-')
-                                         let start = int.Parse(range[0])
-                                         let end = int.Parse(range[range.Length - 1])
-                                         from i in Enumerable.Range(start, end - start + 1)
-                                         orderby i
-                                         select i).Distinct().ToArray();
-                    TcpExcludePorts.Text = FormatTcpPortRange(portNumbers);
+                    TcpExcludePorts.Text = FormatTcpPortRange(PortStringToArray(TcpExcludePorts.Text));
+                }
+                if (UdpIncludePorts.Text.Length > 0)
+                {
+                    UdpIncludePorts.Text = FormatTcpPortRange(PortStringToArray(UdpIncludePorts.Text));
+                }
+                if (UdpExcludePorts.Text.Length > 0)
+                {
+                    UdpExcludePorts.Text = FormatTcpPortRange(PortStringToArray(UdpExcludePorts.Text));
                 }
 
                 using (XmlWriter writer = XmlWriter.Create(settingsPath, new XmlWriterSettings() { Indent = true }))
@@ -64,6 +58,7 @@ namespace tcpTrigger.Editor
                     // Enabled components.
                     writer.WriteStartElement("enabledComponents");
                     writer.WriteElementString("tcp", MonitorTcpOption.IsChecked == true ? t : f);
+                    writer.WriteElementString("udp", MonitorUdpOption.IsChecked == true ? t : f);
                     writer.WriteElementString("icmp", MonitorIcmpOption.IsChecked == true ? t : f);
                     writer.WriteElementString("rogueDhcp", MonitorDhcpOption.IsChecked == true ? t : f);
                     writer.WriteEndElement();
@@ -73,6 +68,10 @@ namespace tcpTrigger.Editor
                     writer.WriteStartElement("tcp");
                     writer.WriteElementString("include", TcpIncludePorts.Text);
                     writer.WriteElementString("exclude", TcpExcludePorts.Text);
+                    writer.WriteEndElement();
+                    writer.WriteStartElement("udp");
+                    writer.WriteElementString("include", UdpIncludePorts.Text);
+                    writer.WriteElementString("exclude", UdpExcludePorts.Text);
                     writer.WriteEndElement();
                     writer.WriteEndElement();
 
@@ -250,6 +249,17 @@ namespace tcpTrigger.Editor
             }
 
             return true;
+        }
+
+        private int[] PortStringToArray(string ports)
+        {
+            return (from part in ports.Split(',')
+                    let range = part.Split('-')
+                    let start = int.Parse(range[0])
+                    let end = int.Parse(range[range.Length - 1])
+                    from i in Enumerable.Range(start, end - start + 1)
+                    orderby i
+                    select i).Distinct().ToArray();
         }
 
         private string FormatTcpPortRange(int[] range)

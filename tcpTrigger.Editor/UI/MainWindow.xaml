@@ -59,9 +59,11 @@
                     <GroupBox Header="Trigger Rules"
                               DockPanel.Dock="Top">
                         <StackPanel Margin="5">
-                            <CheckBox Content="Monitor ICMP requests"
+                            <!-- ICMP -->
+                            <CheckBox Content="Detect ICMP requests"
                                       Name="MonitorIcmpOption"/>
-                            <CheckBox Content="Monitor TCP connections"
+                            <!-- TCP -->
+                            <CheckBox Content="Detect TCP connections"
                                       Name="MonitorTcpOption"
                                       Margin="0,7,0,0"/>
                             <DockPanel Margin="35,3,0,0">
@@ -84,6 +86,31 @@
                                          PreviewTextInput="TcpPorts_PreviewTextInput"
                                          DockPanel.Dock="Right"/>
                             </DockPanel>
+                            <!-- UDP -->
+                            <CheckBox Content="Detect UDP communication"
+                                      Name="MonitorUdpOption"
+                                      Margin="0,7,0,0"/>
+                            <DockPanel Margin="35,3,0,0">
+                                <Grid MinWidth="100">
+                                    <TextBlock Text="Include ports"/>
+                                </Grid>
+                                <TextBox Name="UdpIncludePorts"
+                                         MaxLength="512"
+                                         FontFamily="Consolas"
+                                         PreviewTextInput="TcpPorts_PreviewTextInput"
+                                         DockPanel.Dock="Right"/>
+                            </DockPanel>
+                            <DockPanel Margin="35,5,0,0">
+                                <Grid MinWidth="100">
+                                    <TextBlock Text="Exclude ports"/>
+                                </Grid>
+                                <TextBox Name="UdpExcludePorts"
+                                         MaxLength="512"
+                                         FontFamily="Consolas"
+                                         PreviewTextInput="TcpPorts_PreviewTextInput"
+                                         DockPanel.Dock="Right"/>
+                            </DockPanel>
+                            <!-- DHCP -->
                             <CheckBox Content="Rogue DHCP server detection"
                                       Name="MonitorDhcpOption"
                                       Margin="0,7,0,0" />

@@ -21,7 +21,25 @@ namespace tcpTrigger.Editor
                                  + "Use a comma to specify multiple ports." + Environment.NewLine
                                  + "Use a hyphen to specify ranges." + Environment.NewLine + Environment.NewLine
                                  + "Example: 21,23,400-450,3389",
-                        title: "Invalid port number(s)",
+                        title: "Invalid TCP port number(s)",
+                        type: DialogWindow.Type.Error,
+                        tab: MainTab);
+                    return false;
+                }
+            }
+
+            if (MonitorUdpOption.IsChecked == true)
+            {
+                if (
+                    (UdpIncludePorts.Text.Length > 0 && !IsTcpPortsValid(UdpIncludePorts.Text))
+                    || (UdpExcludePorts.Text.Length > 0 && !IsTcpPortsValid(UdpExcludePorts.Text)))
+                {
+                    ShowMessageBox(
+                        message: "A port must be a number between 1-65535." + Environment.NewLine
+                                 + "Use a comma to specify multiple ports." + Environment.NewLine
+                                 + "Use a hyphen to specify ranges." + Environment.NewLine + Environment.NewLine
+                                 + "Example: 21,23,400-450,3389",
+                        title: "Invalid UDP port number(s)",
                         type: DialogWindow.Type.Error,
                         tab: MainTab);
                     return false;

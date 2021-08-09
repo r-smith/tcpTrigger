@@ -38,6 +38,10 @@ namespace tcpTrigger.Editor
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { MonitorTcpOption.IsChecked = bool.Parse(xn.InnerText); }
 
+                currentNode = SettingsNode.enabledComponents_udp;
+                xn = xd.DocumentElement.SelectSingleNode(currentNode);
+                if (xn != null) { MonitorUdpOption.IsChecked = bool.Parse(xn.InnerText); }
+
                 currentNode = SettingsNode.enabledComponents_icmp;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { MonitorIcmpOption.IsChecked = bool.Parse(xn.InnerText); }
@@ -51,6 +55,10 @@ namespace tcpTrigger.Editor
                 TcpIncludePorts.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
                 currentNode = SettingsNode.monitoredPorts_tcp_exclude;
                 TcpExcludePorts.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                currentNode = SettingsNode.monitoredPorts_udp_include;
+                UdpIncludePorts.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                currentNode = SettingsNode.monitoredPorts_udp_exclude;
+                UdpExcludePorts.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
 
                 // tcpTrigger/dhcpServerIgnoreList
                 currentNode = SettingsNode.dhcpServerIgnoreList_ipAddress;
