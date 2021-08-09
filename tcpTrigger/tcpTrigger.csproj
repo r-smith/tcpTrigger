@@ -52,22 +52,31 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Settings.cs" />
-    <Compile Include="StringCipher.cs" />
-    <Compile Include="TcpTriggerInterface.cs" />
-    <Compile Include="PacketGenerator.cs" />
-    <Compile Include="PacketHeader.cs" />
+    <Compile Include="Classes\Settings.cs" />
+    <Compile Include="Classes\StringCipher.cs" />
+    <Compile Include="Classes\TcpTriggerInterface.cs" />
+    <Compile Include="Classes\PacketGenerator.cs" />
+    <Compile Include="Classes\PacketHeader.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ProjectInstaller.Designer.cs">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </Compile>
-    <Compile Include="UserVariableExpansion.cs" />
-    <Compile Include="tcpTrigger.cs">
+    <Compile Include="Classes\UserVariableExpansion.cs" />
+    <Compile Include="Service\Actions.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="tcpTrigger.Designer.cs">
+    <Compile Include="Service\Listener.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Service\MatchChecks.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Service\tcpTrigger.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Service\tcpTrigger.Designer.cs">
       <DependentUpon>tcpTrigger.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
@@ -78,7 +87,7 @@
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="tcpTrigger.resx">
+    <EmbeddedResource Include="Service\tcpTrigger.resx">
       <DependentUpon>tcpTrigger.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
