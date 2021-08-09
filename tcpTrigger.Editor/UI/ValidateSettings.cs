@@ -90,11 +90,6 @@ namespace tcpTrigger.Editor
 
             if (SendEmailOption.IsChecked == true)
             {
-                //if (EmailSubject.Text.Length == 0)
-                //{
-                //    return false;
-                //}
-
                 if (EmailServer.Text.Length == 0)
                 {
                     ShowMessageBox(
@@ -140,6 +135,26 @@ namespace tcpTrigger.Editor
                         type: DialogWindow.Type.Error,
                         tab: EmailTab,
                         control: EmailSender);
+                    return false;
+                }
+
+                if (EmailSubject.Text.Length == 0)
+                {
+                    ShowMessageBox(
+                        message: "You have email notifications enabled, but no message subject for your notifications was entered.",
+                        title: "Missing message subject",
+                        tab: MessagesTab,
+                        control: EmailSubject);
+                    return false;
+                }
+
+                if (EmailBody.Text.Length == 0)
+                {
+                    ShowMessageBox(
+                        message: "You have email notifications enabled, but no message body for your notifications was entered.",
+                        title: "Missing message body",
+                        tab: MessagesTab,
+                        control: EmailBody);
                     return false;
                 }
             }

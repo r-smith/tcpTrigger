@@ -143,7 +143,7 @@ namespace tcpTrigger.Editor
 
                     // Action settings.
                     writer.WriteStartElement("actionSettings");
-                    writer.WriteElementString("rateLimitSeconds", RateLimitSeconds.Text);
+                    writer.WriteElementString("emailRateLimitSeconds", RateLimitSeconds.Text);
                     writer.WriteElementString("logPath", LogPath.Text);
                     writer.WriteStartElement("command");
                     writer.WriteElementString("path", ApplicationPath.Text);
@@ -206,21 +206,10 @@ namespace tcpTrigger.Editor
                     writer.WriteEndElement();
                     writer.WriteEndElement();
 
-                    // Custom messages.
-                    writer.WriteStartElement("customMessage");
-                    writer.WriteAttributeString("type", "tcp");
+                    // Email message.
+                    writer.WriteStartElement("emailMessage");
                     writer.WriteElementString("subject", EmailSubject.Text);
-                    writer.WriteElementString("body", TcpMessageBody.Text);
-                    writer.WriteEndElement();
-                    writer.WriteStartElement("customMessage");
-                    writer.WriteAttributeString("type", "icmp");
-                    writer.WriteElementString("subject", EmailSubject.Text);
-                    writer.WriteElementString("body", IcmpMessageBody.Text);
-                    writer.WriteEndElement();
-                    writer.WriteStartElement("customMessage");
-                    writer.WriteAttributeString("type", "rogueDhcp");
-                    writer.WriteElementString("subject", EmailSubject.Text);
-                    writer.WriteElementString("body", RogueDhcpMessageBody.Text);
+                    writer.WriteElementString("body", EmailBody.Text);
                     writer.WriteEndElement();
 
                     // End tags.

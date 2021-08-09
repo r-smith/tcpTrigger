@@ -321,6 +321,12 @@ namespace tcpTrigger.Editor
             TcpIncludePorts.Text = "1-65535";
             LogOption.IsChecked = true;
             LogPath.Text = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\connections.log";
+            RateLimitOption.IsChecked = true;
+            RateLimitSeconds.Text = "180";
+            EmailSubject.Text = "ALERT: Suspicious network activity detected by tcpTrigger";
+            EmailBody.Text = "Incoming network connections on #Interface.IP# are being monitored by tcpTrigger. The following activity was detected:"
+                + Environment.NewLine + Environment.NewLine
+                + "#Connection.Log#";
         }
     }
 }

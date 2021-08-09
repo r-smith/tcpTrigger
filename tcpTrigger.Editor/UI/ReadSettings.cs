@@ -109,7 +109,7 @@ namespace tcpTrigger.Editor
                 if (xn != null) { LaunchAppOption.IsChecked = bool.Parse(xn.InnerText); }
 
                 // tcpTrigger/actionSettings
-                currentNode = SettingsNode.actionsSettings_rateLimitSeconds;
+                currentNode = SettingsNode.actionsSettings_emailRateLimitSeconds;
                 RateLimitSeconds.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
                 if (RateLimitSeconds.Text.Length > 0)
                     RateLimitOption.IsChecked = true;
@@ -185,24 +185,11 @@ namespace tcpTrigger.Editor
                 currentNode = SettingsNode.emailSettings_sender_displayName;
                 EmailSenderFriendly.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
 
-                // tcpTrigger/customMessage
-                currentNode = SettingsNode.customMessage;
-                nl = xd.DocumentElement.SelectNodes(currentNode);
-                for (int i = 0; i < nl.Count; i++)
-                {
-                    if (nl[i].Attributes["type"]?.InnerText == "tcp")
-                    {
-                        TcpMessageBody.Text = nl[i].SelectSingleNode("body")?.InnerText;
-                    }
-                    if (nl[i].Attributes["type"]?.InnerText == "icmp")
-                    {
-                        IcmpMessageBody.Text = nl[i].SelectSingleNode("body")?.InnerText;
-                    }
-                    if (nl[i].Attributes["type"]?.InnerText == "rogueDhcp")
-                    {
-                        RogueDhcpMessageBody.Text = nl[i].SelectSingleNode("body")?.InnerText;
-                    }
-                }
+                // tcpTrigger/emailMessage
+                currentNode = SettingsNode.emailMessageSubject;
+                EmailSubject.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                currentNode = SettingsNode.emailMessageBody;
+                EmailBody.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
             }
             catch (UnauthorizedAccessException)
             {
