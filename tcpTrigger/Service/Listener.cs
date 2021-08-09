@@ -23,11 +23,13 @@ namespace tcpTrigger
                 // Packet received.  Extract header information and determine if the packet matches our trigger rules.
                 var packetHeader = new PacketHeader(buffer);
 
-                if (DoesPacketMatchPingRequest(packetHeader, ipInterface.IP))
+                if (DoesPacketMatchICMP(packetHeader, ipInterface.IP))
                     packetHeader.MatchType = PacketMatch.PingRequest;
-                else if (DoesPacketMatchMonitoredPort(packetHeader, ipInterface.IP))
+                else if (DoesPacketMatchTCP(packetHeader, ipInterface.IP))
                     packetHeader.MatchType = PacketMatch.TcpConnect;
-                else if (DoesPacketMatchDhcpServer(packetHeader, ipInterface.IP))
+                else if (DoesPacketMatchUDP(packetHeader, ipInterface.IP))
+                    packetHeader.MatchType = PacketMatch.UdpCommunication;
+                else if (DoesPacketMatchDHCP(packetHeader, ipInterface.IP))
                 {
                     // If no DHCP servers are specified by the user, we will do automatic detection.
                     // Auto rogue DHCP detection alerts if more than one DHCP server is discovered.

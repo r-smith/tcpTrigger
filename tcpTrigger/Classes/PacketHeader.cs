@@ -18,6 +18,7 @@ namespace tcpTrigger
     {
         PingRequest,
         TcpConnect,
+        UdpCommunication,
         RogueDhcp,
         None
     }

@@ -11,11 +11,15 @@ namespace tcpTrigger
     public static class Settings
     {
         public static bool IsMonitorTcpEnabled { get; private set; }
+        public static bool IsMonitorUdpEnabled { get; private set; }
         public static bool IsMonitorIcmpEnabled { get; private set; }
         public static bool IsMonitorDhcpEnabled { get; private set; }
         public static HashSet<ushort> TcpPortsToMonitor { get; private set; }
         public static string TcpPortsToIncludeAsString { get; private set; }
         public static string TcpPortsToExcludeAsString { get; private set; }
+        public static HashSet<ushort> UdpPortsToMonitor { get; private set; }
+        public static string UdpPortsToIncludeAsString { get; private set; }
+        public static string UdpPortsToExcludeAsString { get; private set; }
         public static bool IsLogEnabled { get; set; }
         public static bool IsEventLogEnabled { get; private set; }
         public static bool IsEmailNotificationEnabled { get; private set; }
@@ -91,6 +95,10 @@ namespace tcpTrigger
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { IsMonitorTcpEnabled = bool.Parse(xn.InnerText); }
 
+                currentNode = SettingsNode.enabledComponents_udp;
+                xn = xd.DocumentElement.SelectSingleNode(currentNode);
+                if (xn != null) { IsMonitorUdpEnabled = bool.Parse(xn.InnerText); }
+
                 currentNode = SettingsNode.enabledComponents_icmp;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { IsMonitorIcmpEnabled = bool.Parse(xn.InnerText); }
@@ -132,6 +140,40 @@ namespace tcpTrigger
                     }
                     // Final HashSet will contain all included ports except those excluded.
                     TcpPortsToMonitor = new HashSet<ushort>(includePorts.Except(excludePorts));
+                }
+                if (IsMonitorUdpEnabled)
+                {
+                    // tcpTrigger/monitoredPorts
+                    List<ushort> includePorts = new List<ushort>();
+                    List<ushort> excludePorts = new List<ushort>();
+                    // Included ports.
+                    currentNode = SettingsNode.monitoredPorts_udp_include;
+                    UdpPortsToIncludeAsString = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                    if (!string.IsNullOrEmpty(UdpPortsToIncludeAsString))
+                    {
+                        includePorts = (from part in UdpPortsToIncludeAsString.Split(',')
+                                        let range = part.Split('-')
+                                        let start = ushort.Parse(range[0])
+                                        let end = ushort.Parse(range[range.Length - 1])
+                                        from i in Enumerable.Range(start, end - start + 1)
+                                        orderby i
+                                        select (ushort)i).Distinct().ToList();
+                    }
+                    // Excluded ports.
+                    currentNode = SettingsNode.monitoredPorts_udp_exclude;
+                    UdpPortsToExcludeAsString = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                    if (!string.IsNullOrEmpty(UdpPortsToExcludeAsString))
+                    {
+                        excludePorts = (from part in UdpPortsToExcludeAsString.Split(',')
+                                        let range = part.Split('-')
+                                        let start = ushort.Parse(range[0])
+                                        let end = ushort.Parse(range[range.Length - 1])
+                                        from i in Enumerable.Range(start, end - start + 1)
+                                        orderby i
+                                        select (ushort)i).Distinct().ToList();
+                    }
+                    // Final HashSet will contain all included ports except those excluded.
+                    UdpPortsToMonitor = new HashSet<ushort>(includePorts.Except(excludePorts));
                 }
                 if (IsMonitorDhcpEnabled)
                 {
@@ -301,10 +343,13 @@ namespace tcpTrigger
     {
         // XML node paths for the tcpTrigger configuration file.
         public const string enabledComponents_tcp = "/tcpTrigger/enabledComponents/tcp";
+        public const string enabledComponents_udp = "/tcpTrigger/enabledComponents/udp";
         public const string enabledComponents_icmp = "/tcpTrigger/enabledComponents/icmp";
         public const string enabledComponents_rogueDhcp = "/tcpTrigger/enabledComponents/rogueDhcp";
         public const string monitoredPorts_tcp_include = "/tcpTrigger/monitoredPorts/tcp/include";
         public const string monitoredPorts_tcp_exclude = "/tcpTrigger/monitoredPorts/tcp/exclude";
+        public const string monitoredPorts_udp_include = "/tcpTrigger/monitoredPorts/udp/include";
+        public const string monitoredPorts_udp_exclude = "/tcpTrigger/monitoredPorts/udp/exclude";
         public const string dhcpServerIgnoreList_ipAddress = "/tcpTrigger/dhcpServerIgnoreList/ipAddress";
         public const string endpointIgnoreList_ipAddress = "/tcpTrigger/endpointIgnoreList/ipAddress";
         public const string networkInterfaceExcludeList_deviceGuid = "/tcpTrigger/networkInterfaceExcludeList/deviceGuid";

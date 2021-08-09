@@ -55,6 +55,9 @@ namespace tcpTrigger
                         case PacketMatch.TcpConnect:
                             logText = $"TCP connection to port {packetHeader.DestinationPort} from {packetHeader.SourceIP}";
                             break;
+                        case PacketMatch.UdpCommunication:
+                            logText = $"UDP communication to port {packetHeader.DestinationPort} from {packetHeader.SourceIP}";
+                            break;
                         case PacketMatch.PingRequest:
                             logText = $"ICMP ping request from {packetHeader.SourceIP}";
                             break;
@@ -85,6 +88,15 @@ namespace tcpTrigger
         {
             switch (packetHeader.MatchType)
             {
+                case PacketMatch.PingRequest:
+                    EventLog.WriteEntry(
+                        "tcpTrigger",
+                        $"ICMP ping request detected.{Environment.NewLine}{Environment.NewLine}" +
+                        $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}" +
+                        $"Destination IP: {packetHeader.DestinationIP}",
+                        EventLogEntryType.Information,
+                        200);
+                    break;
                 case PacketMatch.TcpConnect:
                     EventLog.WriteEntry(
                         "tcpTrigger",
@@ -94,16 +106,17 @@ namespace tcpTrigger
                         $"Destination port: {packetHeader.DestinationPort}{Environment.NewLine}{Environment.NewLine}" +
                         $"TCP flags: {packetHeader.TcpFlagsAsString}",
                         EventLogEntryType.Information,
-                        200);
+                        201);
                     break;
-                case PacketMatch.PingRequest:
+                case PacketMatch.UdpCommunication:
                     EventLog.WriteEntry(
                         "tcpTrigger",
-                        $"ICMP ping request detected.{Environment.NewLine}{Environment.NewLine}" +
+                        $"UDP communication detected.{Environment.NewLine}{Environment.NewLine}" +
                         $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}" +
-                        $"Destination IP: {packetHeader.DestinationIP}",
+                        $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}" +
+                        $"Destination port: {packetHeader.DestinationPort}{Environment.NewLine}{Environment.NewLine}",
                         EventLogEntryType.Information,
-                        201);
+                        202);
                     break;
                 case PacketMatch.RogueDhcp:
                     EventLog.WriteEntry(
@@ -112,7 +125,7 @@ namespace tcpTrigger
                         $"DHCP Server IP: {packetHeader.DhcpServerAddress}{Environment.NewLine}" +
                         $"Interface: {packetHeader.DestinationIP}",
                         EventLogEntryType.Information,
-                        202);
+                        203);
                     break;
             }
         }

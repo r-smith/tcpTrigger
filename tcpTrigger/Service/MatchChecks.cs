@@ -5,7 +5,7 @@ namespace tcpTrigger
 {
     partial class tcpTrigger : ServiceBase
     {
-        private bool DoesPacketMatchPingRequest(PacketHeader header, IPAddress ip)
+        private bool DoesPacketMatchICMP(PacketHeader header, IPAddress ip)
         {
             if (Settings.IsMonitorIcmpEnabled &&
                 header.ProtocolType == Protocol.ICMP &&
@@ -18,7 +18,7 @@ namespace tcpTrigger
             return false;
         }
 
-        private bool DoesPacketMatchMonitoredPort(PacketHeader header, IPAddress ip)
+        private bool DoesPacketMatchTCP(PacketHeader header, IPAddress ip)
         {
             if (Settings.IsMonitorTcpEnabled &&
                 header.ProtocolType == Protocol.TCP &&
@@ -32,7 +32,20 @@ namespace tcpTrigger
             return false;
         }
 
-        private bool DoesPacketMatchDhcpServer(PacketHeader header, IPAddress ip)
+        private bool DoesPacketMatchUDP(PacketHeader header, IPAddress ip)
+        {
+            if (Settings.IsMonitorUdpEnabled &&
+                header.ProtocolType == Protocol.UDP &&
+                header.DestinationIP.Equals(ip) &&
+                Settings.UdpPortsToMonitor.Contains(header.DestinationPort))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool DoesPacketMatchDHCP(PacketHeader header, IPAddress ip)
         {
             if (Settings.IsMonitorDhcpEnabled &&
                 header.DhcpServerAddress != null)

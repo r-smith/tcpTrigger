@@ -173,6 +173,12 @@ namespace tcpTrigger
                 sb.AppendLine($"[+] Including TCP port(s): {Settings.TcpPortsToIncludeAsString}");
                 sb.AppendLine($"[+] Excluding TCP port(s): {Settings.TcpPortsToExcludeAsString}");
             }
+            sb.AppendLine("Detect incoming UDP communication: " + (Settings.IsMonitorUdpEnabled ? "Enabled" : "Disabled"));
+            if (Settings.IsMonitorUdpEnabled)
+            {
+                sb.AppendLine($"[+] Including UDP port(s): {Settings.UdpPortsToIncludeAsString}");
+                sb.AppendLine($"[+] Excluding UDP port(s): {Settings.UdpPortsToExcludeAsString}");
+            }
             sb.AppendLine("Detect rogue DHCP servers: " + (Settings.IsMonitorDhcpEnabled ? "Enabled" : "Disabled"));
 
             // Log DHCP server ignore list.
