@@ -27,39 +27,27 @@ namespace tcpTrigger
                     packetHeader.MatchType = PacketMatch.PingRequest;
                 else if (DoesPacketMatchMonitoredPort(packetHeader, ipInterface.IP))
                     packetHeader.MatchType = PacketMatch.TcpConnect;
-                else if (DoesPacketMatchNamePoison(packetHeader, ipInterface.IP))
-                {
-                    // Ensure at least two unique responses.
-                    if (_namePoisonTransactionIdResponse < 0)
-                    {
-                        _namePoisonTransactionIdResponse = packetHeader.NetbiosTransactionId;
-                    }
-                    else if (_namePoisonTransactionIdResponse != packetHeader.NetbiosTransactionId)
-                    {
-                        packetHeader.MatchType = PacketMatch.NamePoison;
-                    }
-                }
                 else if (DoesPacketMatchDhcpServer(packetHeader, ipInterface.IP))
                 {
                     // If no DHCP servers are specified by the user, we will do automatic detection.
                     // Auto rogue DHCP detection alerts if more than one DHCP server is discovered.
                     if (Settings.IgnoredDhcpServers.Count == 0)
                     {
-                        if (!ipInterface.DiscoveredDhcpServerList.Contains(packetHeader.DhcpServerAddress))
+                        if (!ipInterface.DiscoveredDhcpServers.Contains(packetHeader.DhcpServerAddress))
                         {
                             packetHeader.DestinationIP = ipInterface.IP;
                             packetHeader.SourceIP = packetHeader.DhcpServerAddress;
-                            ipInterface.DiscoveredDhcpServerList.Add(packetHeader.DhcpServerAddress);
-                            if (ipInterface.DiscoveredDhcpServerList.Count > 1)
+                            ipInterface.DiscoveredDhcpServers.Add(packetHeader.DhcpServerAddress);
+                            if (ipInterface.DiscoveredDhcpServers.Count > 1)
                                 packetHeader.MatchType = PacketMatch.RogueDhcp;
                         }
                     }
                     else if (!Settings.IgnoredDhcpServers.Contains(packetHeader.DhcpServerAddress) &&
-                        !ipInterface.DiscoveredDhcpServerList.Contains(packetHeader.DhcpServerAddress))
+                        !ipInterface.DiscoveredDhcpServers.Contains(packetHeader.DhcpServerAddress))
                     {
                         packetHeader.DestinationIP = ipInterface.IP;
                         packetHeader.SourceIP = packetHeader.DhcpServerAddress;
-                        ipInterface.DiscoveredDhcpServerList.Add(packetHeader.DhcpServerAddress);
+                        ipInterface.DiscoveredDhcpServers.Add(packetHeader.DhcpServerAddress);
                         packetHeader.MatchType = PacketMatch.RogueDhcp;
                     }
                 }

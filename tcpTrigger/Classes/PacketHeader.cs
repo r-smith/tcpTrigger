@@ -18,7 +18,6 @@ namespace tcpTrigger
     {
         PingRequest,
         TcpConnect,
-        NamePoison,
         RogueDhcp,
         None
     }
@@ -58,8 +57,6 @@ namespace tcpTrigger
         public byte TcpFlags { get; set; }
         public byte IcmpType { get; set; }
         public Protocol ProtocolType { get; set; }
-        public ushort NetbiosTransactionId { get; set; }
-        public bool IsNameQueryResponse { get; set; }
         public IPAddress DhcpServerAddress { get; set; }
         public PacketMatch MatchType { get; set; }
 
@@ -148,15 +145,6 @@ namespace tcpTrigger
 
                     // Read the UDP destination port - starting at byte [IP header length] + 2 (16 bits).
                     DestinationPort = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, headerLength + 2));
-
-                    // If NetBIOS or LLMNR packet, read the Transaction ID and query response flag.
-                    if (DestinationPort == 137 || DestinationPort == 5355 || SourcePort == 5355)
-                    {
-                        NetbiosTransactionId = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, headerLength + 8));
-                        var queryFlag = buffer[headerLength + 10];
-                        queryFlag >>= 7;
-                        if (queryFlag == 1) IsNameQueryResponse = true; else IsNameQueryResponse = false;
-                    }
 
                     // If DHCP packet, determine if it's a reply message (server to client) and read the DHCP server's IP address.
                     if (DestinationPort == 68)

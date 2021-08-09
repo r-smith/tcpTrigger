@@ -32,21 +32,6 @@ namespace tcpTrigger
             return false;
         }
 
-        private bool DoesPacketMatchNamePoison(PacketHeader header, IPAddress ip)
-        {
-            if (Settings.IsMonitorPoisonEnabled &&
-                _isNamePoisonDetectionInProgress &&
-                header.IsNameQueryResponse &&
-                header.DestinationIP.Equals(ip) &&
-                header.NetbiosTransactionId >= _netbiosTransactionId &&
-                header.NetbiosTransactionId <= _netbiosTransactionId + 3)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
         private bool DoesPacketMatchDhcpServer(PacketHeader header, IPAddress ip)
         {
             if (Settings.IsMonitorDhcpEnabled &&

@@ -14,10 +14,6 @@ namespace tcpTrigger
     partial class tcpTrigger : ServiceBase
     {
         private List<TcpTriggerInterface> _tcpTriggerInterfaces;
-        private System.Timers.Timer _namePoisionDetectionTimer;
-        private ushort _netbiosTransactionId = 0x8000;
-        private bool _isNamePoisonDetectionInProgress = false;
-        private int _namePoisonTransactionIdResponse = int.MinValue;
 
         public tcpTrigger()
         {
@@ -65,15 +61,6 @@ namespace tcpTrigger
                 }
             }
 
-            // If enabled, start name poison detection.
-            if (Settings.IsMonitorPoisonEnabled)
-            {
-                _namePoisionDetectionTimer = new System.Timers.Timer();
-                _namePoisionDetectionTimer.Interval = TimeSpan.FromMinutes(4).TotalMilliseconds;
-                _namePoisionDetectionTimer.Elapsed += NamePoisionDetectionTimer_Elapsed;
-                _namePoisionDetectionTimer.Enabled = true;
-            }
-
             // Retrieve network interfaces and start IP listener threads.
             // This is done on a timer so that the listener thread can automatically restart
             // if any changes to network interfaces are detected.
@@ -87,14 +74,6 @@ namespace tcpTrigger
         protected override void OnStop()
         {
             // The tcpTrigger Windows service is stopping.
-
-            // Stop and dispose timers and threads.
-            if (_namePoisionDetectionTimer != null)
-            {
-                _namePoisionDetectionTimer.Enabled = false;
-                _namePoisionDetectionTimer.Dispose();
-                _namePoisionDetectionTimer = null;
-            }
 
             // Close (and dispose) all existing listeners.
             for (int i = 0; i < _tcpTriggerInterfaces.Count; i++)
@@ -124,7 +103,6 @@ namespace tcpTrigger
                             networkInterfaces.Add(
                                 new TcpTriggerInterface(
                                     address: address.Address,
-                                    subnetMask: address.IPv4Mask,
                                     description: networkInterface.Description,
                                     macAddress: networkInterface.GetPhysicalAddress(),
                                     guid: networkInterface.Id)
@@ -195,7 +173,6 @@ namespace tcpTrigger
                 sb.AppendLine($"[+] Including TCP port(s): {Settings.TcpPortsToIncludeAsString}");
                 sb.AppendLine($"[+] Excluding TCP port(s): {Settings.TcpPortsToExcludeAsString}");
             }
-            sb.AppendLine("Detect name poison attempts: " + (Settings.IsMonitorPoisonEnabled ? "Enabled" : "Disabled"));
             sb.AppendLine("Detect rogue DHCP servers: " + (Settings.IsMonitorDhcpEnabled ? "Enabled" : "Disabled"));
 
             // Log DHCP server ignore list.

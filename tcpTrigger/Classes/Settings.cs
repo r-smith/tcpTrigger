@@ -12,7 +12,6 @@ namespace tcpTrigger
     {
         public static bool IsMonitorTcpEnabled { get; private set; }
         public static bool IsMonitorIcmpEnabled { get; private set; }
-        public static bool IsMonitorPoisonEnabled { get; private set; }
         public static bool IsMonitorDhcpEnabled { get; private set; }
         public static HashSet<ushort> TcpPortsToMonitor { get; private set; }
         public static string TcpPortsToIncludeAsString { get; private set; }
@@ -39,7 +38,6 @@ namespace tcpTrigger
         public static string EmailSubject { get; private set; }
         public static string MessageBodyPing { get; private set; }
         public static string MessageBodyTcpConnect { get; private set; }
-        public static string MessageBodyNamePoison { get; private set; }
         public static string MessageBodyRogueDhcp { get; private set; }
 
         private static string GetSettingsPath()
@@ -96,10 +94,6 @@ namespace tcpTrigger
                 currentNode = SettingsNode.enabledComponents_icmp;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { IsMonitorIcmpEnabled = bool.Parse(xn.InnerText); }
-
-                currentNode = SettingsNode.enabledComponents_namePoison;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null) { IsMonitorPoisonEnabled = bool.Parse(xn.InnerText); }
 
                 currentNode = SettingsNode.enabledComponents_rogueDhcp;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
@@ -276,10 +270,6 @@ namespace tcpTrigger
                     {
                         MessageBodyPing = nl[i].SelectSingleNode("body")?.InnerText;
                     }
-                    if (nl[i].Attributes["type"]?.InnerText == "namePoison")
-                    {
-                        MessageBodyNamePoison = nl[i].SelectSingleNode("body")?.InnerText;
-                    }
                     if (nl[i].Attributes["type"]?.InnerText == "rogueDhcp")
                     {
                         MessageBodyRogueDhcp = nl[i].SelectSingleNode("body")?.InnerText;
@@ -312,7 +302,6 @@ namespace tcpTrigger
         // XML node paths for the tcpTrigger configuration file.
         public const string enabledComponents_tcp = "/tcpTrigger/enabledComponents/tcp";
         public const string enabledComponents_icmp = "/tcpTrigger/enabledComponents/icmp";
-        public const string enabledComponents_namePoison = "/tcpTrigger/enabledComponents/namePoison";
         public const string enabledComponents_rogueDhcp = "/tcpTrigger/enabledComponents/rogueDhcp";
         public const string monitoredPorts_tcp_include = "/tcpTrigger/monitoredPorts/tcp/include";
         public const string monitoredPorts_tcp_exclude = "/tcpTrigger/monitoredPorts/tcp/exclude";

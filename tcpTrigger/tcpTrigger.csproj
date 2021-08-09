@@ -55,7 +55,6 @@
     <Compile Include="Classes\Settings.cs" />
     <Compile Include="Classes\StringCipher.cs" />
     <Compile Include="Classes\TcpTriggerInterface.cs" />
-    <Compile Include="Classes\PacketGenerator.cs" />
     <Compile Include="Classes\PacketHeader.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>

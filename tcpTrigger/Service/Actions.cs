@@ -4,7 +4,6 @@ using System.IO;
 using System.Net;
 using System.Net.Mail;
 using System.ServiceProcess;
-using System.Threading;
 
 namespace tcpTrigger
 {
@@ -59,9 +58,6 @@ namespace tcpTrigger
                         case PacketMatch.PingRequest:
                             logText = $"ICMP ping request from {packetHeader.SourceIP}";
                             break;
-                        case PacketMatch.NamePoison:
-                            logText = $"Name poison attempt from {packetHeader.SourceIP}";
-                            break;
                         case PacketMatch.RogueDhcp:
                             logText = $"Unrecognized DHCP server at {packetHeader.DhcpServerAddress}";
                             break;
@@ -108,14 +104,6 @@ namespace tcpTrigger
                         $"Destination IP: {packetHeader.DestinationIP}",
                         EventLogEntryType.Information,
                         201);
-                    break;
-                case PacketMatch.NamePoison:
-                    EventLog.WriteEntry(
-                        "tcpTrigger",
-                        $"Name poison attempt detected.{Environment.NewLine}{Environment.NewLine}" +
-                        $"Source IP: {packetHeader.SourceIP}",
-                        EventLogEntryType.Information,
-                        202);
                     break;
                 case PacketMatch.RogueDhcp:
                     EventLog.WriteEntry(
@@ -247,9 +235,6 @@ namespace tcpTrigger
                 case PacketMatch.TcpConnect:
                     messageBody = Settings.MessageBodyTcpConnect;
                     break;
-                case PacketMatch.NamePoison:
-                    messageBody = Settings.MessageBodyNamePoison;
-                    break;
                 case PacketMatch.RogueDhcp:
                     messageBody = Settings.MessageBodyRogueDhcp;
                     break;
@@ -259,51 +244,6 @@ namespace tcpTrigger
             }
 
             return messageBody;
-        }
-
-        private void NamePoisionDetectionTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            _isNamePoisonDetectionInProgress = true;
-            _namePoisonTransactionIdResponse = int.MinValue;
-
-            foreach (TcpTriggerInterface ipInterface in _tcpTriggerInterfaces)
-            {
-                // Generate three random hostnames between 7 and 15 characters to emulate a user opening Chrome.
-                // Chromium source: https://cs.chromium.org/chromium/src/chrome/browser/intranet_redirect_detector.cc
-
-                var randomHostnames = new string[3];
-                var r = new Random();
-                for (int i = 0; i < randomHostnames.Length; ++i)
-                {
-                    var hostname = string.Empty;
-                    int numberOfCharacters = r.Next(7, 16);
-                    for (int j = 0; j < numberOfCharacters; ++j)
-                        hostname += (char)('a' + r.Next(0, 26));
-                    randomHostnames[i] = hostname;
-                }
-
-                // Send LLMNR name queries.
-                for (int i = 0; i < 3; ++i)
-                {
-                    for (int j = 0; j < randomHostnames.Length; ++j)
-                        PacketGenerator.SendLlmnrQuery(ipInterface, (ushort)(_netbiosTransactionId + j), randomHostnames[j]);
-                    Thread.Sleep(750);
-                }
-
-                // Send NetBIOS name queries.
-                for (int i = 0; i < 3; ++i)
-                {
-                    for (int j = 0; j < randomHostnames.Length; ++j)
-                        PacketGenerator.SendNetbiosQuery(ipInterface, (ushort)(_netbiosTransactionId + j), randomHostnames[j]);
-                    Thread.Sleep(750);
-                }
-            }
-
-            Thread.Sleep(2000);
-            _netbiosTransactionId += 3;
-            if (_netbiosTransactionId < 0x8000)
-                _netbiosTransactionId += 0x8000;
-            _isNamePoisonDetectionInProgress = true;
         }
     }
 }
