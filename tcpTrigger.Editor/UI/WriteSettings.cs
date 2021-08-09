@@ -65,7 +65,6 @@ namespace tcpTrigger.Editor
                     writer.WriteStartElement("enabledComponents");
                     writer.WriteElementString("tcp", MonitorTcpOption.IsChecked == true ? t : f);
                     writer.WriteElementString("icmp", MonitorIcmpOption.IsChecked == true ? t : f);
-                    writer.WriteElementString("namePoison", MonitorPoisonOption.IsChecked == true ? t : f);
                     writer.WriteElementString("rogueDhcp", MonitorDhcpOption.IsChecked == true ? t : f);
                     writer.WriteEndElement();
 
@@ -218,11 +217,6 @@ namespace tcpTrigger.Editor
                     writer.WriteAttributeString("type", "icmp");
                     writer.WriteElementString("subject", EmailSubject.Text);
                     writer.WriteElementString("body", IcmpMessageBody.Text);
-                    writer.WriteEndElement();
-                    writer.WriteStartElement("customMessage");
-                    writer.WriteAttributeString("type", "namePoison");
-                    writer.WriteElementString("subject", EmailSubject.Text);
-                    writer.WriteElementString("body", NamePoisonMessageBody.Text);
                     writer.WriteEndElement();
                     writer.WriteStartElement("customMessage");
                     writer.WriteAttributeString("type", "rogueDhcp");

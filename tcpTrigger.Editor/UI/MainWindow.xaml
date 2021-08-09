@@ -84,9 +84,6 @@
                                          PreviewTextInput="TcpPorts_PreviewTextInput"
                                          DockPanel.Dock="Right"/>
                             </DockPanel>
-                            <CheckBox Content="Name poison detection (NetBIOS and LLMNR)"
-                                      Name="MonitorPoisonOption"
-                                      Margin="0,7,0,0"/>
                             <CheckBox Content="Rogue DHCP server detection"
                                       Name="MonitorDhcpOption"
                                       Margin="0,7,0,0" />
@@ -348,20 +345,6 @@
                                            Width="200" />
                                     <TextBox DockPanel.Dock="Right"
                                              Name="TcpMessageBody"
-                                             FontFamily="Consolas"
-                                             VerticalContentAlignment="Top"
-                                             VerticalScrollBarVisibility="Auto"
-                                             Height="120"
-                                             AcceptsReturn="True"
-                                             MaxLength="2048"/>
-                                </DockPanel>
-                                <DockPanel Margin="0,6,0,0">
-                                    <Label Content="Name poison detected"
-                                           HorizontalContentAlignment="Right"
-                                           VerticalContentAlignment="Top"
-                                           Width="200" />
-                                    <TextBox DockPanel.Dock="Right"
-                                             Name="NamePoisonMessageBody"
                                              FontFamily="Consolas"
                                              VerticalContentAlignment="Top"
                                              VerticalScrollBarVisibility="Auto"

@@ -5,7 +5,6 @@
         // XML node paths for the tcpTrigger configuration file.
         public const string enabledComponents_tcp = "/tcpTrigger/enabledComponents/tcp";
         public const string enabledComponents_icmp = "/tcpTrigger/enabledComponents/icmp";
-        public const string enabledComponents_namePoison = "/tcpTrigger/enabledComponents/namePoison";
         public const string enabledComponents_rogueDhcp = "/tcpTrigger/enabledComponents/rogueDhcp";
         public const string monitoredPorts_tcp_include = "/tcpTrigger/monitoredPorts/tcp/include";
         public const string monitoredPorts_tcp_exclude = "/tcpTrigger/monitoredPorts/tcp/exclude";

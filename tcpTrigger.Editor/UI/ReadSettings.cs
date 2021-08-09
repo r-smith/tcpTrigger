@@ -42,10 +42,6 @@ namespace tcpTrigger.Editor
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { MonitorIcmpOption.IsChecked = bool.Parse(xn.InnerText); }
 
-                currentNode = SettingsNode.enabledComponents_namePoison;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null) { MonitorPoisonOption.IsChecked = bool.Parse(xn.InnerText); }
-
                 currentNode = SettingsNode.enabledComponents_rogueDhcp;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { MonitorDhcpOption.IsChecked = bool.Parse(xn.InnerText); }
@@ -193,10 +189,6 @@ namespace tcpTrigger.Editor
                     if (nl[i].Attributes["type"]?.InnerText == "icmp")
                     {
                         IcmpMessageBody.Text = nl[i].SelectSingleNode("body")?.InnerText;
-                    }
-                    if (nl[i].Attributes["type"]?.InnerText == "namePoison")
-                    {
-                        NamePoisonMessageBody.Text = nl[i].SelectSingleNode("body")?.InnerText;
                     }
                     if (nl[i].Attributes["type"]?.InnerText == "rogueDhcp")
                     {
