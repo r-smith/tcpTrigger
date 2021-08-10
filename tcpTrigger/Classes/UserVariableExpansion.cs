@@ -4,15 +4,19 @@ namespace tcpTrigger
 {
     static class UserVariableExpansion
     {
-        public const string SourceIp = "#SOURCEIP#";
-        public const string DestinationIp = "#DESTINATIONIP#";
-        public const string SourcePort = "#SOURCEPORT#";
-        public const string DestinationPort = "#DESTINATIONPORT#";
-        public const string SourceHostname = "#SOURCEHOSTNAME#";
-        public const string DestinationHostname = "#DESTINATIONHOSTNAME#";
-        public const string DestinationMac = "#DESTINATIONMAC#";
-        public const string DhcpServerIp = "#DHCPSERVERIP#";
-        public const string TcpFlags = "#TCPFLAGS#";
+        public const string InterfaceIp = "#INTERFACE_IP#";
+        public const string InterfaceMac = "#INTERFACE_MAC#";
+        public const string InterfaceDescription = "#INTERFACE_DESCRIPTION#";
+        public const string ConnectionLog = "#CONNECTION_LOG#";
+        public const string SourceIp = "#SOURCE_IP#";
+        public const string DestinationIp = "#DESTINATION_IP#";
+        public const string SourcePort = "#SOURCE_PORT#";
+        public const string DestinationPort = "#DESTINATION_PORT#";
+        public const string SourceHostname = "#SOURCE_HOSTNAME#";
+        public const string DestinationHostname = "#DESTINATION_HOSTNAME#";
+        public const string DestinationMac = "#DESTINATION_MAC#";
+        public const string DhcpServerIp = "#DHCP_SERVER_IP#";
+        public const string TcpFlags = "#TCP_FLAGS#";
         
         public static string GetExpandedString(string message, PacketHeader header)
         {
@@ -60,6 +64,20 @@ namespace tcpTrigger
                 { }
                 message = message.Replace(DestinationHostname, hostname);
             }
+
+            return message;
+        }
+
+        public static string GetExpandedString(string message, TcpTriggerInterface ipInterface)
+        {
+            if (message.Contains(InterfaceIp))
+                message = message.Replace(InterfaceIp, ipInterface.IP.ToString());
+            if (message.Contains(InterfaceMac))
+                message = message.Replace(InterfaceMac, ipInterface.MacAddressAsString);
+            if (message.Contains(InterfaceDescription))
+                message = message.Replace(InterfaceDescription, ipInterface.Description);
+            if (message.Contains(ConnectionLog))
+                message = message.Replace(ConnectionLog, ipInterface.EmailLogBuffer);
 
             return message;
         }

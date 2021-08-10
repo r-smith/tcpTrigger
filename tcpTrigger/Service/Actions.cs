@@ -242,11 +242,8 @@ namespace tcpTrigger
                             message.To.Add(Settings.EmailRecipients[i].Trim());
                         }
                     }
-                    // TODO: REPLACE SUBJECT/BODY.
-                    //message.Subject = UserVariableExpansion.GetExpandedString(Settings.EmailSubject, packetHeader);
-                    //message.Body = UserVariableExpansion.GetExpandedString(GetMessageBody(packetHeader), packetHeader);
-                    message.Subject = "ALERT: Suspicious network activity detected by tcpTrigger";
-                    message.Body = ipInterface.EmailLogBuffer;
+                    message.Subject = UserVariableExpansion.GetExpandedString(Settings.EmailSubject, ipInterface);
+                    message.Body = UserVariableExpansion.GetExpandedString(Settings.EmailBody, ipInterface);
 
                     //Send the email.
                     smtpClient.Send(message);
@@ -255,7 +252,7 @@ namespace tcpTrigger
                 {
                     EventLog.WriteEntry(
                         "tcpTrigger",
-                        $"Email action triggered, but the message failed to send.{Environment.NewLine}{ex.Message}",
+                        $"Email action triggered, but the message failed to send.{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.InnerException.Message}",
                         EventLogEntryType.Warning,
                         403);
                     return;

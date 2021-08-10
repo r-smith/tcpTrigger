@@ -41,9 +41,7 @@ namespace tcpTrigger
         public static string EmailSender { get; private set; }
         public static string EmailSenderDisplayName { get; private set; }
         public static string EmailSubject { get; private set; }
-        public static string MessageBodyPing { get; private set; }
-        public static string MessageBodyTcpConnect { get; private set; }
-        public static string MessageBodyRogueDhcp { get; private set; }
+        public static string EmailBody { get; private set; }
 
         private static string GetSettingsPath()
         {
@@ -224,7 +222,7 @@ namespace tcpTrigger
                 if (xn != null) { IsExternalAppEnabled = bool.Parse(xn.InnerText); }
 
                 // tcpTrigger/actionSettings
-                currentNode = SettingsNode.actionsSettings_rateLimitSeconds;
+                currentNode = SettingsNode.actionsSettings_emailRateLimitSeconds;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null && !string.IsNullOrEmpty(xn.InnerText)) { EmailRateLimitSeconds = int.Parse(xn.InnerText); }
                 else { EmailRateLimitSeconds = 0; }
@@ -300,27 +298,11 @@ namespace tcpTrigger
                 currentNode = SettingsNode.emailSettings_sender_displayName;
                 EmailSenderDisplayName = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
 
-                // tcpTrigger/customMessage
-                currentNode = SettingsNode.customMessage;
-                nl = xd.DocumentElement.SelectNodes(currentNode);
-                for (int i = 0; i < nl.Count; i++)
-                {
-                    if (nl[i].Attributes["type"]?.InnerText == "tcp")
-                    {
-                        MessageBodyTcpConnect = nl[i].SelectSingleNode("body")?.InnerText;
-                    }
-                    if (nl[i].Attributes["type"]?.InnerText == "icmp")
-                    {
-                        MessageBodyPing = nl[i].SelectSingleNode("body")?.InnerText;
-                    }
-                    if (nl[i].Attributes["type"]?.InnerText == "rogueDhcp")
-                    {
-                        MessageBodyRogueDhcp = nl[i].SelectSingleNode("body")?.InnerText;
-                    }
-                }
-
-                //bool.TryParse(ConfigurationManager.AppSettings["DoNotMonitorVMwareVirtualHostAdapters"], out DoNotMonitorVMwareVirtualHostAdapters);
-                // Get subject!
+                // tcpTrigger/emailMessage
+                currentNode = SettingsNode.emailMessageSubject;
+                EmailSubject = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                currentNode = SettingsNode.emailMessageBody;
+                EmailBody = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
 
                 return true;
             }
@@ -359,7 +341,7 @@ namespace tcpTrigger
         public const string enabledActions_emailNotification = "/tcpTrigger/enabledActions/emailNotification";
         public const string enabledActions_popupNotification = "/tcpTrigger/enabledActions/popupNotification";
         public const string enabledActions_executeCommand = "/tcpTrigger/enabledActions/executeCommand";
-        public const string actionsSettings_rateLimitSeconds = "/tcpTrigger/actionSettings/rateLimitSeconds";
+        public const string actionsSettings_emailRateLimitSeconds = "/tcpTrigger/actionSettings/emailRateLimitSeconds";
         public const string actionsSettings_logPath = "/tcpTrigger/actionSettings/logPath";
         public const string actionsSettings_command_path = "/tcpTrigger/actionSettings/command/path";
         public const string actionsSettings_command_arguments = "/tcpTrigger/actionSettings/command/arguments";
@@ -371,6 +353,7 @@ namespace tcpTrigger
         public const string emailSettings_recipientList_address = "/tcpTrigger/emailSettings/recipientList/address";
         public const string emailSettings_sender_address = "/tcpTrigger/emailSettings/sender/address";
         public const string emailSettings_sender_displayName = "/tcpTrigger/emailSettings/sender/displayName";
-        public const string customMessage = "/tcpTrigger/customMessage";
+        public const string emailMessageSubject = "/tcpTrigger/emailMessage/subject";
+        public const string emailMessageBody = "/tcpTrigger/emailMessage/body";
     }
 }
