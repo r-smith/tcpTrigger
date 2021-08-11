@@ -53,10 +53,14 @@ namespace tcpTrigger.Editor
                 // tcpTrigger/monitoredPorts
                 currentNode = SettingsNode.monitoredPorts_tcp_include;
                 TcpIncludePorts.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                _tcpInclude = TcpIncludePorts.Text;
+                if (_tcpInclude.Equals("1-65535")) { TcpAllPortsOption.IsChecked = true; }
                 currentNode = SettingsNode.monitoredPorts_tcp_exclude;
                 TcpExcludePorts.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
                 currentNode = SettingsNode.monitoredPorts_udp_include;
                 UdpIncludePorts.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                _udpInclude = UdpIncludePorts.Text;
+                if (_udpInclude.Equals("1-65535")) { UdpAllPortsOption.IsChecked = true; }
                 currentNode = SettingsNode.monitoredPorts_udp_exclude;
                 UdpExcludePorts.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
 

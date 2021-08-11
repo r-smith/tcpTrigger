@@ -66,16 +66,32 @@
                             <CheckBox Content="Detect TCP connections"
                                       Name="MonitorTcpOption"
                                       Margin="0,7,0,0"/>
-                            <DockPanel Margin="35,3,0,0">
+                            <!-- TCP: Include -->
+                            <Grid Margin="35,3,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
                                 <Grid MinWidth="100">
                                     <TextBlock Text="Include ports"/>
                                 </Grid>
                                 <TextBox Name="TcpIncludePorts"
-                                         MaxLength="512"
-                                         FontFamily="Consolas"
+                                         Grid.Column="1"
                                          PreviewTextInput="TcpPorts_PreviewTextInput"
-                                         DockPanel.Dock="Right"/>
-                            </DockPanel>
+                                         MaxLength="512"
+                                         Padding="4,5,100,5"
+                                         FontFamily="Consolas"/>
+                                <CheckBox Name="TcpAllPortsOption"
+                                          Grid.Column="1"
+                                          Content="All ports"
+                                          HorizontalAlignment="Right"
+                                          FontWeight="SemiBold"
+                                          Width="90"
+                                          Checked="TcpAllPortsOption_Checked"
+                                          Unchecked="TcpAllPortsOption_Unchecked"
+                                          Margin="0,0,10,0"/>
+                            </Grid>
+                            <!-- TCP: Exclude -->
                             <DockPanel Margin="35,5,0,0">
                                 <Grid MinWidth="100">
                                     <TextBlock Text="Exclude ports"/>
@@ -90,16 +106,32 @@
                             <CheckBox Content="Detect UDP communication"
                                       Name="MonitorUdpOption"
                                       Margin="0,7,0,0"/>
-                            <DockPanel Margin="35,3,0,0">
+                            <!-- UDP: Include -->
+                            <Grid Margin="35,3,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
                                 <Grid MinWidth="100">
                                     <TextBlock Text="Include ports"/>
                                 </Grid>
                                 <TextBox Name="UdpIncludePorts"
-                                         MaxLength="512"
-                                         FontFamily="Consolas"
+                                         Grid.Column="1"
                                          PreviewTextInput="TcpPorts_PreviewTextInput"
-                                         DockPanel.Dock="Right"/>
-                            </DockPanel>
+                                         MaxLength="512"
+                                         Padding="4,5,100,5"
+                                         FontFamily="Consolas"/>
+                                <CheckBox Name="UdpAllPortsOption"
+                                          Grid.Column="1"
+                                          Content="All ports"
+                                          HorizontalAlignment="Right"
+                                          FontWeight="SemiBold"
+                                          Width="90"
+                                          Checked="UdpAllPortsOption_Checked"
+                                          Unchecked="UdpAllPortsOption_Unchecked"
+                                          Margin="0,0,10,0"/>
+                            </Grid>
+                            <!-- UDP: Exclude -->
                             <DockPanel Margin="35,5,0,0">
                                 <Grid MinWidth="100">
                                     <TextBlock Text="Exclude ports"/>

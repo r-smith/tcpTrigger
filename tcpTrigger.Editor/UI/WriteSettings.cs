@@ -32,7 +32,7 @@ namespace tcpTrigger.Editor
             {
                 // Convert port numbers to an ordered int array and remove duplicates.
                 // Port numbers can be entered comma-separated and also specified using ranges with '-'.
-                if (TcpIncludePorts.Text.Length > 0)
+                if (TcpAllPortsOption.IsChecked == false && TcpIncludePorts.Text.Length > 0)
                 {
                     TcpIncludePorts.Text = FormatTcpPortRange(PortStringToArray(TcpIncludePorts.Text));
                 }
@@ -40,7 +40,7 @@ namespace tcpTrigger.Editor
                 {
                     TcpExcludePorts.Text = FormatTcpPortRange(PortStringToArray(TcpExcludePorts.Text));
                 }
-                if (UdpIncludePorts.Text.Length > 0)
+                if (UdpAllPortsOption.IsChecked == false && UdpIncludePorts.Text.Length > 0)
                 {
                     UdpIncludePorts.Text = FormatTcpPortRange(PortStringToArray(UdpIncludePorts.Text));
                 }
@@ -66,11 +66,11 @@ namespace tcpTrigger.Editor
                     // Monitored ports.
                     writer.WriteStartElement("monitoredPorts");
                     writer.WriteStartElement("tcp");
-                    writer.WriteElementString("include", TcpIncludePorts.Text);
+                    writer.WriteElementString("include", (TcpAllPortsOption.IsChecked == true) ? "1-65535" : TcpIncludePorts.Text);
                     writer.WriteElementString("exclude", TcpExcludePorts.Text);
                     writer.WriteEndElement();
                     writer.WriteStartElement("udp");
-                    writer.WriteElementString("include", UdpIncludePorts.Text);
+                    writer.WriteElementString("include", (UdpAllPortsOption.IsChecked == true) ? "1-65535" : UdpIncludePorts.Text);
                     writer.WriteElementString("exclude", UdpExcludePorts.Text);
                     writer.WriteEndElement();
                     writer.WriteEndElement();

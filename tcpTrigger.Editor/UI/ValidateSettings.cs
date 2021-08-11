@@ -13,7 +13,7 @@ namespace tcpTrigger.Editor
             if (MonitorTcpOption.IsChecked == true)
             {
                 if (
-                    (TcpIncludePorts.Text.Length > 0 && !IsTcpPortsValid(TcpIncludePorts.Text))
+                    (TcpAllPortsOption.IsChecked == false && TcpIncludePorts.Text.Length > 0 && !IsTcpPortsValid(TcpIncludePorts.Text))
                     || (TcpExcludePorts.Text.Length > 0 && !IsTcpPortsValid(TcpExcludePorts.Text)))
                 {
                     ShowMessageBox(
@@ -31,7 +31,7 @@ namespace tcpTrigger.Editor
             if (MonitorUdpOption.IsChecked == true)
             {
                 if (
-                    (UdpIncludePorts.Text.Length > 0 && !IsTcpPortsValid(UdpIncludePorts.Text))
+                    (UdpAllPortsOption.IsChecked == false && UdpIncludePorts.Text.Length > 0 && !IsTcpPortsValid(UdpIncludePorts.Text))
                     || (UdpExcludePorts.Text.Length > 0 && !IsTcpPortsValid(UdpExcludePorts.Text)))
                 {
                     ShowMessageBox(

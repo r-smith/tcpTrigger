@@ -20,6 +20,8 @@ namespace tcpTrigger.Editor
     {
         private HashSet<string> ExcludedNetworkInterfaces = new HashSet<string>();
         private List<TcpTriggerInterface> AllNetworkInterfaces;
+        private string _tcpInclude = string.Empty;
+        private string _udpInclude = string.Empty;
 
         public MainWindow()
         {
@@ -318,15 +320,42 @@ namespace tcpTrigger.Editor
         {
             MonitorIcmpOption.IsChecked = true;
             MonitorTcpOption.IsChecked = true;
-            TcpIncludePorts.Text = "1-65535";
+            TcpAllPortsOption.IsChecked = true;
             LogOption.IsChecked = true;
+            EventLogOption.IsChecked = true;
             LogPath.Text = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\connections.log";
             RateLimitOption.IsChecked = true;
             RateLimitSeconds.Text = "180";
-            EmailSubject.Text = "ALERT: Suspicious network activity detected by tcpTrigger";
+            EmailSubject.Text = "ALERT: Suspicious network activity";
             EmailBody.Text = "Incoming network connections on #Interface.IP# are being monitored by tcpTrigger. The following activity was detected:"
                 + Environment.NewLine + Environment.NewLine
                 + "#Connection.Log#";
+        }
+
+        private void TcpAllPortsOption_Checked(object sender, RoutedEventArgs e)
+        {
+            TcpIncludePorts.Text = "[ALL]";
+            TcpIncludePorts.IsEnabled = false;
+        }
+
+        private void TcpAllPortsOption_Unchecked(object sender, RoutedEventArgs e)
+        {
+            TcpIncludePorts.Text = _tcpInclude;
+            TcpIncludePorts.IsEnabled = true;
+            TcpIncludePorts.Focus();
+        }
+
+        private void UdpAllPortsOption_Checked(object sender, RoutedEventArgs e)
+        {
+            UdpIncludePorts.Text = "[ALL]";
+            UdpIncludePorts.IsEnabled = false;
+        }
+
+        private void UdpAllPortsOption_Unchecked(object sender, RoutedEventArgs e)
+        {
+            UdpIncludePorts.Text = _udpInclude;
+            UdpIncludePorts.IsEnabled = true;
+            UdpIncludePorts.Focus();
         }
     }
 }
