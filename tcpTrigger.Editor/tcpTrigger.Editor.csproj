@@ -80,6 +80,9 @@
     </ApplicationDefinition>
     <Compile Include="Classes\Elevate.cs" />
     <Compile Include="Classes\SettingsNode.cs" />
+    <Compile Include="Controls\Spinner.xaml.cs">
+      <DependentUpon>Spinner.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ApplySettingsWindow.xaml.cs">
       <DependentUpon>ApplySettingsWindow.xaml</DependentUpon>
     </Compile>
@@ -95,7 +98,7 @@
     <Compile Include="Classes\ValueConverters.cs" />
     <Compile Include="UI\ReadSettings.cs" />
     <Compile Include="UI\WriteSettings.cs" />
-    <Page Include="Controls\CircularProgressBar.xaml">
+    <Page Include="Controls\Spinner.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -118,9 +121,6 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Controls\CircularProgressBar.xaml.cs">
-      <DependentUpon>CircularProgressBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\EmailSettings.cs" />
     <Compile Include="UI\HelpWindow.xaml.cs">
