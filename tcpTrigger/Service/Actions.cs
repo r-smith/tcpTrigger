@@ -165,19 +165,9 @@ namespace tcpTrigger
 
         private void TriggerEmail(PacketHeader packetHeader, TcpTriggerInterface ipInterface)
         {
-            // Record matched connection to log buffer.
+            // Record matched connection to log buffer and enable timer, which handles sending the notification email.
             ipInterface.Mutex.WaitOne();
             ipInterface.EmailLogBuffer += GetLogText(packetHeader) + Environment.NewLine;
-            
-            if (ipInterface.EmailLastSentTimestamp != null
-                && ipInterface.EmailLastSentTimestamp > DateTime.Now.AddSeconds(-Settings.EmailRateLimitSeconds))
-            {
-                ipInterface.EmailSendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailRateLimitSeconds).TotalMilliseconds;
-            }
-            else
-            {
-                ipInterface.EmailSendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailBufferSeconds).TotalMilliseconds;
-            }
             ipInterface.EmailSendTimer.Enabled = true;
             ipInterface.Mutex.ReleaseMutex();
         }
@@ -247,6 +237,11 @@ namespace tcpTrigger
 
                     //Send the email.
                     smtpClient.Send(message);
+                    EventLog.WriteEntry(
+                        "tcpTrigger",
+                        $"Email notifcation sent.",
+                        EventLogEntryType.Information,
+                        105);
                 }
                 catch (Exception ex)
                 {

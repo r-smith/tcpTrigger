@@ -60,16 +60,35 @@ namespace tcpTrigger
         // Methods.
         private void EmailBufferTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            // Send email using current log buffer.
-            tcpTrigger.SendEmail(this);
+            if (EmailLastSentTimestamp != null
+                && EmailLastSentTimestamp > DateTime.Now.AddSeconds(-Settings.EmailRateLimitSeconds))
+            {
+                // Too soon to send another email. Apply rate limiting by changing the timer interval.
+                double secondsSinceLastEmail = (DateTime.Now - EmailLastSentTimestamp).TotalSeconds;
+                if (secondsSinceLastEmail > 0 && secondsSinceLastEmail < Settings.EmailRateLimitSeconds)
+                {
+                    // Set timer interval to rate limit setting minus seconds since the last send email.
+                    EmailSendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailRateLimitSeconds - secondsSinceLastEmail).TotalMilliseconds;
+                }
+                else
+                {
+                    // Set timer interval to rate limit setting.
+                    EmailSendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailRateLimitSeconds).TotalMilliseconds;
+                }
+            }
+            else
+            {
+                // Send email using current log buffer.
+                tcpTrigger.SendEmail(this);
 
-            // Email sent. Record current timestamp, reset log buffer, and reset timer settings.
-            Mutex.WaitOne();
-            EmailLastSentTimestamp = DateTime.Now;
-            EmailLogBuffer = string.Empty;
-            EmailSendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailBufferSeconds).TotalMilliseconds;
-            EmailSendTimer.Enabled = false;
-            Mutex.ReleaseMutex();
+                // Email sent. Record current timestamp, reset log buffer, and reset timer settings.
+                Mutex.WaitOne();
+                EmailLastSentTimestamp = DateTime.Now;
+                EmailLogBuffer = string.Empty;
+                EmailSendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailBufferSeconds).TotalMilliseconds;
+                EmailSendTimer.Enabled = false;
+                Mutex.ReleaseMutex();
+            }
         }
     }
 }
