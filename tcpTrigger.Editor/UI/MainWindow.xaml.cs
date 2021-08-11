@@ -111,7 +111,7 @@ namespace tcpTrigger.Editor
                     dialog.Description = "Select a folder for the log file.";
                     dialog.ShowNewFolderButton = true;
                     if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                        LogPath.Text = dialog.SelectedPath + @"\connections.log";
+                        LogPath.Text = dialog.SelectedPath + @"\tcpTrigger.log";
                 }
                 catch (Exception ex)
                 {
@@ -139,7 +139,7 @@ namespace tcpTrigger.Editor
         private void LogOption_Click(object sender, RoutedEventArgs e)
         {
             // When checked, set default log path if there isn't already a path set.
-            string defaultLogPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\connections.log";
+            string defaultLogPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\tcpTrigger.log";
             if (LogOption.IsChecked == true && LogPath.Text.Length == 0)
                 LogPath.Text = defaultLogPath;
             else if (LogOption.IsChecked == false && LogPath.Text == defaultLogPath)
@@ -323,7 +323,7 @@ namespace tcpTrigger.Editor
             TcpAllPortsOption.IsChecked = true;
             LogOption.IsChecked = true;
             EventLogOption.IsChecked = true;
-            LogPath.Text = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\connections.log";
+            LogPath.Text = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\tcpTrigger.log";
             RateLimitOption.IsChecked = true;
             RateLimitSeconds.Text = "180";
             EmailSubject.Text = "ALERT: Suspicious network activity";
