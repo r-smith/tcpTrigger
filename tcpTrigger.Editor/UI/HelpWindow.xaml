@@ -26,15 +26,17 @@
                    FontWeight="SemiBold" />
         </StackPanel>
         <ScrollViewer Padding="12" FontSize="14" Grid.Row="1">
-
             <StackPanel Orientation="Vertical">
                 <TextBlock FontWeight="SemiBold"
-                       Margin="0,20,0,0"
-                       Text="Overview"/>
+                           Margin="0,20,0,0"
+                           Text="Overview"/>
                 <TextBlock TextWrapping="Wrap"
-                       Margin="10,0,0,0"
-                       Foreground="#555"
-                       Text="tcpTrigger is a Windows service intended to notify you of incoming network connections.  You specify a TCP port to monitor and an action to take.  Actions taken include: sending a notification email and/or launching an external application or script.  Your action will then be triggered each time an incoming connection is attempted on your specified port." />
+                           Margin="10,0,0,0"
+                           Foreground="#555">
+                    tcpTrigger is a Windows service intended to notify you of incoming network connections.
+                    You specify what to monitor, and the actions to take when a connection is detected.
+                    Actions include: writing to a log, sending a notification email, and launching an external script or application.
+                </TextBlock>
 
                 <TextBlock FontWeight="SemiBold"
                        Margin="0,15,0,0"
