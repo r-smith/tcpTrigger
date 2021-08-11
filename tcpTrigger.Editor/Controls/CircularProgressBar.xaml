@@ -4,15 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              Background="Transparent"
-             Height="135"
-             Width="135">
+             Height="60"
+             Width="60">
 
     <UserControl.Resources>
         <!--<SolidColorBrush x:Key="progressCirclesColor" Color="#FF2E6187" />-->
         <SolidColorBrush x:Key="progressCirclesColor" Color="#333" />
     </UserControl.Resources>
 
-    <Viewbox Width="120" Height="120" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Viewbox Width="60" Height="60" HorizontalAlignment="Center" VerticalAlignment="Center">
         <Grid Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Canvas RenderTransformOrigin="0.5,0.5"
               HorizontalAlignment="Center"

@@ -13,8 +13,8 @@
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         WindowStyle="None"
-        BorderBrush="Black"
-        BorderThickness="2"
+        BorderBrush="#333"
+        BorderThickness="1"
         SizeToContent="Height"
         ShowInTaskbar="False">
 
@@ -28,7 +28,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Border Background="#2263e6be" CornerRadius="15" BorderBrush="#ccc" BorderThickness="1" Padding="25,15">
+            <Border Background="#200b6e2d" CornerRadius="15" BorderBrush="#888" BorderThickness="1" Padding="25,15">
                 <DockPanel>
                     <Grid DockPanel.Dock="Left">
                         <Ellipse Width="34" Height="34" Fill="White" VerticalAlignment="Center"/>

@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:tcpTrigger.Editor"
+        xmlns:controls="clr-namespace:tcpTrigger.Editor.Controls"
         mc:Ignorable="d"
         Title="tcpTrigger"
         Height="250"
@@ -13,8 +13,8 @@
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         WindowStyle="None"
-        BorderBrush="Black"
-        BorderThickness="2"
+        BorderBrush="#333"
+        BorderThickness="1"
         SizeToContent="Height"
         ShowInTaskbar="False">
 
@@ -29,9 +29,9 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Border Name="ResultBorder"
-                    Background="#2263e6be"
+                    Background="#200b6e2d"
                     CornerRadius="15"
-                    BorderBrush="#ccc"
+                    BorderBrush="#888"
                     BorderThickness="1"
                     Padding="25,15">
                 <DockPanel>
@@ -77,18 +77,36 @@
                         IsEnabled="False"/>
             </StackPanel>
         </Border>
-        
+
         <!-- Overlay while restart is in progress -->
         <Border Name="Overlay"
                 Grid.RowSpan="2"
-                Background="White"
                 Visibility="Collapsed">
-            <DockPanel>
-                <TextBlock Text="Restarting tcpTrigger service..."
+            <Border.Background>
+                <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+                    <GradientStop Color="White" Offset="0.139"/>
+                    <GradientStop Color="#ccc" Offset="0.834"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Grid HorizontalAlignment="Center"
+                  VerticalAlignment="Center">
+                <DockPanel>
+                    <controls:CircularProgressBar Visibility="{Binding Visibility, ElementName=LoadingOverlay}"
+                                              DockPanel.Dock="Top"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              SnapsToDevicePixels="False"
+                                              Margin="0,-10,0,0"/>
+                    <TextBlock Text="Restarting tcpTrigger service..."
+                           DockPanel.Dock="Top"
+                           Foreground="#444"
+                           Margin="0,25,0,0"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
-                           FontSize="18"/>
-            </DockPanel>
+                           FontWeight="SemiBold"
+                           FontSize="15"/>
+                </DockPanel>
+            </Grid>
         </Border>
     </Grid>
 </Window>

@@ -32,7 +32,7 @@ namespace tcpTrigger.Editor
         {
             // Brief sleep before starting process. Otherwise this window would sometimes not display the
             // loading overlay if the UAC prompt appears before the window finishes loading.
-            System.Threading.Thread.Sleep(250);
+            System.Threading.Thread.Sleep(350);
 
             try
             {
