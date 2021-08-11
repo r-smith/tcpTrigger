@@ -164,6 +164,7 @@
               <Permission User="Administrators" FileAllRights="yes"/>
               <Permission User="Users" GenericRead="yes" GenericExecute="yes" />
               -->
+              <util:PermissionEx User="NT Authority\Local Service" GenericAll="yes"/>
             </CreateFolder>
           </Component>
         </Directory>
