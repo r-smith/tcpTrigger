@@ -9,6 +9,8 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "tcpTrigger.Setup", "tcpTrig
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tcpTrigger.Editor", "tcpTrigger.Editor\tcpTrigger.Editor.csproj", "{386264B5-9107-4595-ABBC-44959747BDEE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tcpTrigger.Monitor", "tcpTrigger.Monitor\tcpTrigger.Monitor.csproj", "{C52CBEE5-774E-4D74-893B-357CB9061CA6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +52,18 @@ Global
 		{386264B5-9107-4595-ABBC-44959747BDEE}.Release|x64.Build.0 = Release|Any CPU
 		{386264B5-9107-4595-ABBC-44959747BDEE}.Release|x86.ActiveCfg = Release|Any CPU
 		{386264B5-9107-4595-ABBC-44959747BDEE}.Release|x86.Build.0 = Release|Any CPU
+		{C52CBEE5-774E-4D74-893B-357CB9061CA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C52CBEE5-774E-4D74-893B-357CB9061CA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C52CBEE5-774E-4D74-893B-357CB9061CA6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C52CBEE5-774E-4D74-893B-357CB9061CA6}.Debug|x64.Build.0 = Debug|Any CPU
+		{C52CBEE5-774E-4D74-893B-357CB9061CA6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C52CBEE5-774E-4D74-893B-357CB9061CA6}.Debug|x86.Build.0 = Debug|Any CPU
+		{C52CBEE5-774E-4D74-893B-357CB9061CA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C52CBEE5-774E-4D74-893B-357CB9061CA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C52CBEE5-774E-4D74-893B-357CB9061CA6}.Release|x64.ActiveCfg = Release|Any CPU
+		{C52CBEE5-774E-4D74-893B-357CB9061CA6}.Release|x64.Build.0 = Release|Any CPU
+		{C52CBEE5-774E-4D74-893B-357CB9061CA6}.Release|x86.ActiveCfg = Release|Any CPU
+		{C52CBEE5-774E-4D74-893B-357CB9061CA6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
