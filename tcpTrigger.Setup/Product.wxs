@@ -136,7 +136,7 @@
                               EventMessageFile="%SystemRoot%\Microsoft.NET\Framework\v2.0.50727\EventLogMessages.dll" />
           </Component>
 
-          <!-- Install the graphical configuration editor -->
+          <!-- Install the settings editor GUI (tcpTrigger Manager) -->
           <Component Id="ConfigurationEditor" Guid="{E326FFDE-ED02-4C1D-AF5D-C2BFD002C2CB}" Win64="$(var.Win64)">
             <File Id="tcpTrigger.Editor.exe" Source="$(var.tcpTrigger.Editor.TargetPath)" KeyPath="yes">
               <Shortcut Id="EditorDesktopShortcut"
@@ -148,7 +148,11 @@
                         Advertise="yes" />
             </File>
           </Component>
-
+          
+          <!-- Install the log monitoring utility (tcpTrigger Monitor) -->
+          <Component Id="LogMonitor" Guid="{93A20328-44CB-49FB-B6B4-B66BBC38F1AA}" Win64="$(var.Win64)">
+            <File Id="tcpTrigger.Monitor.exe" Source="$(var.tcpTrigger.Monitor.TargetPath)" KeyPath="yes" />
+          </Component>
         </Directory>
       </Directory>
 
@@ -175,6 +179,7 @@
     <Feature Id="FullInstallation" Level="1">
       <ComponentRef Id="MainExecutable" />
       <ComponentRef Id="ConfigurationEditor" />
+      <ComponentRef Id="LogMonitor" />
       <ComponentRef Id="CreateProgramDataFolder" />
       <ComponentRef Id="CreateEventSourceDotNet35" />
       <ComponentRef Id="CreateEventSourceDotNet4" />
