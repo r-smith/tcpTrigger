@@ -214,7 +214,7 @@ namespace tcpTrigger
                 sb.AppendLine($"[+] App args: {Settings.ExternalAppArguments}");
             }
 
-            // Log email configuration.
+            // Log email settings.
             if (Settings.IsEmailNotificationEnabled)
             {
                 sb.AppendLine();
@@ -225,6 +225,9 @@ namespace tcpTrigger
                 sb.AppendLine("Recipient(s): " + string.Join(", ", Settings.EmailRecipients.ToArray()));
                 sb.AppendLine($"Sender address: {Settings.EmailSender}");
                 sb.AppendLine($"Sender display name: {Settings.EmailSenderDisplayName}");
+                sb.AppendLine($"Message subject: {Settings.EmailSubject}");
+                sb.AppendLine($"Rate limit: " + (Settings.EmailRateLimitSeconds > 0 ? Settings.EmailRateLimitSeconds.ToString() + " seconds" : "Disabled"));
+                sb.AppendLine($"Buffer: " + (Settings.EmailBufferSeconds > 0 ? Settings.EmailBufferSeconds.ToString() + " seconds" : "Disabled"));
             }
 
             // Write to event log.

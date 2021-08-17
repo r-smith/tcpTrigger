@@ -113,11 +113,6 @@ namespace tcpTrigger.Editor
                 if (xn != null) { LaunchAppOption.IsChecked = bool.Parse(xn.InnerText); }
 
                 // tcpTrigger/actionSettings
-                currentNode = SettingsNode.actionsSettings_emailRateLimitSeconds;
-                RateLimitSeconds.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
-                if (RateLimitSeconds.Text.Length > 0)
-                    RateLimitOption.IsChecked = true;
-
                 currentNode = SettingsNode.actionsSettings_logPath;
                 LogPath.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
                 currentNode = SettingsNode.actionsSettings_command_path;
@@ -125,18 +120,18 @@ namespace tcpTrigger.Editor
                 currentNode = SettingsNode.actionsSettings_command_arguments;
                 ApplicationArguments.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
 
-                // tcpTrigger/emailSettings
-                currentNode = SettingsNode.emailSettings_server;
+                // tcpTrigger/email
+                currentNode = SettingsNode.email_server;
                 EmailServer.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
-                currentNode = SettingsNode.emailSettings_port;
+                currentNode = SettingsNode.email_port;
                 EmailPort.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
 
-                currentNode = SettingsNode.emailSettings_isAuthRequired;
+                currentNode = SettingsNode.email_isAuthRequired;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { IsSmtpAuthenticationRequired.IsChecked = bool.Parse(xn.InnerText); }
 
                 // Decrypt username.
-                currentNode = SettingsNode.emailSettings_username;
+                currentNode = SettingsNode.email_username;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null)
                 {
@@ -155,7 +150,7 @@ namespace tcpTrigger.Editor
                 }
 
                 // Decrypt password.
-                currentNode = SettingsNode.emailSettings_password;
+                currentNode = SettingsNode.email_password;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null)
                 {
@@ -173,7 +168,7 @@ namespace tcpTrigger.Editor
                     }
                 }
 
-                currentNode = SettingsNode.emailSettings_recipientList_address;
+                currentNode = SettingsNode.email_recipientList_address;
                 nl = xd.DocumentElement.SelectNodes(currentNode);
                 List<string> recipients = new List<string>();
                 for (int i = 0; i < nl.Count; i++)
@@ -184,16 +179,22 @@ namespace tcpTrigger.Editor
                 // Join recipients list to single string.
                 EmailRecipient.Text = string.Join(", ", recipients.ToArray());
 
-                currentNode = SettingsNode.emailSettings_sender_address;
+                currentNode = SettingsNode.email_sender_address;
                 EmailSender.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
-                currentNode = SettingsNode.emailSettings_sender_displayName;
+                currentNode = SettingsNode.email_sender_displayName;
                 EmailSenderFriendly.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
 
-                // tcpTrigger/emailMessage
-                currentNode = SettingsNode.emailMessageSubject;
+                // tcpTrigger/email/message
+                currentNode = SettingsNode.email_message_subject;
                 EmailSubject.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
-                currentNode = SettingsNode.emailMessageBody;
+                currentNode = SettingsNode.email_message_body;
                 EmailBody.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+
+                // tcpTrigger/email/options
+                currentNode = SettingsNode.email_options_rateLimitSeconds;
+                RateLimitSeconds.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                if (RateLimitSeconds.Text.Length > 0)
+                    RateLimitOption.IsChecked = true;
             }
             catch (UnauthorizedAccessException)
             {

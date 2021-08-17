@@ -222,7 +222,7 @@ namespace tcpTrigger
                 if (xn != null) { IsExternalAppEnabled = bool.Parse(xn.InnerText); }
 
                 // tcpTrigger/actionSettings
-                currentNode = SettingsNode.actionsSettings_emailRateLimitSeconds;
+                currentNode = SettingsNode.email_options_rateLimitSeconds;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null && !string.IsNullOrEmpty(xn.InnerText)) { EmailRateLimitSeconds = int.Parse(xn.InnerText); }
                 else { EmailRateLimitSeconds = 0; }
@@ -235,20 +235,20 @@ namespace tcpTrigger
                 ExternalAppArguments = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
 
                 // tcpTrigger/emailSettings
-                currentNode = SettingsNode.emailSettings_server;
+                currentNode = SettingsNode.email_server;
                 EmailServer = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
 
-                currentNode = SettingsNode.emailSettings_port;
+                currentNode = SettingsNode.email_port;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null && !string.IsNullOrEmpty(xn.InnerText)) { EmailServerPort = int.Parse(xn.InnerText); }
                 else { EmailServerPort = 25; }
 
-                currentNode = SettingsNode.emailSettings_isAuthRequired;
+                currentNode = SettingsNode.email_isAuthRequired;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { IsEmailAuthRequired = bool.Parse(xn.InnerText); }
 
                 // Decrypt username.
-                currentNode = SettingsNode.emailSettings_username;
+                currentNode = SettingsNode.email_username;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null)
                 {
@@ -267,7 +267,7 @@ namespace tcpTrigger
                 }
 
                 // Decrypt password.
-                currentNode = SettingsNode.emailSettings_password;
+                currentNode = SettingsNode.email_password;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null)
                 {
@@ -285,7 +285,7 @@ namespace tcpTrigger
                     }
                 }
 
-                currentNode = SettingsNode.emailSettings_recipientList_address;
+                currentNode = SettingsNode.email_recipientList_address;
                 nl = xd.DocumentElement.SelectNodes(currentNode);
                 for (int i = 0; i < nl.Count; i++)
                 {
@@ -293,15 +293,15 @@ namespace tcpTrigger
                         EmailRecipients.Add(nl[i].InnerText);
                 }
 
-                currentNode = SettingsNode.emailSettings_sender_address;
+                currentNode = SettingsNode.email_sender_address;
                 EmailSender = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
-                currentNode = SettingsNode.emailSettings_sender_displayName;
+                currentNode = SettingsNode.email_sender_displayName;
                 EmailSenderDisplayName = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
 
                 // tcpTrigger/emailMessage
-                currentNode = SettingsNode.emailMessageSubject;
+                currentNode = SettingsNode.email_message_subject;
                 EmailSubject = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
-                currentNode = SettingsNode.emailMessageBody;
+                currentNode = SettingsNode.email_message_body;
                 EmailBody = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
 
                 return true;
@@ -341,19 +341,19 @@ namespace tcpTrigger
         public const string enabledActions_emailNotification = "/tcpTrigger/enabledActions/emailNotification";
         public const string enabledActions_popupNotification = "/tcpTrigger/enabledActions/popupNotification";
         public const string enabledActions_executeCommand = "/tcpTrigger/enabledActions/executeCommand";
-        public const string actionsSettings_emailRateLimitSeconds = "/tcpTrigger/actionSettings/emailRateLimitSeconds";
         public const string actionsSettings_logPath = "/tcpTrigger/actionSettings/logPath";
         public const string actionsSettings_command_path = "/tcpTrigger/actionSettings/command/path";
         public const string actionsSettings_command_arguments = "/tcpTrigger/actionSettings/command/arguments";
-        public const string emailSettings_server = "/tcpTrigger/emailSettings/server";
-        public const string emailSettings_port = "/tcpTrigger/emailSettings/port";
-        public const string emailSettings_isAuthRequired = "/tcpTrigger/emailSettings/isAuthRequired";
-        public const string emailSettings_username = "/tcpTrigger/emailSettings/username";
-        public const string emailSettings_password = "/tcpTrigger/emailSettings/password";
-        public const string emailSettings_recipientList_address = "/tcpTrigger/emailSettings/recipientList/address";
-        public const string emailSettings_sender_address = "/tcpTrigger/emailSettings/sender/address";
-        public const string emailSettings_sender_displayName = "/tcpTrigger/emailSettings/sender/displayName";
-        public const string emailMessageSubject = "/tcpTrigger/emailMessage/subject";
-        public const string emailMessageBody = "/tcpTrigger/emailMessage/body";
+        public const string email_server = "/tcpTrigger/email/server";
+        public const string email_port = "/tcpTrigger/email/port";
+        public const string email_isAuthRequired = "/tcpTrigger/email/isAuthRequired";
+        public const string email_username = "/tcpTrigger/email/username";
+        public const string email_password = "/tcpTrigger/email/password";
+        public const string email_recipientList_address = "/tcpTrigger/email/recipientList/address";
+        public const string email_sender_address = "/tcpTrigger/email/sender/address";
+        public const string email_sender_displayName = "/tcpTrigger/email/sender/displayName";
+        public const string email_message_subject = "/tcpTrigger/email/message/subject";
+        public const string email_message_body = "/tcpTrigger/email/message/body";
+        public const string email_options_rateLimitSeconds = "/tcpTrigger/email/options/rateLimitSeconds";
     }
 }

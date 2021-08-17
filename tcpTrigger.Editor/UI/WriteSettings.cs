@@ -143,7 +143,6 @@ namespace tcpTrigger.Editor
 
                     // Action settings.
                     writer.WriteStartElement("actionSettings");
-                    writer.WriteElementString("emailRateLimitSeconds", RateLimitSeconds.Text);
                     writer.WriteElementString("logPath", LogPath.Text);
                     writer.WriteStartElement("command");
                     writer.WriteElementString("path", ApplicationPath.Text);
@@ -152,7 +151,7 @@ namespace tcpTrigger.Editor
                     writer.WriteEndElement();
 
                     // Email settings.
-                    writer.WriteStartElement("emailSettings");
+                    writer.WriteStartElement("email");
                     writer.WriteElementString("server", EmailServer.Text);
                     writer.WriteElementString("port", EmailPort.Text);
                     writer.WriteElementString("isAuthRequired", IsSmtpAuthenticationRequired.IsChecked == true ? t : f);
@@ -204,13 +203,20 @@ namespace tcpTrigger.Editor
                     writer.WriteElementString("address", EmailSender.Text);
                     writer.WriteElementString("displayName", EmailSenderFriendly.Text);
                     writer.WriteEndElement();
-                    writer.WriteEndElement();
 
                     // Email message.
-                    writer.WriteStartElement("emailMessage");
+                    writer.WriteStartElement("message");
                     writer.WriteElementString("subject", EmailSubject.Text);
                     writer.WriteElementString("body", EmailBody.Text);
                     writer.WriteEndElement();
+
+                    // Email options.
+                    writer.WriteStartElement("options");
+                    writer.WriteElementString("rateLimitSeconds", RateLimitSeconds.Text);
+                    writer.WriteEndElement();
+                    // End email section.
+                    writer.WriteEndElement();
+
 
                     // End tags.
                     writer.WriteEndElement();
