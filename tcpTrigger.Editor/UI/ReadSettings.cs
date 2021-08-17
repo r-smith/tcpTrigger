@@ -193,8 +193,10 @@ namespace tcpTrigger.Editor
                 // tcpTrigger/email/options
                 currentNode = SettingsNode.email_options_rateLimitSeconds;
                 RateLimitSeconds.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
-                if (RateLimitSeconds.Text.Length > 0)
+                if (RateLimitSeconds.Text.Length > 0 && int.TryParse(RateLimitSeconds.Text, out int rateLimit) && rateLimit > 0)
                     RateLimitOption.IsChecked = true;
+                else
+                    RateLimitSeconds.Text = "";
             }
             catch (UnauthorizedAccessException)
             {

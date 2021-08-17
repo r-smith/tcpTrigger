@@ -212,7 +212,7 @@ namespace tcpTrigger.Editor
 
                     // Email options.
                     writer.WriteStartElement("options");
-                    writer.WriteElementString("rateLimitSeconds", RateLimitSeconds.Text);
+                    writer.WriteElementString("rateLimitSeconds", RateLimitOption.IsChecked == true ? RateLimitSeconds.Text : "0");
                     writer.WriteEndElement();
                     // End email section.
                     writer.WriteEndElement();
