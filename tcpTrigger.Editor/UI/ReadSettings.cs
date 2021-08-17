@@ -197,6 +197,12 @@ namespace tcpTrigger.Editor
                     RateLimitOption.IsChecked = true;
                 else
                     RateLimitSeconds.Text = "";
+                currentNode = SettingsNode.email_options_bufferSeconds;
+                BufferSeconds.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                if (BufferSeconds.Text.Length > 0 && int.TryParse(BufferSeconds.Text, out int bufferSeconds) && bufferSeconds > 0)
+                    BufferOption.IsChecked = true;
+                else
+                    BufferSeconds.Text = "";
             }
             catch (UnauthorizedAccessException)
             {

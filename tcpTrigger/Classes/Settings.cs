@@ -25,7 +25,7 @@ namespace tcpTrigger
         public static bool IsEmailNotificationEnabled { get; private set; }
         public static bool IsExternalAppEnabled { get; private set; }
         public static int EmailRateLimitSeconds { get; private set; }
-        public static int EmailBufferSeconds { get; private set; } = 10;
+        public static int EmailBufferSeconds { get; private set; } = 15;
         public static string LogPath { get; private set; }
         public static string ExternalAppPath { get; private set; }
         public static string ExternalAppArguments { get; private set; }
@@ -222,11 +222,6 @@ namespace tcpTrigger
                 if (xn != null) { IsExternalAppEnabled = bool.Parse(xn.InnerText); }
 
                 // tcpTrigger/actionSettings
-                currentNode = SettingsNode.email_options_rateLimitSeconds;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null && !string.IsNullOrEmpty(xn.InnerText)) { EmailRateLimitSeconds = int.Parse(xn.InnerText); }
-                else { EmailRateLimitSeconds = 0; }
-
                 currentNode = SettingsNode.actionsSettings_logPath;
                 LogPath = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
                 currentNode = SettingsNode.actionsSettings_command_path;
@@ -234,7 +229,7 @@ namespace tcpTrigger
                 currentNode = SettingsNode.actionsSettings_command_arguments;
                 ExternalAppArguments = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
 
-                // tcpTrigger/emailSettings
+                // tcpTrigger/email
                 currentNode = SettingsNode.email_server;
                 EmailServer = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
 
@@ -298,11 +293,21 @@ namespace tcpTrigger
                 currentNode = SettingsNode.email_sender_displayName;
                 EmailSenderDisplayName = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
 
-                // tcpTrigger/emailMessage
+                // tcpTrigger/email/message
                 currentNode = SettingsNode.email_message_subject;
                 EmailSubject = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
                 currentNode = SettingsNode.email_message_body;
                 EmailBody = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+
+                // tcpTrigger/email/options
+                currentNode = SettingsNode.email_options_rateLimitSeconds;
+                xn = xd.DocumentElement.SelectSingleNode(currentNode);
+                if (xn != null && !string.IsNullOrEmpty(xn.InnerText)) { EmailRateLimitSeconds = int.Parse(xn.InnerText); }
+                else { EmailRateLimitSeconds = 180; }
+                currentNode = SettingsNode.email_options_bufferSeconds;
+                xn = xd.DocumentElement.SelectSingleNode(currentNode);
+                if (xn != null && !string.IsNullOrEmpty(xn.InnerText)) { EmailBufferSeconds = int.Parse(xn.InnerText); }
+                else { EmailBufferSeconds = 15; }
 
                 return true;
             }
@@ -355,5 +360,6 @@ namespace tcpTrigger
         public const string email_message_subject = "/tcpTrigger/email/message/subject";
         public const string email_message_body = "/tcpTrigger/email/message/body";
         public const string email_options_rateLimitSeconds = "/tcpTrigger/email/options/rateLimitSeconds";
+        public const string email_options_bufferSeconds = "/tcpTrigger/email/options/bufferSeconds";
     }
 }

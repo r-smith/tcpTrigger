@@ -326,6 +326,8 @@ namespace tcpTrigger.Editor
             LogPath.Text = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\tcpTrigger.log";
             RateLimitOption.IsChecked = true;
             RateLimitSeconds.Text = "180";
+            BufferOption.IsChecked = true;
+            BufferSeconds.Text = "15";
             EmailSubject.Text = "Alert: Suspicious network activity";
             EmailBody.Text = "Network connections to {Interface_IP} are being monitored by tcpTrigger. The following activity was detected:"
                 + Environment.NewLine + Environment.NewLine

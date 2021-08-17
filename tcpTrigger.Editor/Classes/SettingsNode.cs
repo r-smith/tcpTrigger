@@ -33,5 +33,6 @@
         public const string email_message_subject = "/tcpTrigger/email/message/subject";
         public const string email_message_body = "/tcpTrigger/email/message/body";
         public const string email_options_rateLimitSeconds = "/tcpTrigger/email/options/rateLimitSeconds";
+        public const string email_options_bufferSeconds = "/tcpTrigger/email/options/bufferSeconds";
     }
 }

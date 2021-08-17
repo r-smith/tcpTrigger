@@ -424,17 +424,44 @@
                     <!-- Sub Tab: Options -->
                     <TabItem Header="Options" Name="EmailOptionsTab">
                         <StackPanel Margin="8,9,8,8">
+                            <!-- Rate limit -->
                             <CheckBox Name="RateLimitOption" Content="Enable rate limiting on email notifications (recommended)"/>
-                            <StackPanel Orientation="Horizontal" Margin="35,3,0,0">
-                                <Label Content="Limit one email per network interface every"/>
+                            <DockPanel Margin="35,3,0,0">
+                                <TextBlock Text="Limit one email per network interface every"
+                                           DockPanel.Dock="Left"
+                                           HorizontalAlignment="Left"/>
                                 <TextBox Name="RateLimitSeconds"
-                                         Margin="5,0"
+                                         DockPanel.Dock="Left"
+                                         Margin="5,0,10,0"
                                          Width="60"
                                          PreviewTextInput="NumericTextBox_PreviewTextInput"
                                          FontFamily="Consolas"
                                          MaxLength="5"/>
-                                <Label Content="second(s)"/>
-                            </StackPanel>
+                                <TextBlock Text="second(s)"
+                                           DockPanel.Dock="Left"
+                                           HorizontalAlignment="Left"
+                                           TextTrimming="CharacterEllipsis"/>
+                            </DockPanel>
+                            <!-- Buffer -->
+                            <CheckBox Name="BufferOption"
+                                      Content="Buffer connections (recommended)"
+                                      Margin="0,20,0,0"/>
+                            <DockPanel Margin="35,3,0,0">
+                                <TextBlock Text="Log connections for"
+                                           DockPanel.Dock="Left"
+                                           HorizontalAlignment="Left"/>
+                                <TextBox Name="BufferSeconds"
+                                         DockPanel.Dock="Left"
+                                         Margin="5,0,10,0"
+                                         Width="60"
+                                         PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                         FontFamily="Consolas"
+                                         MaxLength="3"/>
+                                <TextBlock Text="second(s) before sending email"
+                                           DockPanel.Dock="Left"
+                                           HorizontalAlignment="Left"
+                                           TextTrimming="CharacterEllipsis"/>
+                            </DockPanel>
                         </StackPanel>
                     </TabItem>
                 </TabControl>
