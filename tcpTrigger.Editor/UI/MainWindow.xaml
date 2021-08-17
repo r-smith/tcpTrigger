@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="tcpTrigger Manager"
         Background="#ffffff"
-        Height="570" MinHeight="550"
+        Height="570" MinHeight="555"
         Width="750" MinWidth="600"
         ResizeMode="CanResizeWithGrip">
     <Window.Resources>
@@ -246,10 +246,13 @@
 
             <!-- Tab: Email -->
             <TabItem Header="Email" Name="EmailTab">
-                <DockPanel LastChildFill="False">
-                    <GroupBox Header="Mail Server Settings"
-                              DockPanel.Dock="Top">
-                        <StackPanel Margin="5">
+                <TabControl TabStripPlacement="Top" Style="{StaticResource TabControlAlternate}">
+                    <TabControl.Resources>
+                        <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource TabItemAlternate}" />
+                    </TabControl.Resources>
+                    <!-- Sub Tab: Mail Server -->
+                    <TabItem Header="Mail Server" Name="EmailServerTab">
+                        <StackPanel Margin="8,9,8,8">
                             <TextBlock Text="Server Information"
                                        HorizontalAlignment="Left"
                                        Foreground="#268bd2"
@@ -277,7 +280,7 @@
                                         <TextBlock Text="Port"/>
                                     </Grid>
                                     <TextBox Name="EmailPort"
-                                             Width="75"
+                                             Width="70"
                                              FontFamily="Consolas"
                                              HorizontalAlignment="Left"
                                              PreviewTextInput="NumericTextBox_PreviewTextInput"
@@ -360,63 +363,81 @@
                                     Content="Test"
                                     HorizontalAlignment="Left"/>
                         </StackPanel>
-                    </GroupBox>
-                </DockPanel>
-            </TabItem>
-
-            <!-- Tab: Messages -->
-            <TabItem Header="Messages" Name="MessagesTab">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <GroupBox Header="Email Notifications">
-                        <DockPanel Margin="5">
-                            <DockPanel DockPanel.Dock="Top" Margin="0,3,0,0">
-                                <Grid MinWidth="95">
-                                    <TextBlock Text="Email subject" HorizontalAlignment="Right"/>
-                                </Grid>
-                                <TextBox Name="EmailSubject"
-                                         DockPanel.Dock="Right"
-                                         MaxLength="512"
-                                         FontFamily="Consolas"/>
+                    </TabItem>
+                    
+                    <!-- Sub Tab: Message -->
+                    <TabItem Header="Message" Name="EmailMessageTab">
+                        <Grid Margin="8,9,8,8">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <!-- Subject and body -->
+                            <DockPanel>
+                                <DockPanel DockPanel.Dock="Top" Margin="0,3,0,0">
+                                    <Grid MinWidth="95">
+                                        <TextBlock Text="Email subject" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                    <TextBox Name="EmailSubject"
+                                             DockPanel.Dock="Right"
+                                             MaxLength="512"
+                                             FontFamily="Consolas"/>
+                                </DockPanel>
+                                <DockPanel DockPanel.Dock="Top" Margin="0,6,0,0">
+                                    <Grid MinWidth="95">
+                                        <TextBlock Text="Email body" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="0,5,0,0"/>
+                                    </Grid>
+                                    <TextBox Name="EmailBody"
+                                             DockPanel.Dock="Right"
+                                             FontFamily="Consolas"
+                                             VerticalContentAlignment="Top"
+                                             VerticalScrollBarVisibility="Auto"
+                                             MinHeight="150"
+                                             TextWrapping="Wrap"
+                                             AcceptsReturn="True"/>
+                                </DockPanel>
                             </DockPanel>
-                            <DockPanel DockPanel.Dock="Top" Margin="0,6,0,0">
-                                <Grid MinWidth="95">
-                                    <TextBlock Text="Email body" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="0,5,0,0"/>
-                                </Grid>
-                                <TextBox Name="EmailBody"
-                                         DockPanel.Dock="Right"
+                            <!-- Variables -->
+                            <GroupBox Header="Variables" Grid.Row="1" Margin="0,20,0,0">
+                                <GroupBox.Resources>
+                                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                                        <Setter Property="FontFamily" Value="Consolas"/>
+                                        <Setter Property="FontSize" Value="15"/>
+                                        <Setter Property="Foreground" Value="#555"/>
+                                    </Style>
+                                </GroupBox.Resources>
+                                <StackPanel>
+                                    <StackPanel Margin="5" Orientation="Horizontal">
+                                        <TextBlock Text="{}{Interface_IP}" Width="200" />
+                                        <TextBlock Text="{}{Interface_Decription}" />
+                                    </StackPanel>
+                                    <StackPanel Margin="5" Orientation="Horizontal">
+                                        <TextBlock Text="{}{Interface_MAC}" Width="200" />
+                                        <TextBlock Text="{}{Connection_Log}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </GroupBox>
+                        </Grid>
+                    </TabItem>
+                    
+                    <!-- Sub Tab: Options -->
+                    <TabItem Header="Options" Name="EmailOptionsTab">
+                        <StackPanel Margin="8,9,8,8">
+                            <CheckBox Name="RateLimitOption" Content="Enable rate limiting on email notifications (recommended)"/>
+                            <StackPanel Orientation="Horizontal" Margin="35,3,0,0">
+                                <Label Content="Limit one email per network interface every"/>
+                                <TextBox Name="RateLimitSeconds"
+                                         Margin="5,0"
+                                         Width="60"
+                                         PreviewTextInput="NumericTextBox_PreviewTextInput"
                                          FontFamily="Consolas"
-                                         VerticalContentAlignment="Top"
-                                         VerticalScrollBarVisibility="Auto"
-                                         TextWrapping="Wrap"
-                                         AcceptsReturn="True"/>
-                            </DockPanel>
-                        </DockPanel>
-                    </GroupBox>
-                    <GroupBox Header="Variables" Grid.Row="1" Margin="0,20,0,0">
-                        <GroupBox.Resources>
-                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                                <Setter Property="HorizontalAlignment" Value="Left"/>
-                                <Setter Property="FontFamily" Value="Consolas"/>
-                                <Setter Property="FontSize" Value="15"/>
-                                <Setter Property="Foreground" Value="#555"/>
-                            </Style>
-                        </GroupBox.Resources>
-                        <StackPanel>
-                            <StackPanel Margin="5" Orientation="Horizontal">
-                                <TextBlock Text="#INTERFACE_IP#" Width="200" />
-                                <TextBlock Text="#INTERFACE_DESCRIPTION#" />
-                            </StackPanel>
-                            <StackPanel Margin="5" Orientation="Horizontal">
-                                <TextBlock Text="#INTERFACE_MAC#" Width="200" />
-                                <TextBlock Text="#CONNECTION_LOG#" />
+                                         MaxLength="5"/>
+                                <Label Content="second(s)"/>
                             </StackPanel>
                         </StackPanel>
-                    </GroupBox>
-                </Grid>
+                    </TabItem>
+                </TabControl>
             </TabItem>
 
             <!-- Tab: Whitelist -->
@@ -540,27 +561,6 @@
                                 </ListView.ItemTemplate>
                             </ListView>
                         </Grid>
-                    </GroupBox>
-                </DockPanel>
-            </TabItem>
-
-            <!-- Tab: Advanced -->
-            <TabItem Header="Advanced" Name="AdvancedTab">
-                <DockPanel LastChildFill="False">
-                    <GroupBox Header="Advanced Settings" DockPanel.Dock="Top">
-                        <StackPanel Margin="5">
-                            <CheckBox Name="RateLimitOption" Content="Enable rate limiting on email notifications (recommended)"/>
-                            <StackPanel Orientation="Horizontal" Margin="35,3,0,0">
-                                <Label Content="Limit one email per network interface every"/>
-                                <TextBox Name="RateLimitSeconds"
-                                         Margin="5,0"
-                                         Width="60"
-                                         PreviewTextInput="NumericTextBox_PreviewTextInput"
-                                         FontFamily="Consolas"
-                                         MaxLength="5"/>
-                                <Label Content="second(s)"/>
-                            </StackPanel>
-                        </StackPanel>
                     </GroupBox>
                 </DockPanel>
             </TabItem>

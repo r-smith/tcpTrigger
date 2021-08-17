@@ -326,10 +326,10 @@ namespace tcpTrigger.Editor
             LogPath.Text = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\tcpTrigger.log";
             RateLimitOption.IsChecked = true;
             RateLimitSeconds.Text = "180";
-            EmailSubject.Text = "ALERT: Suspicious network activity";
-            EmailBody.Text = "Incoming network connections on #Interface.IP# are being monitored by tcpTrigger. The following activity was detected:"
+            EmailSubject.Text = "Alert: Suspicious network activity";
+            EmailBody.Text = "Network connections to {Interface_IP} are being monitored by tcpTrigger. The following activity was detected:"
                 + Environment.NewLine + Environment.NewLine
-                + "#Connection.Log#";
+                + "{Connection_Log}";
         }
 
         private void TcpAllPortsOption_Checked(object sender, RoutedEventArgs e)

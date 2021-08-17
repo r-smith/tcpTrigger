@@ -92,10 +92,11 @@ namespace tcpTrigger.Editor
             {
                 if (EmailServer.Text.Length == 0)
                 {
+                    EmailTab.Focus();
                     ShowMessageBox(
                         message: "You have email notifications enabled, but no email server was entered.",
                         title: "Missing email server",
-                        tab: EmailTab,
+                        tab: EmailServerTab,
                         control: EmailServer);
                     return false;
                 }
@@ -105,55 +106,60 @@ namespace tcpTrigger.Editor
                     || n <= 0
                     || n > 65535)
                 {
+                    EmailTab.Focus();
                     ShowMessageBox(
                         message: "Enter the port number used by your email server."
                                  + Environment.NewLine + "Typical port numbers include: 25, 465, and 587.",
                         title: "Missing email server port",
                         type: DialogWindow.Type.Error,
-                        tab: EmailTab,
+                        tab: EmailServerTab,
                         control: EmailPort);
                     return false;
                 }
 
                 if (EmailRecipient.Text.Length == 0 || !IsEmailAddressListValid(EmailRecipient.Text))
                 {
+                    EmailTab.Focus();
                     ShowMessageBox(
                         message: "Check to ensure the recipient you entered is formatted like a standard email address. "
                                  + Environment.NewLine + "If you have more than one recipient, use a comma to separate them.",
                         title: "Invalid email recipient(s)",
                         type: DialogWindow.Type.Error,
-                        tab: EmailTab,
+                        tab: EmailServerTab,
                         control: EmailRecipient);
                     return false;
                 }
 
                 if (EmailSender.Text.Length == 0 || !IsEmailAddressListValid(EmailSender.Text) || EmailSender.Text.Contains(','))
                 {
+                    EmailTab.Focus();
                     ShowMessageBox(
                         message: "Check to ensure the sender address you entered is formatted like a standard email address.",
                         title: "Invalid email sender",
                         type: DialogWindow.Type.Error,
-                        tab: EmailTab,
+                        tab: EmailServerTab,
                         control: EmailSender);
                     return false;
                 }
 
                 if (EmailSubject.Text.Length == 0)
                 {
+                    EmailTab.Focus();
                     ShowMessageBox(
                         message: "You have email notifications enabled, but no message subject for your notifications was entered.",
                         title: "Missing message subject",
-                        tab: MessagesTab,
+                        tab: EmailMessageTab,
                         control: EmailSubject);
                     return false;
                 }
 
                 if (EmailBody.Text.Length == 0)
                 {
+                    EmailTab.Focus();
                     ShowMessageBox(
                         message: "You have email notifications enabled, but no message body for your notifications was entered.",
                         title: "Missing message body",
-                        tab: MessagesTab,
+                        tab: EmailMessageTab,
                         control: EmailBody);
                     return false;
                 }
@@ -175,11 +181,12 @@ namespace tcpTrigger.Editor
             {
                 if (!int.TryParse(RateLimitSeconds.Text, out int n) || n <= 0 || n > 3600)
                 {
+                    EmailTab.Focus();
                     ShowMessageBox(
                         message: "The number of seconds used for rate limiting must be between 1 and 3600.",
                         title: "Invalid rate limit",
                         type: DialogWindow.Type.Error,
-                        tab: AdvancedTab,
+                        tab: EmailOptionsTab,
                         control: RateLimitSeconds);
                     return false;
                 }

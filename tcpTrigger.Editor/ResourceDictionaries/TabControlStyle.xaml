@@ -85,6 +85,7 @@
         <Setter Property="Margin" Value="0"/>
         <Setter Property="Padding" Value="10,8,20,8"/>
         <Setter Property="MinWidth" Value="140"/>
+        <Setter Property="FontSize" Value="13"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Stretch"/>
         <Setter Property="HeaderTemplate" Value="{StaticResource TabHeader}"/>
@@ -125,6 +126,123 @@
                                 <Condition Property="IsMouseOver" Value="True"/>
                             </MultiTrigger.Conditions>
                             <Setter Property="HeaderTemplate" Value="{StaticResource TabMouseOverHeader}"/>
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <!-- Alternate TabControl Style -->
+    <Style x:Key="TabControlAlternate" TargetType="{x:Type TabControl}">
+        <Setter Property="Padding" Value="2"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="#007acc"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TabControl}">
+                    <Grid x:Name="templateRoot" ClipToBounds="true" SnapsToDevicePixels="true" KeyboardNavigation.TabNavigation="Local">
+                        <Grid.RowDefinitions>
+                            <RowDefinition x:Name="RowDefinition0" Height="Auto"/>
+                            <RowDefinition x:Name="RowDefinition1" Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TabPanel x:Name="headerPanel"
+                                  Grid.Row="0"
+                                  Background="Transparent"
+                                  IsItemsHost="true"
+                                  KeyboardNavigation.TabIndex="1"
+                                  Panel.ZIndex="1"/>
+                        <Border x:Name="contentPanel"
+                                Grid.Row="1"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="4,4,4,4"
+                                KeyboardNavigation.DirectionalNavigation="Contained"
+                                KeyboardNavigation.TabIndex="2"
+                                KeyboardNavigation.TabNavigation="Local">
+                            <ContentPresenter x:Name="PART_SelectedContentHost"
+                                              ContentSource="SelectedContent"
+                                              Margin="{TemplateBinding Padding}"
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Alternate TabItem header templates -->
+    <DataTemplate x:Key="TabHeaderAlternate">
+        <TextBlock Text="{Binding}"
+                   FontSize="14"
+                   Foreground="#666"/>
+    </DataTemplate>
+    <DataTemplate x:Key="TabMouseOverHeaderAlternate">
+        <TextBlock Text="{Binding}"
+                   FontSize="14"
+                   FontWeight="SemiBold"
+                   Foreground="#000"/>
+    </DataTemplate>
+    <DataTemplate x:Key="TabSelectedHeaderAlternate">
+        <TextBlock Text="{Binding}"
+                   FontSize="14"
+                   FontWeight="SemiBold"
+                   Foreground="White"/>
+    </DataTemplate>
+    
+    <!-- Alternate TabItem style -->
+    <Style x:Key="TabItemAlternate" TargetType="{x:Type TabItem}" BasedOn="{StaticResource {x:Type TabItem}}">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Background" Value="#eaeaec"/>
+        <Setter Property="Padding" Value="3,3,3,4"/>
+        <Setter Property="MinWidth" Value="139"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+        <Setter Property="HeaderTemplate" Value="{StaticResource TabHeaderAlternate}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TabItem}">
+                    <Border x:Name="mainBorder"
+                            SnapsToDevicePixels="True"
+                            BorderThickness="0"
+                            CornerRadius="4,4,0,0"
+                            Background="{TemplateBinding Background}"
+                            Margin="4,0,0,0">
+                        <ContentPresenter x:Name="contentPresenter"
+                                          ContentSource="Header"
+                                          Focusable="False"
+                                          HorizontalAlignment="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                          Margin="{TemplateBinding Padding}"
+                                          RecognizesAccessKey="True"
+                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                          VerticalAlignment="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True" SourceName="mainBorder">
+                            <Setter Property="Background" Value="#f8f8f8" TargetName="mainBorder"/>
+                            <Setter Property="BorderBrush" Value="#007acc" TargetName="mainBorder"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource TabItem.Static.Foreground}"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#007acc" TargetName="mainBorder"/>
+                            <Setter Property="HeaderTemplate" Value="{StaticResource TabSelectedHeaderAlternate}"/>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="False"/>
+                                <Condition Property="IsMouseOver" Value="True"/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="HeaderTemplate" Value="{StaticResource TabMouseOverHeaderAlternate}"/>
                         </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
