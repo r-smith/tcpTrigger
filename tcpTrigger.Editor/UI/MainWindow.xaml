@@ -56,8 +56,41 @@
             <TabItem Header="Main" Name="MainTab">
                 <DockPanel LastChildFill="False">
                     <!-- Trigger rules -->
-                    <GroupBox Header="Trigger Rules"
-                              DockPanel.Dock="Top">
+                    <GroupBox DockPanel.Dock="Top">
+                        <GroupBox.Header>
+                            <DockPanel>
+                                <TextBlock Text="Trigger Rules"
+                                           DockPanel.Dock="Left"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"/>
+                                <Label DockPanel.Dock="Left"
+                                       MaxWidth="450"
+                                       Style="{StaticResource LabelToolTip}">
+                                    <TextBlock>
+                                        <Run FontWeight="SemiBold" Foreground="#ffd43b">Trigger Rules</Run><LineBreak/>
+                                        Choose what network activity you want to detect. Use the
+                                        <Run FontWeight="SemiBold" Foreground="#63e6be">Actions</Run>
+                                        tab to select what happens on detection.
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        For port number fields, specify multiple ports using a comma and ranges
+                                        using a hyphen.
+                                        <Run FontWeight="SemiBold">Example:</Run><LineBreak/>
+                                        21, 23-25, 3389, 4450-5000
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        Excluded ports override included ports and will not be monitored.
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run FontWeight="SemiBold" Foreground="#30aacc">Default:</Run><LineBreak/>
+                                        Detect incoming ICMP requests and TCP connections on all ports.
+                                    </TextBlock>
+                                </Label>
+                            </DockPanel>
+                        </GroupBox.Header>
                         <StackPanel Margin="5">
                             <!-- ICMP -->
                             <CheckBox Content="Detect ICMP requests"
@@ -164,7 +197,34 @@
             <TabItem Header="Actions" Name="ActionsTab">
                 <DockPanel LastChildFill="False">
                     <!-- Actions -->
-                    <GroupBox Header="Actions" DockPanel.Dock="Top">
+                    <GroupBox DockPanel.Dock="Top">
+                        <GroupBox.Header>
+                            <DockPanel>
+                                <TextBlock Text="Actions"
+                                           DockPanel.Dock="Left"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"/>
+                                <Label DockPanel.Dock="Left"
+                                       Style="{StaticResource LabelToolTip}">
+                                    <TextBlock>
+                                        <Run FontWeight="SemiBold" Foreground="#ffd43b">Actions</Run><LineBreak/>
+                                        Choose what actions you want carried out for each detected connection. Use the
+                                        <Run FontWeight="SemiBold" Foreground="#63e6be">Main</Run>
+                                        tab to specify what network activity to detect. Use the
+                                        <Run FontWeight="SemiBold" Foreground="#63e6be">Email</Run>
+                                        tab to configure options relating to email notifications.
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run FontWeight="SemiBold" Foreground="#30aacc">Default:</Run><LineBreak/>
+                                        Write to standard log and write to Windows event log. Log path:<LineBreak/>
+                                        C:\ProgramData\tcpTrigger\tcpTrigger.log
+                                    </TextBlock>
+                                </Label>
+                            </DockPanel>
+                        </GroupBox.Header>
                         <StackPanel Margin="5">
                             <TextBlock Text="Selected actions will be carried out each time an incoming connection matches a trigger rule."
                                        HorizontalAlignment="Left"
@@ -364,7 +424,7 @@
                                     HorizontalAlignment="Left"/>
                         </StackPanel>
                     </TabItem>
-                    
+
                     <!-- Sub Tab: Message -->
                     <TabItem Header="Message" Name="EmailMessageTab">
                         <Grid Margin="8,9,8,8">
@@ -420,12 +480,29 @@
                             </GroupBox>
                         </Grid>
                     </TabItem>
-                    
+
                     <!-- Sub Tab: Options -->
                     <TabItem Header="Options" Name="EmailOptionsTab">
                         <StackPanel Margin="8,9,8,8">
                             <!-- Rate limit -->
-                            <CheckBox Name="RateLimitOption" Content="Enable rate limiting on email notifications (recommended)"/>
+                            <DockPanel>
+                                <CheckBox Name="RateLimitOption"
+                                          DockPanel.Dock="Left"
+                                          Content="Enable rate limiting on email notifications (recommended)"/>
+                                <Label DockPanel.Dock="Left" Style="{StaticResource LabelToolTip}" Foreground="White" Margin="-5,-3,0,0">
+                                    <TextBlock>
+                                        <Run FontWeight="SemiBold" Foreground="#ffd43b">Rate Limit</Run><LineBreak/>
+                                        Rate limiting prevents email notifications from being sent too quickly. After an
+                                        email notification is sent, tcpTrigger won't send another email for at least
+                                        the number of seconds specified. All connections detected during the wait
+                                        period are logged, and will be sent once the rate limit has passed.
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run FontWeight="SemiBold" Foreground="#30aacc">Default:</Run><LineBreak/>
+                                        180 seconds (3 minutes)
+                                    </TextBlock>
+                                </Label>
+                            </DockPanel>
                             <DockPanel Margin="35,3,0,0">
                                 <TextBlock Text="Limit one email per network interface every"
                                            DockPanel.Dock="Left"
@@ -443,9 +520,24 @@
                                            TextTrimming="CharacterEllipsis"/>
                             </DockPanel>
                             <!-- Buffer -->
-                            <CheckBox Name="BufferOption"
-                                      Content="Buffer connections (recommended)"
-                                      Margin="0,20,0,0"/>
+                            <DockPanel>
+                                <CheckBox Name="BufferOption"
+                                          DockPanel.Dock="Left"
+                                          Content="Buffer connections (recommended)"
+                                          Margin="0,20,0,0"/>
+                                <Label DockPanel.Dock="Left" Style="{StaticResource LabelToolTip}" Foreground="White" Margin="-5,0,0,0" VerticalAlignment="Bottom">
+                                    <TextBlock>
+                                        <Run FontWeight="SemiBold" Foreground="#ffd43b">Buffer Connections</Run><LineBreak/>
+                                        Buffering delays sending an initial email notification when a connection is detected. Delaying allows tcpTrigger
+                                        to log additional connections for a short time before sending the email. After the interval is up,
+                                        the notification email is sent with a log of all connections that ocurred within the buffer time.
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run FontWeight="SemiBold" Foreground="#30aacc">Default:</Run><LineBreak/>
+                                        15 seconds
+                                    </TextBlock>
+                                </Label>
+                            </DockPanel>
                             <DockPanel Margin="35,3,0,0">
                                 <TextBlock Text="Log connections for"
                                            DockPanel.Dock="Left"
@@ -470,21 +562,29 @@
             <!-- Tab: Whitelist -->
             <TabItem Header="Whitelist" Name="WhitelistTab">
                 <DockPanel>
-                    <GroupBox Header="Whitelist"
-                              DockPanel.Dock="Top">
+                    <GroupBox DockPanel.Dock="Top">
+                        <GroupBox.Header>
+                            <TextBlock Text="Whitelist"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Padding="0,1,0,2"
+                                       Foreground="White"/>
+                        </GroupBox.Header>
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <!-- Info banner -->
-                            <Border Background="#1e1e1e" Margin="10,0" CornerRadius="8" BorderThickness="0">
-                                <TextBlock Foreground="#bbb"
+                            <Border Background="#303030" Margin="10,5,10,0" CornerRadius="8" BorderThickness="0">
+                                <TextBlock Foreground="#e2e2e2"
                                            FontSize="14"
                                            Margin="18,4"
                                            TextWrapping="Wrap"
                                            HorizontalAlignment="Left">
-                                    Connections from whitelisted IPs will not trigger alerts.
+                                    Connections from whitelisted IPs will not trigger actions.
                                     <LineBreak/>
                                     Enter one IP address per line or comma-separated.
                                 </TextBlock>
@@ -505,16 +605,24 @@
             <!-- Tab: Devices -->
             <TabItem Header="Devices" Name="DevicesTab">
                 <DockPanel>
-                    <GroupBox Header="Exclude Network Interfaces"
-                              DockPanel.Dock="Top">
+                    <GroupBox DockPanel.Dock="Top">
+                        <GroupBox.Header>
+                            <TextBlock Text="Exclude Network Interfaces"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Padding="0,1,0,2"
+                                       Foreground="White"/>
+                        </GroupBox.Header>
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <!-- Info banner -->
-                            <Border Background="#1e1e1e" Margin="10,0" CornerRadius="8" BorderThickness="0">
-                                <TextBlock Foreground="#bbb"
+                            <Border Background="#303030" Margin="10,5,10,0" CornerRadius="8" BorderThickness="0">
+                                <TextBlock Foreground="#e2e2e2"
                                            FontSize="14"
                                            Margin="18,4"
                                            TextWrapping="Wrap"
@@ -529,7 +637,7 @@
                                       Grid.Row="1"
                                       SelectionMode="Single"
                                       ScrollViewer.CanContentScroll="False"
-                                      Margin="-5,5,-5,0"
+                                      Margin="-5,10,-5,0"
                                       BorderThickness="0">
                                 <ListView.ItemContainerStyle>
                                     <Style TargetType="ListViewItem">

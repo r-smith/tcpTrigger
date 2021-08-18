@@ -38,7 +38,7 @@
                                 Grid.Column="0"
                                 Grid.ColumnSpan="3"
                                 CornerRadius="4,4,0,0"
-                                Padding="7,5"
+                                Padding="15,3,5,3"
                                 Background="{TemplateBinding BorderBrush}">
                             <ContentPresenter ContentSource="Header"
                                               RecognizesAccessKey="True"

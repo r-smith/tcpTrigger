@@ -200,7 +200,7 @@
         <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="Background" Value="#eaeaec"/>
-        <Setter Property="Padding" Value="3,3,3,4"/>
+        <Setter Property="Padding" Value="3,4,3,4"/>
         <Setter Property="MinWidth" Value="139"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
