@@ -19,6 +19,8 @@ namespace tcpTrigger
             {
                 try
                 {
+                    Settings.FileLock.EnterWriteLock();
+
                     // Get current file size.
                     long currentFileSize = new FileInfo(Settings.LogPath).Length;
                     if (currentFileSize >= _maxFileSizeInBytes)
@@ -43,10 +45,15 @@ namespace tcpTrigger
                         EventLogEntryType.Error,
                         401);
                 }
+                finally
+                {
+                    Settings.FileLock.ExitWriteLock();
+                }
             }
 
             try
             {
+                Settings.FileLock.EnterWriteLock();
                 using (StreamWriter outputFile = new StreamWriter(Settings.LogPath, true))
                 {
                     outputFile.WriteLine(GetLogText(packetHeader));
@@ -54,12 +61,15 @@ namespace tcpTrigger
             }
             catch (Exception ex)
             {
-                Settings.IsLogEnabled = false;
                 EventLog.WriteEntry(
                     "tcpTrigger",
-                    $"Error writing to log file '{Settings.LogPath}'. Logging has been disabled.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                    $"Error writing to log file '{Settings.LogPath}'.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                     EventLogEntryType.Error,
                     401);
+            }
+            finally
+            {
+                Settings.FileLock.ExitWriteLock();
             }
         }
 

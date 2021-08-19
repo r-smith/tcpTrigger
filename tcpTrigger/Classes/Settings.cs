@@ -4,12 +4,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Xml;
 
 namespace tcpTrigger
 {
     public static class Settings
     {
+        public static ReaderWriterLockSlim FileLock { get; private set; } = new ReaderWriterLockSlim();
         public static bool IsMonitorTcpEnabled { get; private set; }
         public static bool IsMonitorUdpEnabled { get; private set; }
         public static bool IsMonitorIcmpEnabled { get; private set; }
