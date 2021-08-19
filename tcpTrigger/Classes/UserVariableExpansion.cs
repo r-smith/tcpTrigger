@@ -21,10 +21,10 @@ namespace tcpTrigger
         public static string GetExpandedString(string message, PacketHeader header)
         {
             if (message.Contains(SourceIp))
-                message = message.Replace(SourceIp, header.SourceIP.ToString());
+                message = message.Replace(SourceIp, header.SourceIP?.ToString());
 
             if (message.Contains(DestinationIp))
-                message = message.Replace(DestinationIp, header.DestinationIP.ToString());
+                message = message.Replace(DestinationIp, header.DestinationIP?.ToString());
 
             if (message.Contains(SourcePort))
                 message = message.Replace(SourcePort, header.SourcePort.ToString());
@@ -36,14 +36,14 @@ namespace tcpTrigger
                 message = message.Replace(DestinationMac, header.DestinationMacAsString);
 
             if (message.Contains(DhcpServerIp))
-                message = message.Replace(DhcpServerIp, header.DhcpServerAddress.ToString());
+                message = message.Replace(DhcpServerIp, header.DhcpServerAddress?.ToString());
 
             if (message.Contains(TcpFlags))
                 message = message.Replace(TcpFlags, header.TcpFlagsAsString);
 
             if (message.Contains(SourceHostname))
             {
-                var hostname = string.Empty;
+                string hostname = string.Empty;
                 try
                 {
                     hostname = Dns.GetHostEntry(header.SourceIP).HostName;
@@ -55,7 +55,7 @@ namespace tcpTrigger
 
             if (message.Contains(DestinationHostname))
             {
-                var hostname = string.Empty;
+                string hostname = string.Empty;
                 try
                 {
                     hostname = Dns.GetHostEntry(header.DestinationIP).HostName;
@@ -71,7 +71,7 @@ namespace tcpTrigger
         public static string GetExpandedString(string message, TcpTriggerInterface ipInterface)
         {
             if (message.Contains(InterfaceIp))
-                message = message.Replace(InterfaceIp, ipInterface.IP.ToString());
+                message = message.Replace(InterfaceIp, ipInterface.IP?.ToString());
             if (message.Contains(InterfaceMac))
                 message = message.Replace(InterfaceMac, ipInterface.MacAddressAsString);
             if (message.Contains(InterfaceDescription))

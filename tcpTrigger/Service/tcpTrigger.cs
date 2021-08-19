@@ -48,14 +48,14 @@ namespace tcpTrigger
                 }
             }
 
-            // If enabled, validate external app path and disable if not found.
+            // If external app is enabled, report if no path set.
             if (Settings.IsExternalAppEnabled)
             {
-                if (string.IsNullOrEmpty(Settings.ExternalAppPath) || !File.Exists(Settings.ExternalAppPath))
+                if (string.IsNullOrEmpty(Settings.ExternalAppPath))
                 {
                     EventLog.WriteEntry(
                         "tcpTrigger",
-                        $"The specified external application path '{Settings.ExternalAppPath}' was not found. Update your tcpTrigger configuration to point to a valid executable.",
+                        $"You have enabled the action to launch an external application, but no path is set. Update your tcpTrigger configuration to point to a valid executable.",
                         EventLogEntryType.Error,
                         401);
                 }

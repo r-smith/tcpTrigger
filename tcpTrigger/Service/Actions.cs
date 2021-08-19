@@ -147,16 +147,6 @@ namespace tcpTrigger
 
         private void LaunchApplication(PacketHeader packetHeader)
         {
-            if (string.IsNullOrEmpty(Settings.ExternalAppPath) || !File.Exists(Settings.ExternalAppPath))
-            {
-                EventLog.WriteEntry(
-                    "tcpTrigger",
-                    $"An external application has been triggered to launch, but the specified application path '{Settings.ExternalAppPath}' was not found. Update your tcpTrigger configuration to point to a valid executable.",
-                    EventLogEntryType.Warning,
-                    401);
-                return;
-            }
-
             try
             {
                 Process.Start(
