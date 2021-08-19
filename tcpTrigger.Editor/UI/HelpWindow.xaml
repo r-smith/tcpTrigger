@@ -206,7 +206,8 @@
                     Detect ICMP requests
                 </Paragraph>
                 <Paragraph Style="{StaticResource ParagraphText}">
-                    Enable this option to detect when you receive an incoming ping request.
+                    Enable this option to detect when you receive an incoming ping request. ICMP timestamp and netmask
+                    requests are detected as well.
                 </Paragraph>
                 <Paragraph Style="{StaticResource DefaultsText}">
                     <Run Foreground="#30aacc">[Default]</Run>
