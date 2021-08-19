@@ -84,8 +84,8 @@ namespace tcpTrigger
                 case PacketMatch.UdpCommunication:
                     logText = $"UDP communication to port {packetHeader.DestinationPort} from {packetHeader.SourceIP}";
                     break;
-                case PacketMatch.PingRequest:
-                    logText = $"ICMP ping request from {packetHeader.SourceIP}";
+                case PacketMatch.IcmpRequest:
+                    logText = $"ICMP {Enum.GetName(typeof(IcmpTypeCode), packetHeader.IcmpType)} request from {packetHeader.SourceIP}";
                     break;
                 case PacketMatch.RogueDhcp:
                     logText = $"Unrecognized DHCP server at {packetHeader.DhcpServerAddress}";
@@ -103,10 +103,10 @@ namespace tcpTrigger
         {
             switch (packetHeader.MatchType)
             {
-                case PacketMatch.PingRequest:
+                case PacketMatch.IcmpRequest:
                     EventLog.WriteEntry(
                         "tcpTrigger",
-                        $"ICMP ping request detected.{Environment.NewLine}{Environment.NewLine}" +
+                        $"ICMP {Enum.GetName(typeof(IcmpTypeCode), packetHeader.IcmpType)} request detected.{Environment.NewLine}{Environment.NewLine}" +
                         $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}" +
                         $"Destination IP: {packetHeader.DestinationIP}",
                         EventLogEntryType.Information,

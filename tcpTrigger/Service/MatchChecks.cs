@@ -7,10 +7,12 @@ namespace tcpTrigger
     {
         private bool DoesPacketMatchICMP(PacketHeader header, IPAddress ip)
         {
-            if (Settings.IsMonitorIcmpEnabled &&
-                header.ProtocolType == Protocol.ICMP &&
-                header.DestinationIP.Equals(ip) &&
-                header.IcmpType == 8)
+            if (Settings.IsMonitorIcmpEnabled
+                && header.ProtocolType == Protocol.ICMP
+                && header.DestinationIP.Equals(ip)
+                && (header.IcmpType == (int)IcmpTypeCode.ping
+                    || header.IcmpType == (int)IcmpTypeCode.timestamp
+                    || header.IcmpType == (int)IcmpTypeCode.netmask))
             {
                 return true;
             }

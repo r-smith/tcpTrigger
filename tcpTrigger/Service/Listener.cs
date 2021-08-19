@@ -24,7 +24,7 @@ namespace tcpTrigger
                 var packetHeader = new PacketHeader(buffer);
 
                 if (DoesPacketMatchICMP(packetHeader, ipInterface.IP))
-                    packetHeader.MatchType = PacketMatch.PingRequest;
+                    packetHeader.MatchType = PacketMatch.IcmpRequest;
                 else if (DoesPacketMatchTCP(packetHeader, ipInterface.IP))
                     packetHeader.MatchType = PacketMatch.TcpConnect;
                 else if (DoesPacketMatchUDP(packetHeader, ipInterface.IP))

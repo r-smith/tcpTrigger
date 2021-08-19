@@ -16,11 +16,18 @@ namespace tcpTrigger
 
     public enum PacketMatch
     {
-        PingRequest,
+        IcmpRequest,
         TcpConnect,
         UdpCommunication,
         RogueDhcp,
         None
+    }
+
+    public enum IcmpTypeCode
+    {
+        ping = 8,
+        timestamp = 13,
+        netmask = 17
     }
 
     public enum DhcpOperationCode
