@@ -16,7 +16,8 @@
         BorderBrush="#333"
         BorderThickness="1"
         SizeToContent="Height"
-        ShowInTaskbar="False">
+        ShowInTaskbar="False"
+        Loaded="Window_Loaded">
 
     <Grid>
         <Grid.RowDefinitions>
