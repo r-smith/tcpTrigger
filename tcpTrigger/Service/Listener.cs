@@ -31,26 +31,13 @@ namespace tcpTrigger
                     packetHeader.MatchType = PacketMatch.UdpCommunication;
                 else if (DoesPacketMatchDHCP(packetHeader, ipInterface.IP))
                 {
-                    // If no DHCP servers are specified by the user, we will do automatic detection.
-                    // Auto rogue DHCP detection alerts if more than one DHCP server is discovered.
-                    if (Settings.IgnoredDhcpServers.Count == 0)
-                    {
-                        if (!ipInterface.DiscoveredDhcpServers.Contains(packetHeader.DhcpServerAddress))
-                        {
-                            packetHeader.DestinationIP = ipInterface.IP;
-                            packetHeader.SourceIP = packetHeader.DhcpServerAddress;
-                            ipInterface.DiscoveredDhcpServers.Add(packetHeader.DhcpServerAddress);
-                            if (ipInterface.DiscoveredDhcpServers.Count > 1)
-                                packetHeader.MatchType = PacketMatch.RogueDhcp;
-                        }
-                    }
-                    else if (!Settings.IgnoredDhcpServers.Contains(packetHeader.DhcpServerAddress) &&
-                        !ipInterface.DiscoveredDhcpServers.Contains(packetHeader.DhcpServerAddress))
+                    if (!Settings.IgnoredDhcpServers.Contains(packetHeader.DhcpServerAddress)
+                        && packetHeader.DhcpTransactionId != ipInterface.DhcpLastTransactionId)
                     {
                         packetHeader.DestinationIP = ipInterface.IP;
                         packetHeader.SourceIP = packetHeader.DhcpServerAddress;
-                        ipInterface.DiscoveredDhcpServers.Add(packetHeader.DhcpServerAddress);
                         packetHeader.MatchType = PacketMatch.RogueDhcp;
+                        ipInterface.DhcpLastTransactionId = packetHeader.DhcpTransactionId;
                     }
                 }
 

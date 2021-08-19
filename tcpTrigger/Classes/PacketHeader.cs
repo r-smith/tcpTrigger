@@ -59,6 +59,7 @@ namespace tcpTrigger
         public byte IcmpType { get; set; }
         public Protocol ProtocolType { get; set; }
         public IPAddress DhcpServerAddress { get; set; }
+        public uint DhcpTransactionId { get; set; }
         public PacketMatch MatchType { get; set; }
 
         public string TcpFlagsAsString
@@ -102,7 +103,7 @@ namespace tcpTrigger
 
             // Read the first byte from the buffer.
             // This should include the Version (4 bits) and Internet Header Length (4 bits) fields.
-            var headerLength = buffer[0];
+            byte headerLength = buffer[0];
 
             // We just want the header length in bytes, so drop the first 4 bits.
             headerLength <<= 4;
@@ -123,12 +124,12 @@ namespace tcpTrigger
 
             switch (ProtocolType)
             {
-                case (Protocol.ICMP):
+                case Protocol.ICMP:
                     // Read the ICMP Type field - starting at byte [IP header length] + 0 (8 bits).
                     IcmpType = buffer[headerLength];
                     break;
 
-                case (Protocol.TCP):
+                case Protocol.TCP:
                     // Read the TCP source port - starting at byte [IP header length] + 0 (16 bits).
                     SourcePort = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, headerLength));
 
@@ -140,54 +141,53 @@ namespace tcpTrigger
                     TcpFlags = buffer[headerLength + 13];
                     break;
 
-                case (Protocol.UDP):
+                case Protocol.UDP:
                     // Read the UDP source port - starting at byte [IP header length] + 0 (16 bits).
                     SourcePort = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, headerLength));
 
                     // Read the UDP destination port - starting at byte [IP header length] + 2 (16 bits).
                     DestinationPort = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, headerLength + 2));
 
-                    // If DHCP packet, determine if it's a reply message (server to client) and read the DHCP server's IP address.
-                    if (DestinationPort == 68)
+                    // If rogue DHCP detection is enabled, determine if this is a DHCP packet.
+                    if (Settings.IsMonitorDhcpEnabled && (DestinationPort == 68 || DestinationPort == 67))
                     {
-                        // Read the UDP length field
-                        var udpLength = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, headerLength + 4));
+                        // Read the UDP length field (16 bits).
+                        ushort udpLength = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, headerLength + 4));
+
+                        // Read the DHCP transaction ID at byte 12 (UDP header is 8 bytes + 4 bytes to get to transaction ID field in DHCP packet).
+                        DhcpTransactionId = (uint)IPAddress.NetworkToHostOrder(BitConverter.ToInt32(buffer, headerLength + 12));
 
                         // Offset starting at 8 (UDP header is 8 bytes).
-                        var offset = 8;
+                        int offset = 8;
 
-                        // We are only interested in DHCP replies (server to client messages).
-                        if (buffer[headerLength + offset] == (int)DhcpOperationCode.Reply)
+                        // Skip to the DHCP options section.
+                        offset += 240;
+
+                        // Look for DHCP option 54 which gives us the DHCP server IP address.
+                        while (offset < udpLength && headerLength + offset <= buffer.Length - 6)
                         {
-                            // Skip to the DHCP options section.
-                            offset += 240;
+                            // Read the current DHCP option code.
+                            byte dhcpOption = buffer[headerLength + offset];
+                            ++offset;
+                            // Read the byte length of the current DHCP option
+                            byte dhcpOptionLength = buffer[headerLength + offset];
+                            ++offset;
 
-                            while (offset < udpLength && headerLength + offset <= buffer.Length - 6)
+                            // Check if this is DHCP option 54 (DHCP server IP).
+                            if (dhcpOption == 54)
                             {
-                                var dhcpOption = buffer[headerLength + offset];
-                                ++offset;
-                                var dhcpOptionLength = buffer[headerLength + offset];
-                                ++offset;
-
-                                // Option 53: DHCP message type.
-                                //if (dhcpOption == 53)
-                                //{
-                                //    // We only care about DCHPOFFER and DHCPACK messages.
-                                //    var dhcpMessageType = buffer[headerLength + placeHolder];
-                                //    if (dhcpMessageType != (int)DhcpMessageType.Offer || dhcpMessageType != (int)DhcpMessageType.Ack)
-                                //        break;
-                                //}
-
-                                // Option 54: DHCP server identifier.
-                                if (dhcpOption == 54)
-                                {
-                                    DhcpServerAddress = new IPAddress(BitConverter.ToUInt32(buffer, headerLength + offset));
-                                    break;
-                                }
-                                offset += dhcpOptionLength;
+                                // Found. Read in DHCP server IP address and exit processing options.
+                                DhcpServerAddress = new IPAddress(BitConverter.ToUInt32(buffer, headerLength + offset));
+                                break;
                             }
+
+                            // Skip to end of current DHCP option; ready to read next option.
+                            offset += dhcpOptionLength;
                         }
                     }
+                    break;
+
+                case Protocol.Unknown:
                     break;
 
                 default:
