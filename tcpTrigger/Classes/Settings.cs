@@ -306,10 +306,12 @@ namespace tcpTrigger
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null && !string.IsNullOrEmpty(xn.InnerText)) { EmailRateLimitSeconds = int.Parse(xn.InnerText); }
                 else { EmailRateLimitSeconds = 180; }
+                if (EmailRateLimitSeconds <= 0) { EmailRateLimitSeconds = 1; }
                 currentNode = SettingsNode.email_options_bufferSeconds;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null && !string.IsNullOrEmpty(xn.InnerText)) { EmailBufferSeconds = int.Parse(xn.InnerText); }
                 else { EmailBufferSeconds = 15; }
+                if (EmailBufferSeconds <= 0) { EmailBufferSeconds = 1; }
 
                 return true;
             }
