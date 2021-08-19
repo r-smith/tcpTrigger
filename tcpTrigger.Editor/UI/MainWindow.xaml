@@ -470,12 +470,12 @@
                                 </GroupBox.Resources>
                                 <StackPanel>
                                     <StackPanel Margin="5" Orientation="Horizontal">
-                                        <TextBlock Text="{}{Interface_IP}" Width="200" />
-                                        <TextBlock Text="{}{Interface_Decription}" />
+                                        <TextBlock Text="{}{INTERFACE_IP}" Width="200" />
+                                        <TextBlock Text="{}{INTERFACE_DESCRIPTION}" />
                                     </StackPanel>
                                     <StackPanel Margin="5" Orientation="Horizontal">
-                                        <TextBlock Text="{}{Interface_MAC}" Width="200" />
-                                        <TextBlock Text="{}{Connection_Log}" />
+                                        <TextBlock Text="{}{INTERFACE_MAC}" Width="200" />
+                                        <TextBlock Text="{}{CONNECTION_LOG}" />
                                     </StackPanel>
                                 </StackPanel>
                             </GroupBox>
