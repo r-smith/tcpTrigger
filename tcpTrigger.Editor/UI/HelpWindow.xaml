@@ -1,6 +1,512 @@
 ﻿<Window x:Class="tcpTrigger.Editor.HelpWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="tcpTrigger Guide"
+        UseLayoutRounding="True"
+        Height="575"
+        Width="750"
+        Background="#1e1e1e"
+        WindowStartupLocation="CenterScreen"
+        PreviewKeyDown="Window_PreviewKeyDown"
+        Loaded="Window_Loaded"
+        Closed="Window_Closed">
+
+    <Window.Resources>
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="FontSize" Value="16" />
+        </Style>
+        <Style TargetType="{x:Type Paragraph}">
+            <Setter Property="TextAlignment" Value="Left" />
+            <Setter Property="FontFamily" Value="Segoe UI, Arial" />
+            <Setter Property="FontSize" Value="15" />
+        </Style>
+
+        <!-- Title style -->
+        <Style x:Key="TitleText"
+               TargetType="{x:Type TextBlock}"
+               BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter Property="Margin" Value="0,0,0,0" />
+            <Setter Property="FontSize" Value="26" />
+            <Setter Property="Foreground" Value="#f4f4f4" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+        </Style>
+
+        <!-- HyperLink style -->
+        <Style x:Key="HyperlinkStyle"
+               TargetType="{x:Type Hyperlink}"
+               BasedOn="{StaticResource {x:Type Hyperlink}}">
+            <Setter Property="TextDecorations" Value="None" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Foreground" Value="#6c71c4" />
+        </Style>
+
+        <!-- Version style -->
+        <Style x:Key="VersionText"
+               TargetType="{x:Type Paragraph}"
+               BasedOn="{StaticResource {x:Type Paragraph}}">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="#909090" />
+            <Setter Property="Margin" Value="0,0,0,0" />
+            <Setter Property="TextAlignment" Value="Center" />
+        </Style>
+
+        <!-- Section header style -->
+        <Style x:Key="HeaderText"
+               TargetType="{x:Type Paragraph}"
+               BasedOn="{StaticResource {x:Type Paragraph}}">
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Margin" Value="0,45,0,0" />
+            <Setter Property="Foreground" Value="#ffd43b" />
+            <Setter Property="FontSize" Value="26" />
+        </Style>
+
+        <!-- Sub-header style -->
+        <Style x:Key="SubHeaderText"
+               TargetType="{x:Type Paragraph}"
+               BasedOn="{StaticResource {x:Type Paragraph}}">
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Margin" Value="0,25,0,0" />
+            <Setter Property="Foreground" Value="#63e6be" />
+            <Setter Property="FontSize" Value="16" />
+        </Style>
+
+        <!-- Paragraph style -->
+        <Style x:Key="ParagraphText"
+               TargetType="{x:Type Paragraph}"
+               BasedOn="{StaticResource {x:Type Paragraph}}">
+            <Setter Property="Margin" Value="0,2,0,0" />
+            <Setter Property="Foreground" Value="#f0f0f0" />
+        </Style>
+        
+        <!-- Defaults style -->
+        <Style x:Key="DefaultsText"
+               TargetType="{x:Type Paragraph}"
+               BasedOn="{StaticResource ResourceKey=ParagraphText}">
+            <Setter Property="Margin" Value="15,15,0,0"/>
+            <!--<Setter Property="FontSize" Value="14"/>-->
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        
+        <!-- Navigation tree -->
+        <TreeView Name="tree"
+                  BorderThickness="0"
+                  Padding="0,20,0,0"
+                  FontSize="14"
+                  Background="#2d2d30">
+            <TreeView.Resources>
+                <Style TargetType="TreeViewItem">
+                    <Setter Property="Foreground" Value="#f4f4f4"/>
+                    <Setter Property="Margin" Value="0,2,20,2"/>
+                </Style>
+            </TreeView.Resources>
+            <TreeViewItem Header="Overview"
+                          Selected="Overview_Selected" />
+            <TreeViewItem Header="Deployment Guide"
+                          Selected="DeploymentGuide_Selected" />
+            <TreeViewItem Header="Trigger Rules"
+                          Selected="TriggerRules_Selected" />
+            <TreeViewItem Header="Actions"
+                          Selected="Actions_Selected" />
+            <TreeViewItem Header="Email Notifications"
+                          Selected="Email_Selected" />
+            <TreeViewItem Header="Whitelist"
+                          Selected="Whitelist_Selected" />
+            <TreeViewItem Header="Devices"
+                          Selected="Devices_Selected" />
+        </TreeView>
+        
+        <GridSplitter Grid.Column="1" Width="4"
+                      HorizontalAlignment="Center"
+                      BorderBrush="Black"
+                      BorderThickness="0"
+                      VerticalAlignment="Stretch" />
+        
+        <!-- Flow document -->
+        <FlowDocumentScrollViewer Name="MainDocument" Grid.Column="2" FocusVisualStyle="{x:Null}" PreviewMouseWheel="MainDocument_PreviewMouseWheel">
+            <FlowDocument>
+                <!-- Logo and title -->
+                <BlockUIContainer Name="TopOfDocument">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,20">
+                        <TextBlock Style="{StaticResource TitleText}"
+                                   VerticalAlignment="Center"
+                                   Text="tcpTrigger Guide">
+                            <TextBlock.Effect>
+                                <DropShadowEffect ShadowDepth="4" Direction="330" Color="Black" Opacity="0.15" BlurRadius="4" />
+                            </TextBlock.Effect>
+                        </TextBlock>
+                    </StackPanel>
+                </BlockUIContainer>
+
+                <!-- Link to homepage -->
+                <Paragraph TextAlignment="Center">
+                    <Hyperlink NavigateUri="https://github.com/r-smith/tcptrigger"
+                               RequestNavigate="Hyperlink_RequestNavigate"
+                               Style="{StaticResource HyperlinkStyle}">
+                        https://github.com/r-smith/tcptrigger
+                    </Hyperlink>
+                </Paragraph>
+
+                <!-- Version -->
+                <Paragraph Name="Version"
+                           Style="{StaticResource  VersionText}"
+                           Margin="0,3,0,0">
+                    Version X.XXXX.XXXX
+                </Paragraph>
+                <Paragraph Name="Copyright"
+                           Style="{StaticResource VersionText}"
+                           FontSize="13">
+                    Created by Ryan Smith
+                </Paragraph>
+
+                <!-- Overview -->
+                <BlockUIContainer>
+                    <Rectangle Margin="0,30,0,0" HorizontalAlignment="Stretch" Fill="#f0f0f0" Height="1" />
+                </BlockUIContainer>
+                <Paragraph Margin="0,5"
+                           Foreground="#e0e0e0">
+                    tcpTrigger is a Windows service.
+                </Paragraph>
+                <BlockUIContainer>
+                    <Rectangle HorizontalAlignment="Stretch" Fill="#f0f0f0" Height="1" />
+                </BlockUIContainer>
+
+                <!-- Deployment Guide -->
+                <Paragraph Name="DeploymentGuide"
+                           Style="{StaticResource HeaderText}">
+                    Deployment Guide
+                </Paragraph>
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Overview
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Full deployment guide coming soon.
+                </Paragraph>
+
+                <!-- Trigger Rules -->
+                <Paragraph Name="TriggerRules"
+                           Style="{StaticResource HeaderText}">
+                    Trigger Rules
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Use the <Bold><Italic>Rules</Italic></Bold> tab to choose what network activity you want to detect.
+                </Paragraph>
+                <!-- ICMP -->
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Detect ICMP requests
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Enable this option to detect when you receive an incoming ping request.
+                </Paragraph>
+                <Paragraph Style="{StaticResource DefaultsText}">
+                    <Run Foreground="#30aacc">[Default]</Run>
+                    <LineBreak/>
+                    Enabled
+                </Paragraph>
+                <!-- TCP -->
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Detect TCP connections
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Enable this option to detect incoming network connections to any port.
+                    Detection occurs at the start of the TCP handshake process.
+                    This ensures all attempts are detected, and does not indicate
+                    whether the connection was fully established.
+                    <LineBreak/>
+                    <LineBreak/>
+                    Use the
+                    <Italic>include ports</Italic> field to list which ports you want
+                    to monitor. Typically you would include all TCP ports and there is an
+                    option provided to do so. Use the
+                    <Italic>exclude ports</Italic> field
+                    to list ports you do not want to monitor. Excluded ports override included ports.
+                    When entering ports, use a comma to list multiple ports and a hyphen to enter
+                    ranges of ports.
+                    <LineBreak/>
+                    <LineBreak/>
+                    <Run FontWeight="SemiBold">Example:</Run>
+                    <Run FontWeight="SemiBold" Foreground="#cd6ed1">21, 23-25, 3389, 4450-5000</Run>
+                </Paragraph>
+                <Paragraph Style="{StaticResource DefaultsText}">
+                    <Run Foreground="#30aacc">[Default]</Run>
+                    <LineBreak/>
+                    Enabled
+                    <LineBreak/>
+                    Include: ALL
+                </Paragraph>
+                <!-- UDP -->
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Detect UDP communication
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Enable this option to detect incoming UDP communication. Be aware that UDP is a
+                    connectionless protocol, and tcpTrigger is not able to detect if incoming data is standard
+                    reply traffic. For example, if your machine makes an outgoing DNS request, the
+                    response from the DNS server might trigger your detection rules even though the
+                    communications was initiated by you. If unsure, leave this option disabled.
+                    <LineBreak/>
+                    <LineBreak/>
+                    If you are still interested in detecting UDP traffic, the following rules make a good starting point:
+                    <Run FontWeight="SemiBold" Foreground="#ffffff">Include:</Run>
+                    <Run FontWeight="SemiBold" Foreground="#cd6ed1">ALL,</Run>
+                    <Run FontWeight="SemiBold" Foreground="#ffffff">Exclude:</Run>
+                    <Run FontWeight="SemiBold" Foreground="#cd6ed1">68, 123, 49152-65535.</Run>
+                </Paragraph>
+                <Paragraph Style="{StaticResource DefaultsText}">
+                    <Run Foreground="#30aacc">[Default]</Run>
+                    <LineBreak/>
+                    Disabled
+                </Paragraph>
+                <!-- DHCP -->
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Rogue DHCP detection
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Enabling this option detects any acting DHCP server on the network.
+                    Rogue DHCP servers are not always malicious, and can come from network misconfigurations,
+                    or someone carelessly plugging in a home router or other device onto the network.
+                    Detection is limited to the broadcast traffic visible to your computer. As such,
+                    detection across subnets is unlikely. If unsure, leave this option disabled.
+                    <LineBreak/>
+                    <LineBreak/>
+                    To setup, type your known good and expected DHCP servers into the
+                    <Italic>Known DHCP servers</Italic> field.
+                    Servers must be entered by their IP address. Use a comma to enter multiple addresses.
+                </Paragraph>
+                <Paragraph Style="{StaticResource DefaultsText}">
+                    <Run Foreground="#30aacc">[Default]</Run>
+                    <LineBreak/>
+                    Disabled
+                </Paragraph>
+
+                <!-- Actions  -->
+                <Paragraph Name="Actions"
+                           Style="{StaticResource HeaderText}">
+                    Actions
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Use the
+                    <Bold><Italic>Actions</Italic></Bold>
+                    tab to choose what actions should occur when a connection is detected.
+                </Paragraph>
+                <!-- Standard log -->
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Write to standard log
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Enable this option to record a log of connections to a plain text file.
+                    This option is highly recommended and is used by the included log monitoring utility.
+                    Log files are limited to 15 MB in size and will rotate to the file extension
+                    .log-1 if exceeded. It is best to use the default path,
+                    but if you choose an alternate path, ensure the tcpTrigger service has
+                    the necessary read and write permissions.
+                </Paragraph>
+                <Paragraph Style="{StaticResource DefaultsText}">
+                    <Run Foreground="#30aacc">[Default]</Run>
+                    <LineBreak/>
+                    Enabled
+                    <LineBreak/>
+                    C:\ProgramData\tcpTrigger\tcpTrigger.log
+                </Paragraph>
+                <!-- Event log -->
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Write to Windows event log
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Enable this option to record detected connections to the Windows event log. Events are
+                    written to the
+                    <Run FontWeight="SemiBold" FontStyle="Italic">Application</Run> log using
+                    <Run FontWeight="SemiBold" FontStyle="Italic">tcpTrigger</Run>
+                    as the event source. This option is useful for sending tcpTrigger events to a SIEM.
+                    <LineBreak/>
+                    <LineBreak/>
+                    Event code 200 = Detected ICMP request
+                    <LineBreak/>
+                    Event code 201 = Detected TCP connection
+                    <LineBreak/>
+                    Event code 202 = Detected UDP communication
+                    <LineBreak/>
+                    Event code 203 = Detected rogue DHCP server
+                    <LineBreak/>
+                    <LineBreak/>
+                    This option has no affect on the general status events used by tcpTrigger.
+                    Event codes 100 - 199 are used to report basic status information and event
+                    codes 400 - 499 are used to report errors.
+                </Paragraph>
+                <Paragraph Style="{StaticResource DefaultsText}">
+                    <Run Foreground="#30aacc">[Default]</Run>
+                    <LineBreak/>
+                    Enabled
+                </Paragraph>
+                <!-- Send email -->
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Send a notification email
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Enable this option to send an email notification when a detection rule is matched. Use
+                    the
+                    <Bold><Italic>Email</Italic></Bold>
+                    tab for configuring all options relating to email notifications. This option is highly
+                    recommended if tcpTrigger is running on an unattended system.
+                </Paragraph>
+                <Paragraph Style="{StaticResource DefaultsText}">
+                    <Run Foreground="#30aacc">[Default]</Run>
+                    <LineBreak/>
+                    Disabled
+                </Paragraph>
+                <!-- External app -->
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Launch an external application
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Enable this option to call an external application or script when connection attempts are detected.
+                    The application you choose must execute and automatically exit without any user interaction. There
+                    are many optional variables that can be passed to the application as arguments.
+                </Paragraph>
+                <Paragraph Style="{StaticResource DefaultsText}">
+                    <Run Foreground="#30aacc">[Default]</Run>
+                    <LineBreak/>
+                    Disabled
+                </Paragraph>
+
+                <!-- Email Notifications -->
+                <Paragraph Name="EmailNotificaitons"
+                           Style="{StaticResource HeaderText}">
+                    Email Notifications: Mail Server
+                </Paragraph>
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    SMTP server
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Enter the address for your outgoing mail server.
+                </Paragraph>
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Port
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Enter the port used by your outgoing mail server.
+                    This is typically either 25 or 587.
+                </Paragraph>
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Authentication
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    If your SMTP server requires you to login,
+                    check the option labeled 
+                    <Italic>This server requires authentication,</Italic>
+                    and then enter your mail server username and password.
+                    Note that your credentials will be stored in the
+                    tcpTrigger settings file in an encrypted format, however
+                    the encryption key is viewable in the source
+                    code published for this application. Ensure
+                    access to your settings file is properly secured.
+                </Paragraph>
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Recipient address
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Enter the email address that should receive email notifications from
+                    tcpTrigger. Use a comma to enter multiple recipients.
+                </Paragraph>
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Sender address
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    This is the
+                    <Italic>FROM</Italic> email address used by tcpTrigger when sending email notifications.
+                </Paragraph>
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Sender display name
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Enter a friendly name to display as the sender for email notifcations. This field is optional.
+                </Paragraph>
+                <Paragraph Style="{StaticResource HeaderText}">
+                    Email Notifications: Message
+                </Paragraph>
+                <Paragraph Style="{StaticResource HeaderText}">
+                    Email Notifications: Options
+                </Paragraph>
+                <!-- Rate limiting -->
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Rate limiting
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Rate limiting prevents email notifications from being sent too quickly. After an
+                    email notification is sent, tcpTrigger won't send another email for at least
+                    the number of seconds specified. All connections detected during the wait
+                    period are logged, and will be sent once the rate limit has passed.
+                </Paragraph>
+                <Paragraph Style="{StaticResource DefaultsText}">
+                    <Run Foreground="#30aacc">[Default]</Run>
+                    <LineBreak/>
+                    180 seconds (3 minutes)
+                </Paragraph>
+                <!-- Buffering -->
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Buffer connections
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Buffering delays sending an initial email notification when a connection is detected. Delaying allows tcpTrigger
+                    to log additional connections for a short time before sending the email. After the interval is up,
+                    the notification email is sent with a log of all connections that ocurred within the buffer time.
+                </Paragraph>
+                <Paragraph Style="{StaticResource DefaultsText}">
+                    <Run Foreground="#30aacc">[Default]</Run>
+                    <LineBreak/>
+                    15 seconds
+                </Paragraph>
+                
+                <!-- Whitelist -->
+                <Paragraph Name="Whitelist"
+                           Style="{StaticResource HeaderText}">
+                    Whitelist
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Use the
+                    <Bold><Italic>Whitelist</Italic></Bold> tab to enter IP addresses to ignore.
+                    All ICMP, TCP, and UDP connections from IP addresses in the list
+                    will be completely ignored by tcpTrigger.
+                    Enter either one address per line or comma-separated.
+                </Paragraph>
+                
+                <!-- Devices -->
+                <Paragraph Name="Devices"
+                           Style="{StaticResource HeaderText}">
+                    Devices
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    By default, tcpTrigger monitors traffic on all network interfaces with an IPv4 address.
+                    Devices with multiple IP addresses are supported and detected as well. However, IPv6 addresses
+                    are not supported.
+                    <LineBreak/>
+                    <LineBreak/>
+                    Use the
+                    <Bold><Italic>Devices</Italic></Bold> tab to review the network interfaces and IP addresses
+                    that tcpTrigger will monitor.
+                    You can optionally exclude any device you do not want to monitor.
+                </Paragraph>
+            </FlowDocument>
+        </FlowDocumentScrollViewer>
+    </Grid>
+</Window>
+
+
+
+
+<!--<Window x:Class="tcpTrigger.Editor.HelpWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:tcpTrigger.Editor"
@@ -12,7 +518,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <!-- Title -->
+        --><!-- Title --><!--
         <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Center" Grid.Row="0">
             <Image Source="/Resources/tcpTrigger Logo.png"
@@ -167,4 +673,4 @@
             </StackPanel>
         </ScrollViewer>
     </Grid>
-</Window>
+</Window>-->

@@ -9,7 +9,8 @@
         Background="#ffffff"
         Height="570" MinHeight="555"
         Width="750" MinWidth="600"
-        ResizeMode="CanResizeWithGrip">
+        ResizeMode="CanResizeWithGrip"
+        PreviewKeyDown="Window_PreviewKeyDown">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <local:IsCheckedToImageConverter x:Key="IsCheckedToImageConverter" />
@@ -53,7 +54,7 @@
                     HorizontalContentAlignment="Left"
                     Margin="0,0,15,15">
             <!-- Tab: Main -->
-            <TabItem Header="Main" Name="MainTab">
+            <TabItem Header="Rules" Name="MainTab">
                 <DockPanel LastChildFill="False">
                     <!-- Trigger rules -->
                     <GroupBox DockPanel.Dock="Top">
@@ -212,7 +213,7 @@
                                     <TextBlock>
                                         <Run FontWeight="SemiBold" Foreground="#ffd43b">Actions</Run><LineBreak/>
                                         Choose what actions you want carried out for each detected connection. Use the
-                                        <Run FontWeight="SemiBold" Foreground="#63e6be">Main</Run>
+                                        <Run FontWeight="SemiBold" Foreground="#63e6be">Rules</Run>
                                         tab to specify what network activity to detect. Use the
                                         <Run FontWeight="SemiBold" Foreground="#63e6be">Email</Run>
                                         tab to configure options relating to email notifications.

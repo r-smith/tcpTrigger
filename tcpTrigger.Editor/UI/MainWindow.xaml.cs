@@ -148,21 +148,13 @@ namespace tcpTrigger.Editor
 
         private void Help_Click(object sender, RoutedEventArgs e)
         {
-            bool isWindowOpen = false;
-
-            foreach (Window wnd in Application.Current.Windows)
+            if (HelpWindow._OpenWindow == null)
             {
-                if (wnd is HelpWindow)
-                {
-                    isWindowOpen = true;
-                    wnd.Activate();
-                }
+                new HelpWindow().Show();
             }
-
-            if (!isWindowOpen)
+            else
             {
-                HelpWindow newWnd = new HelpWindow();
-                newWnd.Show();
+                HelpWindow._OpenWindow.Activate();
             }
         }
 
@@ -358,6 +350,21 @@ namespace tcpTrigger.Editor
             UdpIncludePorts.Text = _udpInclude;
             UdpIncludePorts.IsEnabled = true;
             UdpIncludePorts.Focus();
+        }
+
+        private void Window_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.F1)
+            {
+                if (HelpWindow._OpenWindow == null)
+                {
+                    new HelpWindow().Show();
+                }
+                else
+                {
+                    HelpWindow._OpenWindow.Activate();
+                }
+            }
         }
     }
 }
