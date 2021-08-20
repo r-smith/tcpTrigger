@@ -95,8 +95,7 @@ namespace tcpTrigger
                     break;
             }
             return
-                DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToString("HH:mm:ss")
-                + " [" + packetHeader.DestinationIP + "] " + logText;
+                DateTime.Now.ToString(Settings.TimestampFormat) + " [" + packetHeader.DestinationIP + "] " + logText;
         }
 
         private void WriteEventLog(PacketHeader packetHeader)

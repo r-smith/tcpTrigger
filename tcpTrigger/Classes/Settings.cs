@@ -34,6 +34,7 @@ namespace tcpTrigger
         public static HashSet<string> ExcludedNetworkInterfaces { get; private set; } = new HashSet<string>();
         public static HashSet<IPAddress> IgnoredDhcpServers { get; private set; } = new HashSet<IPAddress>();
         public static HashSet<IPAddress> IgnoredEndpoints { get; private set; } = new HashSet<IPAddress>();
+        public static string TimestampFormat { get; private set; } = "yyyy-MM-dd HH:mm:ss";
         public static string EmailServer { get; private set; }
         public static int EmailServerPort { get; private set; }
         public static bool IsEmailAuthRequired { get; private set; }
