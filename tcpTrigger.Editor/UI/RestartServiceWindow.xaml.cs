@@ -40,12 +40,15 @@ namespace tcpTrigger.Editor
                 // passed in to tell the new instance of this app to restart the tcpTrigger service and exit.
                 // See Application_Startup() method in App.xaml.cs for handling of command line arguments.
 
-                ProcessStartInfo startInfo = new ProcessStartInfo();
-                startInfo.Verb = "runas";
-                startInfo.UseShellExecute = true;
-                startInfo.WorkingDirectory = Environment.CurrentDirectory;
-                startInfo.FileName = System.Reflection.Assembly.GetExecutingAssembly().Location;
-                startInfo.Arguments = "--restart-service";
+                e.Result = EXIT_SUCCESS;
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    Verb = "runas",
+                    UseShellExecute = true,
+                    WorkingDirectory = Environment.CurrentDirectory,
+                    FileName = System.Reflection.Assembly.GetExecutingAssembly().Location,
+                    Arguments = "--restart-service"
+                };
                 using (Process process = Process.Start(startInfo))
                 {
                     const int _maxWaitMilliseconds = 45 * 1000;
@@ -57,9 +60,6 @@ namespace tcpTrigger.Editor
                         e.Result = EXIT_FAILURE;
                     }
                 }
-                // Success. Process ran and exited with a success code. This should indicate that the
-                // tcpTrigger service restarted successfully. Set thread result to success.
-                e.Result = EXIT_SUCCESS;
             }
             catch (Win32Exception)
             {
@@ -80,7 +80,7 @@ namespace tcpTrigger.Editor
             const string _successIcon = "icon.check-circle";
             const string _successBrush = "#2263e6be";
             const string _failTitle = "Unable to restart service";
-            const string _failMessage = "Use the Windows services management console to manually restart the tcpTrigger service.";
+            const string _failMessage = "Check the Windows Application event log for additional details.";
             const string _failIcon = "icon.exclamation-circle";
             const string _failBrush = "#22ffd43b";
             const string _cancelTitle = "Cancelled";
