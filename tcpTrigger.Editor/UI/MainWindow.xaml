@@ -86,7 +86,7 @@
                                         Excluded ports override included ports and will not be monitored.
                                         <LineBreak/>
                                         <LineBreak/>
-                                        <Run FontWeight="SemiBold" Foreground="#30aacc">Default:</Run><LineBreak/>
+                                        <Run FontWeight="SemiBold" Foreground="#30aacc">[Default]</Run><LineBreak/>
                                         Detect incoming ICMP requests and TCP connections on all ports.
                                     </TextBlock>
                                 </Label>
@@ -219,7 +219,7 @@
                                         tab to configure options relating to email notifications.
                                         <LineBreak/>
                                         <LineBreak/>
-                                        <Run FontWeight="SemiBold" Foreground="#30aacc">Default:</Run><LineBreak/>
+                                        <Run FontWeight="SemiBold" Foreground="#30aacc">[Default]</Run><LineBreak/>
                                         Write to standard log and write to Windows event log. Log path:<LineBreak/>
                                         C:\ProgramData\tcpTrigger\tcpTrigger.log
                                     </TextBlock>
@@ -499,7 +499,7 @@
                                         period are logged, and will be sent once the rate limit has passed.
                                         <LineBreak/>
                                         <LineBreak/>
-                                        <Run FontWeight="SemiBold" Foreground="#30aacc">Default:</Run><LineBreak/>
+                                        <Run FontWeight="SemiBold" Foreground="#30aacc">[Default]</Run><LineBreak/>
                                         180 seconds (3 minutes)
                                     </TextBlock>
                                 </Label>
@@ -534,7 +534,7 @@
                                         the notification email is sent with a log of all connections that ocurred within the buffer time.
                                         <LineBreak/>
                                         <LineBreak/>
-                                        <Run FontWeight="SemiBold" Foreground="#30aacc">Default:</Run><LineBreak/>
+                                        <Run FontWeight="SemiBold" Foreground="#30aacc">[Default]</Run><LineBreak/>
                                         15 seconds
                                     </TextBlock>
                                 </Label>
