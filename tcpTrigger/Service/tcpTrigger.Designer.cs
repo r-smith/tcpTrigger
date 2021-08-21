@@ -31,6 +31,7 @@
             // 
             // tcpTrigger
             // 
+            this.AutoLog = false;
             this.ServiceName = "tcpTrigger";
 
         }

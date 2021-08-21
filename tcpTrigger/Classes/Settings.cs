@@ -12,6 +12,7 @@ namespace tcpTrigger
     public static class Settings
     {
         public static ReaderWriterLockSlim FileLock { get; private set; } = new ReaderWriterLockSlim();
+        public static string Path { get; private set; }
         public static bool IsMonitorTcpEnabled { get; private set; }
         public static bool IsMonitorUdpEnabled { get; private set; }
         public static bool IsMonitorIcmpEnabled { get; private set; }
@@ -62,22 +63,22 @@ namespace tcpTrigger
 
         public static bool Load()
         {
-            string settingsPath = GetSettingsPath();
+            Path = GetSettingsPath();
             
-            if (string.IsNullOrEmpty(settingsPath))
+            if (string.IsNullOrEmpty(Path))
             {
                 // No configuration was found. Log a warning in the Windows event log and
                 // return true (successful load) to allow the tcpTrigger service to start.
                 // In this state, the tcpTrigger service will start and run with everything disabled.
                 EventLog.WriteEntry(
                     "tcpTrigger",
-                    "Could not locate a configuration file for the tcpTrigger service."
-                    + $" The service will start and run with everything disabled.{Environment.NewLine}{Environment.NewLine}"
-                    + $" First path checked: {AppDomain.CurrentDomain.BaseDirectory + "tcpTrigger.xml"}{Environment.NewLine}"
-                    + $" Second path checked: {Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\tcpTrigger.xml"}",
-                    EventLogEntryType.Warning,
+                    "Failed to start the tcpTrigger service. A settings file is required, but one could not be located. Use 'tcpTrigger Manager.exe' to generate the file."
+                    + $"{Environment.NewLine}{Environment.NewLine}"
+                    + $"First path checked: '{AppDomain.CurrentDomain.BaseDirectory + "tcpTrigger.xml"}'{Environment.NewLine}"
+                    + $"Second path checked: '{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\tcpTrigger.xml'"}",
+                    EventLogEntryType.Error,
                     400);
-                return true;
+                return false;
             }
 
             // currentNode is updated with the XML node path for every element that is read
@@ -86,8 +87,8 @@ namespace tcpTrigger
             string currentNode = string.Empty;
             try
             {
-                var xd = new XmlDocument();
-                xd.Load(settingsPath);
+                XmlDocument xd = new XmlDocument();
+                xd.Load(Path);
 
                 XmlNode xn;
                 XmlNodeList nl;
@@ -321,9 +322,9 @@ namespace tcpTrigger
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
-                    $"Failed to start the tcpTrigger service.{Environment.NewLine}{Environment.NewLine}"
-                    + $"Unable to parse the configuration file '{settingsPath}'.{Environment.NewLine}"
-                    + $"Error parsing XML node: {currentNode}{Environment.NewLine}{Environment.NewLine}"
+                    $"Failed to start the tcpTrigger service. Unable to parse the configuration file '{Path}'."
+                    + $"{Environment.NewLine}{Environment.NewLine}"
+                    + $"Error parsing XML node: '{currentNode}'.{Environment.NewLine}{Environment.NewLine}"
                     + ex.Message,
                     EventLogEntryType.Error,
                     400);

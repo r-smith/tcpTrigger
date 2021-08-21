@@ -41,9 +41,10 @@ namespace tcpTrigger
                     Settings.IsLogEnabled = false;
                     EventLog.WriteEntry(
                         "tcpTrigger",
-                        $"Maximum log size {_maxFileSizeInBytes} bytes has been reached. Error rotating log file '{Settings.LogPath}'. Logging has been disabled.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                        $"Maximum log size {_maxFileSizeInBytes} bytes has been reached. Error rotating log file '{Settings.LogPath}'. "
+                        + $"Logging has been disabled.{ Environment.NewLine}{Environment.NewLine}{ex.Message}",
                         EventLogEntryType.Error,
-                        401);
+                        400);
                 }
                 finally
                 {
@@ -65,7 +66,7 @@ namespace tcpTrigger
                     "tcpTrigger",
                     $"Error writing to log file '{Settings.LogPath}'.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                     EventLogEntryType.Error,
-                    401);
+                    400);
             }
             finally
             {
@@ -156,9 +157,9 @@ namespace tcpTrigger
             {
                 EventLog.WriteEntry(
                     "tcpTrigger",
-                    $"Error launching external triggered application '{Settings.ExternalAppPath}'.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                    EventLogEntryType.Error,
-                    401);
+                    $"Error launching external application '{Settings.ExternalAppPath}'.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                    EventLogEntryType.Warning,
+                    400);
             }
         }
 
@@ -179,7 +180,7 @@ namespace tcpTrigger
                     "tcpTrigger",
                     "Email event triggered, but no recipient address is configured.",
                     EventLogEntryType.Warning,
-                    402);
+                    400);
                 return;
             }
             if (Settings.EmailSender.Length == 0)
@@ -188,7 +189,7 @@ namespace tcpTrigger
                     "tcpTrigger",
                     "Email event triggered, but no sender address is configured.",
                     EventLogEntryType.Warning,
-                    402);
+                    400);
                 return;
             }
             if (Settings.EmailServer.Length == 0)
@@ -197,7 +198,7 @@ namespace tcpTrigger
                     "tcpTrigger",
                     "Email event triggered, but no mail server is configured.",
                     EventLogEntryType.Warning,
-                    402);
+                    400);
                 return;
             }
             if (Settings.EmailSubject.Length == 0)
@@ -206,7 +207,7 @@ namespace tcpTrigger
                     "tcpTrigger",
                     "Email event triggered, but no message subject is configured.",
                     EventLogEntryType.Warning,
-                    402);
+                    400);
                 return;
             }
 
@@ -236,11 +237,6 @@ namespace tcpTrigger
 
                     //Send the email.
                     smtpClient.Send(message);
-                    EventLog.WriteEntry(
-                        "tcpTrigger",
-                        $"Email notifcation sent.",
-                        EventLogEntryType.Information,
-                        105);
                 }
                 catch (Exception ex)
                 {
@@ -248,7 +244,7 @@ namespace tcpTrigger
                         "tcpTrigger",
                         $"Email action triggered, but the message failed to send.{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.InnerException.Message}",
                         EventLogEntryType.Warning,
-                        403);
+                        400);
                     return;
                 }
             }

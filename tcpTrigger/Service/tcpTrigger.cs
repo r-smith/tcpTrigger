@@ -44,7 +44,7 @@ namespace tcpTrigger
                         "tcpTrigger",
                         $"Log file path '{Settings.LogPath}' is inaccessible. Logging has been disabled. Update your tcpTrigger configuration with a valid path.",
                         EventLogEntryType.Error,
-                        401);
+                        400);
                 }
             }
 
@@ -57,7 +57,7 @@ namespace tcpTrigger
                         "tcpTrigger",
                         $"You have enabled the action to launch an external application, but no path is set. Update your tcpTrigger configuration to point to a valid executable.",
                         EventLogEntryType.Error,
-                        401);
+                        400);
                 }
             }
 
@@ -69,6 +69,11 @@ namespace tcpTrigger
             networkInterfaceInitializeTimer.Elapsed += InitializeNetworkListeners_Elapsed;
             networkInterfaceInitializeTimer.Enabled = true;
             InitializeNetworkListeners_Elapsed(null, null);
+
+            EventLog.WriteEntry("tcpTrigger",
+                                $"Service started successfully.",
+                                EventLogEntryType.Information,
+                                90);
         }
 
         protected override void OnStop()
@@ -80,6 +85,10 @@ namespace tcpTrigger
             {
                 _tcpTriggerInterfaces[i].NetworkSocket.Close();
             }
+            EventLog.WriteEntry("tcpTrigger",
+                                $"Service stopped successfully.",
+                                EventLogEntryType.Information,
+                                91);
         }
 
         private void InitializeNetworkListeners_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -126,7 +135,7 @@ namespace tcpTrigger
                     // Network interfaces have changed. Record to event log that a change was detected.
                     EventLog.WriteEntry(
                         "tcpTrigger",
-                        "tcpTrigger detected changes to network interfaces in Windows. Restarting listeners.",
+                        "tcpTrigger detected a change in the network interface configuration in Windows. Restarting listeners.",
                         EventLogEntryType.Information,
                         101);
 
@@ -150,10 +159,12 @@ namespace tcpTrigger
             var sb = new StringBuilder();
 
             // Log interfaces.
-            sb.AppendLine("[Starting listeners]");
+            sb.AppendLine($"Using configuration file: '{Settings.Path}'");
+            sb.AppendLine();
+            sb.AppendLine("# Network interfaces");
             foreach (TcpTriggerInterface ipInterface in _tcpTriggerInterfaces)
             {
-                sb.AppendLine($"Listening on: {ipInterface.Description} [{ipInterface.IP}]");
+                sb.AppendLine($"Listening on: {ipInterface.IP} ({ipInterface.Description})");
             }
             if (Settings.ExcludedNetworkInterfaces.Count > 0)
             {
@@ -165,60 +176,62 @@ namespace tcpTrigger
 
             // Log monitoring configuration.
             sb.AppendLine();
-            sb.AppendLine("[Monitoring configuration]");
-            sb.AppendLine("Detect incoming ICMP pings: " + (Settings.IsMonitorIcmpEnabled ? "Enabled" : "Disabled"));
-            sb.AppendLine("Detect incoming TCP connections: " + (Settings.IsMonitorTcpEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("# Rules");
+            sb.AppendLine("Detect incoming ICMP: " + (Settings.IsMonitorIcmpEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Detect incoming TCP: " + (Settings.IsMonitorTcpEnabled ? "Enabled" : "Disabled"));
             if (Settings.IsMonitorTcpEnabled)
             {
-                sb.AppendLine($"[+] Including TCP port(s): {Settings.TcpPortsToIncludeAsString}");
-                sb.AppendLine($"[+] Excluding TCP port(s): {Settings.TcpPortsToExcludeAsString}");
+                sb.AppendLine($"Including TCP port(s): {Settings.TcpPortsToIncludeAsString}");
+                sb.AppendLine($"Excluding TCP port(s): {Settings.TcpPortsToExcludeAsString}");
             }
-            sb.AppendLine("Detect incoming UDP communication: " + (Settings.IsMonitorUdpEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Detect incoming UDP: " + (Settings.IsMonitorUdpEnabled ? "Enabled" : "Disabled"));
             if (Settings.IsMonitorUdpEnabled)
             {
-                sb.AppendLine($"[+] Including UDP port(s): {Settings.UdpPortsToIncludeAsString}");
-                sb.AppendLine($"[+] Excluding UDP port(s): {Settings.UdpPortsToExcludeAsString}");
+                sb.AppendLine($"Including UDP port(s): {Settings.UdpPortsToIncludeAsString}");
+                sb.AppendLine($"Excluding UDP port(s): {Settings.UdpPortsToExcludeAsString}");
             }
-            sb.AppendLine("Detect rogue DHCP servers: " + (Settings.IsMonitorDhcpEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Detect rogue DHCP: " + (Settings.IsMonitorDhcpEnabled ? "Enabled" : "Disabled"));
 
             // Log DHCP server ignore list.
             if (Settings.IgnoredDhcpServers.Count > 0)
             {
                 foreach (IPAddress ip in Settings.IgnoredDhcpServers)
                 {
-                    sb.AppendLine("[+] Ignore DHCP server: " + ip.ToString());
+                    sb.AppendLine("Ignore DHCP server: " + ip.ToString());
                 }
             }
 
             // Log endpoint ignore list.
             if (Settings.IgnoredEndpoints.Count > 0)
             {
+                sb.AppendLine();
+                sb.AppendLine("# Whitelist");
                 foreach (IPAddress ip in Settings.IgnoredEndpoints)
                 {
-                    sb.AppendLine("[+] Ignore source IP: " + ip.ToString());
+                    sb.AppendLine("Ignore IP: " + ip.ToString());
                 }
             }
 
             // Log enabled actions and settings.
             sb.AppendLine();
-            sb.AppendLine("[Actions]");
+            sb.AppendLine("# Actions");
             sb.AppendLine("Write to text log: " + (Settings.IsLogEnabled ? "Enabled" : "Disabled"));
             if (Settings.IsLogEnabled)
-                sb.AppendLine($"[+] Log path: {Settings.LogPath}");
+                sb.AppendLine($"Log path: '{Settings.LogPath}'");
             sb.AppendLine("Write to Windows event log: " + (Settings.IsEventLogEnabled ? "Enabled" : "Disabled"));
             sb.AppendLine("Email notifications: " + (Settings.IsEmailNotificationEnabled ? "Enabled" : "Disabled"));
             sb.AppendLine("Launch external application: " + (Settings.IsExternalAppEnabled ? "Enabled" : "Disabled"));
             if (Settings.IsExternalAppEnabled)
             {
-                sb.AppendLine($"[+] App path: {Settings.ExternalAppPath}");
-                sb.AppendLine($"[+] App args: {Settings.ExternalAppArguments}");
+                sb.AppendLine($"Launch app path: '{Settings.ExternalAppPath}'");
+                sb.AppendLine($"Launch app args: '{Settings.ExternalAppArguments}'");
             }
 
             // Log email settings.
             if (Settings.IsEmailNotificationEnabled)
             {
                 sb.AppendLine();
-                sb.AppendLine("[Email configuration]");
+                sb.AppendLine("# Email");
                 sb.AppendLine($"Server: {Settings.EmailServer}");
                 sb.AppendLine($"Port: {Settings.EmailServerPort}");
                 sb.AppendLine("Use authentication? " + (Settings.IsEmailAuthRequired ? "Yes" : "No"));
