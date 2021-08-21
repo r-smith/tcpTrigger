@@ -146,18 +146,6 @@ namespace tcpTrigger.Editor
                 LogPath.Text = string.Empty;
         }
 
-        private void Help_Click(object sender, RoutedEventArgs e)
-        {
-            if (HelpWindow._OpenWindow == null)
-            {
-                new HelpWindow().Show();
-            }
-            else
-            {
-                HelpWindow._OpenWindow.Activate();
-            }
-        }
-
         private void NumericTextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
             var regex = new Regex("[^0-9.-]+");
@@ -356,15 +344,45 @@ namespace tcpTrigger.Editor
         {
             if (e.Key == System.Windows.Input.Key.F1)
             {
-                if (HelpWindow._OpenWindow == null)
-                {
-                    new HelpWindow().Show();
-                }
-                else
-                {
-                    HelpWindow._OpenWindow.Activate();
-                }
+                ShowHelp();
             }
+        }
+
+        private void Help_Click(object sender, RoutedEventArgs e)
+        {
+            ShowHelp();
+        }
+
+        private void ShowHelp(string sectionName = null)
+        {
+            if (HelpWindow._OpenWindow == null)
+            {
+                new HelpWindow().Show();
+            }
+            else
+            {
+                if (HelpWindow._OpenWindow.WindowState == WindowState.Minimized)
+                {
+                    HelpWindow._OpenWindow.WindowState = WindowState.Normal;
+                }
+                HelpWindow._OpenWindow.Activate();
+            }
+
+            if (!string.IsNullOrEmpty(sectionName))
+            {
+                try
+                {
+                    System.Windows.Documents.Paragraph paragraph =
+                        (System.Windows.Documents.Paragraph)HelpWindow._OpenWindow.FindName(sectionName);
+                    paragraph.BringIntoView();
+                }
+                catch { }
+            }
+        }
+
+        private void ExternalAppTooltip_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            ShowHelp("ExternalApp");
         }
     }
 }

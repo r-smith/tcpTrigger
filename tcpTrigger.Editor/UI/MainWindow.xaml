@@ -267,9 +267,32 @@
                                       Margin="0,10,0,0"/>
 
                             <!-- Launch external application -->
-                            <CheckBox Name="LaunchAppOption"
-                                      Content="Launch an external application"
-                                      Margin="0,10,0,0" />
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <CheckBox Name="LaunchAppOption"
+                                          Content="Launch an external application"/>
+                                <Label Style="{StaticResource LabelToolTip}"
+                                       Foreground="White"
+                                       Margin="-5,0,0,0"
+                                       MouseDown="ExternalAppTooltip_MouseDown"
+                                       MaxWidth="200">
+                                    <TextBlock FontFamily="Consolas" Foreground="#cd6ed1">
+                                        <Run FontWeight="Regular" Foreground="#ffffff" FontStyle="Italic" FontFamily="Segoe UI">Click to open help...</Run>
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run FontWeight="SemiBold" Foreground="#ffd43b" FontFamily="Segoe UI">Variables</Run><LineBreak/>
+                                        {SOURCE_IP}<LineBreak/>
+                                        {SOURCE_PORT}<LineBreak/>
+                                        {SOURCE_HOSTNAME}<LineBreak/>
+                                        {DESTINATION_IP}<LineBreak/>
+                                        {DESTINATION_PORT}<LineBreak/>
+                                        {DESTINATION_HOSTNAME}<LineBreak/>
+                                        {DESTINATION_MAC}<LineBreak/>
+                                        {TIMESTAMP}<LineBreak/>
+                                        {MATCH_TYPE}<LineBreak/>
+                                        {TCP_FLAGS}
+                                    </TextBlock>
+                                </Label>
+                            </StackPanel>
                             <Grid Margin="35,3,0,0">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -292,13 +315,19 @@
                                         Padding="15,0"
                                         Click="Browse_Click"/>
                                 <TextBlock Text="Arguments"
+                                           VerticalAlignment="Top"
+                                           Padding="0,4,0,0"
                                            Grid.Row="2"/>
                                 <TextBox Name="ApplicationArguments"
                                          Grid.Row="2"
                                          Grid.Column="1"
                                          Grid.ColumnSpan="2"
                                          FontSize="13"
-                                         FontFamily="Consolas"/>
+                                         FontFamily="Consolas"
+                                         VerticalContentAlignment="Top"
+                                         VerticalScrollBarVisibility="Auto"
+                                         TextWrapping="Wrap"
+                                         Height="60"/>
                             </Grid>
                         </StackPanel>
                     </GroupBox>

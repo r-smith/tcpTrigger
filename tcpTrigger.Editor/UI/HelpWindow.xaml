@@ -86,8 +86,15 @@
                TargetType="{x:Type Paragraph}"
                BasedOn="{StaticResource ResourceKey=ParagraphText}">
             <Setter Property="Margin" Value="15,15,0,0"/>
-            <!--<Setter Property="FontSize" Value="14"/>-->
             <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
+        <!-- Variables style -->
+        <Style x:Key="VariablesText"
+               TargetType="{x:Type Paragraph}"
+               BasedOn="{StaticResource ResourceKey=DefaultsText}">
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="Foreground" Value="#cd6ed1"/>
         </Style>
     </Window.Resources>
 
@@ -331,18 +338,24 @@
                     as the event source. This option is useful for sending tcpTrigger events to a SIEM.
                     <LineBreak/>
                     <LineBreak/>
-                    Event code 200 = Detected ICMP request
+                    <Run FontWeight="SemiBold" Foreground="#ffffff" FontFamily="Consolas">[Event code: 200]</Run>
+                    <Run FontWeight="SemiBold" Foreground="#cd6ed1" FontFamily="Consolas">Detected ICMP request</Run>
                     <LineBreak/>
-                    Event code 201 = Detected TCP connection
+                    <Run FontWeight="SemiBold" Foreground="#ffffff" FontFamily="Consolas">[Event code: 201]</Run>
+                    <Run FontWeight="SemiBold" Foreground="#cd6ed1" FontFamily="Consolas">Detected TCP connection</Run>
                     <LineBreak/>
-                    Event code 202 = Detected UDP communication
+                    <Run FontWeight="SemiBold" Foreground="#ffffff" FontFamily="Consolas">[Event code: 202]</Run>
+                    <Run FontWeight="SemiBold" Foreground="#cd6ed1" FontFamily="Consolas">Detected UDP communication</Run>
                     <LineBreak/>
-                    Event code 203 = Detected rogue DHCP server
+                    <Run FontWeight="SemiBold" Foreground="#ffffff" FontFamily="Consolas">[Event code: 203]</Run>
+                    <Run FontWeight="SemiBold" Foreground="#cd6ed1" FontFamily="Consolas">Detected rogue DHCP server</Run>
                     <LineBreak/>
                     <LineBreak/>
                     This option has no affect on the general status events used by tcpTrigger.
-                    Event codes 100 - 199 are used to report basic status information and event
-                    codes 400 - 499 are used to report errors.
+                    Event code 90 reports service started. Event code 91 reports service stopped.
+                    Event code 100 reports the running configuration when the service starts. Event code 101
+                    reports when listeners restart because a network interface change in Windows was detected.
+                    And event code 400 is used to report errors.
                 </Paragraph>
                 <Paragraph Style="{StaticResource DefaultsText}">
                     <Run Foreground="#30aacc">[Default]</Run>
@@ -366,7 +379,7 @@
                     Disabled
                 </Paragraph>
                 <!-- External app -->
-                <Paragraph Style="{StaticResource SubHeaderText}">
+                <Paragraph Name="ExternalApp" Style="{StaticResource SubHeaderText}">
                     Launch an external application
                 </Paragraph>
                 <Paragraph Style="{StaticResource ParagraphText}">
@@ -387,24 +400,17 @@
                     When calling an external script or application, placeholder variables can be used
                     in the application arguments.
                 </Paragraph>
-                <Paragraph Style="{StaticResource DefaultsText}">
-                    <Run Foreground="#cd6ed1">{SOURCE_IP}</Run>
-                    <LineBreak/>
-                    <Run Foreground="#cd6ed1">{DESTINATION_IP}</Run>
-                    <LineBreak/>
-                    <Run Foreground="#cd6ed1">{SOURCE_PORT}</Run>
-                    <LineBreak/>
-                    <Run Foreground="#cd6ed1">{DESTINATION_PORT}</Run>
-                    <LineBreak/>
-                    <Run Foreground="#cd6ed1">{SOURCE_HOSTNAME}</Run>
-                    <LineBreak/>
-                    <Run Foreground="#cd6ed1">{DESTINATION_HOSTNAME}</Run>
-                    <LineBreak/>
-                    <Run Foreground="#cd6ed1">{DESTINATION_MAC}</Run>
-                    <LineBreak/>
-                    <Run Foreground="#cd6ed1">{DHCP_SERVER_IP}</Run>
-                    <LineBreak/>
-                    <Run Foreground="#cd6ed1">{TCP_FLAGS}</Run>
+                <Paragraph Style="{StaticResource VariablesText}">
+                    {SOURCE_IP}<LineBreak/>
+                    {SOURCE_PORT}<LineBreak/>
+                    {SOURCE_HOSTNAME}<LineBreak/>
+                    {DESTINATION_IP}<LineBreak/>
+                    {DESTINATION_PORT}<LineBreak/>
+                    {DESTINATION_HOSTNAME}<LineBreak/>
+                    {DESTINATION_MAC}<LineBreak/>
+                    {TIMESTAMP}<LineBreak/>
+                    {MATCH_TYPE}<LineBreak/>
+                    {TCP_FLAGS}
                 </Paragraph>
 
                 <!-- Email Notifications -->
@@ -482,14 +488,11 @@
                     When used in your message subject or body, placeholder variables are replaced with their
                     underlying values when a notification email is generated.
                 </Paragraph>
-                <Paragraph Style="{StaticResource DefaultsText}">
-                    <Run Foreground="#cd6ed1">{INTERFACE_IP}</Run>
-                    <LineBreak/>
-                    <Run Foreground="#cd6ed1">{INTERFACE_DESCRIPTION}</Run>
-                    <LineBreak/>
-                    <Run Foreground="#cd6ed1">{INTERFACE_MAC}</Run>
-                    <LineBreak/>
-                    <Run Foreground="#cd6ed1">{CONNECTION_LOG}</Run>
+                <Paragraph Style="{StaticResource VariablesText}">
+                    {INTERFACE_IP}<LineBreak/>
+                    {INTERFACE_DESCRIPTION}<LineBreak/>
+                    {INTERFACE_MAC}<LineBreak/>
+                    {CONNECTION_LOG}
                 </Paragraph>
                 <!-- Options -->
                 <Paragraph Style="{StaticResource HeaderText}">
