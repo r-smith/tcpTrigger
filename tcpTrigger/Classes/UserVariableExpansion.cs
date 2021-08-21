@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 
 namespace tcpTrigger
 {
@@ -8,14 +9,16 @@ namespace tcpTrigger
         public const string InterfaceMac = "{INTERFACE_MAC}";
         public const string InterfaceDescription = "{INTERFACE_DESCRIPTION}";
         public const string ConnectionLog = "{CONNECTION_LOG}";
+
         public const string SourceIp = "{SOURCE_IP}";
-        public const string DestinationIp = "{DESTINATION_IP}";
         public const string SourcePort = "{SOURCE_PORT}";
-        public const string DestinationPort = "{DESTINATION_PORT}";
         public const string SourceHostname = "{SOURCE_HOSTNAME}";
+        public const string DestinationIp = "{DESTINATION_IP}";
+        public const string DestinationPort = "{DESTINATION_PORT}";
         public const string DestinationHostname = "{DESTINATION_HOSTNAME}";
         public const string DestinationMac = "{DESTINATION_MAC}";
-        public const string DhcpServerIp = "{DHCP_SERVER_IP}";
+        public const string Timestamp = "{TIMESTAMP}";
+        public const string MatchType = "{MATCH_TYPE}";
         public const string TcpFlags = "{TCP_FLAGS}";
         
         public static string GetExpandedString(string message, PacketHeader header)
@@ -23,11 +26,11 @@ namespace tcpTrigger
             if (message.Contains(SourceIp))
                 message = message.Replace(SourceIp, header.SourceIP?.ToString());
 
-            if (message.Contains(DestinationIp))
-                message = message.Replace(DestinationIp, header.DestinationIP?.ToString());
-
             if (message.Contains(SourcePort))
                 message = message.Replace(SourcePort, header.SourcePort.ToString());
+
+            if (message.Contains(DestinationIp))
+                message = message.Replace(DestinationIp, header.DestinationIP?.ToString());
 
             if (message.Contains(DestinationPort))
                 message = message.Replace(DestinationPort, header.DestinationPort.ToString());
@@ -35,11 +38,36 @@ namespace tcpTrigger
             if (message.Contains(DestinationMac))
                 message = message.Replace(DestinationMac, header.DestinationMacAsString);
 
-            if (message.Contains(DhcpServerIp))
-                message = message.Replace(DhcpServerIp, header.DhcpServerAddress?.ToString());
-
             if (message.Contains(TcpFlags))
                 message = message.Replace(TcpFlags, header.TcpFlagsAsString);
+
+            if (message.Contains(Timestamp))
+                message = message.Replace(Timestamp, DateTime.Now.ToString(Settings.TimestampFormat));
+
+            if (message.Contains(MatchType))
+            {
+                string t;
+                switch (header.MatchType)
+                {
+                    case PacketMatch.IcmpRequest:
+                        t = "ICMP";
+                        break;
+                    case PacketMatch.TcpConnect:
+                        t = "TCP";
+                        break;
+                    case PacketMatch.UdpCommunication:
+                        t = "UDP";
+                        break;
+                    case PacketMatch.RogueDhcp:
+                        t = "DHCP";
+                        break;
+                    case PacketMatch.None:
+                    default:
+                        t = "None";
+                        break;
+                }
+                message = message.Replace(MatchType, t);
+            }
 
             if (message.Contains(SourceHostname))
             {
