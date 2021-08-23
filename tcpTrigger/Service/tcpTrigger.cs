@@ -206,9 +206,18 @@ namespace tcpTrigger
             {
                 sb.AppendLine();
                 sb.AppendLine("# Whitelist");
-                foreach (IPAddress ip in Settings.IgnoredEndpoints)
+                foreach (KeyValuePair<IPAddress, HashSet<int>> pair in Settings.IgnoredEndpoints)
                 {
-                    sb.AppendLine("Ignore IP: " + ip.ToString());
+                    foreach (int port in pair.Value)
+                    {
+                        sb.Append($"Ignore IP: {pair.Key}");
+                        if (port == Settings.IgnoreIcmp)
+                            sb.AppendLine(":icmp");
+                        else if (port == Settings.IgnoreAll)
+                            sb.AppendLine();
+                        else
+                            sb.AppendLine($":{port}");
+                    }
                 }
             }
 

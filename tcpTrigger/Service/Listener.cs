@@ -20,44 +20,37 @@ namespace tcpTrigger
             Action<IAsyncResult> OnReceive = null;
             OnReceive = (ar) =>
             {
-                // Packet received.  Extract header information and determine if the packet matches our trigger rules.
+                // Packet received. Extract header information.
                 var packetHeader = new PacketHeader(buffer);
 
+                // Determine if the packet matches our trigger rules.
                 if (DoesPacketMatchICMP(packetHeader, ipInterface.IP))
                     packetHeader.MatchType = PacketMatch.IcmpRequest;
                 else if (DoesPacketMatchTCP(packetHeader, ipInterface.IP))
                     packetHeader.MatchType = PacketMatch.TcpConnect;
                 else if (DoesPacketMatchUDP(packetHeader, ipInterface.IP))
                     packetHeader.MatchType = PacketMatch.UdpCommunication;
-                else if (DoesPacketMatchDHCP(packetHeader, ipInterface.IP))
+                else if (DoesPacketMatchDHCP(packetHeader, ipInterface))
                 {
-                    if (!Settings.IgnoredDhcpServers.Contains(packetHeader.DhcpServerAddress)
-                        && packetHeader.DhcpTransactionId != ipInterface.DhcpLastTransactionId)
-                    {
-                        packetHeader.DestinationIP = ipInterface.IP;
-                        packetHeader.SourceIP = packetHeader.DhcpServerAddress;
-                        packetHeader.MatchType = PacketMatch.RogueDhcp;
-                        ipInterface.DhcpLastTransactionId = packetHeader.DhcpTransactionId;
-                    }
+                    packetHeader.DestinationIP = ipInterface.IP;
+                    packetHeader.SourceIP = packetHeader.DhcpServerAddress;
+                    packetHeader.MatchType = PacketMatch.RogueDhcp;
+                    ipInterface.DhcpLastTransactionId = packetHeader.DhcpTransactionId;
                 }
 
                 // Process actions.
                 if (packetHeader.MatchType != PacketMatch.None)
                 {
                     // A match was detected. Perform enabled actions.
-
                     packetHeader.DestinationMac = ipInterface.MacAddress;
-                    if (!Settings.IgnoredEndpoints.Contains(packetHeader.SourceIP))
-                    {
-                        if (Settings.IsLogEnabled)
-                            WriteLog(packetHeader);
-                        if (Settings.IsEventLogEnabled)
-                            WriteEventLog(packetHeader);
-                        if (Settings.IsExternalAppEnabled)
-                            LaunchApplication(packetHeader);
-                        if (Settings.IsEmailNotificationEnabled)
-                            TriggerEmail(packetHeader, ipInterface);
-                    }
+                    if (Settings.IsLogEnabled)
+                        WriteLog(packetHeader);
+                    if (Settings.IsEventLogEnabled)
+                        WriteEventLog(packetHeader);
+                    if (Settings.IsExternalAppEnabled)
+                        LaunchApplication(packetHeader);
+                    if (Settings.IsEmailNotificationEnabled)
+                        TriggerEmail(packetHeader, ipInterface);
                 }
                 // Reset buffer and continue listening for new data.
                 buffer = new byte[512];

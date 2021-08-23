@@ -11,6 +11,9 @@ namespace tcpTrigger
 {
     public static class Settings
     {
+        internal const int IgnoreAll = 0;
+        internal const int IgnoreIcmp = -1;
+
         public static ReaderWriterLockSlim FileLock { get; private set; } = new ReaderWriterLockSlim();
         public static string Path { get; private set; }
         public static bool IsMonitorTcpEnabled { get; private set; }
@@ -34,7 +37,7 @@ namespace tcpTrigger
         public static string ExternalAppArguments { get; private set; }
         public static HashSet<string> ExcludedNetworkInterfaces { get; private set; } = new HashSet<string>();
         public static HashSet<IPAddress> IgnoredDhcpServers { get; private set; } = new HashSet<IPAddress>();
-        public static HashSet<IPAddress> IgnoredEndpoints { get; private set; } = new HashSet<IPAddress>();
+        public static Dictionary<IPAddress, HashSet<int>> IgnoredEndpoints { get; private set; } = new Dictionary<IPAddress, HashSet<int>>();
         public static string TimestampFormat { get; private set; } = "yyyy-MM-dd HH:mm:ss";
         public static string EmailServer { get; private set; }
         public static int EmailServerPort { get; private set; }
@@ -196,7 +199,33 @@ namespace tcpTrigger
                 for (int i = 0; i < nl.Count; i++)
                 {
                     if (!string.IsNullOrEmpty(nl[i].InnerText))
-                        IgnoredEndpoints.Add(IPAddress.Parse(nl[i].InnerText));
+                    {
+                        string portAttr = nl[i].Attributes["port"]?.Value;
+                        int port = IgnoreAll;
+
+                        if (!string.IsNullOrEmpty(portAttr))
+                        {
+                            if (portAttr.ToLower().Equals("icmp"))
+                            {
+                                port = IgnoreIcmp;
+                            }
+                            else if (!int.TryParse(portAttr, out port) || port < 1 || port > 65535)
+                            {
+                                port = IgnoreAll;
+                            }
+                        }
+                        if (IPAddress.TryParse(nl[i].InnerText, out IPAddress ip))
+                        {
+                            if (!IgnoredEndpoints.ContainsKey(ip))
+                            {
+                                IgnoredEndpoints.Add(ip, new HashSet<int>() { port } );
+                            }
+                            else
+                            {
+                                IgnoredEndpoints[ip].Add(port);
+                            }
+                        }
+                    }
                 }
 
                 // tcpTrigger/networkInterfaceExcludeList
