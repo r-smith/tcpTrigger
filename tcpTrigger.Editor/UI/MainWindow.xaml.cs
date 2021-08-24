@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Net;
@@ -18,8 +19,9 @@ namespace tcpTrigger.Editor
     /// </summary>
     public partial class MainWindow : Window
     {
-        private HashSet<string> ExcludedNetworkInterfaces = new HashSet<string>();
-        private List<TcpTriggerInterface> AllNetworkInterfaces;
+        private readonly HashSet<string> ExcludedNetworkInterfaces = new HashSet<string>();
+        private readonly List<TcpTriggerInterface> AllNetworkInterfaces;
+        private readonly ObservableCollection<WhitelistItem> WhitelistItems = new ObservableCollection<WhitelistItem>();
         private string _tcpInclude = string.Empty;
         private string _udpInclude = string.Empty;
 
@@ -31,6 +33,10 @@ namespace tcpTrigger.Editor
             AllNetworkInterfaces = GetNetworkInterfaces();
             AllNetworkInterfaces.Sort((x, y) => x.Description.CompareTo(y.Description));
             Devices.ItemsSource = AllNetworkInterfaces;
+
+            Whitelist.ItemsSource = WhitelistItems;
+            if (WhitelistItems.Count < 1)
+                WhitelistItems.Add(new WhitelistItem());
         }
 
         private List<TcpTriggerInterface> GetNetworkInterfaces()
@@ -383,6 +389,27 @@ namespace tcpTrigger.Editor
         private void ExternalAppTooltip_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             ShowHelp("ExternalApp");
+        }
+
+        private void WhitelistAdd_Click(object sender, RoutedEventArgs e)
+        {
+            WhitelistItems.Add(new WhitelistItem());
+            Whitelist.UpdateLayout();
+            WhitelistScroller.ScrollToEnd();
+            if (Whitelist.Items.Count > 0)
+            {
+                ContentPresenter cp = Whitelist.ItemContainerGenerator.ContainerFromIndex(Whitelist.Items.Count - 1) as ContentPresenter;
+                TextBox tb = (TextBox)cp.ContentTemplate.FindName("WhitelistIP", cp);
+                tb?.Focus();
+            }
+        }
+
+        private void WhitelistRemove_Click(object sender, RoutedEventArgs e)
+        {
+            WhitelistItem item = (sender as Button).DataContext as WhitelistItem;
+            WhitelistItems.Remove(item);
+            if (WhitelistItems.Count < 1)
+                WhitelistItems.Add(new WhitelistItem());
         }
     }
 }

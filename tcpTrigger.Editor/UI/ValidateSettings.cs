@@ -165,18 +165,6 @@ namespace tcpTrigger.Editor
                 }
             }
 
-            if (Whitelist.Text.Length > 0 && !IsIpAddressListValid(Whitelist.Text))
-            {
-                ShowMessageBox(
-                        message: "Check to ensure the IP addresses you entered are formatted properly."
-                                 + Environment.NewLine + "IP addresses can be entered one per line, or comma-separated.",
-                        title: "Invalid whitelist",
-                        type: DialogWindow.Type.Error,
-                        tab: WhitelistTab,
-                        control: Whitelist);
-                return false;
-            }
-
             if (RateLimitSeconds.Text.Length > 0)
             {
                 if (!int.TryParse(RateLimitSeconds.Text, out int n) || n <= 0 || n > 3600)

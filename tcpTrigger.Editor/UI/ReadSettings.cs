@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using System.Net;
 using System.Windows;
 using System.Xml;
 
@@ -78,13 +78,21 @@ namespace tcpTrigger.Editor
                 // tcpTrigger/endpointIgnoreList
                 currentNode = SettingsNode.endpointIgnoreList_ipAddress;
                 nl = xd.DocumentElement.SelectNodes(currentNode);
-                var sb = new StringBuilder();
                 for (int i = 0; i < nl.Count; i++)
                 {
-                    if (!string.IsNullOrEmpty(nl[i].InnerText))
-                        sb.AppendLine(nl[i].InnerText.Trim());
+                    if (!string.IsNullOrEmpty(nl[i].InnerText)
+                        && IPAddress.TryParse(nl[i].InnerText, out _))
+                    {
+                        {
+                            WhitelistItems.Add(new WhitelistItem()
+                            {
+                                IP = nl[i].InnerText,
+                                Port = nl[i].Attributes["port"]?.Value,
+                                Comment = nl[i].Attributes["comment"]?.Value
+                            });
+                        }
+                    }
                 }
-                Whitelist.Text = sb.ToString();
 
                 // tcpTrigger/networkInterfaceExcludeList
                 currentNode = SettingsNode.networkInterfaceExcludeList_deviceGuid;

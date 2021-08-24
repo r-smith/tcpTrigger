@@ -92,33 +92,57 @@ namespace tcpTrigger.Editor
 
                     // Ignored endpoints.
                     writer.WriteStartElement("endpointIgnoreList");
-                    if (Whitelist.Text.Trim().Length > 0)
+                    if (WhitelistItems.Count > 0)
                     {
-                        try
+                        List<WhitelistItem> sortedWhitelist = new List<WhitelistItem>();
+                        foreach (WhitelistItem item in WhitelistItems)
                         {
-                            // Split whitelist by both commas and newlines. Parse each item to IPAddress. Store end result in a List<IPAddress>.
-                            List<IPAddress> ignoredEndpoints =
-                                Whitelist.Text
-                                .Trim()
-                                .Split(new string[] { ",", "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)
-                                .Select(ip => IPAddress.Parse(ip.Trim()))
-                                .ToList();
-                            // Sort IPs using custom sorter.
-                            ignoredEndpoints.Sort(new IPAddressComparer());
-                            // Write each IP to config.
-                            for (int i = 0; i < ignoredEndpoints.Count; i++)
+                            // Skip entries that don't parse to an IP address.
+                            if (string.IsNullOrWhiteSpace(item.IP)
+                                || IPAddress.TryParse(item.IP, out _) == false)
                             {
-                                writer.WriteElementString("ipAddress", ignoredEndpoints[i].ToString().Trim());
+                                continue;
                             }
-                        }
-                        catch
-                        {
-                            ShowMessageBox(
-                                message: "Check to ensure the IP addresses you entered are valid.",
-                                title: "Failed to save your whitelist settings",
-                                type: DialogWindow.Type.Error);
+
+                            string port = string.Empty;
+                            // Check if this whitelist item has a port specified.
+                            if (!string.IsNullOrEmpty(item.Port))
+                            {
+                                // Port is specified. Check if it parses to a number.
+                                if (int.TryParse(item.Port, out int p))
+                                {
+                                    // Port parses to a number. If outside valid port range, set to empty string.
+                                    port = p < 1 || p > 65535 ? string.Empty : item.Port;
+                                }
+                                else
+                                {
+                                    // Port does not parse to a number. If not equal to "icmp", set to empty string.
+                                    port = !item.Port.ToLower().Equals("icmp") ? string.Empty : item.Port.ToLower();
+                                }
+                            }
+
+                            sortedWhitelist.Add(new WhitelistItem()
+                            {
+                                IP = item.IP, Port = port, Comment = item.Comment
+                            });
                         }
 
+                        // Sort by IP, then by port.
+                        sortedWhitelist = sortedWhitelist
+                            .OrderBy(x => IPAddress.Parse(x.IP), new IPAddressComparer())
+                            .ThenBy(p => p.Port, new PortComparer())
+                            .ToList();
+
+                        foreach (WhitelistItem item in sortedWhitelist)
+                        {
+                            writer.WriteStartElement("ipAddress");
+                            if (!string.IsNullOrWhiteSpace(item.Comment))
+                                writer.WriteAttributeString("comment", item.Comment);
+                            if (!string.IsNullOrWhiteSpace(item.Port))
+                                writer.WriteAttributeString("port", item.Port);
+                            writer.WriteString(item.IP);
+                            writer.WriteEndElement();
+                        }
                     }
                     writer.WriteEndElement();
 

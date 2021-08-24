@@ -79,7 +79,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\CustomComparers.cs" />
     <Compile Include="Classes\Elevate.cs" />
+    <Compile Include="Classes\WhitelistItem.cs" />
     <Compile Include="Classes\SettingsNode.cs" />
     <Compile Include="Controls\Spinner.xaml.cs">
       <DependentUpon>Spinner.xaml</DependentUpon>

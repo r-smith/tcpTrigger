@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="tcpTrigger Manager"
         Background="#ffffff"
-        Height="570" MinHeight="555"
+        Height="570" MinHeight="565"
         Width="750" MinWidth="600"
         ResizeMode="CanResizeWithGrip"
         PreviewKeyDown="Window_PreviewKeyDown">
@@ -447,9 +447,9 @@
                                     Name="TestEmail"
                                     DockPanel.Dock="Top"
                                     Click="TestEmail_Click"
-                                    Width="100"
+                                    Width="75"
                                     Margin="0,18,0,0"
-                                    Padding="0,1"
+                                    Padding="0,3"
                                     Content="Test"
                                     HorizontalAlignment="Left"/>
                         </StackPanel>
@@ -607,26 +607,156 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            <!-- Info banner -->
-                            <Border Background="#303030" Margin="10,5,10,0" CornerRadius="8" BorderThickness="0">
-                                <TextBlock Foreground="#e2e2e2"
-                                           FontSize="14"
-                                           Margin="18,4"
-                                           TextWrapping="Wrap"
-                                           HorizontalAlignment="Left">
-                                    Connections from whitelisted IPs will not trigger actions.
-                                    <LineBreak/>
-                                    Enter one IP address per line or comma-separated.
-                                </TextBlock>
-                            </Border>
-                            <TextBox Name="Whitelist"
-                                     Grid.Row="1"
-                                     FontFamily="Consolas"
-                                     FontSize="17"
-                                     AcceptsReturn="True"
-                                     VerticalScrollBarVisibility="Auto"
-                                     Margin="10,10,10,5"
-                                     VerticalContentAlignment="Top"/>
+
+                            <Grid Grid.Row="1" Margin="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="190" />
+                                    <ColumnDefinition Width="70" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                
+                                <!-- Header row -->
+                                <TextBlock Grid.Column="0"
+                                           Text="IP Address"
+                                           HorizontalAlignment="Left"
+                                           FontWeight="Bold"/>
+                                <TextBlock Grid.Column="1"
+                                           Text="Port"
+                                           HorizontalAlignment="Left"
+                                           FontWeight="Bold"/>
+                                <TextBlock Grid.Column="2"
+                                           Text="Comment"
+                                           HorizontalAlignment="Left"
+                                           FontWeight="Bold"/>
+                                <ScrollViewer Name="WhitelistScroller"
+                                              Grid.Row="1"
+                                              Grid.ColumnSpan="3"
+                                              VerticalScrollBarVisibility="Auto"
+                                              FocusVisualStyle="{x:Null}">
+                                    <ItemsControl Name="Whitelist"
+                                                  Margin="0,-1,0,0"
+                                                  UseLayoutRounding="True"
+                                                  IsTabStop="False"
+                                                  FocusVisualStyle="{x:Null}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Name="TPGrid">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="190" />
+                                                        <ColumnDefinition Width="70" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <!-- IP Address -->
+                                                    <TextBox Text="{Binding IP}"
+                                                             Grid.Column="0"
+                                                             Margin="0,3,6,0"
+                                                             Name="WhitelistIP"
+                                                             FontFamily="Consolas"
+                                                             FontSize="15">
+                                                        <TextBox.Style>
+                                                            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                                                                <Setter Property="FontWeight" Value="Regular"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding ElementName=TPGrid, Path=IsMouseOver}" Value="True">
+                                                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                                                        <Setter Property="Background" Value="#fcfcfc"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBox.Style>
+                                                    </TextBox>
+                                                    <!-- Port -->
+                                                    <TextBox Text="{Binding Port}"
+                                                             Grid.Column="1"
+                                                             Margin="0,3,6,0"
+                                                             MaxLength="5"
+                                                             FontFamily="Consolas"
+                                                             FontSize="15">
+                                                        <TextBox.Style>
+                                                            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                                                                <Setter Property="FontWeight" Value="Regular"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding ElementName=TPGrid, Path=IsMouseOver}" Value="True">
+                                                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                                                        <Setter Property="Background" Value="#fcfcfc"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBox.Style>
+                                                    </TextBox>
+                                                    <!-- Comment -->
+                                                    <TextBox Text="{Binding Comment}"
+                                                             Grid.Column="2"
+                                                             Margin="0,3,3,0"
+                                                             FontFamily="Consolas"
+                                                             FontSize="15">
+                                                        <TextBox.Style>
+                                                            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                                                                <Setter Property="FontWeight" Value="Regular"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding ElementName=TPGrid, Path=IsMouseOver}" Value="True">
+                                                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                                                        <Setter Property="Background" Value="#fcfcfc"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBox.Style>
+                                                    </TextBox>
+                                                    <!-- Remove button -->
+                                                    <Button Grid.Column="3"
+                                                            Name="WhitelistRemoveButton"
+                                                            Margin="0,3,6,0"
+                                                            Padding="7,2"
+                                                            Background="Transparent"
+                                                            ToolTip="Remove"
+                                                            ToolTipService.InitialShowDelay="1500"
+                                                            ToolTipService.ShowDuration="2000"
+                                                            Click="WhitelistRemove_Click">
+                                                        <Button.Template>
+                                                            <ControlTemplate TargetType="Button">
+                                                                <Border Name="controlButton_border"
+                                                                        BorderThickness="1"
+                                                                        BorderBrush="Transparent"
+                                                                        CornerRadius="4"
+                                                                        Opacity="0.35"
+                                                                        Padding="{TemplateBinding Padding}"
+                                                                        Background="{TemplateBinding Background}">
+                                                                    <Image Name="controlButton_image"
+                                                                           Source="{StaticResource icon.delete-item}"
+                                                                           Width="11"
+                                                                           Height="11"/>
+                                                                </Border>
+                                                                <ControlTemplate.Triggers>
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter TargetName="controlButton_border" Property="Background" Value="#eaeaeb" />
+                                                                        <Setter TargetName="controlButton_border" Property="Opacity" Value="1" />
+                                                                        <Setter TargetName="controlButton_border" Property="BorderBrush" Value="#d0d0d0" />
+                                                                    </Trigger>
+                                                                    <Trigger Property="IsPressed" Value="True">
+                                                                        <Setter TargetName="controlButton_border" Property="BorderBrush" Value="#606060" />
+                                                                        <Setter TargetName="controlButton_border" Property="Background" Value="#dadada" />
+                                                                    </Trigger>
+                                                                </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </Button.Template>
+                                                    </Button>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                                <!-- Add button -->
+                                <Button Grid.Row="2" Grid.Column="0" Width="75" Content="Add" HorizontalAlignment="Left" Click="WhitelistAdd_Click"
+                                        Style="{StaticResource ButtonSecondaryStyle}"
+                                        Margin="0,6,0,0"
+                                        Padding="0,3"/>
+                            </Grid>
                         </Grid>
                     </GroupBox>
                 </DockPanel>
