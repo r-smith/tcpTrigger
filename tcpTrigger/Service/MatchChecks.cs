@@ -36,10 +36,13 @@ namespace tcpTrigger
         private bool DoesPacketMatchTCP(PacketHeader header, IPAddress ip)
         {
             if (Settings.IsMonitorTcpEnabled
-                && header.ProtocolType == Protocol.TCP
-                && header.TcpFlags == 0x2
-                && header.DestinationIP.Equals(ip)
-                && Settings.TcpPortsToMonitor.Contains(header.DestinationPort))
+               && header.ProtocolType == Protocol.TCP
+               && header.DestinationIP.Equals(ip)
+               && Settings.TcpPortsToMonitor.Contains(header.DestinationPort)
+               && (header.TcpFlags == 0x2           /*           SYN */
+                   || header.TcpFlags == 0xc2       /* CWR, ECE, SYN */
+                   || header.TcpFlags == 0x82       /* CWR,      SYN */
+                   || header.TcpFlags == 0x42))     /*      ECE, SYN */
             {
                 // So far match is good. Now check if source IP is in ignore list.
                 if (Settings.IgnoredEndpoints.TryGetValue(header.SourceIP, out HashSet<int> ports))
