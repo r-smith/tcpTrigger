@@ -828,7 +828,7 @@
                                     </ItemsControl>
                                 </ScrollViewer>
                                 <!-- Add button -->
-                                <Button Grid.Row="2" Grid.Column="0" Width="75" Content="Add" HorizontalAlignment="Left" Click="WhitelistAdd_Click"
+                                <Button Grid.Row="2" Grid.Column="0" Width="75" Content="_Add" HorizontalAlignment="Left" Click="WhitelistAdd_Click"
                                         Style="{StaticResource ButtonSecondaryStyle}"
                                         Margin="0,6,0,0"
                                         Padding="0,3"/>
