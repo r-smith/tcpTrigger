@@ -147,7 +147,7 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,20">
                         <TextBlock Style="{StaticResource TitleText}"
                                    VerticalAlignment="Center"
-                                   Text="tcpTrigger Guide">
+                                   Text="tcpTrigger">
                             <TextBlock.Effect>
                                 <DropShadowEffect ShadowDepth="4" Direction="330" Color="Black" Opacity="0.15" BlurRadius="4" />
                             </TextBlock.Effect>
@@ -194,10 +194,32 @@
                     Deployment Guide
                 </Paragraph>
                 <Paragraph Style="{StaticResource SubHeaderText}">
-                    Overview
+                    Basic Setup
                 </Paragraph>
                 <Paragraph Style="{StaticResource ParagraphText}">
-                    Full deployment guide coming soon.
+                    Download and install the latest version of tcpTrigger from
+                    <Hyperlink NavigateUri="https://github.com/r-smith/tcptrigger"
+                               RequestNavigate="Hyperlink_RequestNavigate"
+                               Style="{StaticResource HyperlinkStyle}">
+                        https://github.com/r-smith/tcptrigger
+                    </Hyperlink>.
+                    After installation, launch tcpTrigger Manager to
+                    create the required settings file. Setup is easy:
+                    Use the <Bold><Italic>Rules</Italic></Bold>
+                    tab to define what network
+                    activity tcpTrigger should detect, and then use the
+                    <Bold><Italic>Actions</Italic></Bold> tab to select
+                    what happens upon detection.
+                    If you decide to enable email notifications, use the
+                    <Bold><Italic>Email</Italic></Bold> tab for all mail-related options.
+                    If you want to ignore connections from certain IP
+                    addresses, enter that information in the <Bold><Italic>Whitelist</Italic></Bold>
+                    tab. Finally, click <Bold><Italic>Save</Italic></Bold> to create your initial settings
+                    file and start the tcpTrigger service. tcpTrigger runs
+                    in the background as a Windows service and starts
+                    automatically when your computer boots. Relaunch
+                    tcpTrigger Manager at any time to make adjustments
+                    to your settings.
                 </Paragraph>
 
                 <!-- Trigger Rules -->
@@ -234,7 +256,7 @@
                     <LineBreak/>
                     Use the
                     <Italic>include ports</Italic> field to list which ports you want
-                    to monitor. Typically you would include all TCP ports and there is an
+                    to monitor. Typically you would include all TCP ports, and there is an
                     option provided to do so. Use the
                     <Italic>exclude ports</Italic> field
                     to list ports you do not want to monitor. Excluded ports override included ports.
