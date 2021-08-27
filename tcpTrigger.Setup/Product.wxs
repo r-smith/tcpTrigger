@@ -143,9 +143,7 @@
                         Name="tcpTrigger Manager"
                         Description="Configuration editor for the tcpTrigger service"
                         Directory="DesktopFolder"
-                        WorkingDirectory="INSTALLFOLDER"
-                        Icon="tcpTrigger.ico"
-                        Advertise="yes" />
+                        WorkingDirectory="INSTALLFOLDER" />
             </File>
           </Component>
           
