@@ -5,17 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:tcpTrigger.Monitor"
         mc:Ignorable="d"
-        Title="tcpTrigger" Height="380" Width="780"
-        Loaded="Window_Loaded">
+        Title="tcpTrigger" Height="380" Width="780">
     <Grid>
-        <TextBox Name="Log"
-                 FontFamily="Consolas"
-                 FontSize="15"
-                 Background="#252526"
-                 Foreground="#d8d8d8"
-                 IsReadOnly="True"
-                 Cursor="Arrow"
-                 HorizontalScrollBarVisibility="Auto"
-                 VerticalScrollBarVisibility="Auto"/>
+        <DataGrid Name="Log"/>
     </Grid>
 </Window>

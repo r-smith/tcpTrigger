@@ -1,7 +1,9 @@
 ﻿using System;
-using System.IO;
+using System.Collections.ObjectModel;
+using System.Diagnostics.Eventing.Reader;
+using System.Net;
+using System.Text.RegularExpressions;
 using System.Windows;
-using System.Xml;
 
 namespace tcpTrigger.Monitor
 {
@@ -10,105 +12,114 @@ namespace tcpTrigger.Monitor
     /// </summary>
     public partial class MainWindow : Window
     {
-        string LogPath;
-
+        private readonly ObservableCollection<DetectionEvent> DetectionEvents = new ObservableCollection<DetectionEvent>();
+        
         public MainWindow()
         {
             InitializeComponent();
 
-            LogPath = GetLogPath(settingsPath: GetSettingsPath());
-            if (string.IsNullOrEmpty(LogPath))
-            {
-                // No log file found. Display error.
-            }
-            else if (!Directory.Exists(Path.GetDirectoryName(LogPath)))
-            {
-                // Log path successfully read from settings, but the directory it points to does not exist. Display error.
-            }
-            else
-            {
-                try
-                {
-                    // Folder containing log file found. Start file system watcher to monitor changes to file.
-                    // Log file doesn't necessarily have to exist at this point.
-                    Watch();
-                    if (File.Exists(LogPath))
-                        Log.Text = File.ReadAllText(LogPath);
-                }
-                catch
-                {
-
-                }
-            }
+            SubscribeToDetectionEvents();
+            Log.ItemsSource = DetectionEvents;
         }
 
-        private void Watch()
+        private void SubscribeToDetectionEvents()
         {
-            if (!string.IsNullOrEmpty(LogPath))
-            {
-                FileSystemWatcher watcher = new FileSystemWatcher
-                {
-                    Path = Path.GetDirectoryName(LogPath),
-                    Filter = Path.GetFileName(LogPath),
-                    NotifyFilter = NotifyFilters.LastWrite,
-                    EnableRaisingEvents = true
-                };
-                watcher.Changed += new FileSystemEventHandler(OnChanged);
-            }
-        }
+            const string _detectionQuery =
+                "<QueryList>"
+                + "<Query Id='0'>"
+                + "  <Select Path='Application'>"
+                + "    *[System[Provider[@Name='tcpTrigger']"
+                + "      and ( (EventID &gt;= 200 and EventID &lt;= 203) )]]"
+                + "  </Select>"
+                + "</Query>"
+                + "</QueryList>";
 
-        private void OnChanged(object source, FileSystemEventArgs e)
-        {
-            if (e.FullPath.ToLower().Equals(LogPath.ToLower()))
-            {
-                try
-                {
-                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        Log.Text = File.ReadAllText(LogPath);
-                        Log.CaretIndex = Log.Text.Length;
-                        Log.ScrollToEnd();
-                    }));
-                }
-                catch
-                {
-
-                }
-            }
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            Log.ScrollToEnd();
-        }
-
-        private string GetSettingsPath()
-        {
-            // Locate the tcpTrigger.xml settings file.
-            // First check the current directory. If not found, use ProgramData, regardless if the file exists or not.
-            const string _fileName = "tcpTrigger.xml";
-            if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + _fileName))
-                return AppDomain.CurrentDomain.BaseDirectory + _fileName;
-            else
-                return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\" + _fileName;
-        }
-
-        private string GetLogPath(string settingsPath)
-        {
-            const string _xmlNodeLogPath = "/tcpTrigger/actionSettings/logPath";
-
-            // Read settings XML document to get the log path.
+            EventLogWatcher watcher = null;
             try
             {
-                XmlDocument xd = new XmlDocument();
-                xd.Load(settingsPath);
-                return xd.DocumentElement.SelectSingleNode(_xmlNodeLogPath)?.InnerText;
+                EventLogQuery logQuery = new EventLogQuery("Application", PathType.LogName, _detectionQuery);
+                watcher = new EventLogWatcher(logQuery, null, true);
+                watcher.EventRecordWritten += new EventHandler<EventRecordWrittenEventArgs>(EventLogEventRead);
+                watcher.Enabled = true;
             }
-            catch
+            catch (Exception ex)
             {
-                // Either settings file was not found or something went wrong when parsing the XML.
-                // Return an empty string for the path.
-                return string.Empty;
+                MessageBox.Show(ex.Message);
+                if (watcher != null)
+                {
+                    watcher.Enabled = false;
+                    watcher.Dispose();
+                }
+            }
+        }
+
+        private void EventLogEventRead(object obj, EventRecordWrittenEventArgs arg)
+        {
+            const int DetectICMP = 200;
+            const int DetectTCP = 201;
+            const int DetectUDP = 202;
+            const int DetectDHCP = 203;
+
+            if (arg.EventRecord != null)
+            {
+                string recordDescription = arg.EventRecord.FormatDescription();
+                if (recordDescription.StartsWith("A captured"))
+                    return;
+
+                string pattern;
+                MatchType matchType;
+
+                switch (arg.EventRecord.Id)
+                {
+                    case DetectICMP:
+                        matchType = MatchType.ICMP;
+                        pattern = @"^Source IP: (?<s_ip>.*)\r\n"
+                                + @"^Destination IP: (?<d_ip>.*)$";
+                        break;
+                    case DetectTCP:
+                        matchType = MatchType.TCP;
+                        pattern = @"^Source IP: (?<s_ip>.*)\r\n"
+                                + @"^Source port: (?<s_port>.*)\r\n"
+                                + @"^Destination IP: (?<d_ip>.*)\r\n"
+                                + @"^Destination port: (?<d_port>.*)\r\n";
+                        break;
+                    case DetectUDP:
+                        matchType = MatchType.UDP;
+                        pattern = @"^Source IP: (?<s_ip>.*)\r\n"
+                                + @"^Source port: (?<s_port>.*)\r\n"
+                                + @"^Destination IP: (?<d_ip>.*)\r\n"
+                                + @"^Destination port: (?<d_port>.*)$";
+                        break;
+                    case DetectDHCP:
+                        matchType = MatchType.DHCP;
+                        pattern = @"^DHCP server IP: (?<s_ip>.*)\r\n"
+                                + @"^Interface IP: (?<d_ip>.*)$";
+                        break;
+                    default:
+                        return;
+                }
+
+                Match match = Regex.Match(recordDescription, pattern, RegexOptions.Multiline);
+                if (match.Success)
+                {
+                    _ = IPAddress.TryParse(match.Groups["s_ip"]?.Value, out IPAddress sourceIP);
+                    _ = IPAddress.TryParse(match.Groups["d_ip"]?.Value, out IPAddress destinationIP);
+                    _ = int.TryParse(match.Groups["s_port"]?.Value, out int sourcePort);
+                    _ = int.TryParse(match.Groups["d_port"]?.Value, out int destinationPort);
+
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        DetectionEvents.Insert(0, new DetectionEvent
+                        {
+                            Timestamp = arg.EventRecord.TimeCreated.Value,
+                            Type = matchType,
+                            SourceIP = sourceIP,
+                            SourcePort = sourcePort,
+                            DestinationIP = destinationIP,
+                            DestinationPort = destinationPort
+                        });
+                    }));
+                }
             }
         }
     }
