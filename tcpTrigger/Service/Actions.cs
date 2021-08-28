@@ -140,6 +140,7 @@ namespace tcpTrigger
                         $"DHCP server detected.{Environment.NewLine}{Environment.NewLine}"
                         + $"Match type: DHCP{Environment.NewLine}"
                         + $"DHCP server IP: {packetHeader.DhcpServerAddress}{Environment.NewLine}"
+                        + $"DHCP transaction ID: {packetHeader.DhcpTransactionId}{Environment.NewLine}"
                         + $"Interface IP: {packetHeader.DestinationIP}",
                         EventLogEntryType.Information,
                         203);
