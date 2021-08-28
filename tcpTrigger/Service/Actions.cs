@@ -104,41 +104,43 @@ namespace tcpTrigger
             switch (packetHeader.MatchType)
             {
                 case PacketMatch.IcmpRequest:
-                    EventLog.WriteEntry(
-                        "tcpTrigger",
-                        $"ICMP {Enum.GetName(typeof(IcmpTypeCode), packetHeader.IcmpType)} request detected.{Environment.NewLine}{Environment.NewLine}" +
-                        $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}" +
-                        $"Destination IP: {packetHeader.DestinationIP}",
+                    EventLog.WriteEntry("tcpTrigger",
+                        $"ICMP {Enum.GetName(typeof(IcmpTypeCode), packetHeader.IcmpType)} request detected.{Environment.NewLine}{Environment.NewLine}"
+                        + $"Match type: ICMP{Environment.NewLine}"
+                        + $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}"
+                        + $"Destination IP: {packetHeader.DestinationIP}",
                         EventLogEntryType.Information,
                         200);
                     break;
                 case PacketMatch.TcpConnect:
-                    EventLog.WriteEntry(
-                        "tcpTrigger",
-                        $"TCP connection detected.{Environment.NewLine}{Environment.NewLine}" +
-                        $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}" +
-                        $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}" +
-                        $"Destination port: {packetHeader.DestinationPort}{Environment.NewLine}{Environment.NewLine}" +
-                        $"TCP flags: {packetHeader.TcpFlagsAsString}",
+                    EventLog.WriteEntry("tcpTrigger",
+                        $"TCP connection detected.{Environment.NewLine}{Environment.NewLine}"
+                        + $"Match type: TCP{Environment.NewLine}"
+                        + $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}"
+                        + $"Source port: {packetHeader.SourcePort}{Environment.NewLine}"
+                        + $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}"
+                        + $"Destination port: {packetHeader.DestinationPort}{Environment.NewLine}{Environment.NewLine}"
+                        + $"TCP flags: {packetHeader.TcpFlagsAsString}",
                         EventLogEntryType.Information,
                         201);
                     break;
                 case PacketMatch.UdpCommunication:
-                    EventLog.WriteEntry(
-                        "tcpTrigger",
-                        $"UDP communication detected.{Environment.NewLine}{Environment.NewLine}" +
-                        $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}" +
-                        $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}" +
-                        $"Destination port: {packetHeader.DestinationPort}{Environment.NewLine}{Environment.NewLine}",
+                    EventLog.WriteEntry("tcpTrigger",
+                        $"UDP connection detected.{Environment.NewLine}{Environment.NewLine}"
+                        + $"Match type: UDP{Environment.NewLine}"
+                        + $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}"
+                        + $"Source port: {packetHeader.SourcePort}{Environment.NewLine}"
+                        + $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}"
+                        + $"Destination port: {packetHeader.DestinationPort}",
                         EventLogEntryType.Information,
                         202);
                     break;
                 case PacketMatch.RogueDhcp:
-                    EventLog.WriteEntry(
-                        "tcpTrigger",
-                        $"Unrecognized DHCP server detected.{Environment.NewLine}{Environment.NewLine}" +
-                        $"DHCP Server IP: {packetHeader.DhcpServerAddress}{Environment.NewLine}" +
-                        $"Interface: {packetHeader.DestinationIP}",
+                    EventLog.WriteEntry("tcpTrigger",
+                        $"DHCP server detected.{Environment.NewLine}{Environment.NewLine}"
+                        + $"Match type: DHCP{Environment.NewLine}"
+                        + $"DHCP server IP: {packetHeader.DhcpServerAddress}{Environment.NewLine}"
+                        + $"Interface IP: {packetHeader.DestinationIP}",
                         EventLogEntryType.Information,
                         203);
                     break;
