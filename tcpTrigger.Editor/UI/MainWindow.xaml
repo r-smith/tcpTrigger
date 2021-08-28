@@ -523,9 +523,9 @@
                                     <TextBlock>
                                         <Run FontWeight="SemiBold" Foreground="#ffd43b">Rate Limit</Run><LineBreak/>
                                         Rate limiting prevents email notifications from being sent too quickly. After an
-                                        email notification is sent, tcpTrigger won't send another email for at least
+                                        email notification is sent, tcpTrigger will not send another email for at least
                                         the number of seconds specified. All connections detected during the wait
-                                        period are logged, and will be sent once the rate limit has passed.
+                                        period are logged and will be sent once the rate limit has passed.
                                         <LineBreak/>
                                         <LineBreak/>
                                         <Run FontWeight="SemiBold" Foreground="#30aacc">[Default]</Run><LineBreak/>
@@ -560,7 +560,7 @@
                                         <Run FontWeight="SemiBold" Foreground="#ffd43b">Buffer Connections</Run><LineBreak/>
                                         Buffering delays sending an initial email notification when a connection is detected. Delaying allows tcpTrigger
                                         to log additional connections for a short time before sending the email. After the interval is up,
-                                        the notification email is sent with a log of all connections that ocurred within the buffer time.
+                                        the notification email is sent with a log of all connections that occurred within the buffer time.
                                         <LineBreak/>
                                         <LineBreak/>
                                         <Run FontWeight="SemiBold" Foreground="#30aacc">[Default]</Run><LineBreak/>
@@ -608,7 +608,7 @@
                                         <Run FontWeight="SemiBold" Foreground="#ffd43b">Whitelist</Run><LineBreak/>
                                         All connections from IP addresses in the whitelist are completely ignored by tcpTrigger.
                                         You can optionally enter a port number to ignore only when the IP connects to the specified port.
-                                        Enter one address per line, and use the <Italic>Add</Italic> button for additional entries.
+                                        Enter one address per line and use the <Italic>Add</Italic> button for additional entries.
                                         <LineBreak/>
                                         <LineBreak/>
                                         <Run FontWeight="SemiBold" Foreground="#63e6be">IP Address</Run><LineBreak/>
@@ -630,51 +630,6 @@
                                         The <Italic>comment</Italic> field is for recording notes.
                                         It is for your reference only and is useful for giving a description to each entry.
                                     </TextBlock>
-
-                                    <!--<Paragraph Name="Whitelist"
-                           Style="{StaticResource HeaderText}">
-                                        Whitelist
-                                    </Paragraph>
-                                    <Paragraph Style="{StaticResource ParagraphText}">
-                                        Use the
-                                        <Bold>
-                                            <Italic>Whitelist</Italic>
-                                        </Bold> tab to enter IP addresses to ignore.
-                    All ICMP, TCP, and UDP connections from IP addresses in the list
-                    will be completely ignored by tcpTrigger. If a port number is entered,
-                    then the connection will be ignored only when the IP connects to the specified port.
-                    Enter one address per line, and use the
-                                        <Italic>Add</Italic> button for additional entries.
-                                    </Paragraph>
-                                    <Paragraph Style="{StaticResource SubHeaderText}">
-                                        IP Address
-                                    </Paragraph>
-                                    <Paragraph Style="{StaticResource ParagraphText}">
-                                        Enter the IP address to ignore in the
-                                        <Italic>IP address</Italic> field. Specify one address per entry. DNS names are not supported.
-                                    </Paragraph>
-                                    <Paragraph Style="{StaticResource SubHeaderText}">
-                                        Port
-                                        <Run Foreground="#ffffff" FontStyle="Italic" FontWeight="Regular">(Optional)</Run>
-                                    </Paragraph>
-                                    <Paragraph Style="{StaticResource ParagraphText}">
-                                        If the
-                                        <Italic>port</Italic> field is left blank, all connections from the IP address are ignored.
-                    If you want to ignore only connections to a specific port, enter the port number.
-                    Only one port can be specified per entry. Add additional entries for multiple ports.
-                    If you want to ignore ICMP requests, type
-                                        <Run FontWeight="SemiBold" Foreground="#cd6ed1">icmp</Run>
-                                        into the port field.
-                                    </Paragraph>
-                                    <Paragraph Style="{StaticResource SubHeaderText}">
-                                        Comment
-                                        <Run Foreground="#ffffff" FontStyle="Italic" FontWeight="Regular">(Optional)</Run>
-                                    </Paragraph>
-                                    <Paragraph Style="{StaticResource ParagraphText}">
-                                        The
-                                        <Italic>comment</Italic> field is for recording notes. It is for your reference only and is
-                    useful for giving a description to each entry.
-                                    </Paragraph>-->
                                 </Label>
                             </DockPanel>
                         </GroupBox.Header>

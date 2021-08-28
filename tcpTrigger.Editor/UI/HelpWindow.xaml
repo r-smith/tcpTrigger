@@ -218,8 +218,244 @@
                     file and start the tcpTrigger service. tcpTrigger runs
                     in the background as a Windows service and starts
                     automatically when your computer boots. Relaunch
-                    tcpTrigger Manager at any time to make adjustments
-                    to your settings.
+                    tcpTrigger Manager at any time to adjust your settings.
+                </Paragraph>
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Deployment: Internal Honeypot
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    The primary objective of tcpTrigger is to provide simple
+                    intrusion detection inside your enterprise network.
+                    The application does not require complicated rules
+                    or configurations, it does not require maintenance or
+                    upkeep; and still, effectively alerts you of intruders,
+                    with practically zero false positives. It basically
+                    works as an internal honeypot. You install tcpTrigger
+                    on a system that serves no other legitimate purpose.
+                    If your system is then probed in any way whatsoever,
+                    you immediately receive an email notification.
+                    No, this will not catch every intruder. But you should
+                    be practicing defense in depth. tcpTrigger is simply
+                    another tool in your toolbox.
+                    <LineBreak/>
+                    <LineBreak/>
+                    <Italic>
+                        This deployment scenario assumes your enterprise
+                        network is a Windows environment with Active Directory.
+                    </Italic>
+                    <LineBreak/>
+                    <LineBreak/>
+                    Install tcpTrigger on a dedicated system. Preferably,
+                    install on a server-based operating system. The computer
+                    name in Windows should be set to a name that makes your
+                    system appear like it serves an important function.
+                    This step is essential. Names that make the system look
+                    like a crucial finance server, file server, database server,
+                    backup server, or email server are good examples.
+                    The name should conform to the naming scheme used
+                    in your environment, but also named to entice potential
+                    intruders. The system should be joined to your Active
+                    Directory Domain.
+                    <LineBreak/>
+                    <LineBreak/>
+                    Why install on a server operating system, provide a
+                    fake computer name, and join to Active Directory?
+                    If an intruder gains access to your network through
+                    a compromised user account, they are likely to
+                    query Active Directory for a list of computers.
+                    This will give them every Windows computer on your
+                    network, along with the name and operating system
+                    version. You need your tcpTrigger system to
+                    appear in that query. It needs to blend in with
+                    your environment yet appear like an important
+                    server. The goal here is to attract intruders to
+                    your system.
+                    <LineBreak/>
+                    <LineBreak/>
+                    You also want to catch cases where an intruder
+                    is attempting to locate targets using traditional
+                    port scanning. In this case, you want to increase
+                    the odds that your system gets probed in a port scan.
+                    Your tcpTrigger system should be on the same subnet
+                    as other core network services. Place it on the same
+                    subnet as your DNS servers, DHCP servers, or any
+                    other subnet that hosts important servers. Ensure
+                    your system has a reverse DNS entry registered.
+                    Performing a DNS lookup against the IP address of
+                    your system, should resolve to the fake computer
+                    name you chose.
+                    Remember that tcpTrigger listens on all IP addresses
+                    in Windows. You can put multiple NICs and/or assign
+                    multiple IP addresses to your tcpTrigger system.
+                    <LineBreak/>
+                    <LineBreak/>
+                    For the configuration of tcpTrigger itself, the
+                    default settings are a great starting place.
+                    You should monitor ICMP requests and TCP connections
+                    on all ports. If you choose to also monitor UDP,
+                    expect to do additional tuning. You should enable
+                    logging to both a text log and the Windows event log.
+                    The event log is useful if you plan on sending
+                    detections to a SIEM. The text log makes it easy
+                    to review past detections. And unless you are
+                    utilizing a SIEM, email notifications should
+                    always be enabled (and tested). Though you might
+                    want to wait until initial tuning is complete
+                    before enabling email notifications.
+                    <LineBreak/>
+                    <LineBreak/>
+                    Once the initial configuration is done, be
+                    sure to save your settings and start the tcpTrigger
+                    service. Expect to do some tuning, as you will
+                    likely detect connections that should be ignored.
+                    If you have uptime monitoring software, asset
+                    management software, or similar software on your
+                    network, you will probably see connections from those
+                    services. Ignore such systems by adding them to
+                    tcpTrigger's whitelist. If you have IT staff that
+                    typically scans the network, they will need to be
+                    added to the whitelist, or they need to ensure their
+                    scanning excludes IP addresses for tcpTrigger systems.
+                    If tcpTrigger is detecting connections and you
+                    are unsure of the source, a network analyzer,
+                    such as Wireshark, will aid immensely.
+                    You might need to monitor for a week or more
+                    before your filters are fully tuned. The goal here
+                    is zero false positives. When you get a detection
+                    alert from tcpTrigger, it should either be from
+                    IT staff, an employee poking around, new software
+                    on the network, or a malicious intruder.
+                    <LineBreak/>
+                    <LineBreak/>
+                    You should test to ensure tcpTrigger is
+                    detecting everything it is supposed to and
+                    performing all the actions you expect it to.
+                    Use the tcpTrigger Monitor utility to watch
+                    detection logs in real time. To test specific
+                    TCP ports, use the PowerShell command:
+                </Paragraph>
+                <Paragraph Style="{StaticResource VariablesText}" Margin="15,10,0,10">
+                    Test-NetConnection -ComputerName <Italic>&lt;tcptrigger_IP&gt;</Italic>
+                    -Port <Italic>&lt;port_number_to_test&gt;</Italic>
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    To test ICMP detection, use the command:
+                </Paragraph>
+                <Paragraph Style="{StaticResource VariablesText}" Margin="15,10,0,10">
+                    ping -n 1 <Italic>&lt;tcptrigger_IP&gt;</Italic>
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Ensure you use the actual tcpTrigger IP address,
+                    and not 127.0.0.1. If tcpTrigger is
+                    not detecting your probes, it is likely
+                    due to the Windows firewall. The most common probes
+                    you want to detect in a Windows environment, are TCP
+                    ports: 135, 137, 139, 445, and 3389. Ensure at least
+                    some of those ports are detected by
+                    tcpTrigger and ensure ICMP pings are detected
+                    as well. Adjust your firewall if necessary.
+                    <LineBreak/>
+                    <LineBreak/>
+                    Develop an incident response plan. If you
+                    receive a detection alert from tcpTrigger,
+                    do you know exactly how to track down
+                    the source of the connection? What other steps
+                    should be taken in response to an alert?
+                    Ensure everything is clearly documented
+                    and understood by you and your team.
+                    It can be helpful to include brief incident
+                    response steps in your notification emails.
+                    <LineBreak/>
+                    <LineBreak/>
+                    Notification emails should go to multiple
+                    recipients or a distribution list. The email
+                    notifications should be tested to verify receipt.
+                    Ensure every recipient understands
+                    what tcpTrigger does, where it is running,
+                    how it is configured, and how to interpret the
+                    alerts. Ensure every recipient has a clear understanding
+                    of your incident response plan. Finally, test your incident
+                    response to ensure success.
+                </Paragraph>
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Deployment: Personal Connection Notifier
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    The secondary intent of tcpTrigger is to provide
+                    a personal intrusion detection system.
+                    <LineBreak/>
+                    <LineBreak/>
+                    In this deployment scenario, install tcpTrigger
+                    on your personal computer. Once running,
+                    tcpTrigger will record when your computer
+                    is probed on the network in any way.
+                    All network interfaces are monitored by
+                    tcpTrigger. It also detects new network interfaces
+                    while the system is running, and changes such as a
+                    new Wi-Fi connection or a new dynamic IP address.
+                    <LineBreak/>
+                    <LineBreak/>
+                    Setup of tcpTrigger itself is like the
+                    honeypot deployment scenario. The default settings
+                    might be all you need. You should detect
+                    ICMP requests, and TCP connections on all ports.
+                    You should log to both a plain text log and the Windows
+                    event log. Email notifications are optional.
+                    Exclude any TCP ports you do not need to monitor
+                    and populate the whitelist with any
+                    connections you want to ignore.
+                    Use the tcpTrigger Monitor utility to view your
+                    detection logs in real time.
+                    <LineBreak/>
+                    <LineBreak/>
+                    Understand that the TCP protocol defines a
+                    handshake process that must be performed in
+                    order to establish a connection. tcpTrigger
+                    detects when such a handshake is being initiated.
+                    Detection by tcpTrigger does not indicate
+                    whether a connection was actually established.
+                    This behavior is desired in order to catch
+                    all port scans and probes against your system.
+                    If tcpTrigger detects a connection to a port
+                    where you have nothing listening, then no
+                    connection is established, it is merely the attempt
+                    that is detected.
+                    If you are unsure what ports your computer
+                    is listening on, get a complete list with
+                    the command:
+                </Paragraph>
+                <Paragraph Style="{StaticResource VariablesText}" Margin="15,10,0,10">
+                    netstat -ano
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    An excellent program for listing which processes
+                    are listening on which ports, along with a live
+                    view of all incoming and outgoing TCP and UDP connections,
+                    is Microsoft's TCPView (Originally created by Mark Russinovich).
+                    The application is available as a free download, here:
+                    <LineBreak/>
+                    <Hyperlink NavigateUri="https://docs.microsoft.com/en-us/sysinternals/downloads/tcpview"
+                               RequestNavigate="Hyperlink_RequestNavigate"
+                               Style="{StaticResource HyperlinkStyle}">
+                        https://docs.microsoft.com/en-us/sysinternals/downloads/tcpview
+                    </Hyperlink>
+                </Paragraph>
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Deployment: Closing
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    This concludes the tcpTrigger deployment guide. You might
+                    find other use cases that fit your needs as well. While
+                    not an intended use case, you could place tcpTrigger on
+                    your perimeter network as a method of logging incoming
+                    connections from the internet. You might also come
+                    up with creative uses for the action that triggers an
+                    external script.
+                    <LineBreak/>
+                    <LineBreak/>
+                    The remaining sections in this guide document
+                    the available options in the tcpTrigger Manager
+                    utility.
                 </Paragraph>
 
                 <!-- Trigger Rules -->
@@ -250,13 +486,13 @@
                 <Paragraph Style="{StaticResource ParagraphText}">
                     Enable this option to detect incoming network connections to any port.
                     Detection occurs at the start of the TCP handshake process.
-                    This ensures all attempts are detected, and does not indicate
+                    This ensures all attempts are detected and does not indicate
                     whether the connection was fully established.
                     <LineBreak/>
                     <LineBreak/>
                     Use the
                     <Italic>include ports</Italic> field to list which ports you want
-                    to monitor. Typically you would include all TCP ports, and there is an
+                    to monitor. Typically, you would include all TCP ports, and there is an
                     option provided to do so. Use the
                     <Italic>exclude ports</Italic> field
                     to list ports you do not want to monitor. Excluded ports override included ports.
@@ -373,7 +609,7 @@
                     <Run FontWeight="SemiBold" Foreground="#cd6ed1" FontFamily="Consolas">Detected rogue DHCP server</Run>
                     <LineBreak/>
                     <LineBreak/>
-                    This option has no affect on the general status events used by tcpTrigger.
+                    This option has no effect on the general status events used by tcpTrigger.
                     Event code 90 reports service started. Event code 91 reports service stopped.
                     Event code 100 reports the running configuration when the service starts. Event code 101
                     reports when listeners restart because a network interface change in Windows was detected.
@@ -407,7 +643,43 @@
                 <Paragraph Style="{StaticResource ParagraphText}">
                     Enable this option to call an external application or script when connection attempts are detected.
                     The application you choose must execute and automatically exit without any user interaction. There
-                    are several optional variables that can be entered into the arguments field.
+                    are several optional variables, listed below, that can be entered into the
+                    <Italic>Arguments</Italic> field. For executing scripts in Windows, you likely need to point to the
+                    script interpreter in the <Italic>Application</Italic> field
+                    and then pass your script path and arguments in the <Italic>Arguments</Italic> field.
+                    <LineBreak/>
+                    <LineBreak/>
+                    For example, to run a PowerShell script, use the following as a starting point:
+                </Paragraph>
+                <Paragraph Style="{StaticResource VariablesText}" Margin="15,10,0,10">
+                    <Run Foreground="White">Application:</Run>
+                    powershell.exe<LineBreak/>
+                    <Run Foreground="White">Arguments:</Run>
+                    -ExecutionPolicy Bypass "c:\scripts\myscript.ps1" -SampleArgument {SOURCE_IP}
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    To run any command from the Windows command interpreter, use the following as a starting point:
+                </Paragraph>
+                <Paragraph Style="{StaticResource VariablesText}" Margin="15,10,0,10">
+                    <Run Foreground="White">Application:</Run>
+                    cmd.exe
+                    <LineBreak/>
+                    <Run Foreground="White">Arguments:</Run>
+                    /C echo {TIMESTAMP} {SOURCE_IP}:{DESTINATION_PORT} >> c:\logs\connection.log
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    If your application does not appear to launch, use the Windows event log to
+                    aid in troubleshooting. Launch errors appear with event code 400 under the
+                    <Italic>tcpTrigger</Italic> source. If you do not see errors, check the
+                    Windows task manager to see if the application appears in the process list.
+                    Do not try to launch GUI applications or anything that waits for an input.
+                    Doing so will cause them to launch and get stuck. Also, keep in mind that
+                    tcpTrigger runs using the low privilege built-in
+                    <Italic>Local Service</Italic> account. Your script might fail if
+                    the <Italic>Local Service</Italic> account does not have the permissions
+                    needed for what you are trying to execute. You can optionally run the
+                    tcpTrigger service using a higher privilege built-in account or Domain
+                    account, though this is not recommended.
                 </Paragraph>
                 <Paragraph Style="{StaticResource DefaultsText}">
                     <Run Foreground="#30aacc">[Default]</Run>
@@ -420,7 +692,7 @@
                 </Paragraph>
                 <Paragraph Style="{StaticResource ParagraphText}">
                     When calling an external script or application, placeholder variables can be used
-                    in the application arguments.
+                    in the <Italic>Arguments</Italic> field.
                 </Paragraph>
                 <Paragraph Style="{StaticResource VariablesText}">
                     {SOURCE_IP}<LineBreak/>
@@ -485,7 +757,7 @@
                     Sender display name
                 </Paragraph>
                 <Paragraph Style="{StaticResource ParagraphText}">
-                    Enter a friendly name to display as the sender for email notifcations. This field is optional.
+                    Enter a friendly name to display as the sender for email notifications. This field is optional.
                 </Paragraph>
                 <!-- Message -->
                 <Paragraph Style="{StaticResource HeaderText}">
@@ -526,9 +798,9 @@
                 </Paragraph>
                 <Paragraph Style="{StaticResource ParagraphText}">
                     Rate limiting prevents email notifications from being sent too quickly. After an
-                    email notification is sent, tcpTrigger won't send another email for at least
+                    email notification is sent, tcpTrigger will not send another email for at least
                     the number of seconds specified. All connections detected during the wait
-                    period are logged, and will be sent once the rate limit has passed.
+                    period are logged and will be sent once the rate limit has passed.
                 </Paragraph>
                 <Paragraph Style="{StaticResource DefaultsText}">
                     <Run Foreground="#30aacc">[Default]</Run>
@@ -542,7 +814,7 @@
                 <Paragraph Style="{StaticResource ParagraphText}">
                     Buffering delays sending an initial email notification when a connection is detected. Delaying allows tcpTrigger
                     to log additional connections for a short time before sending the email. After the interval is up,
-                    the notification email is sent with a log of all connections that ocurred within the buffer time.
+                    the notification email is sent with a log of all connections that occurred within the buffer time.
                 </Paragraph>
                 <Paragraph Style="{StaticResource DefaultsText}">
                     <Run Foreground="#30aacc">[Default]</Run>
@@ -560,7 +832,7 @@
                     <Bold><Italic>Whitelist</Italic></Bold> tab to enter IP addresses to ignore.
                     All ICMP, TCP, and UDP connections from IP addresses in the list are completely ignored by tcpTrigger.
                     You can optionally enter a port number to ignore only when the IP connects to the specified port.
-                    Enter one address per line, and use the
+                    Enter one address per line and use the
                     <Italic>Add</Italic> button for additional entries.
                 </Paragraph>
                 <Paragraph Style="{StaticResource SubHeaderText}">
@@ -599,7 +871,7 @@
                     Devices
                 </Paragraph>
                 <Paragraph Style="{StaticResource ParagraphText}">
-                    By default, tcpTrigger monitors traffic on all network interfaces with an IPv4 address.
+                    tcpTrigger monitors traffic on all network interfaces with an IPv4 address.
                     Devices with multiple IP addresses are supported and detected as well. However, IPv6 addresses
                     are not supported.
                     <LineBreak/>
