@@ -37,7 +37,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>tcpTrigger.ico</ApplicationIcon>
+    <ApplicationIcon>tcpTrigger Monitor.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -96,7 +96,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="tcpTrigger.ico" />
+    <Resource Include="tcpTrigger Monitor.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
