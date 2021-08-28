@@ -168,7 +168,7 @@
           <!-- Create a dummy registry entry because shortcuts cannot be KeyPaths. -->
           <!-- Strange, but the technique is used in WiX's official documentation. -->
           <RegistryValue Root="HKCU"
-                         Key="Software\tcpTrigger\tcpTrigger"
+                         Key="Software\tcpTrigger"
                          Name="installed"
                          Type="integer"
                          Value="1"
