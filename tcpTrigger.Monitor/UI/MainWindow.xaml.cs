@@ -122,6 +122,17 @@ namespace tcpTrigger.Monitor
                             DestinationIP = destinationIP,
                             DestinationPort = destinationPort
                         });
+
+                        if (Settings.FocusOnUpdate)
+                        {
+                            if (WindowState == WindowState.Minimized)
+                            {
+                                WindowState = WindowState.Normal;
+                            }
+                            Topmost = true;
+                            Topmost = false;
+                            Focus();
+                        }
                     }));
                 }
             }
