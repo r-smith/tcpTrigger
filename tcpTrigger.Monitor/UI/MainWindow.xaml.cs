@@ -73,7 +73,7 @@ namespace tcpTrigger.Monitor
             if (arg.EventRecord != null)
             {
                 string recordDescription = arg.EventRecord.FormatDescription();
-                if (recordDescription.StartsWith("A captured"))
+                if (string.IsNullOrEmpty(recordDescription) || recordDescription.StartsWith("A captured"))
                     return;
 
                 string pattern;
@@ -257,24 +257,31 @@ namespace tcpTrigger.Monitor
         private void HideToTray()
         {
             Visibility = Visibility.Hidden;
-            if (NotifyIcon == null)
+            try
             {
-                // Build context menu for tray icon.
-                System.Windows.Forms.ContextMenuStrip menuStrip = new System.Windows.Forms.ContextMenuStrip();
-                System.Windows.Forms.ToolStripMenuItem menuExit = new System.Windows.Forms.ToolStripMenuItem("Exit tcpTrigger Monitor");
-                menuExit.Click += (s, args) => Application.Current.Shutdown();
-                menuStrip.Items.Add(menuExit);
-
-                // Create tray icon.
-                NotifyIcon = new System.Windows.Forms.NotifyIcon
+                if (NotifyIcon == null)
                 {
-                    Icon = new System.Drawing.Icon(@"../../tcpTrigger Monitor.ico"),
-                    Text = "tcpTrigger",
-                    ContextMenuStrip = menuStrip
-                };
-                NotifyIcon.MouseUp += NotifyIcon_MouseUp;
+                    // Build context menu for tray icon.
+                    System.Windows.Forms.ContextMenuStrip menuStrip = new System.Windows.Forms.ContextMenuStrip();
+                    System.Windows.Forms.ToolStripMenuItem menuExit = new System.Windows.Forms.ToolStripMenuItem("Exit tcpTrigger Monitor");
+                    menuExit.Click += (s, args) => Application.Current.Shutdown();
+                    menuStrip.Items.Add(menuExit);
+
+                    // Create tray icon.
+                    NotifyIcon = new System.Windows.Forms.NotifyIcon
+                    {
+                        Icon = new System.Drawing.Icon(Application.GetResourceStream(new Uri("pack://application:,,,/tcpTrigger Monitor.ico")).Stream),
+                        Text = "tcpTrigger",
+                        ContextMenuStrip = menuStrip
+                    };
+                    NotifyIcon.MouseUp += NotifyIcon_MouseUp;
+                }
+                NotifyIcon.Visible = true;
             }
-            NotifyIcon.Visible = true;
+            catch
+            {
+                Visibility = Visibility.Visible;
+            }
         }
 
         private void NotifyIcon_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
