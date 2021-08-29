@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,6 +17,7 @@ namespace tcpTrigger.Monitor
     public partial class MainWindow : Window
     {
         private readonly ObservableCollection<DetectionEvent> DetectionEvents = new ObservableCollection<DetectionEvent>();
+        private System.Windows.Forms.NotifyIcon NotifyIcon;
 
         public MainWindow()
         {
@@ -129,6 +131,13 @@ namespace tcpTrigger.Monitor
 
                         if (Settings.FocusOnUpdate)
                         {
+                            if (NotifyIcon != null)
+                            {
+                                NotifyIcon.Visible = false;
+                                Visibility = Visibility.Visible;
+                                Show();
+                                WindowState = WindowState.Normal;
+                            }
                             if (WindowState == WindowState.Minimized)
                             {
                                 WindowState = WindowState.Normal;
@@ -242,6 +251,69 @@ namespace tcpTrigger.Monitor
             catch
             {
                 // Failed to store setting in registry. Setting is still applied to current instance of application.
+            }
+        }
+
+        private void HideToTray()
+        {
+            Visibility = Visibility.Hidden;
+            if (NotifyIcon == null)
+            {
+                // Build context menu for tray icon.
+                System.Windows.Forms.ContextMenuStrip menuStrip = new System.Windows.Forms.ContextMenuStrip();
+                System.Windows.Forms.ToolStripMenuItem menuExit = new System.Windows.Forms.ToolStripMenuItem("Exit tcpTrigger Monitor");
+                menuExit.Click += (s, args) => Application.Current.Shutdown();
+                menuStrip.Items.Add(menuExit);
+
+                // Create tray icon.
+                NotifyIcon = new System.Windows.Forms.NotifyIcon
+                {
+                    Icon = new System.Drawing.Icon(@"../../tcpTrigger Monitor.ico"),
+                    Text = "tcpTrigger",
+                    ContextMenuStrip = menuStrip
+                };
+                NotifyIcon.MouseUp += NotifyIcon_MouseUp;
+            }
+            NotifyIcon.Visible = true;
+        }
+
+        private void NotifyIcon_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+            {
+                // Left click. Restore application window.
+                NotifyIcon.Visible = false;
+                Visibility = Visibility.Visible;
+                Show();
+                WindowState = WindowState.Normal;
+            }
+            else if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            {
+                // Right click. Display context menu.
+                MethodInfo mi = typeof(System.Windows.Forms.NotifyIcon)
+                    .GetMethod("ShowContextMenu", BindingFlags.Instance | BindingFlags.NonPublic);
+                mi.Invoke(NotifyIcon, null);
+            }
+        }
+
+        private void Window_StateChanged(object sender, EventArgs e)
+        {
+            if (WindowState == WindowState.Minimized && Settings.MinimizeToTray)
+            {
+                HideToTray();
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (Settings.ExitToTray)
+            {
+                HideToTray();
+                e.Cancel = true;
+            }
+            else if (NotifyIcon != null)
+            {
+                NotifyIcon.Dispose();
             }
         }
     }
