@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.Eventing.Reader;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace tcpTrigger.Monitor
@@ -13,16 +14,16 @@ namespace tcpTrigger.Monitor
     public partial class MainWindow : Window
     {
         private readonly ObservableCollection<DetectionEvent> DetectionEvents = new ObservableCollection<DetectionEvent>();
-        
+
         public MainWindow()
         {
             InitializeComponent();
 
-            SubscribeToDetectionEvents();
             Log.ItemsSource = DetectionEvents;
+            SubscribeToDetectionEvents();
         }
 
-        private void SubscribeToDetectionEvents()
+        private async void SubscribeToDetectionEvents()
         {
             const string _detectionQuery =
                 "<QueryList>"
@@ -35,22 +36,25 @@ namespace tcpTrigger.Monitor
                 + "</QueryList>";
 
             EventLogWatcher watcher = null;
-            try
+            await Task.Run(() =>
             {
-                EventLogQuery logQuery = new EventLogQuery("Application", PathType.LogName, _detectionQuery);
-                watcher = new EventLogWatcher(logQuery, null, true);
-                watcher.EventRecordWritten += new EventHandler<EventRecordWrittenEventArgs>(EventLogEventRead);
-                watcher.Enabled = true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-                if (watcher != null)
+                try
                 {
-                    watcher.Enabled = false;
-                    watcher.Dispose();
+                    EventLogQuery logQuery = new EventLogQuery("Application", PathType.LogName, _detectionQuery);
+                    watcher = new EventLogWatcher(logQuery, null, true);
+                    watcher.EventRecordWritten += new EventHandler<EventRecordWrittenEventArgs>(EventLogEventRead);
+                    watcher.Enabled = true;
                 }
-            }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    if (watcher != null)
+                    {
+                        watcher.Enabled = false;
+                        watcher.Dispose();
+                    }
+                }
+            });
         }
 
         private void EventLogEventRead(object obj, EventRecordWrittenEventArgs arg)
