@@ -2,6 +2,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Eventing.Reader;
+using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -151,7 +152,49 @@ namespace tcpTrigger.Monitor
 
         private void LaunchAtLogonOption_Click(object sender, RoutedEventArgs e)
         {
-
+            Settings.LaunchAtLogon = LaunchAtLogonOption.IsChecked;
+            if (Settings.LaunchAtLogon)
+            {
+                // Attempt to create a shortcut to the user's startup folder by copying shortcut from start menu.
+                try
+                {
+                    string sourcePath = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu) + @"\Programs\tcpTrigger\tcpTrigger Monitor.lnk";
+                    string destinationPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\tcpTrigger Monitor.lnk";
+                    // Copy shortcut from common start menu to user's startup. Throw exception if source shortcut doesn't exist.
+                    // The start menu shortcut is created by the tcpTrigger installer, but could have been removed by the user.
+                    File.Copy(sourceFileName: sourcePath,
+                              destFileName: destinationPath,
+                              overwrite: true);
+                }
+                catch (Exception ex)
+                {
+                    // Failed to copy shortcut to user's startup folder.
+                    // TODO: Give more helpful error message.
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Settings.LaunchAtLogon = false;
+                    LaunchAtLogonOption.IsChecked = false;
+                }
+            }
+            else
+            {
+                // Remove shortcut from user's startup folder.
+                try
+                {
+                    string shortcutPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\tcpTrigger Monitor.lnk";
+                    if (File.Exists(shortcutPath))
+                    {
+                        File.Delete(shortcutPath);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Failed to delete shortcut from user's startup folder.
+                    // TODO: Give more helpful error message.
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Settings.LaunchAtLogon = true;
+                    LaunchAtLogonOption.IsChecked = true;
+                }
+            }
         }
 
         private void MinimizeToTrayOption_Click(object sender, RoutedEventArgs e)
@@ -159,7 +202,10 @@ namespace tcpTrigger.Monitor
             Settings.MinimizeToTray = MinimizeToTrayOption.IsChecked;
             try
             {
-                Registry.SetValue(@"HKEY_CURRENT_USER\SOFTWARE\tcpTrigger", "MinimizeToTray", Settings.MinimizeToTray, RegistryValueKind.DWord);
+                Registry.SetValue(keyName: @"HKEY_CURRENT_USER\SOFTWARE\tcpTrigger",
+                                  valueName: "MinimizeToTray",
+                                  value: Settings.MinimizeToTray,
+                                  valueKind: RegistryValueKind.DWord);
             }
             catch
             {
@@ -172,7 +218,10 @@ namespace tcpTrigger.Monitor
             Settings.ExitToTray = ExitToTrayOption.IsChecked;
             try
             {
-                Registry.SetValue(@"HKEY_CURRENT_USER\SOFTWARE\tcpTrigger", "ExitToTray", Settings.ExitToTray, RegistryValueKind.DWord);
+                Registry.SetValue(keyName: @"HKEY_CURRENT_USER\SOFTWARE\tcpTrigger",
+                                  valueName: "ExitToTray",
+                                  value: Settings.ExitToTray,
+                                  valueKind: RegistryValueKind.DWord);
             }
             catch
             {
@@ -185,7 +234,10 @@ namespace tcpTrigger.Monitor
             Settings.FocusOnUpdate = FocusOnUpdateOption.IsChecked;
             try
             {
-                Registry.SetValue(@"HKEY_CURRENT_USER\SOFTWARE\tcpTrigger", "FocusOnUpdate", Settings.FocusOnUpdate, RegistryValueKind.DWord);
+                Registry.SetValue(keyName: @"HKEY_CURRENT_USER\SOFTWARE\tcpTrigger",
+                                  valueName: "FocusOnUpdate",
+                                  value: Settings.FocusOnUpdate,
+                                  valueKind: RegistryValueKind.DWord);
             }
             catch
             {
