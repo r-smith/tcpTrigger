@@ -22,17 +22,25 @@
                       FontSize="12"
                       HorizontalAlignment="Right">
                 <MenuItem Header="Start tcpTrigger Monitor at logon"
+                          Name="LaunchAtLogonOption"
                           IsCheckable="True"
+                          Click="LaunchAtLogonOption_Click"
                           Style="{DynamicResource MenuItemStyle}"/>
                 <Separator/>
                 <MenuItem Header="Minimize to tray"
+                          Name="MinimizeToTrayOption"
                           IsCheckable="True"
+                          Click="MinimizeToTrayOption_Click"
                           Style="{DynamicResource MenuItemStyle}"/>
                 <MenuItem Header="Exit to tray"
+                          Name="ExitToTrayOption"
                           IsCheckable="True"
+                          Click="ExitToTrayOption_Click"
                           Style="{DynamicResource MenuItemStyle}"/>
-                <MenuItem Header="Focus window on updates"
+                <MenuItem Header="Focus window on new activity"
+                          Name="FocusOnUpdateOption"
                           IsCheckable="True"
+                          Click="FocusOnUpdateOption_Click"
                           Style="{DynamicResource MenuItemStyle}"/>
             </MenuItem>
         </Menu>

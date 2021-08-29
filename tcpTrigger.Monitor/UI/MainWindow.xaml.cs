@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Eventing.Reader;
 using System.Net;
@@ -19,6 +20,8 @@ namespace tcpTrigger.Monitor
         {
             InitializeComponent();
 
+            Settings.Load();
+            SetCheckboxState();
             Log.ItemsSource = DetectionEvents;
             SubscribeToDetectionEvents();
         }
@@ -135,6 +138,58 @@ namespace tcpTrigger.Monitor
                         }
                     }));
                 }
+            }
+        }
+
+        private void SetCheckboxState()
+        {
+            LaunchAtLogonOption.IsChecked = Settings.LaunchAtLogon;
+            MinimizeToTrayOption.IsChecked = Settings.MinimizeToTray;
+            ExitToTrayOption.IsChecked = Settings.ExitToTray;
+            FocusOnUpdateOption.IsChecked = Settings.FocusOnUpdate;
+        }
+
+        private void LaunchAtLogonOption_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MinimizeToTrayOption_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.MinimizeToTray = MinimizeToTrayOption.IsChecked;
+            try
+            {
+                Registry.SetValue(@"HKEY_CURRENT_USER\SOFTWARE\tcpTrigger", "MinimizeToTray", Settings.MinimizeToTray, RegistryValueKind.DWord);
+            }
+            catch
+            {
+                // Failed to store setting in registry. Setting is still applied to current instance of application.
+            }
+        }
+
+        private void ExitToTrayOption_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.ExitToTray = ExitToTrayOption.IsChecked;
+            try
+            {
+                Registry.SetValue(@"HKEY_CURRENT_USER\SOFTWARE\tcpTrigger", "ExitToTray", Settings.ExitToTray, RegistryValueKind.DWord);
+            }
+            catch
+            {
+                // Failed to store setting in registry. Setting is still applied to current instance of application.
+            }
+        }
+
+        private void FocusOnUpdateOption_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.FocusOnUpdate = FocusOnUpdateOption.IsChecked;
+            try
+            {
+                Registry.SetValue(@"HKEY_CURRENT_USER\SOFTWARE\tcpTrigger", "FocusOnUpdate", Settings.FocusOnUpdate, RegistryValueKind.DWord);
+            }
+            catch
+            {
+                // Failed to store setting in registry. Setting is still applied to current instance of application.
             }
         }
     }
