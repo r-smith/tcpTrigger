@@ -15,6 +15,24 @@ namespace tcpTrigger.Monitor
     {
         public DateTime Timestamp { get; set; }
         public MatchType Type { get; set; }
+        public string Action {
+            get
+            {
+                switch (Type)
+                {
+                    case MatchType.ICMP:
+                        return "ICMP request";
+                    case MatchType.TCP:
+                        return "TCP connection";
+                    case MatchType.UDP:
+                        return "UDP connection";
+                    case MatchType.DHCP:
+                        return "DHCP server found";
+                    default:
+                        return string.Empty;
+                }
+            }
+        }
         public IPAddress SourceIP { get; set; }
         public IPAddress DestinationIP { get; set; }
         public int SourcePort { get; set; }
