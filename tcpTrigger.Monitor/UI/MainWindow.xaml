@@ -6,7 +6,38 @@
         mc:Ignorable="d"
         Title="tcpTrigger" Height="373" Width="800">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Menu Background="#404040">
+            <Menu.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <DockPanel HorizontalAlignment="Stretch"/>
+                </ItemsPanelTemplate>
+            </Menu.ItemsPanel>
+            <MenuItem Header="Options"
+                      Padding="8"
+                      Style="{DynamicResource MenuItemStyle}"
+                      FontSize="12"
+                      HorizontalAlignment="Right">
+                <MenuItem Header="Start tcpTrigger Monitor at logon"
+                          IsCheckable="True"
+                          Style="{DynamicResource MenuItemStyle}"/>
+                <Separator/>
+                <MenuItem Header="Minimize to tray"
+                          IsCheckable="True"
+                          Style="{DynamicResource MenuItemStyle}"/>
+                <MenuItem Header="Exit to tray"
+                          IsCheckable="True"
+                          Style="{DynamicResource MenuItemStyle}"/>
+                <MenuItem Header="Focus window on updates"
+                          IsCheckable="True"
+                          Style="{DynamicResource MenuItemStyle}"/>
+            </MenuItem>
+        </Menu>
         <DataGrid Name="Log"
+                  Grid.Row="1"
                   FontSize="16"
                   Style="{DynamicResource DataGridStyle}">
             <DataGrid.Columns>
