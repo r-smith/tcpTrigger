@@ -31,12 +31,24 @@ namespace tcpTrigger.Monitor
 
         private async void SubscribeToDetectionEvents()
         {
-            const string _detectionQuery =
+            // Build TimeCreated query to be included in the final event log query.
+            // If EventLog_MaxDays is set, use that value to build the query.
+            // Otherwise, if EventLog_FromDate is set, use that date to build the query.
+            // Otherwise, no timespan query needed, so set to empty string.
+            string timeSpan = Settings.EventLog_MaxDays > 0
+                ? $"and TimeCreated[timediff(@SystemTime) &lt;= {TimeSpan.FromDays(Settings.EventLog_MaxDays).TotalMilliseconds}]"
+                : !string.IsNullOrWhiteSpace(Settings.EventLog_FromDate)
+                    ? $"and TimeCreated[@SystemTime&gt;='{Settings.EventLog_FromDate}']"
+                    : string.Empty;
+
+            // Build event log query for retreiving tcpTrigger detection events.
+            string _detectionQuery =
                 "<QueryList>"
                 + "<Query Id='0'>"
                 + "  <Select Path='Application'>"
                 + "    *[System[Provider[@Name='tcpTrigger']"
-                + "      and ( (EventID &gt;= 200 and EventID &lt;= 203) )]]"
+                + "      and (EventID &gt;= 200 and EventID &lt;= 203) "
+                + timeSpan + "]]"
                 + "  </Select>"
                 + "</Query>"
                 + "</QueryList>";
