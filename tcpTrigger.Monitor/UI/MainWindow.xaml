@@ -7,6 +7,8 @@
         Title="tcpTrigger"
         Height="376"
         Width="800"
+        MinWidth="300"
+        MinHeight="160"
         StateChanged="Window_StateChanged"
         Closing="Window_Closing">
     <Grid>
@@ -181,5 +183,31 @@
                 </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
+
+        <Border Grid.Row="1" Background="#1e1e1e">
+            <Border.Style>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ElementName=Log, Path=Items.Count}" Value="0">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="No events"
+                           Foreground="#ffd43b"
+                           FontWeight="SemiBold"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,24"
+                           FontSize="36"/>
+                <TextBlock Foreground="#e8e8e8" FontSize="16">
+                    This window shows network activity
+                    <LineBreak/>
+                    detected by tcpTrigger in real time.
+                </TextBlock>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>
