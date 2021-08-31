@@ -5,6 +5,7 @@ using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Net;
 using System.Reflection;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -176,20 +177,26 @@ namespace tcpTrigger.Monitor
             Settings.LaunchAtLogon = LaunchAtLogonOption.IsChecked;
             if (Settings.LaunchAtLogon)
             {
-                // Attempt to create a shortcut to the user's startup folder by copying shortcut from start menu.
+                // Create a shortcut in the user's startup folder.
                 try
                 {
-                    string sourcePath = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu) + @"\Programs\tcpTrigger\tcpTrigger Monitor.lnk";
                     string destinationPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\tcpTrigger Monitor.lnk";
-                    // Copy shortcut from common start menu to user's startup. Throw exception if source shortcut doesn't exist.
-                    // The start menu shortcut is created by the tcpTrigger installer, but could have been removed by the user.
-                    File.Copy(sourceFileName: sourcePath,
-                              destFileName: destinationPath,
-                              overwrite: true);
+                    const string description = "Log viewer for tcpTrigger service";
+                    const string arguments = "-minimized";
+
+                    // Set shortcut information.
+                    IShellLink link = (IShellLink)new ShellLink();
+                    link.SetDescription(description);
+                    link.SetPath(Assembly.GetExecutingAssembly().Location);
+                    link.SetArguments(arguments);
+
+                    // Save it.
+                    IPersistFile file = (IPersistFile)link;
+                    file.Save(destinationPath, false);
                 }
                 catch (Exception ex)
                 {
-                    // Failed to copy shortcut to user's startup folder.
+                    // Failed to create shortcut in the user's startup folder.
                     // TODO: Give more helpful error message.
                     MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     Settings.LaunchAtLogon = false;
