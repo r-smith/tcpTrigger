@@ -269,7 +269,7 @@
                 BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
                 Background="{TemplateBinding Background}"
-                Height="32"
+                Height="28"
                 SnapsToDevicePixels="true">
             <Grid Margin="-1">
                 <Grid.ColumnDefinitions>
@@ -319,7 +319,7 @@
     <Style x:Key="MenuItemStyle" TargetType="{x:Type MenuItem}">
         <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
         <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
-        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="FontSize" Value="14"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="1"/>
