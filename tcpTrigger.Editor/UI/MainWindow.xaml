@@ -703,30 +703,59 @@
                                                         </TextBox.Style>
                                                     </TextBox>
                                                     <!-- Port -->
-                                                    <TextBox Text="{Binding Port}"
-                                                             Grid.Column="1"
-                                                             Margin="0,3,6,0"
-                                                             MaxLength="5"
-                                                             FontFamily="Consolas"
-                                                             FontSize="15">
-                                                        <TextBox.Style>
-                                                            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
-                                                                <Setter Property="FontWeight" Value="Regular"/>
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding ElementName=TPGrid, Path=IsMouseOver}" Value="True">
-                                                                        <Setter Property="FontWeight" Value="SemiBold"/>
-                                                                        <Setter Property="Background" Value="#fcfcfc"/>
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </TextBox.Style>
-                                                    </TextBox>
+                                                    <Grid Grid.Column="1"
+                                                          Margin="0,3,6,0">
+                                                        <TextBox Text="{Binding Port}"
+                                                                 Name="WhitelistPort"
+                                                                 MaxLength="5"
+                                                                 FontFamily="Consolas"
+                                                                 FontSize="15">
+                                                            <TextBox.Style>
+                                                                <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                                                                    <Setter Property="FontWeight" Value="Regular"/>
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding ElementName=TPGrid, Path=IsMouseOver}" Value="True">
+                                                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                                                            <Setter Property="Background" Value="#fcfcfc"/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Text}" Value="icmp">
+                                                                            <Setter Property="Foreground" Value="Purple"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBox.Style>
+                                                        </TextBox>
+                                                        <TextBlock Text="ALL"
+                                                                   IsHitTestVisible="False"
+                                                                   VerticalAlignment="Center"
+                                                                   HorizontalAlignment="Left"
+                                                                   Margin="10,0,0,0"
+                                                                   Opacity="0.5"
+                                                                   Foreground="#ff0b6e2d"
+                                                                   FontFamily="Consolas"
+                                                                   FontSize="14">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="{x:Type TextBlock}">
+                                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Text, ElementName=WhitelistPort}" Value="">
+                                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding IsFocused, ElementName=WhitelistPort}" Value="True">
+                                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </Grid>
                                                     <!-- Comment -->
                                                     <TextBox Text="{Binding Comment}"
                                                              Grid.Column="2"
                                                              Margin="0,3,3,0"
                                                              FontFamily="Consolas"
-                                                             FontSize="15">
+                                                             FontSize="14"
+                                                             MaxLength="128">
                                                         <TextBox.Style>
                                                             <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
                                                                 <Setter Property="FontWeight" Value="Regular"/>

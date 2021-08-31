@@ -315,7 +315,7 @@ namespace tcpTrigger.Editor
             BufferOption.IsChecked = true;
             BufferSeconds.Text = "15";
             EmailSubject.Text = "Alert: Suspicious network activity";
-            EmailBody.Text = "Network connections to {INTERFACE_IP} are being monitored by tcpTrigger. The following activity was detected:"
+            EmailBody.Text = "Network connections to {INTERFACE_IP} are being monitored. The following activity was detected:"
                 + Environment.NewLine + Environment.NewLine
                 + "{CONNECTION_LOG}";
         }
