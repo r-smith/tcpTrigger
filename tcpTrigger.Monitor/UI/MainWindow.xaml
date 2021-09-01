@@ -5,209 +5,292 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="tcpTrigger"
-        Height="376"
+        Height="370"
         Width="800"
-        MinWidth="300"
-        MinHeight="160"
+        MinWidth="350"
+        MinHeight="170"
         StateChanged="Window_StateChanged"
-        Closing="Window_Closing">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Menu Background="#404040">
-            <Menu.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <DockPanel HorizontalAlignment="Stretch"/>
-                </ItemsPanelTemplate>
-            </Menu.ItemsPanel>
-            <MenuItem Header="Options"
-                      Padding="8"
-                      Style="{DynamicResource MenuItemStyle}"
-                      FontSize="12"
-                      HorizontalAlignment="Right">
-                <MenuItem Header="Start tcpTrigger Monitor at logon"
-                          Name="LaunchAtLogonOption"
-                          IsCheckable="True"
-                          Click="LaunchAtLogonOption_Click"
-                          Style="{DynamicResource MenuItemStyle}"/>
-                <Separator/>
-                <MenuItem Header="Minimize to tray"
-                          Name="MinimizeToTrayOption"
-                          IsCheckable="True"
-                          Click="MinimizeToTrayOption_Click"
-                          Style="{DynamicResource MenuItemStyle}"/>
-                <MenuItem Header="Exit to tray"
-                          Name="ExitToTrayOption"
-                          IsCheckable="True"
-                          Click="ExitToTrayOption_Click"
-                          Style="{DynamicResource MenuItemStyle}"/>
-                <MenuItem Header="Focus window on new activity"
-                          Name="FocusOnUpdateOption"
-                          IsCheckable="True"
-                          Click="FocusOnUpdateOption_Click"
-                          Style="{DynamicResource MenuItemStyle}"/>
-            </MenuItem>
-        </Menu>
-        <DataGrid Name="Log"
-                  Grid.Row="1"
-                  FontSize="16"
-                  Style="{DynamicResource DataGridStyle}">
-            <DataGrid.Columns>
-                <!--Timestamp-->
-                <DataGridTextColumn Binding="{Binding Timestamp}" Header="Timestamp">
-                    <DataGridTextColumn.CellStyle>
-                        <Style TargetType="{x:Type DataGridCell}">
-                            <Setter Property="Focusable" Value="False"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding Timestamp, StringFormat=d }"
-                                                       Foreground="#a0a0a0"
-                                                       Padding="5,4,0,4"/>
-                                            <TextBlock Text=" "/>
-                                            <TextBlock Text="{Binding Timestamp, StringFormat=T}"
-                                                       Foreground="#e0e0e0"
-                                                       Padding="0,4,5,4"/>
-                                        </StackPanel>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </DataGridTextColumn.CellStyle>
-                </DataGridTextColumn>
-
-                <!--Destination IP-->
-                <DataGridTextColumn Binding="{Binding DestinationIP}" Header="Interface">
-                    <DataGridTextColumn.CellStyle>
-                        <Style TargetType="{x:Type DataGridCell}">
-                            <Setter Property="Focusable" Value="False"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="["
-                                                       Foreground="#808080"
-                                                       Padding="5,4,1,4"/>
-                                            <TextBlock Text="{Binding DestinationIP}"
-                                                       Foreground="#63e6be"
-                                                       Padding="0,4" />
-                                            <TextBlock Text="]"
-                                                       Foreground="#808080"
-                                                       Padding="2,4,15,4"/>
-                                        </StackPanel>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </DataGridTextColumn.CellStyle>
-                </DataGridTextColumn>
-
-                <!--Event-->
-                <DataGridTextColumn Binding="{Binding Action}" Header="Event">
-                    <DataGridTextColumn.CellStyle>
-                        <Style TargetType="{x:Type DataGridCell}">
-                            <Setter Property="Focusable" Value="False"/>
-                            <Setter Property="Foreground" Value="#f4f4f4"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
-                                        <TextBlock Text="{Binding Action}"
-                                                   Padding="5,4,15,4"/>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </DataGridTextColumn.CellStyle>
-                </DataGridTextColumn>
-
-                <!--Source IP-->
-                <DataGridTextColumn Binding="{Binding SourceIP}" Header="Source">
-                    <DataGridTextColumn.CellStyle>
-                        <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource {x:Type DataGridCell}}">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Foreground="#808080"
-                                                       Padding="5,4,4,4">
-                                                <TextBlock.Style>
-                                                    <Style TargetType="{x:Type TextBlock}">
-                                                        <Setter Property="Text" Value="from:"/>
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding Action}" Value="DHCP server found">
-                                                                <Setter Property="Text" Value="at:"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </TextBlock.Style>
-                                            </TextBlock>
-                                            <TextBlock Text="{Binding SourceIP}"
-                                                       Foreground="#ffd43b"
-                                                       Padding="0,4,15,4" />
-                                        </StackPanel>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </DataGridTextColumn.CellStyle>
-                </DataGridTextColumn>
-
-                <!--Destination port-->
-                <DataGridTextColumn Binding="{Binding DestinationPort}" Header="Port">
-                    <DataGridTextColumn.CellStyle>
-                        <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource {x:Type DataGridCell}}">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="to port:"
-                                                       Foreground="#808080"
-                                                       Padding="5,4,4,4"/>
-                                            <TextBlock Text="{Binding DestinationPort}"
-                                                       Foreground="#61b8ff"
-                                                       Padding="0,4" />
-                                        </StackPanel>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding DestinationPort}" Value="0">
-                                    <Setter Property="Visibility" Value="Hidden"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </DataGridTextColumn.CellStyle>
-                </DataGridTextColumn>
-            </DataGrid.Columns>
-        </DataGrid>
-
-        <Border Grid.Row="1" Background="#1e1e1e">
-            <Border.Style>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding ElementName=Log, Path=Items.Count}" Value="0">
-                            <Setter Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <TextBlock Text="No events"
-                           Foreground="#ffd43b"
-                           FontWeight="SemiBold"
-                           HorizontalAlignment="Center"
-                           Margin="0,0,0,24"
-                           FontSize="36"/>
-                <TextBlock Foreground="#e8e8e8" FontSize="16">
-                    This window shows network activity
-                    <LineBreak/>
-                    detected by tcpTrigger in real time.
+        Background="#2d2d30"
+        Closing="Window_Closing"
+        WindowStyle="None">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="32" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}" />
+    </WindowChrome.WindowChrome>
+    <Border Style="{StaticResource WindowMainPanelStyle}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <!-- Window title bar -->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <!-- Icon -->
+                <Image Grid.Column="0"
+                       Width="22"
+                       Height="22"
+                       Margin="4"
+                       Source="{StaticResource icon.tcpTrigger}" />
+                <TextBlock Grid.Column="1"
+                           Margin="4 0 0 0"
+                           VerticalAlignment="Center"
+                           FontSize="14"
+                           Foreground="#f0f0f0"
+                           Text="{Binding Path=Title,
+                                 RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
                 </TextBlock>
-            </StackPanel>
-        </Border>
-    </Grid>
+                <!-- Menu bar -->
+                <Menu Background="Transparent" Grid.Column="2" Margin="0,0,10,0">
+                    <MenuItem Header="Options"
+                              Padding="8"
+                              Style="{DynamicResource MenuItemStyle}"
+                              FontSize="12"
+                              HorizontalAlignment="Right">
+                        <MenuItem Header="Start tcpTrigger Monitor at logon"
+                                  Name="LaunchAtLogonOption"
+                                  IsCheckable="True"
+                                  Click="LaunchAtLogonOption_Click"
+                                  Style="{DynamicResource MenuItemStyle}"/>
+                        <Separator/>
+                        <MenuItem Header="Minimize to tray"
+                                  Name="MinimizeToTrayOption"
+                                  IsCheckable="True"
+                                  Click="MinimizeToTrayOption_Click"
+                                  Style="{DynamicResource MenuItemStyle}"/>
+                        <MenuItem Header="Exit to tray"
+                                  Name="ExitToTrayOption"
+                                  IsCheckable="True"
+                                  Click="ExitToTrayOption_Click"
+                                  Style="{DynamicResource MenuItemStyle}"/>
+                        <MenuItem Header="Focus window on new activity"
+                                  Name="FocusOnUpdateOption"
+                                  IsCheckable="True"
+                                  Click="FocusOnUpdateOption_Click"
+                                  Style="{DynamicResource MenuItemStyle}"/>
+                    </MenuItem>
+                </Menu>
+                <!-- Minimize button -->
+                <Button Grid.Column="3"
+                        Click="OnMinimizeButtonClick"
+                        RenderOptions.EdgeMode="Aliased"
+                        Style="{StaticResource TitleBarButtonStyle}"
+                        ToolTip="Minimize" ToolTipService.InitialShowDelay="1000"
+                        Foreground="#d0d0d0">
+                    <Path Width="46"
+                          Height="29"
+                          Data="M 18,15 H 28"
+                          Stroke="{Binding Path=Foreground,
+                                  RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
+                          StrokeThickness="1" />
+                </Button>
+                <!-- Maximize button -->
+                <Button Name="maximizeButton"
+                        Grid.Column="4"
+                        Click="OnMaximizeRestoreButtonClick"
+                        Style="{StaticResource TitleBarButtonStyle}"
+                        ToolTip="Maximize" ToolTipService.InitialShowDelay="1000"
+                        Foreground="#d0d0d0">
+                    <Path Width="46"
+                          Height="32"
+                          Data="M 18.5,10.5 H 27.5 V 19.5 H 18.5 Z"
+                          Stroke="{Binding Path=Foreground,
+                                  RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
+                          StrokeThickness="1" />
+                </Button>
+                <!-- Restore button -->
+                <Button Name="restoreButton"
+                        Grid.Column="4"
+                        Click="OnMaximizeRestoreButtonClick"
+                        Style="{StaticResource TitleBarButtonStyle}"
+                        ToolTip="Restore Down" ToolTipService.InitialShowDelay="1000"
+                        Foreground="#d0d0d0">
+                    <Path Width="46"
+                          Height="32"
+                          Data="M 18.5,12.5 H 25.5 V 19.5 H 18.5 Z M 20.5,12.5 V 10.5 H 27.5 V 17.5 H 25.5"
+                          Stroke="{Binding Path=Foreground,
+                                  RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
+                          StrokeThickness="1" />
+                </Button>
+                <!-- Close button -->
+                <Button Grid.Column="5"
+                        Click="OnCloseButtonClick"
+                        Style="{StaticResource TitleBarCloseButtonStyle}"
+                        ToolTip="Close" ToolTipService.InitialShowDelay="1000"
+                        Foreground="#c0c0c0">
+                    <Path Width="46"
+                          Height="32"
+                          Data="M 18,11 27,20 M 18,20 27,11"
+                          Stroke="{Binding Path=Foreground,
+							      RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
+                          StrokeThickness="2" />
+                </Button>
+            </Grid>
+            
+            <!-- Datagrid for detection events -->
+            <DataGrid Name="Log"
+                      Grid.Row="1"
+                      FontSize="16"
+                      Style="{DynamicResource DataGridStyle}">
+                <DataGrid.Columns>
+                    <!--Timestamp-->
+                    <DataGridTextColumn Binding="{Binding Timestamp}" Header="Timestamp">
+                        <DataGridTextColumn.CellStyle>
+                            <Style TargetType="{x:Type DataGridCell}">
+                                <Setter Property="Focusable" Value="False"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Timestamp, StringFormat=d }"
+                                                           Foreground="#a0a0a0"
+                                                           Padding="5,4,0,4"/>
+                                                <TextBlock Text=" "/>
+                                                <TextBlock Text="{Binding Timestamp, StringFormat=T}"
+                                                           Foreground="#e0e0e0"
+                                                           Padding="0,4,5,4"/>
+                                            </StackPanel>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+                    </DataGridTextColumn>
+
+                    <!--Destination IP-->
+                    <DataGridTextColumn Binding="{Binding DestinationIP}" Header="Interface">
+                        <DataGridTextColumn.CellStyle>
+                            <Style TargetType="{x:Type DataGridCell}">
+                                <Setter Property="Focusable" Value="False"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="["
+                                                           Foreground="#808080"
+                                                           Padding="5,4,1,4"/>
+                                                <TextBlock Text="{Binding DestinationIP}"
+                                                           Foreground="#63e6be"
+                                                           Padding="0,4" />
+                                                <TextBlock Text="]"
+                                                           Foreground="#808080"
+                                                           Padding="2,4,15,4"/>
+                                            </StackPanel>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+                    </DataGridTextColumn>
+
+                    <!--Event-->
+                    <DataGridTextColumn Binding="{Binding Action}" Header="Event">
+                        <DataGridTextColumn.CellStyle>
+                            <Style TargetType="{x:Type DataGridCell}">
+                                <Setter Property="Focusable" Value="False"/>
+                                <Setter Property="Foreground" Value="#f4f4f4"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                            <TextBlock Text="{Binding Action}"
+                                                       Padding="5,4,15,4"/>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+                    </DataGridTextColumn>
+
+                    <!--Source IP-->
+                    <DataGridTextColumn Binding="{Binding SourceIP}" Header="Source">
+                        <DataGridTextColumn.CellStyle>
+                            <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource {x:Type DataGridCell}}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Foreground="#808080"
+                                                           Padding="5,4,4,4">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="{x:Type TextBlock}">
+                                                            <Setter Property="Text" Value="from:"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Action}" Value="DHCP server found">
+                                                                    <Setter Property="Text" Value="at:"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                                <TextBlock Text="{Binding SourceIP}"
+                                                           Foreground="#ffd43b"
+                                                           Padding="0,4,15,4" />
+                                            </StackPanel>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+                    </DataGridTextColumn>
+
+                    <!--Destination port-->
+                    <DataGridTextColumn Binding="{Binding DestinationPort}" Header="Port">
+                        <DataGridTextColumn.CellStyle>
+                            <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource {x:Type DataGridCell}}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="to port:"
+                                                           Foreground="#808080"
+                                                           Padding="5,4,4,4"/>
+                                                <TextBlock Text="{Binding DestinationPort}"
+                                                           Foreground="#61b8ff"
+                                                           Padding="0,4" />
+                                            </StackPanel>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DestinationPort}" Value="0">
+                                        <Setter Property="Visibility" Value="Hidden"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <Border Grid.Row="1" Background="#0e0e0e">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=Log, Path=Items.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="No events"
+                               Foreground="#ffd43b"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,24"
+                               FontSize="36"/>
+                    <TextBlock Foreground="#e8e8e8" FontSize="16" TextWrapping="Wrap">
+                        Network activity detected by tcpTrigger is shown here
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
 </Window>

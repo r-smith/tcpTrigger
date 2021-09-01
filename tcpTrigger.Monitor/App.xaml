@@ -8,6 +8,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="ResourceDictionaries/DataGridStyle.xaml"/>
                 <ResourceDictionary Source="ResourceDictionaries/MenuItemStyle.xaml"/>
+                <ResourceDictionary Source="ResourceDictionaries/WindowChrome.xaml"/>
+                <ResourceDictionary Source="ResourceDictionaries/Icons.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
