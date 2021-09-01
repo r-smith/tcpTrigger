@@ -2,7 +2,7 @@
 
 <?define ProductName = "tcpTrigger" ?>
 <?define ProductManufacturer = "Ryan Smith" ?>
-<?define ProductVersion = "1.3.0" ?>
+<?define ProductVersion = "1.3.1" ?>
 
 <!-- Starting with tcpTrigger version 1.3.0:                                                         -->
 <!--     A new 64-bit MSI installer is introduced. Prior installers for tcpTrigger were 32-bit only. -->
@@ -19,13 +19,13 @@
 <!--                                                                                       -->
 <!-- ************************************************************************************* -->
 <?if $(var.Platform) = x64 ?>
-<?define ProductId = "{F1F91D9A-FC63-450F-9EDC-0CEC584EFC13}" ?>
+<?define ProductId = "{1E3BE981-989C-49A2-AA64-622CC71F39B6}" ?>
 <?define ProductUpgradeCode = "{68A80CF7-645A-48A6-9B13-BE7D639D519B}" ?>
 <?define Win64 = "yes" ?>
 <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
 <?define ProductDisplayName = "$(var.ProductName)" ?>
 <?else ?>
-<?define ProductId = "{24BD9DA2-2ED3-46CD-879A-5AD12763035B}"?>
+<?define ProductId = "{0E3FA49E-D990-4B63-B4C3-3D7E8B8DE0BD}"?>
 <?define ProductUpgradeCode = "{7FEBF1AD-0417-4A10-A6EF-8046C5BBB8EB}" ?>
 <?define Win64 = "no" ?>
 <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
