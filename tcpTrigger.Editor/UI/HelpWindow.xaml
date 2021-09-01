@@ -5,6 +5,8 @@
         UseLayoutRounding="True"
         Height="575"
         Width="750"
+        MinHeight="200"
+        MinWidth="500"
         Background="#1e1e1e"
         WindowStartupLocation="CenterScreen"
         PreviewKeyDown="Window_PreviewKeyDown"
@@ -182,7 +184,11 @@
                 </BlockUIContainer>
                 <Paragraph Margin="0,5"
                            Foreground="#e0e0e0">
-                    tcpTrigger is a Windows service.
+                    tcpTrigger detects incoming network connections and then performs various actions upon detection.
+                    It runs in the background as a Windows service.
+                    This utility, tcpTrigger Manager, lets you view and manage all options available
+                    to the tcpTrigger service. A separate utility, tcpTrigger Monitor, provides a
+                    real time view of network activity detected by tcpTrigger.
                 </Paragraph>
                 <BlockUIContainer>
                     <Rectangle HorizontalAlignment="Stretch" Fill="#f0f0f0" Height="1" />
@@ -404,44 +410,37 @@
                     Exclude any TCP ports you do not need to monitor
                     and populate the whitelist with any
                     connections you want to ignore.
-                    Use the tcpTrigger Monitor utility to view your
-                    detection logs in real time.
                     <LineBreak/>
                     <LineBreak/>
-                    Understand that the TCP protocol defines a
+                    Use the included tcpTrigger Monitor utility to view your
+                    detection logs in real time. It is designed to run
+                    in the background at all times, though certainly
+                    not required. It can minimize to the system tray so
+                    that it stays out of the way, and optionally start
+                    automatically when you log in to Windows. When new
+                    network activity is detected, the window will pop
+                    up with the activity log. That way you are immediately
+                    notified of incoming connections. Again, this
+                    utility is entirely optional, but very helpful.
+                    <LineBreak/>
+                    <LineBreak/>
+                    It is also important to understand what tcpTrigger
+                    considers an incoming TCP 'connection'.
+                    The TCP protocol defines a
                     handshake process that must be performed in
                     order to establish a connection. tcpTrigger
                     detects when such a handshake is being initiated.
                     Detection by tcpTrigger does not indicate
-                    whether a connection was actually established.
+                    whether a connection was fully established.
                     This behavior is desired in order to catch
                     all port scans and probes against your system.
                     If tcpTrigger detects a connection to a port
                     where you have nothing listening, then no
                     connection is established, it is merely the attempt
                     that is detected.
-                    If you are unsure what ports your computer
-                    is listening on, get a complete list with
-                    the command:
-                </Paragraph>
-                <Paragraph Style="{StaticResource VariablesText}" Margin="15,10,0,10">
-                    netstat -ano
-                </Paragraph>
-                <Paragraph Style="{StaticResource ParagraphText}">
-                    An excellent program for listing which processes
-                    are listening on which ports, along with a live
-                    view of all incoming and outgoing TCP and UDP connections,
-                    is Microsoft's TCPView (Originally created by Mark Russinovich).
-                    The application is available as a free download, here:
-                    <LineBreak/>
-                    <Hyperlink NavigateUri="https://docs.microsoft.com/en-us/sysinternals/downloads/tcpview"
-                               RequestNavigate="Hyperlink_RequestNavigate"
-                               Style="{StaticResource HyperlinkStyle}">
-                        https://docs.microsoft.com/en-us/sysinternals/downloads/tcpview
-                    </Hyperlink>
                 </Paragraph>
                 <Paragraph Style="{StaticResource SubHeaderText}">
-                    Deployment: Closing
+                    Other Deployment Notes
                 </Paragraph>
                 <Paragraph Style="{StaticResource ParagraphText}">
                     This concludes the tcpTrigger deployment guide. You might
