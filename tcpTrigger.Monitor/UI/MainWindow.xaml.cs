@@ -28,6 +28,7 @@ namespace tcpTrigger.Monitor
             SetCheckboxState();
             Log.ItemsSource = DetectionEvents;
             SubscribeToDetectionEvents();
+            ProcessCommandLineArgs();
         }
 
         private async void SubscribeToDetectionEvents()
@@ -55,12 +56,18 @@ namespace tcpTrigger.Monitor
                 + "</QueryList>";
 
             EventLogWatcher watcher = null;
+            // Store current FocusOnUpdate setting. Disable this setting during initial loading of events.
+            bool isAutoFocusEnabled = Settings.FocusOnUpdate;
+            Settings.FocusOnUpdate = false;
             await Task.Run(() =>
             {
                 try
                 {
+                    // Start event log watcher, while also retrieving all existing events that match our query.
                     EventLogQuery logQuery = new EventLogQuery("Application", PathType.LogName, _detectionQuery);
-                    watcher = new EventLogWatcher(logQuery, null, true);
+                    watcher = new EventLogWatcher(eventQuery: logQuery,
+                                                  bookmark: null,
+                                                  readExistingEvents: true);
                     watcher.EventRecordWritten += new EventHandler<EventRecordWrittenEventArgs>(EventLogEventRead);
                     watcher.Enabled = true;
                 }
@@ -74,6 +81,8 @@ namespace tcpTrigger.Monitor
                     }
                 }
             });
+            // Initial loading of events is complete. Restore previous FocusOnUpdate setting.
+            Settings.FocusOnUpdate = isAutoFocusEnabled;
         }
 
         private void EventLogEventRead(object obj, EventRecordWrittenEventArgs arg)
@@ -170,6 +179,15 @@ namespace tcpTrigger.Monitor
             MinimizeToTrayOption.IsChecked = Settings.MinimizeToTray;
             ExitToTrayOption.IsChecked = Settings.ExitToTray;
             FocusOnUpdateOption.IsChecked = Settings.FocusOnUpdate;
+        }
+
+        private void ProcessCommandLineArgs()
+        {
+            string[] args = Environment.GetCommandLineArgs();
+            if (args.Length == 2 && args[1].Equals("-minimized"))
+            {
+                HideToTray();
+            }
         }
 
         private void LaunchAtLogonOption_Click(object sender, RoutedEventArgs e)
