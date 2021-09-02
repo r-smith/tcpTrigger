@@ -14,7 +14,7 @@
         Closing="Window_Closing"
         WindowStyle="None">
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="32" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}" />
+        <WindowChrome CaptionHeight="32" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}" GlassFrameThickness="0" CornerRadius="0" />
     </WindowChrome.WindowChrome>
     <Border Style="{StaticResource WindowMainPanelStyle}">
         <Grid>
