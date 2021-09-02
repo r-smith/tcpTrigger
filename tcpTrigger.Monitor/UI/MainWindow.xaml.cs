@@ -408,7 +408,7 @@ namespace tcpTrigger.Monitor
             ((HwndSource)PresentationSource.FromVisual(this)).AddHook(HookProc);
         }
 
-        public static IntPtr HookProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        protected virtual IntPtr HookProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             if (msg == WM_GETMINMAXINFO)
             {
@@ -433,6 +433,25 @@ namespace tcpTrigger.Monitor
                 }
 
                 Marshal.StructureToPtr(mmi, lParam, true);
+            }
+
+            // Single instance application. If app is already running, bring window to front.
+            if (msg == App.NativeMethods.WM_SHOWME)
+            {
+                if (NotifyIcon != null)
+                {
+                    NotifyIcon.Visible = false;
+                    Visibility = Visibility.Visible;
+                    Show();
+                    WindowState = WindowState.Normal;
+                }
+                if (WindowState == WindowState.Minimized)
+                {
+                    WindowState = WindowState.Normal;
+                }
+                Topmost = true;
+                Topmost = false;
+                Focus();
             }
 
             return IntPtr.Zero;
