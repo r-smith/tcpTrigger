@@ -14,7 +14,7 @@
     <SolidColorBrush x:Key="DG.Row.MouseOver.Background" Color="#2e2e2e"/>
     <SolidColorBrush x:Key="DG.Row.MouseOver.Border" Color="#50303030"/>
     <SolidColorBrush x:Key="DG.Gridlines.Border" Color="#404040"/>
-    <SolidColorBrush x:Key="DG.Border" Color="#FF688CAF"/>
+    <SolidColorBrush x:Key="DG.Border" Color="Black"/>
 
     <Style x:Key="DataGridStyle" TargetType="{x:Type DataGrid}">
         <Style.Resources>
