@@ -7,7 +7,7 @@
     <SolidColorBrush x:Key="MenuItem.Highlight.Disabled.Background" Color="#0A000000"/>
     <SolidColorBrush x:Key="MenuItem.Highlight.Disabled.Border" Color="#21000000"/>
     <SolidColorBrush x:Key="MenuItem.Selected.Border" Color="Black"/>
-    <SolidColorBrush x:Key="MenuItem.Selected.Background" Color="#007acc"/>
+    <SolidColorBrush x:Key="MenuItem.Selected.Background" Color="#477fb2"/>
     <SolidColorBrush x:Key="Menu.Disabled.Foreground" Color="#FF707070"/>
     <SolidColorBrush x:Key="Menu.Static.Foreground" Color="#f0f0f0"/>
     <SolidColorBrush x:Key="Menu.Static.Border" Color="#FF999999"/>
@@ -92,7 +92,7 @@
         <Border x:Name="templateRoot"
                 BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
-                Background="{StaticResource MenuTopLevel.Static.Background}"
+                Background="{TemplateBinding Background}"
                 SnapsToDevicePixels="true">
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
@@ -162,15 +162,37 @@
     
     <!-- Top level item -->
     <ControlTemplate x:Key="{ComponentResourceKey ResourceId=TopLevelItemTemplateKey, TypeInTargetAssembly={x:Type MenuItem}}" TargetType="{x:Type MenuItem}">
-        <Border x:Name="templateRoot" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+        <Border x:Name="templateRoot"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                Background="{TemplateBinding Background}"
+                SnapsToDevicePixels="true">
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <ContentPresenter x:Name="Icon" ContentSource="Icon" HorizontalAlignment="Center" Height="16" Margin="3" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center" Width="16"/>
-                <Path x:Name="GlyphPanel" Data="{StaticResource Checkmark}" Fill="{StaticResource Menu.Static.Foreground}" FlowDirection="LeftToRight" Margin="3" Visibility="Collapsed" VerticalAlignment="Center"/>
-                <ContentPresenter Grid.Column="1" ContentSource="Header" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                <ContentPresenter x:Name="Icon"
+                                  ContentSource="Icon"
+                                  HorizontalAlignment="Center"
+                                  Height="16"
+                                  Width="16"
+                                  Margin="3"
+                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                  VerticalAlignment="Center"/>
+                <Path x:Name="GlyphPanel"
+                      Data="{StaticResource Checkmark}"
+                      Fill="{TemplateBinding Foreground}"
+                      FlowDirection="LeftToRight"
+                      Margin="3"
+                      Visibility="Collapsed"
+                      VerticalAlignment="Center"/>
+                <ContentPresenter Grid.Column="1"
+                                  ContentSource="Header"
+                                  Margin="{TemplateBinding Padding}"
+                                  RecognizesAccessKey="True"
+                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                  TextElement.Foreground="{StaticResource MenuTopLevel.Static.Foreground}"/>
             </Grid>
         </Border>
         <ControlTemplate.Triggers>
@@ -271,8 +293,8 @@
                 SnapsToDevicePixels="true">
             <Grid Margin="-1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition MinWidth="22" SharedSizeGroup="MenuItemIconColumnGroup" Width="Auto"/>
-                    <ColumnDefinition Width="13"/>
+                    <ColumnDefinition MinWidth="18" SharedSizeGroup="MenuItemIconColumnGroup" Width="Auto"/>
+                    <ColumnDefinition Width="9"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="30"/>
                     <ColumnDefinition SharedSizeGroup="MenuItemIGTColumnGroup" Width="Auto"/>
@@ -290,14 +312,13 @@
                         BorderBrush="{StaticResource MenuItem.Selected.Border}"
                         BorderThickness="1"
                         Background="{StaticResource MenuItem.Selected.Background}"
-                        CornerRadius="3"
                         ClipToBounds="False"
                         HorizontalAlignment="Center"
-                        Height="22"
-                        Margin="3,0,0,0"
+                        Height="18"
+                        Width="18"
+                        Margin="3"
                         Visibility="Hidden"
-                        VerticalAlignment="Center"
-                        Width="22">
+                        VerticalAlignment="Center">
                     <Path x:Name="Glyph" Data="{StaticResource Checkmark}" Fill="{StaticResource Menu.Static.Foreground}" FlowDirection="LeftToRight" Height="11" Width="10"/>
                 </Border>
                 <ContentPresenter x:Name="menuHeaderContainer" Grid.Column="2" ContentSource="Header" HorizontalAlignment="Left" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center"/>
@@ -352,8 +373,8 @@
                 <Setter Property="Padding" Value="6,0"/>
             </Trigger>
             <Trigger Property="Role" Value="TopLevelItem">
-                <Setter Property="Background" Value="{StaticResource Menu.Static.Background}"/>
-                <Setter Property="BorderBrush" Value="{StaticResource Menu.Static.Border}"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
                 <Setter Property="Foreground" Value="{StaticResource Menu.Static.Foreground}"/>
                 <Setter Property="Template" Value="{DynamicResource {ComponentResourceKey ResourceId=TopLevelItemTemplateKey, TypeInTargetAssembly={x:Type MenuItem}}}"/>
                 <Setter Property="Padding" Value="6,0"/>
