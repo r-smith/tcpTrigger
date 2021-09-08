@@ -10,6 +10,7 @@ using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
 using System.Windows.Media.Effects;
 
 namespace tcpTrigger.Editor
@@ -410,6 +411,29 @@ namespace tcpTrigger.Editor
             WhitelistItems.Remove(item);
             if (WhitelistItems.Count < 1)
                 WhitelistItems.Add(new WhitelistItem());
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            ((HwndSource)PresentationSource.FromVisual(this)).AddHook(HookProc);
+        }
+
+        protected virtual IntPtr HookProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            // Single instance application. If app is already running, bring window to front.
+            if (msg == App.NativeMethods.WM_SHOWME)
+            {
+                if (WindowState == WindowState.Minimized)
+                {
+                    WindowState = WindowState.Normal;
+                }
+                Topmost = true;
+                Topmost = false;
+                Focus();
+            }
+
+            return IntPtr.Zero;
         }
     }
 }
