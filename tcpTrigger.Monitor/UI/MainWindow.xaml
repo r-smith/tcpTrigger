@@ -48,32 +48,37 @@
                 </TextBlock>
                 <!-- Menu bar -->
                 <Menu Background="Transparent" Grid.Column="2" Margin="0,0,10,0">
+                    <Menu.Resources>
+                        <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MenuItemStyle}"/>
+                    </Menu.Resources>
                     <MenuItem Header="Options"
                               Padding="8"
-                              Style="{DynamicResource MenuItemStyle}"
                               FontSize="12"
                               HorizontalAlignment="Right">
                         <MenuItem Header="Start tcpTrigger Monitor at logon"
                                   Name="LaunchAtLogonOption"
                                   IsCheckable="True"
-                                  Click="LaunchAtLogonOption_Click"
-                                  Style="{DynamicResource MenuItemStyle}"/>
-                        <Separator/>
+                                  Click="LaunchAtLogonOption_Click"/>
+                        <Separator Background="#606060"/>
                         <MenuItem Header="Minimize to tray"
                                   Name="MinimizeToTrayOption"
                                   IsCheckable="True"
-                                  Click="MinimizeToTrayOption_Click"
-                                  Style="{DynamicResource MenuItemStyle}"/>
+                                  Click="MinimizeToTrayOption_Click"/>
                         <MenuItem Header="Exit to tray"
                                   Name="ExitToTrayOption"
                                   IsCheckable="True"
-                                  Click="ExitToTrayOption_Click"
-                                  Style="{DynamicResource MenuItemStyle}"/>
+                                  Click="ExitToTrayOption_Click"/>
                         <MenuItem Header="Focus window on new activity"
                                   Name="FocusOnUpdateOption"
                                   IsCheckable="True"
-                                  Click="FocusOnUpdateOption_Click"
-                                  Style="{DynamicResource MenuItemStyle}"/>
+                                  Click="FocusOnUpdateOption_Click"/>
+                        <Separator Background="#606060"/>
+                        <MenuItem Header="Manage tcpTrigger service"
+                                  Click="LaunchSettingsManager_Click">
+                            <MenuItem.Icon>
+                                <Image Source="{StaticResource icon.external-link}"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
                     </MenuItem>
                 </Menu>
                 <!-- Minimize button -->

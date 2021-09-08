@@ -201,7 +201,11 @@ namespace tcpTrigger.Monitor
                 // Create a shortcut in the user's startup folder.
                 try
                 {
-                    string destinationPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\tcpTrigger Monitor.lnk";
+                    string destinationPath = Path.Combine(new string[]
+                    {
+                        Environment.GetFolderPath(Environment.SpecialFolder.Startup),
+                        "tcpTrigger Monitor.lnk"
+                    });
                     const string description = "Log viewer for tcpTrigger service";
                     const string arguments = "-minimized";
 
@@ -229,7 +233,11 @@ namespace tcpTrigger.Monitor
                 // Remove shortcut from user's startup folder.
                 try
                 {
-                    string shortcutPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\tcpTrigger Monitor.lnk";
+                    string shortcutPath = Path.Combine(new string[]
+                    {
+                        Environment.GetFolderPath(Environment.SpecialFolder.Startup),
+                        "tcpTrigger Monitor.lnk"
+                    });
                     if (File.Exists(shortcutPath))
                     {
                         File.Delete(shortcutPath);
@@ -291,6 +299,36 @@ namespace tcpTrigger.Monitor
             catch
             {
                 // Failed to store setting in registry. Setting is still applied to current instance of application.
+            }
+        }
+
+        private void LaunchSettingsManager_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string path;
+                path = Path.Combine(new string[]
+                {
+                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                    "tcpTrigger Manager.exe"
+                });
+                if (!File.Exists(path))
+                {
+                    path = Path.Combine(new string[]
+                    {
+                        Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu),
+                        "Programs",
+                        "tcpTrigger",
+                        "tcpTrigger Manager.lnk"
+                    });
+                }
+                System.Diagnostics.Process p = new System.Diagnostics.Process();
+                p.StartInfo.FileName = path;
+                p.Start();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
 
