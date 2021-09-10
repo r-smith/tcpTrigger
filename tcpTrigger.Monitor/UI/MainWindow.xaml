@@ -40,31 +40,57 @@
                        Height="20"
                        Margin="6,0,4,0"
                        Source="{StaticResource icon.tcpTrigger}" />
-                
+
                 <!-- Title -->
                 <TextBlock Grid.Column="1"
                            Margin="4,0,0,0"
                            VerticalAlignment="Center"
                            FontSize="14"
-                           Foreground="#f0f0f0"
+                           Foreground="#f1f1f1"
                            Text="{Binding Path=Title,
                                  RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
                 </TextBlock>
-                
+
                 <!-- Filter -->
-                <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="0,0,10,0">
-                    <TextBox x:Name="FilterField"
-                             KeyUp="FilterField_KeyUp"
-                             Width="150"
-                             Padding="4,1,1,1"
-                             Background="#333337"
-                             Foreground="#f0f0f0"
-                             FontSize="13"
-                             WindowChrome.IsHitTestVisibleInChrome="True"/>
+                <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="0,0,12,0">
+                    <Grid>
+                        <TextBox x:Name="FilterField"
+                                 Style="{StaticResource FilterTextBoxStyle}"
+                                 KeyUp="FilterField_KeyUp"
+                                 Width="120"
+                                 Padding="3,1,1,1"
+                                 FontSize="13"
+                                 WindowChrome.IsHitTestVisibleInChrome="True"/>
+                        <TextBlock Text="Filter"
+                                   IsHitTestVisible="False"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Left"
+                                   Margin="6,1,1,1"
+                                   Opacity="1"
+                                   FontSize="14">
+                            <TextBlock.Style>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=FilterField}" Value="">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Setter Property="Foreground" Value="{StaticResource TextBox.Static.Foreground}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsMouseOver, ElementName=FilterField}" Value="True">
+                                            <Setter Property="Foreground" Value="{StaticResource TextBox.Focus.Foreground}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsFocused, ElementName=FilterField}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
                 </StackPanel>
-                
+
                 <!-- Menu bar -->
-                <Menu Background="Transparent" Grid.Column="3" Margin="0,0,10,0" VerticalAlignment="Center">
+                <Menu Background="Transparent" Grid.Column="3" Margin="0,0,12,0" VerticalAlignment="Center">
                     <Menu.Resources>
                         <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MenuItemStyle}"/>
                     </Menu.Resources>
@@ -154,7 +180,7 @@
                           StrokeThickness="2" />
                 </Button>
             </Grid>
-            
+
             <!-- Datagrid for detection events -->
             <DataGrid Name="Log"
                       Grid.Row="1"
