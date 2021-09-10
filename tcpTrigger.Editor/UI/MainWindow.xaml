@@ -730,7 +730,7 @@
                                                                    VerticalAlignment="Center"
                                                                    HorizontalAlignment="Left"
                                                                    Margin="10,0,0,0"
-                                                                   Opacity="0.5"
+                                                                   Opacity="0.7"
                                                                    Foreground="#ff0b6e2d"
                                                                    FontFamily="Consolas"
                                                                    FontSize="14">
