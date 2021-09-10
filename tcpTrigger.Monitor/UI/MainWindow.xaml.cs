@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Net;
@@ -10,6 +11,8 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Interop;
 
 namespace tcpTrigger.Monitor
@@ -20,6 +23,7 @@ namespace tcpTrigger.Monitor
     public partial class MainWindow : Window
     {
         private readonly ObservableCollection<DetectionEvent> DetectionEvents = new ObservableCollection<DetectionEvent>();
+        private readonly ICollectionView DetectionEventsView;
         private System.Windows.Forms.NotifyIcon NotifyIcon;
 
         public MainWindow()
@@ -29,7 +33,11 @@ namespace tcpTrigger.Monitor
             Settings.Load();
             SetCheckboxState();
             RefreshMaximizeRestoreButton();
-            Log.ItemsSource = DetectionEvents;
+
+            DetectionEventsView = CollectionViewSource.GetDefaultView(DetectionEvents);
+            DetectionEventsView.Filter = LogFilter;
+            Log.ItemsSource = DetectionEventsView;
+
             SubscribeToDetectionEvents();
             ProcessCommandLineArgs();
         }
@@ -190,6 +198,38 @@ namespace tcpTrigger.Monitor
             if (args.Length == 2 && args[1].Equals("-minimized"))
             {
                 HideToTray();
+            }
+        }
+
+        private bool LogFilter(object item)
+        {
+            var entry = item as DetectionEvent;
+            if (string.IsNullOrWhiteSpace(FilterField.Text))
+                return true;
+            else if (entry.DestinationIP.ToString().Contains(FilterField.Text))
+                return true;
+            else if (entry.SourceIP.ToString().Contains(FilterField.Text))
+                return true;
+            else if (entry.DestinationPort.ToString().Contains(FilterField.Text))
+                return true;
+            else if (entry.Action.ToUpper().Contains(FilterField.Text.ToUpper()))
+                return true;
+            else
+                return false;
+        }
+
+        private void FilterField_KeyUp(object sender, KeyEventArgs e)
+        {
+            DetectionEventsView.Refresh();
+        }
+
+        private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            // Remove focus from filter textbox when window is clicked.
+            if (FilterField.IsFocused)
+            {
+                FocusManager.SetFocusedElement(FocusManager.GetFocusScope(FilterField), null);
+                Keyboard.ClearFocus();
             }
         }
 
@@ -472,10 +512,18 @@ namespace tcpTrigger.Monitor
 
                 Marshal.StructureToPtr(mmi, lParam, true);
             }
-
-            // Single instance application. If app is already running, bring window to front.
-            if (msg == App.NativeMethods.WM_SHOWME)
+            else if (msg == WM_WINDOWPOSCHANGING)
             {
+                // Remove focus from filter textbox if title bar area is clicked.
+                if (FilterField.IsFocused)
+                {
+                    FocusManager.SetFocusedElement(FocusManager.GetFocusScope(FilterField), null);
+                    Keyboard.ClearFocus();
+                }
+            }
+            else if (msg == App.NativeMethods.WM_SHOWME)
+            {
+                // Single instance application. If app is already running, bring window to front.
                 if (NotifyIcon != null)
                 {
                     NotifyIcon.Visible = false;
@@ -496,7 +544,7 @@ namespace tcpTrigger.Monitor
         }
 
         private const int WM_GETMINMAXINFO = 0x0024;
-
+        private const int WM_WINDOWPOSCHANGING = 0x0046;
         private const uint MONITOR_DEFAULTTONEAREST = 0x00000002;
 
         [DllImport("user32.dll")]

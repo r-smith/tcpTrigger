@@ -5,13 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="tcpTrigger"
-        Height="335"
+        Height="307"
         Width="800"
-        MinWidth="350"
-        MinHeight="170"
+        MinWidth="470"
+        MinHeight="125"
         StateChanged="Window_StateChanged"
-        Background="#2d2d30"
+        PreviewMouseDown="Window_PreviewMouseDown"
         Closing="Window_Closing"
+        Background="#2d2d30"
         WindowStyle="None">
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="32" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}" GlassFrameThickness="0" CornerRadius="0" />
@@ -31,6 +32,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <!-- Icon -->
                 <Image Grid.Column="0"
@@ -38,6 +40,8 @@
                        Height="20"
                        Margin="6,0,4,0"
                        Source="{StaticResource icon.tcpTrigger}" />
+                
+                <!-- Title -->
                 <TextBlock Grid.Column="1"
                            Margin="4,0,0,0"
                            VerticalAlignment="Center"
@@ -46,8 +50,21 @@
                            Text="{Binding Path=Title,
                                  RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
                 </TextBlock>
+                
+                <!-- Filter -->
+                <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="0,0,10,0">
+                    <TextBox x:Name="FilterField"
+                             KeyUp="FilterField_KeyUp"
+                             Width="150"
+                             Padding="4,1,1,1"
+                             Background="#333337"
+                             Foreground="#f0f0f0"
+                             FontSize="13"
+                             WindowChrome.IsHitTestVisibleInChrome="True"/>
+                </StackPanel>
+                
                 <!-- Menu bar -->
-                <Menu Background="Transparent" Grid.Column="2" Margin="0,0,10,0" VerticalAlignment="Center">
+                <Menu Background="Transparent" Grid.Column="3" Margin="0,0,10,0" VerticalAlignment="Center">
                     <Menu.Resources>
                         <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MenuItemStyle}"/>
                     </Menu.Resources>
@@ -82,14 +99,14 @@
                     </MenuItem>
                 </Menu>
                 <!-- Minimize button -->
-                <Button Grid.Column="3"
+                <Button Grid.Column="4"
                         Click="OnMinimizeButtonClick"
                         RenderOptions.EdgeMode="Aliased"
                         Style="{StaticResource TitleBarButtonStyle}"
                         ToolTip="Minimize" ToolTipService.InitialShowDelay="1000"
                         Foreground="#d0d0d0">
                     <Path Width="46"
-                          Height="27"
+                          Height="29"
                           Data="M 18,15 H 28"
                           Stroke="{Binding Path=Foreground,
                                   RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
@@ -97,13 +114,13 @@
                 </Button>
                 <!-- Maximize button -->
                 <Button Name="maximizeButton"
-                        Grid.Column="4"
+                        Grid.Column="5"
                         Click="OnMaximizeRestoreButtonClick"
                         Style="{StaticResource TitleBarButtonStyle}"
                         ToolTip="Maximize" ToolTipService.InitialShowDelay="1000"
                         Foreground="#d0d0d0">
                     <Path Width="46"
-                          Height="30"
+                          Height="31"
                           Data="M 18.5,10.5 H 27.5 V 19.5 H 18.5 Z"
                           Stroke="{Binding Path=Foreground,
                                   RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
@@ -111,26 +128,26 @@
                 </Button>
                 <!-- Restore button -->
                 <Button Name="restoreButton"
-                        Grid.Column="4"
+                        Grid.Column="5"
                         Click="OnMaximizeRestoreButtonClick"
                         Style="{StaticResource TitleBarButtonStyle}"
                         ToolTip="Restore Down" ToolTipService.InitialShowDelay="1000"
                         Foreground="#d0d0d0">
                     <Path Width="46"
-                          Height="30"
+                          Height="31"
                           Data="M 18.5,12.5 H 25.5 V 19.5 H 18.5 Z M 20.5,12.5 V 10.5 H 27.5 V 17.5 H 25.5"
                           Stroke="{Binding Path=Foreground,
                                   RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
                           StrokeThickness="1" />
                 </Button>
                 <!-- Close button -->
-                <Button Grid.Column="5"
+                <Button Grid.Column="6"
                         Click="OnCloseButtonClick"
                         Style="{StaticResource TitleBarCloseButtonStyle}"
                         ToolTip="Close" ToolTipService.InitialShowDelay="1000"
                         Foreground="#c0c0c0">
                     <Path Width="46"
-                          Height="30"
+                          Height="31"
                           Data="M 18,11 27,20 M 18,20 27,11"
                           Stroke="{Binding Path=Foreground,
 							      RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
