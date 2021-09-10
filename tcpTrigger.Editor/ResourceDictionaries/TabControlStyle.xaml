@@ -195,9 +195,20 @@
                    Foreground="White"/>
     </DataTemplate>
     
+    <!-- Alternate TabItem focus visual style -->
+    <Style x:Key="TabItemAlternateFocusVisual">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Rectangle Margin="4,0,0,-1" SnapsToDevicePixels="true" Stroke="Black" StrokeThickness="3"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
     <!-- Alternate TabItem style -->
     <Style x:Key="TabItemAlternate" TargetType="{x:Type TabItem}" BasedOn="{StaticResource {x:Type TabItem}}">
-        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+        <Setter Property="FocusVisualStyle" Value="{StaticResource TabItemAlternateFocusVisual}"/>
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="Background" Value="#eaeaec"/>
         <Setter Property="Padding" Value="3,4,3,4"/>
