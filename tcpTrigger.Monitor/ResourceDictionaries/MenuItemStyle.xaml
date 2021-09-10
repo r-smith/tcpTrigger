@@ -13,7 +13,7 @@
     <SolidColorBrush x:Key="Menu.Static.Border" Color="#FF999999"/>
     <SolidColorBrush x:Key="Menu.Static.Background" Color="#1c1b1d"/>
     <SolidColorBrush x:Key="MenuTopLevel.Static.Background" Color="Transparent"/>
-    <SolidColorBrush x:Key="MenuTopLevel.Static.Foreground" Color="#d0d0d0"/>
+    <SolidColorBrush x:Key="MenuTopLevel.Static.Foreground" Color="#f1f1f1"/>
     <SolidColorBrush x:Key="MenuTopLevel.MouseOver.Background" Color="#3f3f41"/>
     <SolidColorBrush x:Key="MenuTopLevel.MouseOver.Border" Color="#90202020"/>
     
