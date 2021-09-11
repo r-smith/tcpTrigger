@@ -95,7 +95,7 @@
                         <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MenuItemStyle}"/>
                     </Menu.Resources>
                     <MenuItem Header="Options"
-                              Padding="8,6,8,6"
+                              Padding="9,3"
                               FontSize="12"
                               HorizontalAlignment="Right">
                         <MenuItem Header="Start tcpTrigger Monitor at logon"
