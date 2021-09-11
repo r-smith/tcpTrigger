@@ -45,16 +45,16 @@ namespace tcpTrigger.Editor
                         else
                         {
                             // Service is in some other state. Shutdown app with failure exit code.
-                            Current.Shutdown(EXIT_FAILURE);
+                            Environment.Exit(EXIT_FAILURE);
                         }
                     }
                     // Success. Shutdown app.
-                    Current.Shutdown(EXIT_SUCCESS);
+                    Environment.Exit(EXIT_SUCCESS);
                 }
                 catch
                 {
                     // Encountered a problem while restarting service. Shutdown app with failure exit code.
-                    Current.Shutdown(EXIT_FAILURE);
+                    Environment.Exit(EXIT_FAILURE);
                 }
             }
 
