@@ -243,6 +243,7 @@ namespace tcpTrigger
                 sb.AppendLine("# Email");
                 sb.AppendLine($"Server: {Settings.EmailServer}");
                 sb.AppendLine($"Port: {Settings.EmailServerPort}");
+                sb.AppendLine($"SSL / TLS: {(Settings.IsEmailTlsEnabled ? "Enabled" : "Disabled")}");
                 sb.AppendLine("Use authentication? " + (Settings.IsEmailAuthRequired ? "Yes" : "No"));
                 sb.AppendLine("Recipient(s): " + string.Join(", ", Settings.EmailRecipients.ToArray()));
                 sb.AppendLine($"Sender address: {Settings.EmailSender}");

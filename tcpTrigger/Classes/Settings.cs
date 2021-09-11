@@ -41,6 +41,7 @@ namespace tcpTrigger
         public static string TimestampFormat { get; private set; } = "yyyy-MM-dd HH:mm:ss";
         public static string EmailServer { get; private set; }
         public static int EmailServerPort { get; private set; }
+        public static bool IsEmailTlsEnabled { get; private set; }
         public static bool IsEmailAuthRequired { get; private set; }
         public static string EmailUsername { get; private set; }
         public static string EmailPassword { get; private set; }
@@ -271,6 +272,10 @@ namespace tcpTrigger
                 if (xn != null && !string.IsNullOrEmpty(xn.InnerText)) { EmailServerPort = int.Parse(xn.InnerText); }
                 else { EmailServerPort = 25; }
 
+                currentNode = SettingsNode.email_isTlsEnabled;
+                xn = xd.DocumentElement.SelectSingleNode(currentNode);
+                if (xn != null) { IsEmailTlsEnabled = bool.Parse(xn.InnerText); }
+
                 currentNode = SettingsNode.email_isAuthRequired;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { IsEmailAuthRequired = bool.Parse(xn.InnerText); }
@@ -386,6 +391,7 @@ namespace tcpTrigger
         public const string actionsSettings_command_arguments = "/tcpTrigger/actionSettings/command/arguments";
         public const string email_server = "/tcpTrigger/email/server";
         public const string email_port = "/tcpTrigger/email/port";
+        public const string email_isTlsEnabled = "/tcpTrigger/email/isTlsEnabled";
         public const string email_isAuthRequired = "/tcpTrigger/email/isAuthRequired";
         public const string email_username = "/tcpTrigger/email/username";
         public const string email_password = "/tcpTrigger/email/password";
