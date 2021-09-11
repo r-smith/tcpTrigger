@@ -134,6 +134,10 @@ namespace tcpTrigger.Editor
                 currentNode = SettingsNode.email_port;
                 EmailPort.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
 
+                currentNode = SettingsNode.email_isTlsEnabled;
+                xn = xd.DocumentElement.SelectSingleNode(currentNode);
+                if (xn != null) { IsTlsEnabled.IsChecked = bool.Parse(xn.InnerText); }
+
                 currentNode = SettingsNode.email_isAuthRequired;
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { IsSmtpAuthenticationRequired.IsChecked = bool.Parse(xn.InnerText); }

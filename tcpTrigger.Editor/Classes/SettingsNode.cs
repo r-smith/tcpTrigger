@@ -24,6 +24,7 @@
         public const string actionsSettings_command_arguments = "/tcpTrigger/actionSettings/command/arguments";
         public const string email_server = "/tcpTrigger/email/server";
         public const string email_port = "/tcpTrigger/email/port";
+        public const string email_isTlsEnabled = "/tcpTrigger/email/isTlsEnabled";
         public const string email_isAuthRequired = "/tcpTrigger/email/isAuthRequired";
         public const string email_username = "/tcpTrigger/email/username";
         public const string email_password = "/tcpTrigger/email/password";

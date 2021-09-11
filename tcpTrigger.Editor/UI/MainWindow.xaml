@@ -378,15 +378,25 @@
                                 </DockPanel>
 
                             </Grid>
-                            <!-- Authentication option -->
-                            <DockPanel Margin="140,6,0,0">
+                            <!-- Authentication / TLS -->
+                            <Grid Margin="140,6,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <!-- Authentication -->
                                 <CheckBox Name="IsSmtpAuthenticationRequired"
                                           Content="This server requires authentication"
                                           Click="IsSmtpAuthenticationRequired_Click"
                                           Foreground="#777"
-                                          FontSize="13"
-                                          Margin="0,0,0,0"/>
-                            </DockPanel>
+                                          FontSize="13"/>
+                                <!-- SSL / TLS -->
+                                <CheckBox Name="IsTlsEnabled"
+                                          Grid.Column="1"
+                                          Content="Enable SSL/TLS"
+                                          Foreground="#777"
+                                          FontSize="13"/>
+                            </Grid>
 
                             <!-- Username and password section -->
                             <StackPanel DockPanel.Dock="Top"

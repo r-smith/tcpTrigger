@@ -178,6 +178,7 @@ namespace tcpTrigger.Editor
                     writer.WriteStartElement("email");
                     writer.WriteElementString("server", EmailServer.Text);
                     writer.WriteElementString("port", EmailPort.Text);
+                    writer.WriteElementString("isTlsEnabled", IsTlsEnabled.IsChecked == true ? t : f);
                     writer.WriteElementString("isAuthRequired", IsSmtpAuthenticationRequired.IsChecked == true ? t : f);
                     // Encrypt username.
                     if (!string.IsNullOrEmpty(SmtpUsername.Text))
