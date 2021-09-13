@@ -15,15 +15,16 @@ namespace tcpTrigger.Editor
         [STAThread]
         public static void Main()
         {
+            const string _serviceName = "tcpTrigger";
+            const int _timeoutSeconds = 15;
+            const int EXIT_SUCCESS = 0;
+            const int EXIT_FAILURE = 1;
+
             // Process command line arguments.
             string[] args = Environment.GetCommandLineArgs();
             if (args.Length == 2 && args[1].Equals("--restart-service"))
             {
                 // Restart service then exit.
-                const string _serviceName = "tcpTrigger";
-                const int _timeoutSeconds = 15;
-                const int EXIT_SUCCESS = 0;
-                const int EXIT_FAILURE = 1;
                 try
                 {
                     using (ServiceController sc = new ServiceController(_serviceName))
@@ -50,6 +51,24 @@ namespace tcpTrigger.Editor
                     }
                     // Success. Shutdown app.
                     Environment.Exit(EXIT_SUCCESS);
+                }
+                catch
+                {
+                    // Encountered a problem while restarting service. Shutdown app with failure exit code.
+                    Environment.Exit(EXIT_FAILURE);
+                }
+            }
+            else if (args.Length == 2 && args[1].Equals("--stop-service"))
+            {
+                // Stop the service then exit.
+                try
+                {
+                    using (ServiceController sc = new ServiceController(_serviceName))
+                    {
+                        sc.Stop();
+                        sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(_timeoutSeconds));
+                        Environment.Exit(EXIT_SUCCESS);
+                    }
                 }
                 catch
                 {
