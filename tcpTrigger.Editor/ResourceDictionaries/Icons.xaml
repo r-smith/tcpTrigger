@@ -62,7 +62,9 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
-    
+
+    <!-- Icon: window-close -->
+    <!-- Credit: Ryan Smith-->
     <DrawingImage x:Key="icon.window-close">
         <DrawingImage.Drawing>
             <DrawingGroup ClipGeometry="M0,0 V512 H512 V0 H0 Z">
