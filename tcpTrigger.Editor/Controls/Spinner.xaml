@@ -5,14 +5,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:tcpTrigger.Editor.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="640" d:DesignWidth="480">
+             d:DesignHeight="640" d:DesignWidth="480"
+             Height="24" Width="24">
     <UserControl.Resources>
         <Storyboard x:Name="spinner" x:Key="spinner" RepeatBehavior="Forever">
 
             <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="canvas" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[2].(RotateTransform.Angle)">
-                <LinearDoubleKeyFrame KeyTime="00:00:00" Value="0"/>
-                <LinearDoubleKeyFrame KeyTime="00:00:00.5000000" Value="180"/>
-                <LinearDoubleKeyFrame KeyTime="00:00:01" Value="359"/>
+                <EasingDoubleKeyFrame KeyTime="00:00:00" Value="0"/>
+                <EasingDoubleKeyFrame KeyTime="00:00:00.5000000" Value="180"/>
+                <EasingDoubleKeyFrame KeyTime="00:00:01" Value="359"/>
             </DoubleAnimationUsingKeyFrames>
 
         </Storyboard>
