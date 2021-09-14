@@ -6,7 +6,7 @@
     <SolidColorBrush x:Key="TextBox.Static.Foreground" Color="#111"/>
     <SolidColorBrush x:Key="TextBox.Static.Border" Color="#abadb3"/>
     <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#303030"/>
-    <SolidColorBrush x:Key="TextBox.MouseOver.Background" Color="#f4f4f8"/>
+    <SolidColorBrush x:Key="TextBox.MouseOver.Background" Color="#fafafa"/>
     <SolidColorBrush x:Key="TextBox.Focus.Border" Color="#007acc"/>
     <SolidColorBrush x:Key="TextBox.Focus.Background" Color="#f4f4f8"/>
     <Style TargetType="{x:Type TextBox}">
