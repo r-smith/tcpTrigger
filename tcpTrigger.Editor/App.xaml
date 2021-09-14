@@ -9,6 +9,7 @@
                 <ResourceDictionary Source="ResourceDictionaries/FocusVisualStyle.xaml"/>
                 <ResourceDictionary Source="ResourceDictionaries/ButtonStyle.xaml"/>
                 <ResourceDictionary Source="ResourceDictionaries/CheckBoxStyle.xaml"/>
+                <ResourceDictionary Source="ResourceDictionaries/DataGridStyle.xaml"/>
                 <ResourceDictionary Source="ResourceDictionaries/GroupBoxStyle.xaml"/>
                 <ResourceDictionary Source="ResourceDictionaries/Icons.xaml"/>
                 <ResourceDictionary Source="ResourceDictionaries/ScrollBarStyle.xaml"/>
