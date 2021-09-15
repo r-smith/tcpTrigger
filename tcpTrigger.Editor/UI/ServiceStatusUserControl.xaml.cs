@@ -48,13 +48,17 @@ namespace tcpTrigger.Editor
         {
             const int _maxDays = 30;
 
-            // Build event log query for retreiving tcpTrigger service events.
+            // Build event log query for retreiving tcpTrigger service events and Windows shutdown/startup events.
             string timeSpan = $"and TimeCreated[timediff(@SystemTime) &lt;= {TimeSpan.FromDays(_maxDays).TotalMilliseconds}]";
             string _detectionQuery =
                 "<QueryList>"
                 + "<Query Id='0'>"
                 + $"  <Select Path='Application'>*[System[Provider[@Name='tcpTrigger'] {timeSpan}]]</Select>"
                 + "  <Suppress Path='Application'>*[System[( (EventID &gt;= 200 and EventID &lt;= 210) )]]</Suppress>"
+                + "</Query>"
+                + "<Query Id='1'>"
+                + "  <Select Path='System'>*[System[Provider[@Name='Microsoft-Windows-Eventlog' or @Name='Microsoft-Windows-Kernel-General' or @Name='User32']"
+                + $"    and (EventID=12 or EventID=13 or EventID=6008 or EventID=1074) {timeSpan}]]</Select>"
                 + "</Query>"
                 + "</QueryList>";
 
@@ -250,7 +254,6 @@ namespace tcpTrigger.Editor
                 {
                     Grid.SetRowSpan(ServiceLog, 1);
                     EventDetailsBorder.Visibility = Visibility.Visible;
-                    //EventDetailsScroller.ScrollToTop();
                 }
             }
         }
@@ -289,6 +292,18 @@ namespace tcpTrigger.Editor
                         break;
                     case 400:
                         summary = "Error";
+                        break;
+                    case 12:
+                        summary = "Windows: Startup";
+                        break;
+                    case 13:
+                        summary = "Windows: Shutdown";
+                        break;
+                    case 1074:
+                        summary = "Windows: Shutdown initiating";
+                        break;
+                    case 6008:
+                        summary = "Windows: Unexpected shutdown";
                         break;
                     default:
                         summary = string.Empty;
