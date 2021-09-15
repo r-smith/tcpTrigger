@@ -917,6 +917,10 @@
                     viewer. Events relating to the tcpTrigger service are found
                     in the <Italic>Application</Italic> log and use
                     <Italic>tcpTrigger</Italic> for the event source.
+                    <LineBreak/>
+                    <LineBreak/>
+                    Additionally, events that involve Windows shutting down
+                    and starting up are displayed.
                 </Paragraph>
             </FlowDocument>
         </FlowDocumentScrollViewer>
