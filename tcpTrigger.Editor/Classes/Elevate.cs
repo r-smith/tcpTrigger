@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace tcpTrigger.Editor
 {
@@ -12,6 +14,45 @@ namespace tcpTrigger.Editor
         public static extern bool DestroyIcon(IntPtr hIcon);
 
         const int MAX_PATH = 260;
+
+        public static BitmapSource GetUacIcon()
+        {
+            BitmapSource shieldSource;
+            try
+            {
+                // Get UAC icon.
+                if (Environment.OSVersion.Version.Major >= 6)
+                {
+                    SHSTOCKICONINFO sii = new SHSTOCKICONINFO();
+                    sii.cbSize = (UInt32)Marshal.SizeOf(typeof(SHSTOCKICONINFO));
+
+                    Marshal.ThrowExceptionForHR(SHGetStockIconInfo(SHSTOCKICONID.SIID_SHIELD,
+                        SHGSI.SHGSI_ICON | SHGSI.SHGSI_SMALLICON,
+                        ref sii));
+
+                    shieldSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                        sii.hIcon,
+                        Int32Rect.Empty,
+                        BitmapSizeOptions.FromEmptyOptions());
+
+                    DestroyIcon(sii.hIcon);
+                }
+                else
+                {
+                    shieldSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                        System.Drawing.SystemIcons.Shield.Handle,
+                        Int32Rect.Empty,
+                        BitmapSizeOptions.FromEmptyOptions());
+                }
+
+                return shieldSource;
+            }
+            catch
+            {
+                // Failed to get UAC icon.
+                return null;
+            }
+        }
 
         public enum SHSTOCKICONID : uint
         {
