@@ -59,6 +59,7 @@
     <ApplicationIcon>tcpTrigger.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationFramework.Aero" />
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
@@ -92,6 +93,9 @@
     <Compile Include="UI\RestartServiceWindow.xaml.cs">
       <DependentUpon>RestartServiceWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ServiceStatusUserControl.xaml.cs">
+      <DependentUpon>ServiceStatusUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ValidateSettings.cs" />
     <Compile Include="UI\DialogWindow.xaml.cs">
       <DependentUpon>DialogWindow.xaml</DependentUpon>
@@ -102,6 +106,10 @@
     <Compile Include="UI\ReadSettings.cs" />
     <Compile Include="UI\WriteSettings.cs" />
     <Page Include="Controls\Spinner.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ResourceDictionaries\DataGridStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -169,6 +177,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\RestartServiceWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ServiceStatusUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

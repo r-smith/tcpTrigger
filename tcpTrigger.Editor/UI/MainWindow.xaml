@@ -345,7 +345,7 @@
                         <StackPanel Margin="8,9,8,8">
                             <TextBlock Text="Server Information"
                                        HorizontalAlignment="Left"
-                                       Foreground="#268bd2"
+                                       Foreground="#007acc"
                                        FontSize="13"
                                        Margin="0,0,0,5"
                                        FontWeight="SemiBold"/>
@@ -419,7 +419,7 @@
                             </StackPanel>
 
                             <TextBlock Text="Email Addresses"
-                                       Foreground="#268bd2"
+                                       Foreground="#007acc"
                                        FontSize="13"
                                        HorizontalAlignment="Left"
                                        Margin="0,12,0,5"
@@ -928,6 +928,11 @@
                         </Grid>
                     </GroupBox>
                 </DockPanel>
+            </TabItem>
+
+            <!-- Tab: Status -->
+            <TabItem Header="Status" Name="StatusTab">
+                <local:ServiceStatusUserControl/>
             </TabItem>
         </TabControl>
 
