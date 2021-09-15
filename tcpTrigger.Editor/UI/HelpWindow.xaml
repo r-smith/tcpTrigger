@@ -133,6 +133,8 @@
                           Selected="Whitelist_Selected" />
             <TreeViewItem Header="Devices"
                           Selected="Devices_Selected" />
+            <TreeViewItem Header="Service Status"
+                          Selected="Status_Selected"/>
         </TreeView>
         
         <GridSplitter Grid.Column="1" Width="4"
@@ -608,11 +610,8 @@
                     <Run FontWeight="SemiBold" Foreground="#cd6ed1" FontFamily="Consolas">Detected rogue DHCP server</Run>
                     <LineBreak/>
                     <LineBreak/>
-                    This option has no effect on the general status events used by tcpTrigger.
-                    Event code 90 reports service started. Event code 91 reports service stopped.
-                    Event code 100 reports the running configuration when the service starts. Event code 101
-                    reports when listeners restart because a network interface change in Windows was detected.
-                    And event code 400 is used to report errors.
+                    This option has no effect on the general diagnostic and status events used by the tcpTrigger service.
+                    Diagnostic events can be viewed using the <Bold>Status</Bold> tab.
                 </Paragraph>
                 <Paragraph Style="{StaticResource DefaultsText}">
                     <Run Foreground="#30aacc">[Default]</Run>
@@ -667,9 +666,10 @@
                     /C echo {TIMESTAMP} {SOURCE_IP}:{DESTINATION_PORT} >> c:\logs\connection.log
                 </Paragraph>
                 <Paragraph Style="{StaticResource ParagraphText}">
-                    If your application does not appear to launch, use the Windows event log to
-                    aid in troubleshooting. Launch errors appear with event code 400 under the
-                    <Italic>tcpTrigger</Italic> source. If you do not see errors, check the
+                    If your application does not appear to launch, use the <Bold>Status</Bold>
+                    tab to aid in troubleshooting. This tab displays diagnostic events from
+                    the tcpTrigger service and is updated in real time. Errors use Event ID 400.
+                    If you do not see errors, check the
                     Windows task manager to see if the application appears in the process list.
                     Do not try to launch GUI applications or anything that waits for an input.
                     Doing so will cause them to launch and get stuck. Also, keep in mind that
@@ -723,6 +723,18 @@
                 <Paragraph Style="{StaticResource ParagraphText}">
                     Enter the port used by your outgoing mail server.
                     This is typically either 25 or 587.
+                </Paragraph>
+                <Paragraph Style="{StaticResource SubHeaderText}">
+                    Enable SSL/TLS
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Enable this option for encrypted communication with your mail server.
+                    It is recommended to enable this option if supported by your
+                    SMTP server, and it may even be required.
+                    Only SMTP servers that advertise STARTTLS are supported.
+                    If your SMTP server requires the SSL session to be
+                    established up front (typically on port 465),
+                    this is not supported.
                 </Paragraph>
                 <Paragraph Style="{StaticResource SubHeaderText}">
                     Authentication
@@ -879,6 +891,32 @@
                     <Bold><Italic>Devices</Italic></Bold> tab to review the network interfaces and IP addresses
                     that tcpTrigger will monitor.
                     You can optionally exclude any device you do not want to monitor.
+                </Paragraph>
+
+                <!-- Service Status -->
+                <Paragraph Name="ServiceStatus"
+                           Style="{StaticResource HeaderText}">
+                    Service Status
+                </Paragraph>
+                <Paragraph Style="{StaticResource ParagraphText}">
+                    Use the
+                    <Bold>
+                        <Italic>Status</Italic>
+                    </Bold> tab to view the current state of
+                    the tcpTrigger service in Windows. You can optionally
+                    stop and start the service as needed.
+                    <LineBreak/>
+                    <LineBreak/>
+                    A log of diagnostic and status events recorded by the tcpTrigger
+                    service is displayed and updated in real time. The
+                    events are retreived from the Windows event log.
+                    This can be useful for troubleshooting when your
+                    actions are not performing as expected, because errors
+                    from the tcpTrigger service will show here. Alternatively,
+                    the same information can be viewed using the Windows event
+                    viewer. Events relating to the tcpTrigger service are found
+                    in the <Italic>Application</Italic> log and use
+                    <Italic>tcpTrigger</Italic> for the event source.
                 </Paragraph>
             </FlowDocument>
         </FlowDocumentScrollViewer>

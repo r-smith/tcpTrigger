@@ -76,6 +76,11 @@ namespace tcpTrigger.Editor
             Devices.BringIntoView();
         }
 
+        private void Status_Selected(object sender, RoutedEventArgs e)
+        {
+            ServiceStatus.BringIntoView();
+        }
+
         private void MainDocument_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
         {
             DependencyObject scrollHost = sender as DependencyObject;
