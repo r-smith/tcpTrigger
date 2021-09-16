@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="tcpTrigger Guide"
         UseLayoutRounding="True"
-        Height="575"
+        Height="555"
         Width="750"
         MinHeight="200"
         MinWidth="500"
@@ -780,11 +780,24 @@
                 <Paragraph Style="{StaticResource ParagraphText}">
                     Enter the message subject to use for email notifications.
                 </Paragraph>
+                <Paragraph Style="{StaticResource DefaultsText}">
+                    <Run Foreground="#30aacc">[Default]</Run>
+                    <LineBreak/>
+                    Alert: Suspicious network activity
+                </Paragraph>
                 <Paragraph Style="{StaticResource SubHeaderText}">
                     Email body
                 </Paragraph>
                 <Paragraph Style="{StaticResource ParagraphText}">
                     Enter the message body to use for email notifications.
+                </Paragraph>
+                <Paragraph Style="{StaticResource DefaultsText}">
+                    <Run Foreground="#30aacc">[Default]</Run>
+                    <LineBreak/>
+                    Network connections to {INTERFACE_IP} are being monitored. The following activity was detected:
+                    <LineBreak/>
+                    <LineBreak/>
+                    {CONNECTION_LOG}
                 </Paragraph>
                 <Paragraph Style="{StaticResource SubHeaderText}">
                     Variables
