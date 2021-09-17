@@ -46,9 +46,12 @@ namespace tcpTrigger.Editor
 
         private async void SubscribeToServiceEvents()
         {
-            const int _maxDays = 30;
+            // Delay running initial event log subscription.
+            // This gives GUI time to load when launching the application on single core CPUs.
+            await Task.Delay(250);
 
             // Build event log query for retreiving tcpTrigger service events and Windows shutdown/startup events.
+            const int _maxDays = 30;
             string timeSpan = $"and TimeCreated[timediff(@SystemTime) &lt;= {TimeSpan.FromDays(_maxDays).TotalMilliseconds}]";
             string _detectionQuery =
                 "<QueryList>"
