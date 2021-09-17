@@ -119,19 +119,16 @@
                     <Style.Resources>
                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent" />
                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#4198df" />
-                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#282828" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#262626" />
                         <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#cd6ed1" />
                     </Style.Resources>
 
                     <Setter Property="Foreground" Value="#f4f4f4"/>
-                    <Setter Property="Margin" Value="0,3,20,2"/>
-                    <Setter Property="BorderThickness" Value="0,0,0,2"/>
+                    <Setter Property="Margin" Value="0,3,20,3"/>
+                    <Setter Property="BorderThickness" Value="1"/>
                     <Setter Property="BorderBrush" Value="Transparent"/>
                     <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                     <Style.Triggers>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="BorderBrush" Value="#202020"/>
-                        </Trigger>
                         <Trigger Property="Grid.IsMouseOver" Value="True">
                             <Setter Property="Foreground" Value="#61b8ff"/>
                         </Trigger>
