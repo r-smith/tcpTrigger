@@ -157,7 +157,7 @@
                         RenderOptions.EdgeMode="Aliased"
                         Style="{StaticResource TitleBarButtonStyle}"
                         ToolTip="Minimize" ToolTipService.InitialShowDelay="1000"
-                        Foreground="#d0d0d0">
+                        Foreground="#f1f1f1f1">
                     <Path Width="46"
                           Height="29"
                           Data="M 18,15 H 28"
@@ -171,7 +171,7 @@
                         Click="OnMaximizeRestoreButtonClick"
                         Style="{StaticResource TitleBarButtonStyle}"
                         ToolTip="Maximize" ToolTipService.InitialShowDelay="1000"
-                        Foreground="#d0d0d0">
+                        Foreground="#f1f1f1f1">
                     <Path Width="46"
                           Height="31"
                           Data="M 18.5,10.5 H 27.5 V 19.5 H 18.5 Z"
@@ -185,7 +185,7 @@
                         Click="OnMaximizeRestoreButtonClick"
                         Style="{StaticResource TitleBarButtonStyle}"
                         ToolTip="Restore Down" ToolTipService.InitialShowDelay="1000"
-                        Foreground="#d0d0d0">
+                        Foreground="#f1f1f1f1">
                     <Path Width="46"
                           Height="31"
                           Data="M 18.5,12.5 H 25.5 V 19.5 H 18.5 Z M 20.5,12.5 V 10.5 H 27.5 V 17.5 H 25.5"
@@ -198,13 +198,13 @@
                         Click="OnCloseButtonClick"
                         Style="{StaticResource TitleBarCloseButtonStyle}"
                         ToolTip="Close" ToolTipService.InitialShowDelay="1000"
-                        Foreground="#c0c0c0">
+                        Foreground="#f1f1f1f1">
                     <Path Width="46"
                           Height="31"
                           Data="M 18,11 27,20 M 18,20 27,11"
                           Stroke="{Binding Path=Foreground,
 							      RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
-                          StrokeThickness="2" />
+                          StrokeThickness="1" />
                 </Button>
             </Grid>
 
