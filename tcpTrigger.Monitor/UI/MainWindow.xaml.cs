@@ -136,6 +136,7 @@ namespace tcpTrigger.Monitor
                     case DetectDHCP:
                         matchType = MatchType.DHCP;
                         pattern = @"^DHCP server IP: (?<s_ip>.*)\r\n"
+                                + @".*\r\n"
                                 + @"^Interface IP: (?<d_ip>.*)$";
                         break;
                     default:
