@@ -40,7 +40,7 @@
                 <Setter Property="Background" Value="{StaticResource DG.Header.Static.Background}"/>
                 <Setter Property="Foreground" Value="{StaticResource DG.Header.Static.Foreground}"/>
                 <Setter Property="BorderBrush" Value="{StaticResource DG.Header.Static.Border}"/>
-                <Setter Property="BorderThickness" Value="1,0,0,1"/>
+                <Setter Property="BorderThickness" Value="1,0,0,0"/>
                 <Setter Property="Padding" Value="5,5,0,5"/>
                 <Setter Property="Margin" Value="-1,0,0,0"/>
                 <Setter Property="Template">
@@ -144,7 +144,7 @@
         <Setter Property="Foreground" Value="{StaticResource DG.Row.Static.Foreground}"/>
         <Setter Property="RowBackground" Value="{StaticResource DG.Row.Static.Background}"/>
         <Setter Property="BorderBrush" Value="{StaticResource DG.Border}"/>
-        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderThickness" Value="0,2,0,0"/>
         <Setter Property="GridLinesVisibility" Value="Horizontal"/>
         <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource DG.Gridlines.Border}"/>
         <Setter Property="Template">
