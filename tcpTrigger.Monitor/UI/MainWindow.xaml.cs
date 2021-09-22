@@ -224,6 +224,12 @@ namespace tcpTrigger.Monitor
             DetectionEventsView.Refresh();
         }
 
+        private void FilterClear_Click(object sender, RoutedEventArgs e)
+        {
+            FilterField.Text = "";
+            DetectionEventsView.Refresh();
+        }
+
         private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             // Remove focus from filter textbox when window is clicked.
