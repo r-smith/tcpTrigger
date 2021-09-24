@@ -327,7 +327,11 @@
                                          VerticalContentAlignment="Top"
                                          VerticalScrollBarVisibility="Auto"
                                          TextWrapping="Wrap"
-                                         Height="60"/>
+                                         Height="60">
+                                    <TextBox.Resources>
+                                        <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource ScrollBarRounded}"/>
+                                    </TextBox.Resources>
+                                </TextBox>
                             </Grid>
                         </StackPanel>
                     </GroupBox>
@@ -492,9 +496,13 @@
                                              FontFamily="Consolas"
                                              VerticalContentAlignment="Top"
                                              VerticalScrollBarVisibility="Auto"
-                                             MinHeight="150"
+                                             Height="150"
                                              TextWrapping="Wrap"
-                                             AcceptsReturn="True"/>
+                                             AcceptsReturn="True">
+                                        <TextBox.Resources>
+                                            <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource ScrollBarRounded}"/>
+                                        </TextBox.Resources>
+                                    </TextBox>
                                 </DockPanel>
                             </DockPanel>
                             <!-- Variables -->
