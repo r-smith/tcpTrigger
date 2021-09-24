@@ -1,0 +1,22 @@
+﻿<Application x:Class="tcpTrigger.Manager.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="UI/MainWindow.xaml"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ResourceDictionaries/FocusVisualStyle.xaml"/>
+                <ResourceDictionary Source="ResourceDictionaries/ButtonStyle.xaml"/>
+                <ResourceDictionary Source="ResourceDictionaries/CheckBoxStyle.xaml"/>
+                <ResourceDictionary Source="ResourceDictionaries/DataGridStyle.xaml"/>
+                <ResourceDictionary Source="ResourceDictionaries/GroupBoxStyle.xaml"/>
+                <ResourceDictionary Source="ResourceDictionaries/Icons.xaml"/>
+                <ResourceDictionary Source="ResourceDictionaries/ScrollBarStyle.xaml"/>
+                <ResourceDictionary Source="ResourceDictionaries/TabControlStyle.xaml"/>
+                <ResourceDictionary Source="ResourceDictionaries/TextBoxStyle.xaml"/>
+                <ResourceDictionary Source="ResourceDictionaries/ToolTipStyle.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

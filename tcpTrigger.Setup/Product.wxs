@@ -56,7 +56,7 @@
     <!-- WiX UI -->
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch the tcpTrigger configuration manager" />
-    <Property Id="WixShellExecTarget" Value="[#tcpTrigger.Editor.exe]" />
+    <Property Id="WixShellExecTarget" Value="[#tcpTrigger.Manager.exe]" />
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
     <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
     <UIRef Id="WixUI_InstallDir" />
@@ -136,13 +136,13 @@
                               EventMessageFile="%SystemRoot%\Microsoft.NET\Framework\v2.0.50727\EventLogMessages.dll" />
           </Component>
 
-          <!-- Install the settings editor utility (tcpTrigger Manager) -->
-          <Component Id="ConfigurationEditor" Guid="{E326FFDE-ED02-4C1D-AF5D-C2BFD002C2CB}" Win64="$(var.Win64)">
-            <File Id="tcpTrigger.Editor.exe" Source="$(var.tcpTrigger.Editor.TargetPath)" KeyPath="yes" />
+          <!-- Install tcpTrigger Manager -->
+          <Component Id="tcpTriggerManager" Guid="{E326FFDE-ED02-4C1D-AF5D-C2BFD002C2CB}" Win64="$(var.Win64)">
+            <File Id="tcpTrigger.Manager.exe" Source="$(var.tcpTrigger.Manager.TargetPath)" KeyPath="yes" />
           </Component>
 
-          <!-- Install the log monitoring utility (tcpTrigger Monitor) -->
-          <Component Id="LogMonitor" Guid="{93A20328-44CB-49FB-B6B4-B66BBC38F1AA}" Win64="$(var.Win64)">
+          <!-- Install tcpTrigger Monitor -->
+          <Component Id="tcpTriggerMonitor" Guid="{93A20328-44CB-49FB-B6B4-B66BBC38F1AA}" Win64="$(var.Win64)">
             <File Id="tcpTrigger.Monitor.exe" Source="$(var.tcpTrigger.Monitor.TargetPath)" KeyPath="yes" />
           </Component>
         </Directory>
@@ -154,13 +154,13 @@
           <!-- tcpTrigger Manager.exe desktop shortcut -->
           <Shortcut Id="ManagerDesktopShortcut"
                     Name="tcpTrigger Manager"
-                    Description="Configuration editor for the tcpTrigger service"
+                    Description="Manage tcpTrigger settings"
                     Target="[INSTALLFOLDER]tcpTrigger Manager.exe"
                     WorkingDirectory="INSTALLFOLDER" />
           <!-- tcpTrigger Monitor.exe desktop shortcut -->
           <Shortcut Id="MonitorDesktopShortcut"
                     Name="tcpTrigger Monitor"
-                    Description="Log viewer for the tcpTrigger service"
+                    Description="Monitor tcpTrigger detection logs"
                     Target="[INSTALLFOLDER]tcpTrigger Monitor.exe"
                     WorkingDirectory="INSTALLFOLDER" />
           <!-- Remove shortcuts on uninstall -->
@@ -183,13 +183,13 @@
             <!-- tcpTrigger Manager.exe start menu shortcut -->
             <Shortcut Id="ManagerStartMenuShortcut"
                       Name="tcpTrigger Manager"
-                      Description="Configuration editor for the tcpTrigger service"
+                      Description="Manage tcpTrigger settings"
                       Target="[INSTALLFOLDER]tcpTrigger Manager.exe"
                       WorkingDirectory="INSTALLFOLDER" />
             <!-- tcpTrigger Monitor.exe start menu shortcut -->
             <Shortcut Id="MonitorStartMenuShortcut"
                       Name="tcpTrigger Monitor"
-                      Description="Log viewer for the tcpTrigger service"
+                      Description="Monitor tcpTrigger detection logs"
                       Target="[INSTALLFOLDER]tcpTrigger Monitor.exe"
                       WorkingDirectory="INSTALLFOLDER" />
             <!-- Remove shortcuts on uninstall -->
@@ -226,8 +226,8 @@
     <!-- Install the components -->
     <Feature Id="FullInstallation" Level="1">
       <ComponentRef Id="MainExecutable" />
-      <ComponentRef Id="ConfigurationEditor" />
-      <ComponentRef Id="LogMonitor" />
+      <ComponentRef Id="tcpTriggerManager" />
+      <ComponentRef Id="tcpTriggerMonitor" />
       <ComponentRef Id="ApplicationShortcutsDesktop" />
       <ComponentRef Id="ApplicationShortcutsStartMenu" />
       <ComponentRef Id="CreateProgramDataFolder" />

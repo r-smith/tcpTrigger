@@ -1,0 +1,305 @@
+﻿<UserControl x:Class="tcpTrigger.Manager.ServiceStatusUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:tcpTrigger.Manager"
+             xmlns:controls="clr-namespace:tcpTrigger.Manager.Controls"
+             mc:Ignorable="d"
+             Background="White"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <DockPanel LastChildFill="True">
+            <GroupBox DockPanel.Dock="Top">
+                <GroupBox.Header>
+                    <TextBlock Text="Service Status"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Padding="0,1,0,2"
+                               Foreground="White"/>
+                </GroupBox.Header>
+                <DockPanel Margin="5">
+                    <Grid DockPanel.Dock="Top" Margin="0,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Image Grid.RowSpan="2"
+                               Name="StatusImage"
+                               Source="{StaticResource icon.check-circle}"
+                               Width="34"
+                               Height="34"
+                               Margin="5,0,0,0"/>
+                        <StackPanel Grid.Row="0"
+                                    Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    Margin="18,0,0,0">
+                            <TextBlock Text="The tcpTrigger service is currently "
+                                       Margin="0"/>
+                            <TextBlock Name="Status"
+                                       FontWeight="Bold"
+                                       Text="{Binding}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1"
+                                    Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    Margin="18,8,0,0">
+                            <Button Name="StartStopButton"
+                                    Padding="0"
+                                    Width="130"
+                                    Click="StartStopButton_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <controls:Spinner x:Name="Spinner"
+                                                      Visibility="Collapsed"
+                                                      SnapsToDevicePixels="False"
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="Center"
+                                                      Width="24"
+                                                      Height="24"
+                                                      Margin="-2,0,8,0"/>
+                                    <Image Name="ElevateImage"
+                                           Stretch="None"
+                                           Visibility="Visible"
+                                           Margin="0,0,8,0"/>
+                                    <TextBlock Name="StartStopButtonContent"
+                                               Padding="0,6"
+                                               Text="Start service"
+                                               FontFamily="Segoe UI"
+                                               FontSize="12"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource Button.Foreground}"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock DockPanel.Dock="Top"
+                               Text="Event Log for tcpTrigger Service"
+                               HorizontalAlignment="Left"
+                               Foreground="#007acc"
+                               FontSize="13"
+                               Margin="0,30,0,2"
+                               FontWeight="SemiBold"/>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" MinHeight="90"/>
+                            <RowDefinition Height="3"/>
+                            <RowDefinition Height="*" MinHeight="45"/>
+                        </Grid.RowDefinitions>
+                        <!-- tcpTrigger Windows service event log -->
+                        <DataGrid Grid.RowSpan="3"
+                                  Name="ServiceLog"
+                                  Style="{StaticResource DataGridStyle}"
+                                  SelectionChanged="ServiceLog_SelectionChanged"
+                                  FontSize="14">
+                            <DataGrid.Columns>
+                                <!-- Timestamp -->
+                                <DataGridTextColumn Binding="{Binding Timestamp}" Header="Timestamp" MinWidth="170">
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="{x:Type DataGridCell}">
+                                            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                                            <Setter Property="IsTabStop" Value="False"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                                        <DockPanel>
+                                                            <TextBlock DockPanel.Dock="Left"
+                                                                       Text="{Binding Timestamp, StringFormat=d }"
+                                                                       FontWeight="SemiBold"
+                                                                       Foreground="#606060"
+                                                                       Padding="5,4,0,4"/>
+                                                            <TextBlock DockPanel.Dock="Left"
+                                                                       Text=" "/>
+                                                            <TextBlock DockPanel.Dock="Left"
+                                                                       Text="{Binding Timestamp, StringFormat=T}"
+                                                                       FontWeight="SemiBold"
+                                                                       Foreground="#101010"
+                                                                       Padding="0,4,5,4"/>
+                                                        </DockPanel>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
+                                </DataGridTextColumn>
+                                <!--Event ID-->
+                                <DataGridTextColumn Binding="{Binding EventId}" Header="Event ID" MinWidth="70">
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="{x:Type DataGridCell}">
+                                            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                                            <Setter Property="IsTabStop" Value="False"/>
+                                            <Setter Property="Foreground" Value="#606060"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                                        <Grid>
+                                                            <TextBlock Margin="0" Padding="0"/>
+                                                            <TextBlock Text="{Binding EventId}"
+                                                                       HorizontalAlignment="Right"
+                                                                       FontWeight="SemiBold"
+                                                                       Padding="5,4,15,4"/>
+                                                        </Grid>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
+                                </DataGridTextColumn>
+                                <!-- Summary -->
+                                <DataGridTextColumn Binding="{Binding EventSummary}" Header="Summary" Width="*">
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="{x:Type DataGridCell}">
+                                            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                                            <Setter Property="IsTabStop" Value="False"/>
+                                            <Setter Property="Foreground" Value="DarkSlateGray"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                                        <TextBlock Text="{Binding EventSummary}"
+                                                                   FontWeight="SemiBold"
+                                                                   Padding="5,4,15,4">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="{x:Type TextBlock}">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding EventId}" Value="91">
+                                                                            <Setter Property="Foreground" Value="DarkMagenta"/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding EventId}" Value="90">
+                                                                            <Setter Property="Foreground" Value="#34a853"/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding EventId}" Value="400">
+                                                                            <Setter Property="Foreground" Value="#ea4335"/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding EventId}" Value="101">
+                                                                            <Setter Property="Foreground" Value="#4285f4"/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding EventId}" Value="12">
+                                                                            <Setter Property="FontStyle" Value="Italic"/>
+                                                                            <Setter Property="Foreground" Value="#333388"/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding EventId}" Value="13">
+                                                                            <Setter Property="FontStyle" Value="Italic"/>
+                                                                            <Setter Property="Foreground" Value="#883333"/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding EventId}" Value="1074">
+                                                                            <Setter Property="FontStyle" Value="Italic"/>
+                                                                            <Setter Property="Foreground" Value="#883333"/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding EventId}" Value="6008">
+                                                                            <Setter Property="FontStyle" Value="Italic"/>
+                                                                            <Setter Property="Foreground" Value="#883333"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- Grid splitter -->
+                        <GridSplitter Grid.Row="1"
+                                      SnapsToDevicePixels="True"
+                                      Height="3"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Stretch"
+                                      Background="{Binding ElementName=ServiceLog, Path=BorderBrush}"
+                                      BorderThickness="0"
+                                      Focusable="False"
+                                      Visibility="{Binding ElementName=EventDetailsBorder, Path=Visibility}"/>
+                        
+                        <!-- Event details -->
+                        <Border Grid.Row="2" 
+                                Margin="0"
+                                BorderBrush="{Binding ElementName=ServiceLog, Path=BorderBrush}"
+                                BorderThickness="1,0,1,1"
+                                Name="EventDetailsBorder"
+                                Background="#1500a1f1"
+                                Visibility="Collapsed"
+                                SnapsToDevicePixels="True">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                
+                                <!-- Event details header section -->
+                                <Border Grid.Row="0"
+                                        BorderBrush="{Binding ElementName=ServiceLog, Path=BorderBrush}"
+                                        BorderThickness="0,0,0,1"
+                                        Background="#fbbc05">
+                                    <!-- Button: close event details -->
+                                    <Button Padding="5,2"
+                                            Margin="0"
+                                            Background="Transparent"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Top"
+                                            IsTabStop="False"
+                                            ToolTip="Close"
+                                            ToolTipService.InitialShowDelay="1500"
+                                            ToolTipService.ShowDuration="2000"
+                                            Click="CloseDetails_Click">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Name="controlButton_border"
+                                                        BorderThickness="0"
+                                                        Padding="{TemplateBinding Padding}"
+                                                        Background="{TemplateBinding Background}"
+                                                        Opacity="0.5">
+                                                    <Image Source="{StaticResource icon.window-close}"
+                                                           Width="10"
+                                                           Height="10"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="controlButton_border" Property="Opacity" Value="1"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsPressed" Value="True">
+                                                        <Setter TargetName="controlButton_border" Property="Background" Value="#20000000"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                </Border>
+                                
+                                <!-- Event details text -->
+                                <TextBox Grid.Row="1"
+                                         Name="EventDetails"
+                                         Background="Transparent"
+                                         BorderThickness="0"
+                                         Cursor="Arrow"
+                                         FontFamily="Consolas"
+                                         FontSize="13"
+                                         Foreground="Black"
+                                         IsReadOnly="True"
+                                         IsTabStop="False"
+                                         Padding="5,3"
+                                         TextWrapping="Wrap"
+                                         VerticalScrollBarVisibility="Auto"
+                                         VerticalContentAlignment="Top">
+                                    <TextBox.Style>
+                                        <Style TargetType="{x:Type TextBox}">
+                                            <!-- Clear custom style trigger -->
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </DockPanel>
+            </GroupBox>
+        </DockPanel>
+    </Grid>
+</UserControl>

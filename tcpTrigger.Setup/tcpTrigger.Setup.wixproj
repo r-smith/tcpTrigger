@@ -50,8 +50,8 @@
     <Compile Include="Product.wxs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\tcpTrigger.Editor\tcpTrigger.Editor.csproj">
-      <Name>tcpTrigger.Editor</Name>
+    <ProjectReference Include="..\tcpTrigger.Manager\tcpTrigger.Manager.csproj">
+      <Name>tcpTrigger.Manager</Name>
       <Project>{386264b5-9107-4595-abbc-44959747bdee}</Project>
       <Private>True</Private>
       <DoNotHarvest>True</DoNotHarvest>

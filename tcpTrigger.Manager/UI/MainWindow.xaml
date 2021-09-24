@@ -1,0 +1,962 @@
+﻿<Window x:Class="tcpTrigger.Manager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:tcpTrigger.Manager"
+        mc:Ignorable="d"
+        Title="tcpTrigger Manager"
+        Background="#ffffff"
+        Height="570" MinHeight="565"
+        Width="750" MinWidth="600"
+        ResizeMode="CanResizeWithGrip"
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <local:IsCheckedToImageConverter x:Key="IsCheckedToImageConverter" />
+        <local:BoolToStringConverter x:Key="BoolToStringConverter" FalseValue="Monitored" TrueValue="Excluded" />
+        <local:BoolToBrushConverter x:Key="BoolToBrushConverter" FalseValue="#00600f" TrueValue="#a0190b" />
+
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Regular"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Margin" Value="0,0,5,0"/>
+            <Setter Property="Foreground" Value="#484848"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header and logo -->
+        <StackPanel Grid.Row="0"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Margin="0,15">
+            <Image Source="/Resources/tcpTrigger Logo.png"
+                   Height="48"
+                   Width="48"/>
+            <Label Content="tcpTrigger"
+                   FontSize="22"
+                   Margin="20,0,0,0"
+                   VerticalAlignment="Center"
+                   FontWeight="SemiBold"/>
+        </StackPanel>
+
+        <!-- Tab control (main content) -->
+        <TabControl Grid.Row="1"
+                    TabStripPlacement="Left"
+                    HorizontalContentAlignment="Left"
+                    Margin="0,0,15,15">
+            <!-- Tab: Main -->
+            <TabItem Header="Rules" Name="MainTab">
+                <DockPanel LastChildFill="False">
+                    <!-- Trigger rules -->
+                    <GroupBox DockPanel.Dock="Top">
+                        <GroupBox.Header>
+                            <DockPanel>
+                                <TextBlock Text="Trigger Rules"
+                                           DockPanel.Dock="Left"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"/>
+                                <Label DockPanel.Dock="Left"
+                                       MaxWidth="450"
+                                       Style="{StaticResource LabelToolTip}">
+                                    <TextBlock>
+                                        <Run FontWeight="SemiBold" Foreground="#ffd43b">Trigger Rules</Run><LineBreak/>
+                                        Choose what network activity you want to detect. Use the
+                                        <Run FontWeight="SemiBold" Foreground="#63e6be">Actions</Run>
+                                        tab to select what happens on detection.
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        For port number fields, specify multiple ports using a comma and ranges
+                                        using a hyphen.
+                                        <Run FontWeight="SemiBold">Example:</Run><LineBreak/>
+                                        21, 23-25, 3389, 4450-5000
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        Excluded ports override included ports and will not be monitored.
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run FontWeight="SemiBold" Foreground="#30aacc">[Default]</Run><LineBreak/>
+                                        Detect incoming ICMP requests and TCP connections on all ports.
+                                    </TextBlock>
+                                </Label>
+                            </DockPanel>
+                        </GroupBox.Header>
+                        <StackPanel Margin="5">
+                            <!-- ICMP -->
+                            <CheckBox Content="Detect ICMP requests"
+                                      Name="MonitorIcmpOption"/>
+                            <!-- TCP -->
+                            <CheckBox Content="Detect TCP connections"
+                                      Name="MonitorTcpOption"
+                                      Margin="0,7,0,0"/>
+                            <!-- TCP: Include -->
+                            <Grid Margin="35,3,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid MinWidth="100">
+                                    <TextBlock Text="Include ports"/>
+                                </Grid>
+                                <TextBox Name="TcpIncludePorts"
+                                         Grid.Column="1"
+                                         PreviewTextInput="TcpPorts_PreviewTextInput"
+                                         MaxLength="512"
+                                         Padding="4,5,100,5"
+                                         FontFamily="Consolas"/>
+                                <CheckBox Name="TcpAllPortsOption"
+                                          Grid.Column="1"
+                                          Content="All ports"
+                                          HorizontalAlignment="Right"
+                                          FontWeight="SemiBold"
+                                          Width="90"
+                                          Checked="TcpAllPortsOption_Checked"
+                                          Unchecked="TcpAllPortsOption_Unchecked"
+                                          Margin="0,0,10,0"/>
+                            </Grid>
+                            <!-- TCP: Exclude -->
+                            <DockPanel Margin="35,5,0,0">
+                                <Grid MinWidth="100">
+                                    <TextBlock Text="Exclude ports"/>
+                                </Grid>
+                                <TextBox Name="TcpExcludePorts"
+                                         MaxLength="512"
+                                         FontFamily="Consolas"
+                                         PreviewTextInput="TcpPorts_PreviewTextInput"
+                                         DockPanel.Dock="Right"/>
+                            </DockPanel>
+                            <!-- UDP -->
+                            <CheckBox Content="Detect UDP communication"
+                                      Name="MonitorUdpOption"
+                                      Margin="0,7,0,0"/>
+                            <!-- UDP: Include -->
+                            <Grid Margin="35,3,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid MinWidth="100">
+                                    <TextBlock Text="Include ports"/>
+                                </Grid>
+                                <TextBox Name="UdpIncludePorts"
+                                         Grid.Column="1"
+                                         PreviewTextInput="TcpPorts_PreviewTextInput"
+                                         MaxLength="512"
+                                         Padding="4,5,100,5"
+                                         FontFamily="Consolas"/>
+                                <CheckBox Name="UdpAllPortsOption"
+                                          Grid.Column="1"
+                                          Content="All ports"
+                                          HorizontalAlignment="Right"
+                                          FontWeight="SemiBold"
+                                          Width="90"
+                                          Checked="UdpAllPortsOption_Checked"
+                                          Unchecked="UdpAllPortsOption_Unchecked"
+                                          Margin="0,0,10,0"/>
+                            </Grid>
+                            <!-- UDP: Exclude -->
+                            <DockPanel Margin="35,5,0,0">
+                                <Grid MinWidth="100">
+                                    <TextBlock Text="Exclude ports"/>
+                                </Grid>
+                                <TextBox Name="UdpExcludePorts"
+                                         MaxLength="512"
+                                         FontFamily="Consolas"
+                                         PreviewTextInput="TcpPorts_PreviewTextInput"
+                                         DockPanel.Dock="Right"/>
+                            </DockPanel>
+                            <!-- DHCP -->
+                            <CheckBox Content="Rogue DHCP server detection"
+                                      Name="MonitorDhcpOption"
+                                      Margin="0,7,0,0" />
+                            <DockPanel Margin="35,3,0,0">
+                                <Grid MinWidth="100">
+                                    <TextBlock Text="Known DHCP servers"/>
+                                </Grid>
+                                <TextBox Name="DhcpServers"
+                                         MaxLength="512"
+                                         FontFamily="Consolas"
+                                         DockPanel.Dock="Right"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </GroupBox>
+                </DockPanel>
+            </TabItem>
+
+            <!-- Tab: Actions -->
+            <TabItem Header="Actions" Name="ActionsTab">
+                <DockPanel LastChildFill="False">
+                    <!-- Actions -->
+                    <GroupBox DockPanel.Dock="Top">
+                        <GroupBox.Header>
+                            <DockPanel>
+                                <TextBlock Text="Actions"
+                                           DockPanel.Dock="Left"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"/>
+                                <Label DockPanel.Dock="Left"
+                                       Style="{StaticResource LabelToolTip}">
+                                    <TextBlock>
+                                        <Run FontWeight="SemiBold" Foreground="#ffd43b">Actions</Run><LineBreak/>
+                                        Choose what actions you want carried out for each detected connection. Use the
+                                        <Run FontWeight="SemiBold" Foreground="#63e6be">Rules</Run>
+                                        tab to specify what network activity to detect. Use the
+                                        <Run FontWeight="SemiBold" Foreground="#63e6be">Email</Run>
+                                        tab to configure options relating to email notifications.
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run FontWeight="SemiBold" Foreground="#30aacc">[Default]</Run><LineBreak/>
+                                        Write to standard log and write to Windows event log. Log path:<LineBreak/>
+                                        C:\ProgramData\tcpTrigger\tcpTrigger.log
+                                    </TextBlock>
+                                </Label>
+                            </DockPanel>
+                        </GroupBox.Header>
+                        <StackPanel Margin="5">
+                            <TextBlock Text="Selected actions will be carried out each time an incoming connection matches a trigger rule."
+                                       HorizontalAlignment="Left"
+                                       TextWrapping="Wrap"
+                                       FontSize="12"
+                                       Foreground="#888"/>
+
+                            <!-- Write to text log -->
+                            <CheckBox Name="LogOption"
+                                      Content="Write to standard log"
+                                      Click="LogOption_Click"
+                                      Margin="0,15,0,0" />
+                            <Grid Margin="35,3,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="90" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Path"/>
+                                <TextBox Name="LogPath"
+                                         Grid.Column="1"
+                                         FontSize="13"
+                                         FontFamily="Consolas"/>
+                                <Button Content="Browse..."
+                                        Grid.Column="2"
+                                        Margin="15,0,0,0"
+                                        Padding="15,0"
+                                        Click="BrowseLogPath_Click"/>
+                            </Grid>
+
+                            <!-- Write to event log -->
+                            <CheckBox Name="EventLogOption"
+                                      Content="Write to Windows event log"
+                                      Margin="0,10,0,0"/>
+
+                            <!-- Send notification email -->
+                            <CheckBox Name="SendEmailOption"
+                                      Content="Send a notification email"
+                                      Margin="0,10,0,0"/>
+
+                            <!-- Launch external application -->
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <CheckBox Name="LaunchAppOption"
+                                          Content="Launch an external application"/>
+                                <Label Style="{StaticResource LabelToolTip}"
+                                       Foreground="White"
+                                       Margin="-5,0,0,0"
+                                       MouseDown="ExternalAppTooltip_MouseDown"
+                                       MaxWidth="200">
+                                    <TextBlock FontFamily="Consolas" Foreground="#cd6ed1">
+                                        <Run FontWeight="Regular" Foreground="#ffffff" FontStyle="Italic" FontFamily="Segoe UI">Click to open help...</Run>
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run FontWeight="SemiBold" Foreground="#ffd43b" FontFamily="Segoe UI">Variables</Run><LineBreak/>
+                                        {SOURCE_IP}<LineBreak/>
+                                        {SOURCE_PORT}<LineBreak/>
+                                        {SOURCE_HOSTNAME}<LineBreak/>
+                                        {DESTINATION_IP}<LineBreak/>
+                                        {DESTINATION_PORT}<LineBreak/>
+                                        {DESTINATION_HOSTNAME}<LineBreak/>
+                                        {DESTINATION_MAC}<LineBreak/>
+                                        {TIMESTAMP}<LineBreak/>
+                                        {MATCH_TYPE}<LineBreak/>
+                                        {TCP_FLAGS}
+                                    </TextBlock>
+                                </Label>
+                            </StackPanel>
+                            <Grid Margin="35,3,0,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="6" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="90" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Application"/>
+                                <TextBox Name="ApplicationPath"
+                                         Grid.Column="1"
+                                         FontSize="13"
+                                         FontFamily="Consolas"/>
+                                <Button Content="Browse..."
+                                        Grid.Column="2"
+                                        Margin="15,0,0,0"
+                                        Padding="15,0"
+                                        Click="Browse_Click"/>
+                                <TextBlock Text="Arguments"
+                                           VerticalAlignment="Top"
+                                           Padding="0,4,0,0"
+                                           Grid.Row="2"/>
+                                <TextBox Name="ApplicationArguments"
+                                         Grid.Row="2"
+                                         Grid.Column="1"
+                                         Grid.ColumnSpan="2"
+                                         FontSize="13"
+                                         FontFamily="Consolas"
+                                         VerticalContentAlignment="Top"
+                                         VerticalScrollBarVisibility="Auto"
+                                         TextWrapping="Wrap"
+                                         Height="60">
+                                    <TextBox.Resources>
+                                        <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource ScrollBarRounded}"/>
+                                    </TextBox.Resources>
+                                </TextBox>
+                            </Grid>
+                        </StackPanel>
+                    </GroupBox>
+                </DockPanel>
+            </TabItem>
+
+            <!-- Tab: Email -->
+            <TabItem Header="Email" Name="EmailTab">
+                <TabControl TabStripPlacement="Top" Style="{StaticResource TabControlAlternate}">
+                    <TabControl.Resources>
+                        <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource TabItemAlternate}" />
+                    </TabControl.Resources>
+                    <!-- Sub Tab: Mail Server -->
+                    <TabItem Header="Mail Server" Name="EmailServerTab">
+                        <StackPanel Margin="8,9,8,8">
+                            <TextBlock Text="Server Information"
+                                       HorizontalAlignment="Left"
+                                       Foreground="#007acc"
+                                       FontSize="13"
+                                       Margin="0,0,0,5"
+                                       FontWeight="SemiBold"/>
+                            <!-- Email server and port -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <!-- Email server -->
+                                <Grid Width="140">
+                                    <TextBlock Text="SMTP server"/>
+                                </Grid>
+                                <TextBox Name="EmailServer"
+                                         Grid.Column="1"
+                                         FontFamily="Consolas"
+                                         MaxLength="512"/>
+                                <!-- Port -->
+                                <DockPanel Grid.Column="2">
+                                    <Grid Width="70">
+                                        <TextBlock Text="Port"/>
+                                    </Grid>
+                                    <TextBox Name="EmailPort"
+                                             Width="70"
+                                             FontFamily="Consolas"
+                                             HorizontalAlignment="Left"
+                                             PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                             MaxLength="5"/>
+                                </DockPanel>
+
+                            </Grid>
+                            <!-- Authentication / TLS -->
+                            <Grid Margin="140,6,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <!-- Authentication -->
+                                <CheckBox Name="IsSmtpAuthenticationRequired"
+                                          Content="This server requires authentication"
+                                          Click="IsSmtpAuthenticationRequired_Click"
+                                          Foreground="#777"
+                                          FontSize="13"/>
+                                <!-- SSL / TLS -->
+                                <CheckBox Name="IsTlsEnabled"
+                                          Grid.Column="1"
+                                          Content="Enable SSL/TLS"
+                                          Foreground="#777"
+                                          FontSize="13"/>
+                            </Grid>
+
+                            <!-- Username and password section -->
+                            <StackPanel DockPanel.Dock="Top"
+                                        Visibility="{Binding IsChecked, ElementName=IsSmtpAuthenticationRequired, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <!-- Smtp User -->
+                                <DockPanel Margin="0,6,0,0">
+                                    <Grid Width="140">
+                                        <TextBlock Text="Username"/>
+                                    </Grid>
+                                    <TextBox Name="SmtpUsername"/>
+                                </DockPanel>
+
+                                <!-- Smtp Password -->
+                                <DockPanel Margin="0,6,0,0">
+                                    <Grid Width="140">
+                                        <TextBlock Text="Password"/>
+                                    </Grid>
+                                    <PasswordBox Name="SmtpPassword"/>
+                                </DockPanel>
+                            </StackPanel>
+
+                            <TextBlock Text="Email Addresses"
+                                       Foreground="#007acc"
+                                       FontSize="13"
+                                       HorizontalAlignment="Left"
+                                       Margin="0,12,0,5"
+                                       FontWeight="SemiBold"/>
+                            <!-- Recipient -->
+                            <DockPanel Margin="0,0,0,0">
+                                <Grid Width="140">
+                                    <TextBlock Text="Recipient address"/>
+                                </Grid>
+                                <TextBox Name="EmailRecipient"
+                                         FontFamily="Consolas"
+                                         MaxLength="512"/>
+                            </DockPanel>
+                            <!-- Sender -->
+                            <DockPanel Margin="0,6,0,0">
+                                <Grid Width="140">
+                                    <TextBlock Text="Sender address"/>
+                                </Grid>
+                                <TextBox Name="EmailSender"
+                                         FontFamily="Consolas"
+                                         MaxLength="512"/>
+                            </DockPanel>
+                            <!-- Sender friendly -->
+                            <DockPanel Margin="0,6,0,0">
+                                <Grid Width="140">
+                                    <TextBlock Text="Sender display name"/>
+                                </Grid>
+                                <TextBox Name="EmailSenderFriendly"
+                                         FontFamily="Consolas"
+                                         MaxLength="512"/>
+                            </DockPanel>
+
+                            <!-- Email test button -->
+                            <Button Style="{StaticResource ButtonSecondaryStyle}"
+                                    Name="TestEmail"
+                                    DockPanel.Dock="Top"
+                                    Click="TestEmail_Click"
+                                    Width="75"
+                                    Margin="0,18,0,0"
+                                    Padding="0,3"
+                                    Content="Test"
+                                    HorizontalAlignment="Left"/>
+                        </StackPanel>
+                    </TabItem>
+
+                    <!-- Sub Tab: Message -->
+                    <TabItem Header="Message" Name="EmailMessageTab">
+                        <Grid Margin="8,9,8,8">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <!-- Subject and body -->
+                            <DockPanel>
+                                <DockPanel DockPanel.Dock="Top" Margin="0,3,0,0">
+                                    <Grid MinWidth="95">
+                                        <TextBlock Text="Email subject" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                    <TextBox Name="EmailSubject"
+                                             DockPanel.Dock="Right"
+                                             MaxLength="512"
+                                             FontFamily="Consolas"/>
+                                </DockPanel>
+                                <DockPanel DockPanel.Dock="Top" Margin="0,6,0,0">
+                                    <Grid MinWidth="95">
+                                        <TextBlock Text="Email body" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="0,5,0,0"/>
+                                    </Grid>
+                                    <TextBox Name="EmailBody"
+                                             DockPanel.Dock="Right"
+                                             FontFamily="Consolas"
+                                             VerticalContentAlignment="Top"
+                                             VerticalScrollBarVisibility="Auto"
+                                             Height="150"
+                                             TextWrapping="Wrap"
+                                             AcceptsReturn="True">
+                                        <TextBox.Resources>
+                                            <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource ScrollBarRounded}"/>
+                                        </TextBox.Resources>
+                                    </TextBox>
+                                </DockPanel>
+                            </DockPanel>
+                            <!-- Variables -->
+                            <GroupBox Header="Variables" Grid.Row="1" Margin="0,20,0,0">
+                                <GroupBox.Resources>
+                                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                                        <Setter Property="FontFamily" Value="Consolas"/>
+                                        <Setter Property="FontSize" Value="15"/>
+                                        <Setter Property="Foreground" Value="#555"/>
+                                    </Style>
+                                </GroupBox.Resources>
+                                <StackPanel>
+                                    <StackPanel Margin="5" Orientation="Horizontal">
+                                        <TextBlock Text="{}{INTERFACE_IP}" Width="200" />
+                                        <TextBlock Text="{}{INTERFACE_DESCRIPTION}" />
+                                    </StackPanel>
+                                    <StackPanel Margin="5" Orientation="Horizontal">
+                                        <TextBlock Text="{}{INTERFACE_MAC}" Width="200" />
+                                        <TextBlock Text="{}{CONNECTION_LOG}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </GroupBox>
+                        </Grid>
+                    </TabItem>
+
+                    <!-- Sub Tab: Options -->
+                    <TabItem Header="Options" Name="EmailOptionsTab">
+                        <StackPanel Margin="8,9,8,8">
+                            <!-- Rate limit -->
+                            <DockPanel>
+                                <CheckBox Name="RateLimitOption"
+                                          DockPanel.Dock="Left"
+                                          Content="Enable rate limiting on email notifications (recommended)"/>
+                                <Label DockPanel.Dock="Left" Style="{StaticResource LabelToolTip}" Foreground="White" Margin="-5,-3,0,0">
+                                    <TextBlock>
+                                        <Run FontWeight="SemiBold" Foreground="#ffd43b">Rate Limit</Run><LineBreak/>
+                                        Rate limiting prevents email notifications from being sent too quickly. After an
+                                        email notification is sent, tcpTrigger will not send another email for at least
+                                        the number of seconds specified. All connections detected during the wait
+                                        period are logged and will be sent once the rate limit has passed.
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run FontWeight="SemiBold" Foreground="#30aacc">[Default]</Run><LineBreak/>
+                                        180 seconds (3 minutes)
+                                    </TextBlock>
+                                </Label>
+                            </DockPanel>
+                            <DockPanel Margin="35,3,0,0">
+                                <TextBlock Text="Limit one email per network interface every"
+                                           DockPanel.Dock="Left"
+                                           HorizontalAlignment="Left"/>
+                                <TextBox Name="RateLimitSeconds"
+                                         DockPanel.Dock="Left"
+                                         Margin="5,0,10,0"
+                                         Width="60"
+                                         PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                         FontFamily="Consolas"
+                                         MaxLength="5"/>
+                                <TextBlock Text="second(s)"
+                                           DockPanel.Dock="Left"
+                                           HorizontalAlignment="Left"
+                                           TextTrimming="CharacterEllipsis"/>
+                            </DockPanel>
+                            <!-- Buffer -->
+                            <DockPanel>
+                                <CheckBox Name="BufferOption"
+                                          DockPanel.Dock="Left"
+                                          Content="Buffer connections (recommended)"
+                                          Margin="0,20,0,0"/>
+                                <Label DockPanel.Dock="Left" Style="{StaticResource LabelToolTip}" Foreground="White" Margin="-5,0,0,0" VerticalAlignment="Bottom">
+                                    <TextBlock>
+                                        <Run FontWeight="SemiBold" Foreground="#ffd43b">Buffer Connections</Run><LineBreak/>
+                                        Buffering delays sending an initial email notification when a connection is detected. Delaying allows tcpTrigger
+                                        to log additional connections for a short time before sending the email. After the interval is up,
+                                        the notification email is sent with a log of all connections that occurred within the buffer time.
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run FontWeight="SemiBold" Foreground="#30aacc">[Default]</Run><LineBreak/>
+                                        15 seconds
+                                    </TextBlock>
+                                </Label>
+                            </DockPanel>
+                            <DockPanel Margin="35,3,0,0">
+                                <TextBlock Text="Log connections for"
+                                           DockPanel.Dock="Left"
+                                           HorizontalAlignment="Left"/>
+                                <TextBox Name="BufferSeconds"
+                                         DockPanel.Dock="Left"
+                                         Margin="5,0,10,0"
+                                         Width="60"
+                                         PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                         FontFamily="Consolas"
+                                         MaxLength="3"/>
+                                <TextBlock Text="second(s) before sending email"
+                                           DockPanel.Dock="Left"
+                                           HorizontalAlignment="Left"
+                                           TextTrimming="CharacterEllipsis"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </TabItem>
+                </TabControl>
+            </TabItem>
+
+            <!-- Tab: Whitelist -->
+            <TabItem Header="Whitelist" Name="WhitelistTab">
+                <DockPanel>
+                    <GroupBox DockPanel.Dock="Top">
+                        <GroupBox.Header>
+                            <DockPanel>
+                                <TextBlock Text="Whitelist"
+                                           DockPanel.Dock="Left"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"/>
+                                <Label DockPanel.Dock="Left"
+                                       Style="{StaticResource LabelToolTip}">
+                                    <TextBlock>
+                                        <Run FontWeight="SemiBold" Foreground="#ffd43b">Whitelist</Run><LineBreak/>
+                                        All connections from IP addresses in the whitelist are completely ignored by tcpTrigger.
+                                        You can optionally enter a port number to ignore only when the IP connects to the specified port.
+                                        Enter one address per line and use the <Italic>Add</Italic> button for additional entries.
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run FontWeight="SemiBold" Foreground="#63e6be">IP Address</Run><LineBreak/>
+                                        Enter the IP address to ignore in the <Italic>IP address</Italic> field.
+                                        One address per entry. DNS names are not supported.
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run FontWeight="SemiBold" Foreground="#63e6be">Port</Run><LineBreak/>
+                                        If the <Italic>port</Italic> field is left blank,
+                                        all connections from the IP address are ignored.
+                                        To ignore only connections to a specific port, enter the port number.
+                                        One port per entry. Add additional entries for multiple ports.
+                                        To ignore ICMP requests, type
+                                        <Run FontWeight="SemiBold" Foreground="#cd6ed1">icmp</Run>
+                                        into the port field.
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run FontWeight="SemiBold" Foreground="#63e6be">Comment</Run><LineBreak/>
+                                        The <Italic>comment</Italic> field is for recording notes.
+                                        It is for your reference only and is useful for giving a description to each entry.
+                                    </TextBlock>
+                                </Label>
+                            </DockPanel>
+                        </GroupBox.Header>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="1" Margin="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="190" />
+                                    <ColumnDefinition Width="70" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                
+                                <!-- Header row -->
+                                <TextBlock Grid.Column="0"
+                                           Text="IP Address"
+                                           HorizontalAlignment="Left"
+                                           FontWeight="Bold"/>
+                                <TextBlock Grid.Column="1"
+                                           Text="Port"
+                                           HorizontalAlignment="Left"
+                                           FontWeight="Bold"/>
+                                <TextBlock Grid.Column="2"
+                                           Text="Comment"
+                                           HorizontalAlignment="Left"
+                                           FontWeight="Bold"/>
+                                <ScrollViewer Name="WhitelistScroller"
+                                              Grid.Row="1"
+                                              Grid.ColumnSpan="3"
+                                              VerticalScrollBarVisibility="Auto"
+                                              FocusVisualStyle="{x:Null}">
+                                    <ItemsControl Name="Whitelist"
+                                                  Margin="0,-1,0,0"
+                                                  UseLayoutRounding="True"
+                                                  IsTabStop="False"
+                                                  FocusVisualStyle="{x:Null}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Name="TPGrid">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="190" />
+                                                        <ColumnDefinition Width="70" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <!-- IP Address -->
+                                                    <TextBox Text="{Binding IP}"
+                                                             Grid.Column="0"
+                                                             Margin="0,3,6,0"
+                                                             Name="WhitelistIP"
+                                                             FontFamily="Consolas"
+                                                             FontSize="15">
+                                                        <TextBox.Style>
+                                                            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                                                                <Setter Property="FontWeight" Value="Regular"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding ElementName=TPGrid, Path=IsMouseOver}" Value="True">
+                                                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                                                        <Setter Property="Background" Value="#fcfcfc"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBox.Style>
+                                                    </TextBox>
+                                                    <!-- Port -->
+                                                    <Grid Grid.Column="1"
+                                                          Margin="0,3,6,0">
+                                                        <TextBox Text="{Binding Port}"
+                                                                 Name="WhitelistPort"
+                                                                 MaxLength="5"
+                                                                 FontFamily="Consolas"
+                                                                 FontSize="15">
+                                                            <TextBox.Style>
+                                                                <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                                                                    <Setter Property="FontWeight" Value="Regular"/>
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding ElementName=TPGrid, Path=IsMouseOver}" Value="True">
+                                                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                                                            <Setter Property="Background" Value="#fcfcfc"/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Text}" Value="icmp">
+                                                                            <Setter Property="Foreground" Value="Purple"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBox.Style>
+                                                        </TextBox>
+                                                        <TextBlock Text="ALL"
+                                                                   IsHitTestVisible="False"
+                                                                   VerticalAlignment="Center"
+                                                                   HorizontalAlignment="Left"
+                                                                   Margin="10,0,0,0"
+                                                                   Opacity="0.7"
+                                                                   Foreground="#ff0b6e2d"
+                                                                   FontFamily="Consolas"
+                                                                   FontSize="14">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="{x:Type TextBlock}">
+                                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Text, ElementName=WhitelistPort}" Value="">
+                                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding IsFocused, ElementName=WhitelistPort}" Value="True">
+                                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </Grid>
+                                                    <!-- Comment -->
+                                                    <TextBox Text="{Binding Comment}"
+                                                             Grid.Column="2"
+                                                             Margin="0,3,3,0"
+                                                             FontFamily="Consolas"
+                                                             FontSize="14"
+                                                             MaxLength="128">
+                                                        <TextBox.Style>
+                                                            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                                                                <Setter Property="FontWeight" Value="Regular"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding ElementName=TPGrid, Path=IsMouseOver}" Value="True">
+                                                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                                                        <Setter Property="Background" Value="#fcfcfc"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBox.Style>
+                                                    </TextBox>
+                                                    <!-- Remove button -->
+                                                    <Button Grid.Column="3"
+                                                            Name="WhitelistRemoveButton"
+                                                            Margin="0,3,6,0"
+                                                            Padding="7,2"
+                                                            Background="Transparent"
+                                                            ToolTip="Remove"
+                                                            ToolTipService.InitialShowDelay="1500"
+                                                            ToolTipService.ShowDuration="2000"
+                                                            Click="WhitelistRemove_Click">
+                                                        <Button.Template>
+                                                            <ControlTemplate TargetType="Button">
+                                                                <Border Name="controlButton_border"
+                                                                        BorderThickness="1"
+                                                                        BorderBrush="Transparent"
+                                                                        CornerRadius="4"
+                                                                        Opacity="0.35"
+                                                                        Padding="{TemplateBinding Padding}"
+                                                                        Background="{TemplateBinding Background}">
+                                                                    <Image Name="controlButton_image"
+                                                                           Source="{StaticResource icon.delete-item}"
+                                                                           Width="11"
+                                                                           Height="11"/>
+                                                                </Border>
+                                                                <ControlTemplate.Triggers>
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter TargetName="controlButton_border" Property="Background" Value="#eaeaeb" />
+                                                                        <Setter TargetName="controlButton_border" Property="Opacity" Value="1" />
+                                                                        <Setter TargetName="controlButton_border" Property="BorderBrush" Value="#d0d0d0" />
+                                                                    </Trigger>
+                                                                    <Trigger Property="IsPressed" Value="True">
+                                                                        <Setter TargetName="controlButton_border" Property="BorderBrush" Value="#606060" />
+                                                                        <Setter TargetName="controlButton_border" Property="Background" Value="#dadada" />
+                                                                    </Trigger>
+                                                                </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </Button.Template>
+                                                    </Button>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                                <!-- Add button -->
+                                <Button Grid.Row="2" Grid.Column="0" Width="75" Content="_Add" HorizontalAlignment="Left" Click="WhitelistAdd_Click"
+                                        Style="{StaticResource ButtonSecondaryStyle}"
+                                        Margin="0,6,0,0"
+                                        Padding="0,3"/>
+                            </Grid>
+                        </Grid>
+                    </GroupBox>
+                </DockPanel>
+            </TabItem>
+
+            <!-- Tab: Devices -->
+            <TabItem Header="Devices" Name="DevicesTab">
+                <DockPanel>
+                    <GroupBox DockPanel.Dock="Top">
+                        <GroupBox.Header>
+                            <TextBlock Text="Exclude Network Interfaces"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Padding="0,1,0,2"
+                                       Foreground="White"/>
+                        </GroupBox.Header>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <!-- Info banner -->
+                            <Border Background="#303030" Margin="10,5,10,0" CornerRadius="8" BorderThickness="0">
+                                <TextBlock Foreground="#e2e2e2"
+                                           FontSize="14"
+                                           Margin="18,4"
+                                           TextWrapping="Wrap"
+                                           HorizontalAlignment="Left">
+                                    tcpTrigger monitors all available network interfaces.
+                                    <LineBreak/>
+                                    To exclude a device, select it from the list below.
+                                </TextBlock>
+                            </Border>
+                            <!-- Custom selectable list to display network interfaces and their IPs -->
+                            <ListView x:Name="Devices"
+                                      Grid.Row="1"
+                                      SelectionMode="Single"
+                                      ScrollViewer.CanContentScroll="False"
+                                      Margin="-5,10,-5,0"
+                                      BorderThickness="0">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#20336699"/>
+                                                <Setter Property="BorderBrush" Value="#888"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                        <Setter Property="Focusable" Value="False"/>
+                                        <Setter Property="BorderThickness" Value="0,1"/>
+                                        <Setter Property="BorderBrush" Value="Transparent"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel>
+                                            <!-- Checkbox and NIC description -->
+                                            <CheckBox Name="IsDeviceExcluded"
+                                                      Content="{Binding Description, Mode=OneTime}"
+                                                      IsChecked="{Binding IsExcluded, Mode=TwoWay}"
+                                                      Margin="5,0,0,0"
+                                                      FontSize="17"
+                                                      IsTabStop="False"/>
+                                            <!-- Image and text (reflecting monitored or excluded) -->
+                                            <StackPanel Orientation="Horizontal" Margin="45,0,0,0" HorizontalAlignment="Left">
+                                                <Image Source="{Binding IsChecked, ElementName=IsDeviceExcluded, Converter={StaticResource IsCheckedToImageConverter}}"
+                                                       HorizontalAlignment="Left"
+                                                       Width="14" Height="14"/>
+                                                <TextBlock Text="{Binding IsChecked, ElementName=IsDeviceExcluded, Converter={StaticResource BoolToStringConverter}}"
+                                                           Foreground="{Binding IsChecked, ElementName=IsDeviceExcluded, Converter={StaticResource BoolToBrushConverter}}"
+                                                           FontSize="13"
+                                                           FontWeight="SemiBold"
+                                                           HorizontalAlignment="Left"
+                                                           VerticalAlignment="Center"
+                                                           Margin="8,0,0,0"/>
+                                            </StackPanel>
+                                            <!-- IP addresses -->
+                                            <ItemsControl ItemsSource="{Binding IPAddresses, Mode=OneTime}"
+                                                          Margin="45,1,0,4"
+                                                          IsTabStop="False"
+                                                          BorderThickness="0"
+                                                          Background="Transparent">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding}"
+                                                                   Foreground="#666"
+                                                                   HorizontalAlignment="Left"
+                                                                   FontFamily="Consolas"
+                                                                   FontSize="14"/>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Grid>
+                    </GroupBox>
+                </DockPanel>
+            </TabItem>
+
+            <!-- Tab: Status -->
+            <TabItem Header="Status" Name="StatusTab">
+                <local:ServiceStatusUserControl/>
+            </TabItem>
+        </TabControl>
+
+        <!-- Button section -->
+        <Border Grid.Row="2" BorderBrush="#888" Background="#e8e8e8" BorderThickness="0,1,0,0">
+            <DockPanel Margin="15,10" HorizontalAlignment="Right">
+                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Help"
+                            Click="Help_Click"
+                            Width="85"
+                            Margin="0,0,9,0"/>
+                    <Button Content="Save"
+                            Click="Save_Click"
+                            Width="85"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>
