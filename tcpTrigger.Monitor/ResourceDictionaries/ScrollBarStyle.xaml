@@ -4,6 +4,7 @@
     <!-- Control colors -->
     <SolidColorBrush x:Key="ThumbControlBackground" Color="#686868"/>
     <SolidColorBrush x:Key="ThumbControlMouseOver" Color="#9e9e9e"/>
+    <SolidColorBrush x:Key="ThumbControlClick" Color="#efebef"/>
     <SolidColorBrush x:Key="UpDownControlBackground" Color="Transparent"/>
     <SolidColorBrush x:Key="UpDownControlMouseOver" Color="Transparent"/>
     <SolidColorBrush x:Key="SliderTrackColor" Color="#3e3e42"/>
@@ -75,6 +76,9 @@
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background" TargetName="Border" Value="{StaticResource ThumbControlMouseOver}"/>
                         </Trigger>
+                        <Trigger Property="IsMouseCaptured" Value="True">
+                            <Setter Property="Background" TargetName="Border" Value="{StaticResource ThumbControlClick}"/>
+                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -109,7 +113,7 @@
                 <!-- Scrollbar thumb -->
                 <Track.Thumb>
                     <Thumb Style="{StaticResource ScrollBarThumb}"
-                           Margin="1,0,1,0"/>
+                           Margin="2,0"/>
                 </Track.Thumb>
                 <!-- Down pager area -->
                 <Track.IncreaseRepeatButton>
@@ -133,7 +137,7 @@
         <Setter Property="ContextMenu" Value="{x:Null}"/>
         <Style.Triggers>
             <Trigger Property="Orientation" Value="Vertical">
-                <Setter Property="Width" Value="16"/>
+                <Setter Property="Width" Value="17"/>
                 <Setter Property="Height" Value="Auto"/>
                 <Setter Property="Template" Value="{StaticResource VerticalScrollBar}"/>
             </Trigger>
