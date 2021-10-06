@@ -92,7 +92,9 @@
                             WindowChrome.IsHitTestVisibleInChrome="True"
                             Width="20"
                             Margin="1"
-                            Click="FilterClear_Click">
+                            Click="FilterClear_Click"
+                            Focusable="False"
+                            IsTabStop="False">
                         <Button.Template>
                             <ControlTemplate>
                                 <Border>
