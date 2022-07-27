@@ -65,22 +65,19 @@ namespace tcpTrigger
                 return string.Empty;
         }
 
-        public static bool Load()
+        public static void Load()
         {
             Path = GetSettingsPath();
             
             if (string.IsNullOrEmpty(Path))
             {
-                // No configuration was found. Log a warning in the Windows event log and
-                // return true (successful load) to allow the tcpTrigger service to start.
-                // In this state, the tcpTrigger service will start and run with everything disabled.
-                Logger.WriteError(
-                    "Failed to start the tcpTrigger service. A settings file is required, but one could not be located. Use 'tcpTrigger Manager.exe' to generate the file."
+                // Error: A configuration file could not be found.
+                throw new FileNotFoundException(
+                    "A configuration file for tcpTrigger could not be found. Use 'tcpTrigger Manager.exe' to generate the file."
                     + $"{Environment.NewLine}{Environment.NewLine}"
                     + $"First path checked: '{AppDomain.CurrentDomain.BaseDirectory + "tcpTrigger.xml"}'{Environment.NewLine}"
-                    + $"Second path checked: '{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\tcpTrigger.xml'"}",
-                    Logger.EventCode.Error);
-                return false;
+                    + $"Second path checked: '{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\tcpTrigger.xml'"}"
+                    );
             }
 
             // currentNode is updated with the XML node path for every element that is read
@@ -346,19 +343,18 @@ namespace tcpTrigger
                 if (xn != null && !string.IsNullOrEmpty(xn.InnerText)) { EmailBufferSeconds = int.Parse(xn.InnerText); }
                 else { EmailBufferSeconds = 15; }
                 if (EmailBufferSeconds <= 0) { EmailBufferSeconds = 1; }
-
-                return true;
             }
 
             catch (Exception ex)
             {
-                Logger.WriteError(
-                    $"Failed to start the tcpTrigger service. Unable to parse the configuration file '{Path}'."
+                // Error: Failed to parse XML configuration.
+                throw new FileLoadException(
+                    $"Unable to parse the configuration file '{Path}'."
                     + $"{Environment.NewLine}{Environment.NewLine}"
-                    + $"Error parsing XML node: '{currentNode}'.{Environment.NewLine}{Environment.NewLine}"
-                    + ex.Message,
-                    Logger.EventCode.Error);
-                return false;
+                    + $"Error parsing XML node: '{currentNode}'."
+                    + $"{Environment.NewLine}{Environment.NewLine}"
+                    + ex.Message
+                    );
             }
         }
     }

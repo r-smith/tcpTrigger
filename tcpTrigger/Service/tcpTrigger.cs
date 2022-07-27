@@ -24,17 +24,25 @@ namespace tcpTrigger
 
         protected override void OnStart(string[] args)
         {
-            // The tcpTrigger Windows service is starting.
+            // The tcpTrigger service is starting.
 
-            // Locate and read tcpTrigger configuration file.
-            if (Settings.Load() == false)
+            // Read and parse the tcpTrigger configuration file.
+            try
             {
-                // An error was encountered while reading the configuration file. Stop the service and quit.
+                Settings.Load();
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteError(
+                    "Failed to start the tcpTrigger service."
+                    + Environment.NewLine + Environment.NewLine
+                    + ex.Message,
+                    Logger.EventCode.Error);
                 Environment.Exit(1);
                 return;
             }
 
-            // Validate log file path. Disable logging if inaccessible.
+            // Validate log file path.
             if (Settings.IsLogEnabled)
             {
                 if (string.IsNullOrEmpty(Settings.LogPath) || !Directory.Exists(Path.GetDirectoryName(Settings.LogPath)))
@@ -46,7 +54,7 @@ namespace tcpTrigger
                 }
             }
 
-            // If external app is enabled, report if no path set.
+            // Validate external app path.
             if (Settings.IsExternalAppEnabled)
             {
                 if (string.IsNullOrEmpty(Settings.ExternalAppPath))
@@ -71,7 +79,7 @@ namespace tcpTrigger
 
         protected override void OnStop()
         {
-            // The tcpTrigger Windows service is stopping.
+            // The tcpTrigger service is stopping.
 
             // Close (and dispose) all existing listeners.
             for (int i = 0; i < _tcpTriggerInterfaces.Count; i++)
@@ -88,33 +96,42 @@ namespace tcpTrigger
             // Enumerate network interfaces. Determine and record which interfaces to listen on.
             foreach (NetworkInterface networkInterface in NetworkInterface.GetAllNetworkInterfaces())
             {
-                if (Settings.ExcludedNetworkInterfaces.Contains(networkInterface.Id))
+                // Skip: Adapters excluded by user configuration,
+                //       loopback adapters,
+                //       adapters that aren't currently up,
+                //       and adapters that don't support IPv4.
+                if (Settings.ExcludedNetworkInterfaces.Contains(networkInterface.Id)
+                    || networkInterface.NetworkInterfaceType == NetworkInterfaceType.Loopback
+                    || networkInterface.OperationalStatus != OperationalStatus.Up
+                    || networkInterface.Supports(NetworkInterfaceComponent.IPv4) == false)
                 {
                     continue;
                 }
-                if (networkInterface.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
-                    networkInterface.OperationalStatus == OperationalStatus.Up)
+
+                // Get adapter properties.
+                foreach (UnicastIPAddressInformation address in networkInterface.GetIPProperties().UnicastAddresses)
                 {
-                    foreach (UnicastIPAddressInformation address in networkInterface.GetIPProperties().UnicastAddresses)
+                    // Skip if IP address is not IPv4.
+                    if (address.Address.AddressFamily != AddressFamily.InterNetwork)
                     {
-                        if (address.Address.AddressFamily == AddressFamily.InterNetwork)
-                        {
-                            networkInterfaces.Add(
-                                new TcpTriggerInterface(
-                                    address: address.Address,
-                                    description: networkInterface.Description,
-                                    macAddress: networkInterface.GetPhysicalAddress(),
-                                    guid: networkInterface.Id)
-                                );
-                        }
+                        continue;
                     }
+
+                    // Add adapter to tcpTrigger network interface list.
+                    networkInterfaces.Add(
+                        new TcpTriggerInterface(
+                            address: address.Address,
+                            description: networkInterface.Description,
+                            macAddress: networkInterface.GetPhysicalAddress(),
+                            guid: networkInterface.Id)
+                        );
                 }
             }
 
             // Check if tcpTrigger service is already running (_tcpTriggerInterfaces won't be null).
             if (_tcpTriggerInterfaces != null)
             {
-                // Compares list of network interfaces to previously stored list of network interfaces.
+                // Compare list of network interfaces to previously stored list of network interfaces.
                 if (networkInterfaces.SequenceEqual(_tcpTriggerInterfaces, new TcpTriggerInterfaceComparer()))
                 {
                     // Lists are equal. Nothing to do; quit.
