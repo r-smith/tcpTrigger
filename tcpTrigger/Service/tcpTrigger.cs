@@ -91,42 +91,8 @@ namespace tcpTrigger
 
         private void InitializeNetworkListeners_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            var networkInterfaces = new List<TcpTriggerInterface>();
-
-            // Enumerate network interfaces. Determine and record which interfaces to listen on.
-            foreach (NetworkInterface networkInterface in NetworkInterface.GetAllNetworkInterfaces())
-            {
-                // Skip: Adapters excluded by user configuration,
-                //       loopback adapters,
-                //       adapters that aren't currently up,
-                //       and adapters that don't support IPv4.
-                if (Settings.ExcludedNetworkInterfaces.Contains(networkInterface.Id)
-                    || networkInterface.NetworkInterfaceType == NetworkInterfaceType.Loopback
-                    || networkInterface.OperationalStatus != OperationalStatus.Up
-                    || networkInterface.Supports(NetworkInterfaceComponent.IPv4) == false)
-                {
-                    continue;
-                }
-
-                // Get adapter properties.
-                foreach (UnicastIPAddressInformation address in networkInterface.GetIPProperties().UnicastAddresses)
-                {
-                    // Skip if IP address is not IPv4.
-                    if (address.Address.AddressFamily != AddressFamily.InterNetwork)
-                    {
-                        continue;
-                    }
-
-                    // Add adapter to tcpTrigger network interface list.
-                    networkInterfaces.Add(
-                        new TcpTriggerInterface(
-                            address: address.Address,
-                            description: networkInterface.Description,
-                            macAddress: networkInterface.GetPhysicalAddress(),
-                            guid: networkInterface.Id)
-                        );
-                }
-            }
+            // Get network interfaces that support listening.
+            List<TcpTriggerInterface> networkInterfaces = TcpTriggerInterface.GetInterfaces();
 
             // Check if tcpTrigger service is already running (_tcpTriggerInterfaces won't be null).
             if (_tcpTriggerInterfaces != null)
