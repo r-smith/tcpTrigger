@@ -39,12 +39,10 @@ namespace tcpTrigger
                 catch (Exception ex)
                 {
                     Settings.IsLogEnabled = false;
-                    EventLog.WriteEntry(
-                        "tcpTrigger",
+                    Logger.WriteError(
                         $"Maximum log size {_maxFileSizeInBytes} bytes has been reached. Error rotating log file '{Settings.LogPath}'. "
                         + $"Logging has been disabled.{ Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                        EventLogEntryType.Error,
-                        400);
+                        Logger.EventCode.Error);
                 }
                 finally
                 {
@@ -62,11 +60,9 @@ namespace tcpTrigger
             }
             catch (Exception ex)
             {
-                EventLog.WriteEntry(
-                    "tcpTrigger",
+                Logger.WriteError(
                     $"Error writing to log file '{Settings.LogPath}'.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                    EventLogEntryType.Error,
-                    400);
+                    Logger.EventCode.Error);
             }
             finally
             {
@@ -104,16 +100,15 @@ namespace tcpTrigger
             switch (packetHeader.MatchType)
             {
                 case PacketMatch.IcmpRequest:
-                    EventLog.WriteEntry("tcpTrigger",
+                    Logger.Write(
                         $"ICMP {Enum.GetName(typeof(IcmpTypeCode), packetHeader.IcmpType)} request detected.{Environment.NewLine}{Environment.NewLine}"
                         + $"Match type: ICMP{Environment.NewLine}"
                         + $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}"
                         + $"Destination IP: {packetHeader.DestinationIP}",
-                        EventLogEntryType.Information,
-                        200);
+                        Logger.EventCode.MatchedIcmp);
                     break;
                 case PacketMatch.TcpConnect:
-                    EventLog.WriteEntry("tcpTrigger",
+                    Logger.Write(
                         $"TCP connection detected.{Environment.NewLine}{Environment.NewLine}"
                         + $"Match type: TCP{Environment.NewLine}"
                         + $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}"
@@ -121,29 +116,26 @@ namespace tcpTrigger
                         + $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}"
                         + $"Destination port: {packetHeader.DestinationPort}{Environment.NewLine}{Environment.NewLine}"
                         + $"TCP flags: {packetHeader.TcpFlagsAsString}",
-                        EventLogEntryType.Information,
-                        201);
+                        Logger.EventCode.MatchedTcp);
                     break;
                 case PacketMatch.UdpCommunication:
-                    EventLog.WriteEntry("tcpTrigger",
+                    Logger.Write(
                         $"UDP connection detected.{Environment.NewLine}{Environment.NewLine}"
                         + $"Match type: UDP{Environment.NewLine}"
                         + $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}"
                         + $"Source port: {packetHeader.SourcePort}{Environment.NewLine}"
                         + $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}"
                         + $"Destination port: {packetHeader.DestinationPort}",
-                        EventLogEntryType.Information,
-                        202);
+                        Logger.EventCode.MatchedUdp);
                     break;
                 case PacketMatch.RogueDhcp:
-                    EventLog.WriteEntry("tcpTrigger",
+                    Logger.Write(
                         $"DHCP server detected.{Environment.NewLine}{Environment.NewLine}"
                         + $"Match type: DHCP{Environment.NewLine}"
                         + $"DHCP server IP: {packetHeader.DhcpServerAddress}{Environment.NewLine}"
                         + $"DHCP transaction ID: {packetHeader.DhcpTransactionId}{Environment.NewLine}"
                         + $"Interface IP: {packetHeader.DestinationIP}",
-                        EventLogEntryType.Information,
-                        203);
+                        Logger.EventCode.MatchedDhcp);
                     break;
             }
         }
@@ -158,11 +150,9 @@ namespace tcpTrigger
             }
             catch (Exception ex)
             {
-                EventLog.WriteEntry(
-                    "tcpTrigger",
+                Logger.WriteError(
                     $"Error launching external application '{Settings.ExternalAppPath}'.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                    EventLogEntryType.Warning,
-                    400);
+                    Logger.EventCode.Error);
             }
         }
 
@@ -179,38 +169,30 @@ namespace tcpTrigger
         {
             if (Settings.EmailRecipients.Count == 0)
             {
-                EventLog.WriteEntry(
-                    "tcpTrigger",
+                Logger.WriteError(
                     "Email event triggered, but no recipient address is configured.",
-                    EventLogEntryType.Warning,
-                    400);
+                    Logger.EventCode.Error);
                 return;
             }
             if (Settings.EmailSender.Length == 0)
             {
-                EventLog.WriteEntry(
-                    "tcpTrigger",
+                Logger.WriteError(
                     "Email event triggered, but no sender address is configured.",
-                    EventLogEntryType.Warning,
-                    400);
+                    Logger.EventCode.Error);
                 return;
             }
             if (Settings.EmailServer.Length == 0)
             {
-                EventLog.WriteEntry(
-                    "tcpTrigger",
+                Logger.WriteError(
                     "Email event triggered, but no mail server is configured.",
-                    EventLogEntryType.Warning,
-                    400);
+                    Logger.EventCode.Error);
                 return;
             }
             if (Settings.EmailSubject.Length == 0)
             {
-                EventLog.WriteEntry(
-                    "tcpTrigger",
+                Logger.WriteError(
                     "Email event triggered, but no message subject is configured.",
-                    EventLogEntryType.Warning,
-                    400);
+                    Logger.EventCode.Error);
                 return;
             }
 
@@ -244,11 +226,9 @@ namespace tcpTrigger
                 }
                 catch (Exception ex)
                 {
-                    EventLog.WriteEntry(
-                        "tcpTrigger",
+                    Logger.WriteError(
                         $"Email action triggered, but the message failed to send.{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.InnerException.Message}",
-                        EventLogEntryType.Warning,
-                        400);
+                        Logger.EventCode.Error);
                     return;
                 }
             }

@@ -40,11 +40,9 @@ namespace tcpTrigger
                 if (string.IsNullOrEmpty(Settings.LogPath) || !Directory.Exists(Path.GetDirectoryName(Settings.LogPath)))
                 {
                     Settings.IsLogEnabled = false;
-                    EventLog.WriteEntry(
-                        "tcpTrigger",
+                    Logger.WriteError(
                         $"Log file path '{Settings.LogPath}' is inaccessible. Logging has been disabled. Update your tcpTrigger configuration with a valid path.",
-                        EventLogEntryType.Error,
-                        400);
+                        Logger.EventCode.Error);
                 }
             }
 
@@ -53,11 +51,9 @@ namespace tcpTrigger
             {
                 if (string.IsNullOrEmpty(Settings.ExternalAppPath))
                 {
-                    EventLog.WriteEntry(
-                        "tcpTrigger",
+                    Logger.WriteError(
                         $"You have enabled the action to launch an external application, but no path is set. Update your tcpTrigger configuration to point to a valid executable.",
-                        EventLogEntryType.Error,
-                        400);
+                        Logger.EventCode.Error);
                 }
             }
 
@@ -70,10 +66,7 @@ namespace tcpTrigger
             networkInterfaceInitializeTimer.Enabled = true;
             InitializeNetworkListeners_Elapsed(null, null);
 
-            EventLog.WriteEntry("tcpTrigger",
-                                $"Service started successfully.",
-                                EventLogEntryType.Information,
-                                90);
+            Logger.Write("tcpTrigger service started successfully.", Logger.EventCode.ServiceStarted);
         }
 
         protected override void OnStop()
@@ -85,10 +78,7 @@ namespace tcpTrigger
             {
                 _tcpTriggerInterfaces[i].NetworkSocket.Close();
             }
-            EventLog.WriteEntry("tcpTrigger",
-                                $"Service stopped successfully.",
-                                EventLogEntryType.Information,
-                                91);
+            Logger.Write("tcpTrigger service stopped successfully.", Logger.EventCode.ServiceStopped);
         }
 
         private void InitializeNetworkListeners_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -133,11 +123,9 @@ namespace tcpTrigger
                 else
                 {
                     // Network interfaces have changed. Record to event log that a change was detected.
-                    EventLog.WriteEntry(
-                        "tcpTrigger",
+                    Logger.Write(
                         "tcpTrigger detected a change in the network interface configuration in Windows. Restarting listeners.",
-                        EventLogEntryType.Information,
-                        101);
+                        Logger.EventCode.NetworkChangeDetected);
 
                     // Close (and dispose) all existing listeners.
                     for (int i = 0; i < _tcpTriggerInterfaces.Count; i++)
@@ -254,11 +242,7 @@ namespace tcpTrigger
             }
 
             // Write to event log.
-            EventLog.WriteEntry(
-                "tcpTrigger",
-                sb.ToString(),
-                EventLogEntryType.Information,
-                100);
+            Logger.Write(sb.ToString(), Logger.EventCode.ConfigurationApplied);
 
             // Start listeners.
             for (int i = 0; i < _tcpTriggerInterfaces.Count; i++)

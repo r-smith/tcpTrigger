@@ -74,14 +74,12 @@ namespace tcpTrigger
                 // No configuration was found. Log a warning in the Windows event log and
                 // return true (successful load) to allow the tcpTrigger service to start.
                 // In this state, the tcpTrigger service will start and run with everything disabled.
-                EventLog.WriteEntry(
-                    "tcpTrigger",
+                Logger.WriteError(
                     "Failed to start the tcpTrigger service. A settings file is required, but one could not be located. Use 'tcpTrigger Manager.exe' to generate the file."
                     + $"{Environment.NewLine}{Environment.NewLine}"
                     + $"First path checked: '{AppDomain.CurrentDomain.BaseDirectory + "tcpTrigger.xml"}'{Environment.NewLine}"
                     + $"Second path checked: '{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\tcpTrigger.xml'"}",
-                    EventLogEntryType.Error,
-                    400);
+                    Logger.EventCode.Error);
                 return false;
             }
 
@@ -354,14 +352,12 @@ namespace tcpTrigger
 
             catch (Exception ex)
             {
-                EventLog.WriteEntry(
-                    "tcpTrigger",
+                Logger.WriteError(
                     $"Failed to start the tcpTrigger service. Unable to parse the configuration file '{Path}'."
                     + $"{Environment.NewLine}{Environment.NewLine}"
                     + $"Error parsing XML node: '{currentNode}'.{Environment.NewLine}{Environment.NewLine}"
                     + ex.Message,
-                    EventLogEntryType.Error,
-                    400);
+                    Logger.EventCode.Error);
                 return false;
             }
         }
