@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading;
 using System.Xml;
 
@@ -356,6 +356,107 @@ namespace tcpTrigger
                     + ex.Message
                     );
             }
+        }
+
+        public static string DumpToString()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            // Append configuration path.
+            sb.AppendLine("# Configuration file");
+            sb.AppendLine($"'{Path}'");
+
+            // Append network interface exclusions.
+            if (ExcludedNetworkInterfaces.Count > 0)
+            {
+                sb.AppendLine();
+                sb.AppendLine("# Excluded network interfaces");
+                foreach (string guid in ExcludedNetworkInterfaces)
+                {
+                    sb.AppendLine("Do not monitor interface: " + guid);
+                }
+            }
+
+            // Append monitoring configuration.
+            sb.AppendLine();
+            sb.AppendLine("# Rules");
+            sb.AppendLine("Detect incoming ICMP: " + (IsMonitorIcmpEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Detect incoming TCP: " + (IsMonitorTcpEnabled ? "Enabled" : "Disabled"));
+            if (IsMonitorTcpEnabled)
+            {
+                sb.AppendLine($"Including TCP port(s): {TcpPortsToIncludeAsString}");
+                sb.AppendLine($"Excluding TCP port(s): {TcpPortsToExcludeAsString}");
+            }
+            sb.AppendLine("Detect incoming UDP: " + (IsMonitorUdpEnabled ? "Enabled" : "Disabled"));
+            if (IsMonitorUdpEnabled)
+            {
+                sb.AppendLine($"Including UDP port(s): {UdpPortsToIncludeAsString}");
+                sb.AppendLine($"Excluding UDP port(s): {UdpPortsToExcludeAsString}");
+            }
+            sb.AppendLine("Detect rogue DHCP: " + (IsMonitorDhcpEnabled ? "Enabled" : "Disabled"));
+
+            // Append DHCP server ignore list.
+            if (IgnoredDhcpServers.Count > 0)
+            {
+                foreach (IPAddress ip in IgnoredDhcpServers)
+                {
+                    sb.AppendLine("Ignore DHCP server: " + ip.ToString());
+                }
+            }
+
+            // Append endpoint ignore list.
+            if (IgnoredEndpoints.Count > 0)
+            {
+                sb.AppendLine();
+                sb.AppendLine("# Ignored endpoints");
+                foreach (KeyValuePair<IPAddress, HashSet<int>> pair in IgnoredEndpoints)
+                {
+                    foreach (int port in pair.Value)
+                    {
+                        sb.Append($"Ignore IP: {pair.Key}");
+                        if (port == IgnoreIcmp)
+                            sb.AppendLine(":icmp");
+                        else if (port == IgnoreAll)
+                            sb.AppendLine();
+                        else
+                            sb.AppendLine($":{port}");
+                    }
+                }
+            }
+
+            // Append enabled actions and settings.
+            sb.AppendLine();
+            sb.AppendLine("# Actions");
+            sb.AppendLine("Write to text log: " + (IsLogEnabled ? "Enabled" : "Disabled"));
+            if (IsLogEnabled)
+                sb.AppendLine($"Log path: '{LogPath}'");
+            sb.AppendLine("Write to Windows event log: " + (IsEventLogEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Email notifications: " + (IsEmailNotificationEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Launch external application: " + (IsExternalAppEnabled ? "Enabled" : "Disabled"));
+            if (IsExternalAppEnabled)
+            {
+                sb.AppendLine($"Launch app path: '{ExternalAppPath}'");
+                sb.AppendLine($"Launch app args: '{ExternalAppArguments}'");
+            }
+
+            // Append email settings.
+            if (IsEmailNotificationEnabled)
+            {
+                sb.AppendLine();
+                sb.AppendLine("# Email");
+                sb.AppendLine($"Server: {EmailServer}");
+                sb.AppendLine($"Port: {EmailServerPort}");
+                sb.AppendLine($"SSL / TLS: {(IsEmailTlsEnabled ? "Enabled" : "Disabled")}");
+                sb.AppendLine("Use authentication? " + (IsEmailAuthRequired ? "Yes" : "No"));
+                sb.AppendLine("Recipient(s): " + string.Join(", ", EmailRecipients.ToArray()));
+                sb.AppendLine($"Sender address: {EmailSender}");
+                sb.AppendLine($"Sender display name: {EmailSenderDisplayName}");
+                sb.AppendLine($"Message subject: {EmailSubject}");
+                sb.AppendLine($"Rate limit: " + (EmailRateLimitSeconds > 0 ? EmailRateLimitSeconds.ToString() + " seconds" : "Disabled"));
+                sb.AppendLine($"Buffer: " + (EmailBufferSeconds > 0 ? EmailBufferSeconds.ToString() + " seconds" : "Disabled"));
+            }
+
+            return sb.ToString();
         }
     }
 

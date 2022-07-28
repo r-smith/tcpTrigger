@@ -10,6 +10,7 @@ namespace tcpTrigger
             ServiceStopped = 91,
             ConfigurationApplied = 100,
             NetworkChangeDetected = 101,
+            NetworkInterfaces = 102,
             Error = 400,
             MatchedIcmp = 200,
             MatchedTcp = 201,

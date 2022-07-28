@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
 using System.ServiceProcess;
 using System.Text;
 
@@ -65,6 +62,13 @@ namespace tcpTrigger
                 }
             }
 
+            // Write final applied configuration to event log.
+            Logger.Write(
+                "The tcpTrigger service is starting."
+                + Environment.NewLine + Environment.NewLine
+                + Settings.DumpToString(),
+                Logger.EventCode.ConfigurationApplied);
+
             // Retrieve network interfaces and start IP listener threads.
             // This is done on a timer so that the listener thread can automatically restart
             // if any changes to network interfaces are detected.
@@ -74,7 +78,7 @@ namespace tcpTrigger
             networkInterfaceInitializeTimer.Enabled = true;
             InitializeNetworkListeners_Elapsed(null, null);
 
-            Logger.Write("tcpTrigger service started successfully.", Logger.EventCode.ServiceStarted);
+            Logger.Write("The tcpTrigger service started successfully.", Logger.EventCode.ServiceStarted);
         }
 
         protected override void OnStop()
@@ -86,7 +90,7 @@ namespace tcpTrigger
             {
                 _tcpTriggerInterfaces[i].NetworkSocket.Close();
             }
-            Logger.Write("tcpTrigger service stopped successfully.", Logger.EventCode.ServiceStopped);
+            Logger.Write("The tcpTrigger service stopped successfully.", Logger.EventCode.ServiceStopped);
         }
 
         private void InitializeNetworkListeners_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -127,105 +131,17 @@ namespace tcpTrigger
 
         private void StartIpListeners()
         {
-            var sb = new StringBuilder();
-
-            // Log interfaces.
-            sb.AppendLine($"Using configuration file: '{Settings.Path}'");
-            sb.AppendLine();
-            sb.AppendLine("# Network interfaces");
-            foreach (TcpTriggerInterface ipInterface in _tcpTriggerInterfaces)
+            // Log network interfaces.
+            StringBuilder sb = new StringBuilder();
+            foreach (TcpTriggerInterface adapter in _tcpTriggerInterfaces)
             {
-                sb.AppendLine($"Listening on: {ipInterface.IP} ({ipInterface.Description})");
+                sb.AppendLine($"{adapter.IP} => {adapter.Description}");
             }
-            if (Settings.ExcludedNetworkInterfaces.Count > 0)
-            {
-                foreach (string guid in Settings.ExcludedNetworkInterfaces)
-                {
-                    sb.AppendLine("Exclude network interface: " + guid);
-                }
-            }
-
-            // Log monitoring configuration.
-            sb.AppendLine();
-            sb.AppendLine("# Rules");
-            sb.AppendLine("Detect incoming ICMP: " + (Settings.IsMonitorIcmpEnabled ? "Enabled" : "Disabled"));
-            sb.AppendLine("Detect incoming TCP: " + (Settings.IsMonitorTcpEnabled ? "Enabled" : "Disabled"));
-            if (Settings.IsMonitorTcpEnabled)
-            {
-                sb.AppendLine($"Including TCP port(s): {Settings.TcpPortsToIncludeAsString}");
-                sb.AppendLine($"Excluding TCP port(s): {Settings.TcpPortsToExcludeAsString}");
-            }
-            sb.AppendLine("Detect incoming UDP: " + (Settings.IsMonitorUdpEnabled ? "Enabled" : "Disabled"));
-            if (Settings.IsMonitorUdpEnabled)
-            {
-                sb.AppendLine($"Including UDP port(s): {Settings.UdpPortsToIncludeAsString}");
-                sb.AppendLine($"Excluding UDP port(s): {Settings.UdpPortsToExcludeAsString}");
-            }
-            sb.AppendLine("Detect rogue DHCP: " + (Settings.IsMonitorDhcpEnabled ? "Enabled" : "Disabled"));
-
-            // Log DHCP server ignore list.
-            if (Settings.IgnoredDhcpServers.Count > 0)
-            {
-                foreach (IPAddress ip in Settings.IgnoredDhcpServers)
-                {
-                    sb.AppendLine("Ignore DHCP server: " + ip.ToString());
-                }
-            }
-
-            // Log endpoint ignore list.
-            if (Settings.IgnoredEndpoints.Count > 0)
-            {
-                sb.AppendLine();
-                sb.AppendLine("# Whitelist");
-                foreach (KeyValuePair<IPAddress, HashSet<int>> pair in Settings.IgnoredEndpoints)
-                {
-                    foreach (int port in pair.Value)
-                    {
-                        sb.Append($"Ignore IP: {pair.Key}");
-                        if (port == Settings.IgnoreIcmp)
-                            sb.AppendLine(":icmp");
-                        else if (port == Settings.IgnoreAll)
-                            sb.AppendLine();
-                        else
-                            sb.AppendLine($":{port}");
-                    }
-                }
-            }
-
-            // Log enabled actions and settings.
-            sb.AppendLine();
-            sb.AppendLine("# Actions");
-            sb.AppendLine("Write to text log: " + (Settings.IsLogEnabled ? "Enabled" : "Disabled"));
-            if (Settings.IsLogEnabled)
-                sb.AppendLine($"Log path: '{Settings.LogPath}'");
-            sb.AppendLine("Write to Windows event log: " + (Settings.IsEventLogEnabled ? "Enabled" : "Disabled"));
-            sb.AppendLine("Email notifications: " + (Settings.IsEmailNotificationEnabled ? "Enabled" : "Disabled"));
-            sb.AppendLine("Launch external application: " + (Settings.IsExternalAppEnabled ? "Enabled" : "Disabled"));
-            if (Settings.IsExternalAppEnabled)
-            {
-                sb.AppendLine($"Launch app path: '{Settings.ExternalAppPath}'");
-                sb.AppendLine($"Launch app args: '{Settings.ExternalAppArguments}'");
-            }
-
-            // Log email settings.
-            if (Settings.IsEmailNotificationEnabled)
-            {
-                sb.AppendLine();
-                sb.AppendLine("# Email");
-                sb.AppendLine($"Server: {Settings.EmailServer}");
-                sb.AppendLine($"Port: {Settings.EmailServerPort}");
-                sb.AppendLine($"SSL / TLS: {(Settings.IsEmailTlsEnabled ? "Enabled" : "Disabled")}");
-                sb.AppendLine("Use authentication? " + (Settings.IsEmailAuthRequired ? "Yes" : "No"));
-                sb.AppendLine("Recipient(s): " + string.Join(", ", Settings.EmailRecipients.ToArray()));
-                sb.AppendLine($"Sender address: {Settings.EmailSender}");
-                sb.AppendLine($"Sender display name: {Settings.EmailSenderDisplayName}");
-                sb.AppendLine($"Message subject: {Settings.EmailSubject}");
-                sb.AppendLine($"Rate limit: " + (Settings.EmailRateLimitSeconds > 0 ? Settings.EmailRateLimitSeconds.ToString() + " seconds" : "Disabled"));
-                sb.AppendLine($"Buffer: " + (Settings.EmailBufferSeconds > 0 ? Settings.EmailBufferSeconds.ToString() + " seconds" : "Disabled"));
-            }
-
-            // Write to event log.
-            Logger.Write(sb.ToString(), Logger.EventCode.ConfigurationApplied);
+            Logger.Write(
+                "The tcpTrigger service is monitoring the following network interfaces:"
+                + Environment.NewLine + Environment.NewLine
+                + sb.ToString(),
+                Logger.EventCode.NetworkInterfaces);
 
             // Start listeners.
             for (int i = 0; i < _tcpTriggerInterfaces.Count; i++)
