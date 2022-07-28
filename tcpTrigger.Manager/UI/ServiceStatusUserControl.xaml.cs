@@ -293,6 +293,9 @@ namespace tcpTrigger.Manager
                     case 101:
                         summary = "Network change detected";
                         break;
+                    case 102:
+                        summary = "Monitoring network interfaces";
+                        break;
                     case 400:
                         summary = "Error";
                         break;
