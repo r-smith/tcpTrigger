@@ -13,8 +13,15 @@ namespace tcpTrigger
             byte[] buffer = new byte[512];
 
             // Bind socket to IP endpoint.
-            ipInterface.NetworkSocket.Bind(new IPEndPoint(ipInterface.IP, 0));
-            ipInterface.NetworkSocket.IOControl(IOControlCode.ReceiveAll, BitConverter.GetBytes(1), null);
+            try
+            {
+                ipInterface.NetworkSocket.Bind(new IPEndPoint(ipInterface.IP, 0));
+                ipInterface.NetworkSocket.IOControl(IOControlCode.ReceiveAll, BitConverter.GetBytes(1), null);
+            }
+            catch
+            {
+                throw new SocketException();
+            }
 
             // Callback method for processing captured packets.
             Action<IAsyncResult> OnReceive = null;
@@ -42,15 +49,25 @@ namespace tcpTrigger
                 if (packetHeader.MatchType != PacketMatch.None)
                 {
                     // A match was detected. Perform enabled actions.
-                    packetHeader.DestinationMac = ipInterface.MacAddress;
-                    if (Settings.IsLogEnabled)
-                        WriteLog(packetHeader);
-                    if (Settings.IsEventLogEnabled)
-                        WriteEventLog(packetHeader);
-                    if (Settings.IsExternalAppEnabled)
-                        LaunchApplication(packetHeader);
-                    if (Settings.IsEmailNotificationEnabled)
-                        TriggerEmail(packetHeader, ipInterface);
+                    try
+                    {
+                        packetHeader.DestinationMac = ipInterface.MacAddress;
+                        if (Settings.IsLogEnabled)
+                            WriteLog(packetHeader);
+                        if (Settings.IsEventLogEnabled)
+                            WriteEventLog(packetHeader);
+                        if (Settings.IsExternalAppEnabled)
+                            LaunchApplication(packetHeader);
+                        if (Settings.IsEmailNotificationEnabled)
+                            TriggerEmail(packetHeader, ipInterface);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.WriteError(
+                            "A packet matched detection rules but tcpTrigger failed to perform configured actions. "
+                            + ex.Message,
+                            Logger.EventCode.Error);
+                    }
                 }
                 // Reset buffer and continue listening for new data.
                 buffer = new byte[512];
