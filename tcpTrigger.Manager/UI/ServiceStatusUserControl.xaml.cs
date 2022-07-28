@@ -288,28 +288,28 @@ namespace tcpTrigger.Manager
                         summary = "Service stopped";
                         break;
                     case 100:
-                        summary = "Applied user settings";
+                        summary = "Service starting: settings applied";
                         break;
                     case 101:
                         summary = "Network change detected";
                         break;
                     case 102:
-                        summary = "Monitoring network interfaces";
+                        summary = "Network monitoring is active";
                         break;
                     case 400:
                         summary = "Error";
                         break;
                     case 12:
-                        summary = "Windows: Startup";
+                        summary = "- Windows: startup";
                         break;
                     case 13:
-                        summary = "Windows: Shutdown";
+                        summary = "- Windows: shutdown";
                         break;
                     case 1074:
-                        summary = "Windows: Shutdown initiating";
+                        summary = "- Windows: shutdown initiating";
                         break;
                     case 6008:
-                        summary = "Windows: Unexpected shutdown";
+                        summary = "- Windows: unexpected shutdown";
                         break;
                     default:
                         summary = string.Empty;

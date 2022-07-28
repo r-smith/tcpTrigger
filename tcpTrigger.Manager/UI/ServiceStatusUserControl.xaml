@@ -180,20 +180,20 @@
                                                                             <Setter Property="Foreground" Value="#4285f4"/>
                                                                         </DataTrigger>
                                                                         <DataTrigger Binding="{Binding EventId}" Value="12">
-                                                                            <Setter Property="FontStyle" Value="Italic"/>
-                                                                            <Setter Property="Foreground" Value="#333388"/>
+                                                                            <Setter Property="Opacity" Value="0.5"/>
+                                                                            <Setter Property="Foreground" Value="#3333AA"/>
                                                                         </DataTrigger>
                                                                         <DataTrigger Binding="{Binding EventId}" Value="13">
-                                                                            <Setter Property="FontStyle" Value="Italic"/>
-                                                                            <Setter Property="Foreground" Value="#883333"/>
+                                                                            <Setter Property="Opacity" Value="0.5"/>
+                                                                            <Setter Property="Foreground" Value="#AA3333"/>
                                                                         </DataTrigger>
                                                                         <DataTrigger Binding="{Binding EventId}" Value="1074">
-                                                                            <Setter Property="FontStyle" Value="Italic"/>
-                                                                            <Setter Property="Foreground" Value="#883333"/>
+                                                                            <Setter Property="Opacity" Value="0.5"/>
+                                                                            <Setter Property="Foreground" Value="#AA3333"/>
                                                                         </DataTrigger>
                                                                         <DataTrigger Binding="{Binding EventId}" Value="6008">
-                                                                            <Setter Property="FontStyle" Value="Italic"/>
-                                                                            <Setter Property="Foreground" Value="#883333"/>
+                                                                            <Setter Property="Opacity" Value="0.5"/>
+                                                                            <Setter Property="Foreground" Value="#AA3333"/>
                                                                         </DataTrigger>
                                                                     </Style.Triggers>
                                                                 </Style>
