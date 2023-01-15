@@ -50,7 +50,7 @@
 
     <!-- Allow upgrades and prevent downgrades -->
     <MajorUpgrade DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."
-                  Schedule="afterInstallFinalize" />
+                      Schedule="afterInstallValidate" />
 
     <Media Id="1" Cabinet="tcptrigger.cab" EmbedCab="yes" />
 
@@ -88,9 +88,6 @@
 		<!-- References for detecting .NET Framework installation directories (Defined by WixNetFxExtension) -->
 		<PropertyRef Id="NETFRAMEWORK40FULLINSTALLROOTDIR"/>
 		<PropertyRef Id="NETFRAMEWORK40FULLINSTALLROOTDIR64"/>
-        <FileSearch Name="EventLogMessages.dll"/>
-      </DirectorySearch>
-    </Property>
 
     <!-- Define the directory structure -->
     <Directory Id="TARGETDIR" Name="SourceDir">
