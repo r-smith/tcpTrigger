@@ -54,6 +54,12 @@
 
     <Media Id="1" Cabinet="tcptrigger.cab" EmbedCab="yes" />
 
+		<!-- Check for required .NET framework versions -->
+		<PropertyRef Id="WIX_IS_NETFRAMEWORK_45_OR_LATER_INSTALLED"/>
+		<Condition Message="This application requires .NET Framework 4.5 or later. Install a supported .NET Framework version and run this installer again.">
+			<![CDATA[Installed OR WIX_IS_NETFRAMEWORK_45_OR_LATER_INSTALLED]]>
+		</Condition>
+
     <!-- WiX UI -->
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch the tcpTrigger configuration manager" />
