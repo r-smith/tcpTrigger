@@ -85,9 +85,9 @@
                Value="LaunchApplication">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
     </UI>
 
-    <!-- Check for .NET EventLogMessages.dll -->
-    <Property Id="DOTNET4EVENTLOGMESSAGES_EXISTS">
-      <DirectorySearch Id="SystemFolderDriverVersion" Path="[WindowsFolder]\Microsoft.NET\Framework\v4.0.30319" Depth="0">
+		<!-- References for detecting .NET Framework installation directories (Defined by WixNetFxExtension) -->
+		<PropertyRef Id="NETFRAMEWORK40FULLINSTALLROOTDIR"/>
+		<PropertyRef Id="NETFRAMEWORK40FULLINSTALLROOTDIR64"/>
         <FileSearch Name="EventLogMessages.dll"/>
       </DirectorySearch>
     </Property>
@@ -124,23 +124,26 @@
                             Wait="no" />
           </Component>
 
-
-          <!-- Register Windows event log source -->
-          <Component Id="CreateEventSourceDotNet4" Guid="{BC256F58-832A-4F03-806A-3B86D730EF21}" Win64="$(var.Win64)">
-            <!-- If the .NET 4.x EventLogMessages.dll exists, use it to register the EventSource -->
-            <Condition>DOTNET4EVENTLOGMESSAGES_EXISTS</Condition>
+					<!-- Register Windows event log source to use the generic event message file included with .NET -->
+					<!-- Register event source using .NET 4 Full (64-bit) -->
+					<Component Id="CreateEventSource64BitNet4Full" Guid="{D1AE9132-D983-4678-9716-CE04FC6D6A24}" Win64="$(var.Win64)">
+						<Condition>
+							<![CDATA[NETFRAMEWORK40FULLINSTALLROOTDIR64 AND VersionNT64]]>
+						</Condition>
             <CreateFolder/>
             <util:EventSource Name="$(var.ProductName)"
                               Log="Application"
-                              EventMessageFile="%SystemRoot%\Microsoft.NET\Framework\v4.0.30319\EventLogMessages.dll" />
+                                          EventMessageFile="[NETFRAMEWORK40FULLINSTALLROOTDIR64]EventLogMessages.dll"/>
           </Component>
-          <Component Id="CreateEventSourceDotNet35" Guid="{8DEB8041-F204-4FF0-AC8C-C6D3A8592613}" Win64="$(var.Win64)">
-            <!-- If the .NET 4.x EventLogMessage.dll does not exist, use the .NET 2.x dll to register the EventSource -->
-            <Condition>NOT DOTNET4EVENTLOGMESSAGES_EXISTS</Condition>
+					<!-- Register event source using .NET 4 Full (32-bit) -->
+					<Component Id="CreateEventSource32BitNet4Full" Guid="{F8A7C72B-4F57-4286-B720-CF638E31AA48}" Win64="$(var.Win64)">
+						<Condition>
+							<![CDATA[NETFRAMEWORK40FULLINSTALLROOTDIR AND NOT VersionNT64]]>
+						</Condition>
             <CreateFolder/>
             <util:EventSource Name="$(var.ProductName)"
                               Log="Application"
-                              EventMessageFile="%SystemRoot%\Microsoft.NET\Framework\v2.0.50727\EventLogMessages.dll" />
+                                          EventMessageFile="[NETFRAMEWORK40FULLINSTALLROOTDIR]EventLogMessages.dll"/>
           </Component>
 
           <!-- Install tcpTrigger Manager -->
@@ -173,7 +176,7 @@
           <!-- Remove shortcuts on uninstall -->
           <RemoveFolder Id="DesktopFolder" On="uninstall" />
           <!-- Create a dummy registry entry because shortcuts cannot be KeyPaths. -->
-          <!-- Strange, but the technique is used in WiX's official documentation. -->
+					<!-- This technique is used in WiX's official documentation. -->
           <RegistryValue Root="HKCU"
                          Key="Software\tcpTrigger"
                          Name="installed"
@@ -202,7 +205,7 @@
             <!-- Remove shortcuts on uninstall -->
             <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
             <!-- Create a dummy registry entry because shortcuts cannot be KeyPaths. -->
-            <!-- Strange, but the technique is used in WiX's official documentation. -->
+						<!-- This technique is used in WiX's official documentation. -->
             <RegistryValue Root="HKCU"
                            Key="Software\tcpTrigger"
                            Name="installed"
@@ -238,8 +241,8 @@
       <ComponentRef Id="ApplicationShortcutsDesktop" />
       <ComponentRef Id="ApplicationShortcutsStartMenu" />
       <ComponentRef Id="CreateProgramDataFolder" />
-      <ComponentRef Id="CreateEventSourceDotNet35" />
-      <ComponentRef Id="CreateEventSourceDotNet4" />
+			<ComponentRef Id="CreateEventSource64BitNet4Full" />
+			<ComponentRef Id="CreateEventSource32BitNet4Full" />
     </Feature>
 
     <!-- Add the icon used for add/remove programs and the desktop shortcut -->
