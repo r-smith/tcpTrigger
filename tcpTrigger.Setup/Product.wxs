@@ -2,7 +2,7 @@
 
 <?define ProductName = "tcpTrigger" ?>
 <?define ProductManufacturer = "Ryan Smith" ?>
-<?define ProductVersion = "1.3.2" ?>
+<?define ProductVersion = "1.3.3" ?>
 
 <!-- Starting with tcpTrigger version 1.3.0:                                                         -->
 <!--     A new 64-bit MSI installer is introduced. Prior installers for tcpTrigger were 32-bit only. -->
@@ -19,13 +19,13 @@
 <!--                                                                                       -->
 <!-- ************************************************************************************* -->
 <?if $(var.Platform) = x64 ?>
-<?define ProductId = "{F41A5D95-B0A3-456C-B53D-4C0C2870347B}" ?>
+<?define ProductId = "{A7D13D21-8909-4EBA-B7EE-A82925595668}" ?>
 <?define ProductUpgradeCode = "{68A80CF7-645A-48A6-9B13-BE7D639D519B}" ?>
 <?define Win64 = "yes" ?>
 <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
 <?define ProductDisplayName = "$(var.ProductName)" ?>
 <?else ?>
-<?define ProductId = "{4BCFD603-E4CA-4055-AC00-3B948EDC1ABE}"?>
+<?define ProductId = "{D9A1FC30-845A-4A63-AE7C-5D3EB2E0C3B5}"?>
 <?define ProductUpgradeCode = "{7FEBF1AD-0417-4A10-A6EF-8046C5BBB8EB}" ?>
 <?define Win64 = "no" ?>
 <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
@@ -37,89 +37,89 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
 	 xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
 
-  <Product Name="$(var.ProductDisplayName)"
-           Manufacturer="$(var.ProductManufacturer)"
-           Version="$(var.ProductVersion)"
-           Id="$(var.ProductId)"
-           UpgradeCode="$(var.ProductUpgradeCode)"
-           Language="1033" Codepage="1252">
+	<Product Name="$(var.ProductDisplayName)"
+             Manufacturer="$(var.ProductManufacturer)"
+             Version="$(var.ProductVersion)"
+             Id="$(var.ProductId)"
+             UpgradeCode="$(var.ProductUpgradeCode)"
+             Language="1033" Codepage="1252">
 
-    <Package Id="*" Keywords="Installer" InstallerVersion="300" Compressed="yes"
-             Languages="1033" SummaryCodepage="1252"
-             InstallPrivileges="elevated" InstallScope="perMachine" />
+		<Package Id="*" Keywords="Installer" InstallerVersion="300" Compressed="yes"
+                 Languages="1033" SummaryCodepage="1252"
+                 InstallPrivileges="elevated" InstallScope="perMachine" />
 
-    <!-- Allow upgrades and prevent downgrades -->
-    <MajorUpgrade DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."
+		<!-- Allow upgrades and prevent downgrades -->
+		<MajorUpgrade DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."
                       Schedule="afterInstallValidate" />
 
-    <Media Id="1" Cabinet="tcptrigger.cab" EmbedCab="yes" />
-
+		<Media Id="1" Cabinet="tcptrigger.cab" EmbedCab="yes" />
+		
 		<!-- Check for required .NET framework versions -->
 		<PropertyRef Id="WIX_IS_NETFRAMEWORK_45_OR_LATER_INSTALLED"/>
 		<Condition Message="This application requires .NET Framework 4.5 or later. Install a supported .NET Framework version and run this installer again.">
 			<![CDATA[Installed OR WIX_IS_NETFRAMEWORK_45_OR_LATER_INSTALLED]]>
 		</Condition>
 
-    <!-- WiX UI -->
-    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
-    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch the tcpTrigger configuration manager" />
-    <Property Id="WixShellExecTarget" Value="[#tcpTrigger.Manager.exe]" />
-    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
-    <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
-    <UIRef Id="WixUI_InstallDir" />
-    <UI>
-      <UIRef Id="WixUI_InstallDir" />
-      <Publish Dialog="WelcomeDlg"
-               Control="Next"
-               Event="NewDialog"
-               Value="InstallDirDlg"
-               Order="2">1</Publish>
-      <Publish Dialog="InstallDirDlg"
-               Control="Back"
-               Event="NewDialog"
-               Value="WelcomeDlg"
-               Order="2">1</Publish>
-      <Publish Dialog="ExitDialog"
-               Control="Finish"
-               Event="DoAction"
-               Value="LaunchApplication">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
-    </UI>
+		<!-- WiX UI -->
+		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+		<Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch the tcpTrigger configuration manager" />
+		<Property Id="WixShellExecTarget" Value="[#tcpTrigger.Manager.exe]" />
+		<Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+		<CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
+		<UIRef Id="WixUI_InstallDir" />
+		<UI>
+			<UIRef Id="WixUI_InstallDir" />
+			<Publish Dialog="WelcomeDlg"
+                     Control="Next"
+                     Event="NewDialog"
+                     Value="InstallDirDlg"
+                     Order="2">1</Publish>
+			<Publish Dialog="InstallDirDlg"
+                     Control="Back"
+                     Event="NewDialog"
+                     Value="WelcomeDlg"
+                     Order="2">1</Publish>
+			<Publish Dialog="ExitDialog"
+                     Control="Finish"
+                     Event="DoAction"
+                     Value="LaunchApplication">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+		</UI>
 
 		<!-- References for detecting .NET Framework installation directories (Defined by WixNetFxExtension) -->
 		<PropertyRef Id="NETFRAMEWORK40FULLINSTALLROOTDIR"/>
 		<PropertyRef Id="NETFRAMEWORK40FULLINSTALLROOTDIR64"/>
 
-    <!-- Define the directory structure -->
-    <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="$(var.PlatformProgramFilesFolder)">
-        <Directory Id="INSTALLFOLDER" Name="$(var.ProductName)">
+		<!-- Define the directory structure -->
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="$(var.PlatformProgramFilesFolder)">
+				<Directory Id="INSTALLFOLDER" Name="$(var.ProductName)">
 
-          <!-- Installation components -->
-          <Component Id="MainExecutable" Guid="{F4E5590B-B4A7-4A74-A5D8-E91AB7A05014}" Win64="$(var.Win64)">
-            <File Id="tcpTrigger.exe" Source="$(var.tcpTrigger.TargetPath)" Vital="yes" KeyPath="yes">
+					<!-- Installation components -->
+					<Component Id="MainExecutable" Guid="{F4E5590B-B4A7-4A74-A5D8-E91AB7A05014}" Win64="$(var.Win64)">
+						<File Id="tcpTrigger.exe" Source="$(var.tcpTrigger.TargetPath)" Vital="yes" KeyPath="yes">
 
-              <!-- Add a Windows firewall exception for tcpTrigger.exe -->
-              <fire:FirewallException Id="FirewallException" Name="$(var.ProductName)" Scope="any" IgnoreFailure="yes" />
-            </File>
+							<!-- Add a Windows firewall exception for tcpTrigger.exe -->
+							<fire:FirewallException Id="FirewallException" Name="$(var.ProductName)" Scope="any" IgnoreFailure="yes" />
+						</File>
 
-            <!-- Install tcpTrigger as a Windows service -->
-            <ServiceInstall Name="$(var.ProductName)"
-                            DisplayName="$(var.ProductName)"
-                            Type="ownProcess"
-                            Description="Carries out tasks based on incoming network connections"
-                            Start="auto"
-                            Vital="yes"
-                            Account="NT AUTHORITY\LocalService"
-                            ErrorControl="normal" />
+						<!-- Install tcpTrigger as a Windows service -->
+						<ServiceInstall Name="$(var.ProductName)"
+                                        DisplayName="$(var.ProductName)"
+                                        Type="ownProcess"
+                                        Description="Carries out tasks based on incoming network connections"
+                                        Start="auto"
+                                        Vital="yes"
+                                        Account="NT AUTHORITY\LocalService"
+                                        ErrorControl="normal" />
 
-            <!-- Start the service -->
-            <ServiceControl Id="StartService"
-                            Start="install"
-                            Stop="both"
-                            Remove="uninstall"
-                            Name="tcpTrigger"
-                            Wait="no" />
-          </Component>
+						<!-- Start the service -->
+						<ServiceControl Id="StartService"
+                                        Start="install"
+                                        Stop="both"
+                                        Remove="uninstall"
+                                        Name="tcpTrigger"
+                                        Wait="no" />
+					</Component>
 
 					<!-- Register Windows event log source to use the generic event message file included with .NET -->
 					<!-- Register event source using .NET 4 Full (64-bit) -->
@@ -127,124 +127,124 @@
 						<Condition>
 							<![CDATA[NETFRAMEWORK40FULLINSTALLROOTDIR64 AND VersionNT64]]>
 						</Condition>
-            <CreateFolder/>
-            <util:EventSource Name="$(var.ProductName)"
-                              Log="Application"
+						<CreateFolder/>
+						<util:EventSource Name="$(var.ProductName)"
+                                          Log="Application"
                                           EventMessageFile="[NETFRAMEWORK40FULLINSTALLROOTDIR64]EventLogMessages.dll"/>
-          </Component>
+					</Component>
 					<!-- Register event source using .NET 4 Full (32-bit) -->
 					<Component Id="CreateEventSource32BitNet4Full" Guid="{F8A7C72B-4F57-4286-B720-CF638E31AA48}" Win64="$(var.Win64)">
 						<Condition>
 							<![CDATA[NETFRAMEWORK40FULLINSTALLROOTDIR AND NOT VersionNT64]]>
 						</Condition>
-            <CreateFolder/>
-            <util:EventSource Name="$(var.ProductName)"
-                              Log="Application"
+						<CreateFolder/>
+						<util:EventSource Name="$(var.ProductName)"
+                                          Log="Application"
                                           EventMessageFile="[NETFRAMEWORK40FULLINSTALLROOTDIR]EventLogMessages.dll"/>
-          </Component>
+					</Component>
 
-          <!-- Install tcpTrigger Manager -->
-          <Component Id="tcpTriggerManager" Guid="{E326FFDE-ED02-4C1D-AF5D-C2BFD002C2CB}" Win64="$(var.Win64)">
-            <File Id="tcpTrigger.Manager.exe" Source="$(var.tcpTrigger.Manager.TargetPath)" KeyPath="yes" />
-          </Component>
+					<!-- Install tcpTrigger Manager -->
+					<Component Id="tcpTriggerManager" Guid="{E326FFDE-ED02-4C1D-AF5D-C2BFD002C2CB}" Win64="$(var.Win64)">
+						<File Id="tcpTrigger.Manager.exe" Source="$(var.tcpTrigger.Manager.TargetPath)" KeyPath="yes" />
+					</Component>
 
-          <!-- Install tcpTrigger Monitor -->
-          <Component Id="tcpTriggerMonitor" Guid="{93A20328-44CB-49FB-B6B4-B66BBC38F1AA}" Win64="$(var.Win64)">
-            <File Id="tcpTrigger.Monitor.exe" Source="$(var.tcpTrigger.Monitor.TargetPath)" KeyPath="yes" />
-          </Component>
-        </Directory>
-      </Directory>
+					<!-- Install tcpTrigger Monitor -->
+					<Component Id="tcpTriggerMonitor" Guid="{93A20328-44CB-49FB-B6B4-B66BBC38F1AA}" Win64="$(var.Win64)">
+						<File Id="tcpTrigger.Monitor.exe" Source="$(var.tcpTrigger.Monitor.TargetPath)" KeyPath="yes" />
+					</Component>
+				</Directory>
+			</Directory>
 
-      <!-- Create desktop shortcuts -->
-      <Directory Id="DesktopFolder" Name="Desktop">
-        <Component Id="ApplicationShortcutsDesktop" Guid="{409E4518-BE4F-4D15-9A23-39830B882F67}">
-          <!-- tcpTrigger Manager.exe desktop shortcut -->
-          <Shortcut Id="ManagerDesktopShortcut"
-                    Name="tcpTrigger Manager"
-                    Description="Manage tcpTrigger settings"
-                    Target="[INSTALLFOLDER]tcpTrigger Manager.exe"
-                    WorkingDirectory="INSTALLFOLDER" />
-          <!-- tcpTrigger Monitor.exe desktop shortcut -->
-          <Shortcut Id="MonitorDesktopShortcut"
-                    Name="tcpTrigger Monitor"
-                    Description="Monitor tcpTrigger detection logs"
-                    Target="[INSTALLFOLDER]tcpTrigger Monitor.exe"
-                    WorkingDirectory="INSTALLFOLDER" />
-          <!-- Remove shortcuts on uninstall -->
-          <RemoveFolder Id="DesktopFolder" On="uninstall" />
-          <!-- Create a dummy registry entry because shortcuts cannot be KeyPaths. -->
+			<!-- Create desktop shortcuts -->
+			<Directory Id="DesktopFolder" Name="Desktop">
+				<Component Id="ApplicationShortcutsDesktop" Guid="{409E4518-BE4F-4D15-9A23-39830B882F67}">
+					<!-- tcpTrigger Manager.exe desktop shortcut -->
+					<Shortcut Id="ManagerDesktopShortcut"
+                              Name="tcpTrigger Manager"
+                              Description="Manage tcpTrigger settings"
+                              Target="[INSTALLFOLDER]tcpTrigger Manager.exe"
+                              WorkingDirectory="INSTALLFOLDER" />
+					<!-- tcpTrigger Monitor.exe desktop shortcut -->
+					<Shortcut Id="MonitorDesktopShortcut"
+                              Name="tcpTrigger Monitor"
+                              Description="Monitor tcpTrigger detection logs"
+                              Target="[INSTALLFOLDER]tcpTrigger Monitor.exe"
+                              WorkingDirectory="INSTALLFOLDER" />
+					<!-- Remove shortcuts on uninstall -->
+					<RemoveFolder Id="DesktopFolder" On="uninstall" />
+					<!-- Create a dummy registry entry because shortcuts cannot be KeyPaths. -->
 					<!-- This technique is used in WiX's official documentation. -->
-          <RegistryValue Root="HKCU"
-                         Key="Software\tcpTrigger"
-                         Name="installed"
-                         Type="integer"
-                         Value="1"
-                         KeyPath="yes" />
-        </Component>
-      </Directory>
+					<RegistryValue Root="HKCU"
+                                   Key="Software\tcpTrigger"
+                                   Name="installed"
+                                   Type="integer"
+                                   Value="1"
+                                   KeyPath="yes" />
+				</Component>
+			</Directory>
 
-      <!-- Create start menu shortcuts -->
-      <Directory Id="ProgramMenuFolder">
-        <Directory Id="ApplicationProgramsFolder" Name="tcpTrigger">
-          <Component Id="ApplicationShortcutsStartMenu" Guid="{E161D698-DE9B-41BA-A063-B96FF587781A}">
-            <!-- tcpTrigger Manager.exe start menu shortcut -->
-            <Shortcut Id="ManagerStartMenuShortcut"
-                      Name="tcpTrigger Manager"
-                      Description="Manage tcpTrigger settings"
-                      Target="[INSTALLFOLDER]tcpTrigger Manager.exe"
-                      WorkingDirectory="INSTALLFOLDER" />
-            <!-- tcpTrigger Monitor.exe start menu shortcut -->
-            <Shortcut Id="MonitorStartMenuShortcut"
-                      Name="tcpTrigger Monitor"
-                      Description="Monitor tcpTrigger detection logs"
-                      Target="[INSTALLFOLDER]tcpTrigger Monitor.exe"
-                      WorkingDirectory="INSTALLFOLDER" />
-            <!-- Remove shortcuts on uninstall -->
-            <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
-            <!-- Create a dummy registry entry because shortcuts cannot be KeyPaths. -->
+			<!-- Create start menu shortcuts -->
+			<Directory Id="ProgramMenuFolder">
+				<Directory Id="ApplicationProgramsFolder" Name="tcpTrigger">
+					<Component Id="ApplicationShortcutsStartMenu" Guid="{E161D698-DE9B-41BA-A063-B96FF587781A}">
+						<!-- tcpTrigger Manager.exe start menu shortcut -->
+						<Shortcut Id="ManagerStartMenuShortcut"
+                                  Name="tcpTrigger Manager"
+                                  Description="Manage tcpTrigger settings"
+                                  Target="[INSTALLFOLDER]tcpTrigger Manager.exe"
+                                  WorkingDirectory="INSTALLFOLDER" />
+						<!-- tcpTrigger Monitor.exe start menu shortcut -->
+						<Shortcut Id="MonitorStartMenuShortcut"
+                                  Name="tcpTrigger Monitor"
+                                  Description="Monitor tcpTrigger detection logs"
+                                  Target="[INSTALLFOLDER]tcpTrigger Monitor.exe"
+                                  WorkingDirectory="INSTALLFOLDER" />
+						<!-- Remove shortcuts on uninstall -->
+						<RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
+						<!-- Create a dummy registry entry because shortcuts cannot be KeyPaths. -->
 						<!-- This technique is used in WiX's official documentation. -->
-            <RegistryValue Root="HKCU"
-                           Key="Software\tcpTrigger"
-                           Name="installed"
-                           Type="integer"
-                           Value="1"
-                           KeyPath="yes" />
-          </Component>
-        </Directory>
-      </Directory>
+						<RegistryValue Root="HKCU"
+                                       Key="Software\tcpTrigger"
+                                       Name="installed"
+                                       Type="integer"
+                                       Value="1"
+                                       KeyPath="yes" />
+					</Component>
+				</Directory>
+			</Directory>
 
-      <!-- Define ProgramData folders for storing tcpTrigger config and logs -->
-      <Directory Id="CommonAppDataFolder">
-        <Directory Id="ProgramDataTcpTriggerFolder" Name="tcpTrigger">
-          <!-- Create ProgramData\tcpTrigger folder and set permissions -->
-          <Component Id="CreateProgramDataFolder" Guid="{9D4FBF18-254D-4CBD-87D2-406EF81B9E95}" Win64="$(var.Win64)">
-            <CreateFolder>
-              <!--
-              <Permission User="Administrators" FileAllRights="yes"/>
-              <Permission User="Users" GenericRead="yes" GenericExecute="yes" />
-              -->
-              <util:PermissionEx User="NT Authority\Local Service" GenericAll="yes"/>
-            </CreateFolder>
-          </Component>
-        </Directory>
-      </Directory>
-    </Directory>
+			<!-- Define ProgramData folders for storing tcpTrigger config and logs -->
+			<Directory Id="CommonAppDataFolder">
+				<Directory Id="ProgramDataTcpTriggerFolder" Name="tcpTrigger">
+					<!-- Create ProgramData\tcpTrigger folder and set permissions -->
+					<Component Id="CreateProgramDataFolder" Guid="{9D4FBF18-254D-4CBD-87D2-406EF81B9E95}" Win64="$(var.Win64)">
+						<CreateFolder>
+							<!--
+                            <Permission User="Administrators" FileAllRights="yes"/>
+                            <Permission User="Users" GenericRead="yes" GenericExecute="yes" />
+                            -->
+							<util:PermissionEx User="NT Authority\Local Service" GenericAll="yes"/>
+						</CreateFolder>
+					</Component>
+				</Directory>
+			</Directory>
+		</Directory>
 
-    <!-- Install the components -->
-    <Feature Id="FullInstallation" Level="1">
-      <ComponentRef Id="MainExecutable" />
-      <ComponentRef Id="tcpTriggerManager" />
-      <ComponentRef Id="tcpTriggerMonitor" />
-      <ComponentRef Id="ApplicationShortcutsDesktop" />
-      <ComponentRef Id="ApplicationShortcutsStartMenu" />
-      <ComponentRef Id="CreateProgramDataFolder" />
+		<!-- Install the components -->
+		<Feature Id="FullInstallation" Level="1">
+			<ComponentRef Id="MainExecutable" />
+			<ComponentRef Id="tcpTriggerManager" />
+			<ComponentRef Id="tcpTriggerMonitor" />
+			<ComponentRef Id="ApplicationShortcutsDesktop" />
+			<ComponentRef Id="ApplicationShortcutsStartMenu" />
+			<ComponentRef Id="CreateProgramDataFolder" />
 			<ComponentRef Id="CreateEventSource64BitNet4Full" />
 			<ComponentRef Id="CreateEventSource32BitNet4Full" />
-    </Feature>
+		</Feature>
 
-    <!-- Add the icon used for add/remove programs and the desktop shortcut -->
-    <Icon Id="tcpTrigger.ico" SourceFile="tcpTrigger.ico"/>
-    <Property Id="ARPPRODUCTICON" Value="tcpTrigger.ico" />
+		<!-- Add the icon used for add/remove programs and the desktop shortcut -->
+		<Icon Id="tcpTrigger.ico" SourceFile="tcpTrigger.ico"/>
+		<Property Id="ARPPRODUCTICON" Value="tcpTrigger.ico" />
 
-  </Product>
+	</Product>
 </Wix>
