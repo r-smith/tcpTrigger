@@ -89,6 +89,9 @@
 		<PropertyRef Id="NETFRAMEWORK40FULLINSTALLROOTDIR"/>
 		<PropertyRef Id="NETFRAMEWORK40FULLINSTALLROOTDIR64"/>
 
+		<!-- Reference for OSInfo well-known SID for Local Service account -->
+		<PropertyRef Id="WIX_ACCOUNT_LOCALSERVICE"/>
+
 		<!-- Define the directory structure -->
 		<Directory Id="TARGETDIR" Name="SourceDir">
 			<Directory Id="$(var.PlatformProgramFilesFolder)">
@@ -223,7 +226,7 @@
                             <Permission User="Administrators" FileAllRights="yes"/>
                             <Permission User="Users" GenericRead="yes" GenericExecute="yes" />
                             -->
-							<util:PermissionEx User="NT Authority\Local Service" GenericAll="yes"/>
+							<util:PermissionEx User="[WIX_ACCOUNT_LOCALSERVICE]" GenericAll="yes"/>
 						</CreateFolder>
 					</Component>
 				</Directory>
