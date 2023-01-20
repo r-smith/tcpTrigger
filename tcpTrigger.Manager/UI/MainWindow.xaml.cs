@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Net.Mail;
@@ -173,75 +172,23 @@ namespace tcpTrigger.Manager
                 SmtpUsername.Focus();
         }
 
-        private void TestEmail_Click(object sender, RoutedEventArgs e)
+        private async void TestEmail_Click(object sender, RoutedEventArgs e)
         {
             TestEmail.IsEnabled = false;
             TestEmail.Content = "Testing...";
 
-            // Setup background worker to send test email in separate thread.
-            var emailTester = new BackgroundWorker();
-            emailTester.DoWork += EmailTester_DoWork;
-            emailTester.RunWorkerCompleted += EmailTester_RunWorkerCompleted;
-            emailTester.RunWorkerAsync(new EmailSettings()
-            {
-                Server = EmailServer.Text,
-                Port = EmailPort.Text,
-                IsAuthRequired = IsSmtpAuthenticationRequired.IsChecked == true,
-                Username = SmtpUsername.Text,
-                Password = SmtpPassword.SecurePassword,
-                From = EmailSender.Text,
-                FromFriendly = EmailSenderFriendly.Text,
-                Recipient = EmailRecipient.Text
-            });
-        }
-
-        private void EmailTester_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (e.Result != null)
-            {
-                ShowMessageBox(
-                    message: (string)e.Result,
-                    title: "Failed to send test email",
-                    type: DialogWindow.Type.Error);
-            }
-            else
-            {
-                ShowMessageBox(
-                    message: "A test message was sent.",
-                    title: "Email test",
-                    type: DialogWindow.Type.Info);
-            }
-
-            TestEmail.IsEnabled = true;
-            TestEmail.Content = "Test";
-        }
-
-        private void EmailTester_DoWork(object sender, DoWorkEventArgs e)
-        {
             try
             {
-                EmailSettings parameters = e.Argument as EmailSettings;
-                SmtpClient smtpClient = new SmtpClient();
-                smtpClient.Host = parameters.Server;
-                if (parameters.Port.Length > 0)
-                {
-                    smtpClient.Port = int.Parse(parameters.Port);
-                }
-                if (parameters.IsAuthRequired)
-                {
-                    smtpClient.Credentials = new NetworkCredential(parameters.Username, parameters.Password.ToString());
-                }
-
                 using (MailMessage message = new MailMessage())
                 {
-                    message.From = new MailAddress(parameters.From, parameters.FromFriendly); ;
                     message.Subject = "tcpTrigger Test Email";
                     message.Body = $"This is a test email notification sent by tcpTrigger on {DateTime.Now.ToLongDateString()} at {DateTime.Now.ToLongTimeString()}.";
+                    message.From = new MailAddress(EmailSender.Text, EmailSenderFriendly.Text);
                     // Check if multiple recipients were provided.
-                    if (parameters.Recipient.Contains(","))
+                    if (EmailRecipient.Text.Contains(","))
                     {
                         // Multiple recipients. Split and add each to mail message.
-                        string[] recips = parameters.Recipient.Split(',');
+                        string[] recips = EmailRecipient.Text.Split(',');
                         for (int i = 0; i < recips.Length; i++)
                         {
                             if (!string.IsNullOrEmpty(recips[i]))
@@ -253,17 +200,38 @@ namespace tcpTrigger.Manager
                     else
                     {
                         // Single recipient. Add to mail message.
-                        message.To.Add(parameters.Recipient);
+                        message.To.Add(EmailRecipient.Text);
                     }
 
-                    //Send the email.
-                    smtpClient.Send(message);
+                    using (SmtpClient smtpClient = new SmtpClient())
+                    {
+                        smtpClient.Host = EmailServer.Text;
+                        smtpClient.Port = Int32.Parse(EmailPort.Text);
+                        smtpClient.EnableSsl = IsTlsEnabled.IsChecked == true;
+                        if (IsSmtpAuthenticationRequired.IsChecked == true)
+                        {
+                            smtpClient.Credentials = new NetworkCredential(SmtpUsername.Text, SmtpPassword.SecurePassword);
+                        }
+                        await smtpClient.SendMailAsync(message);
+                    }
                 }
+
+                ShowMessageBox(
+                    message: "A test email was sent.",
+                    title: "Email test",
+                    type: DialogWindow.Type.Info);
             }
+
             catch (Exception ex)
             {
-                e.Result = ex.Message;
+                ShowMessageBox(
+                    message: ex.Message,
+                    title: "Failed to send test email",
+                    type: DialogWindow.Type.Error);
             }
+
+            TestEmail.IsEnabled = true;
+            TestEmail.Content = "Test";
         }
 
         private void ShowMessageBox(string message, string title = "Error", DialogWindow.Type type = DialogWindow.Type.Error, TabItem tab = null, Control control = null)
