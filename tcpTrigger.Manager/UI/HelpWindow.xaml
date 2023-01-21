@@ -846,7 +846,7 @@
                 <Paragraph Style="{StaticResource DefaultsText}">
                     <Run Foreground="#30aacc">[Default]</Run>
                     <LineBreak/>
-                    180 seconds (3 minutes)
+                    300 seconds (5 minutes)
                 </Paragraph>
                 <!-- Buffering -->
                 <Paragraph Style="{StaticResource SubHeaderText}">
@@ -860,7 +860,7 @@
                 <Paragraph Style="{StaticResource DefaultsText}">
                     <Run Foreground="#30aacc">[Default]</Run>
                     <LineBreak/>
-                    15 seconds
+                    30 seconds
                 </Paragraph>
                 
                 <!-- Whitelist -->

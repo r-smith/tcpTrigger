@@ -547,7 +547,7 @@
                                         <LineBreak/>
                                         <LineBreak/>
                                         <Run FontWeight="SemiBold" Foreground="#30aacc">[Default]</Run><LineBreak/>
-                                        180 seconds (3 minutes)
+                                        300 seconds (5 minutes)
                                     </TextBlock>
                                 </Label>
                             </DockPanel>
@@ -582,7 +582,7 @@
                                         <LineBreak/>
                                         <LineBreak/>
                                         <Run FontWeight="SemiBold" Foreground="#30aacc">[Default]</Run><LineBreak/>
-                                        15 seconds
+                                        30 seconds
                                     </TextBlock>
                                 </Label>
                             </DockPanel>
