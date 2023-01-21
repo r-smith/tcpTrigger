@@ -165,7 +165,7 @@ namespace tcpTrigger
             ipInterface.Mutex.ReleaseMutex();
         }
 
-        public static void SendEmail(TcpTriggerInterface ipInterface)
+        public static async void SendEmail(TcpTriggerInterface ipInterface)
         {
             if (Settings.EmailRecipients.Count == 0)
             {
@@ -196,20 +196,14 @@ namespace tcpTrigger
                 return;
             }
 
-            using (MailMessage message = new MailMessage())
+            try
             {
-                try
+                using (MailMessage message = new MailMessage())
                 {
-                    SmtpClient smtpClient = new SmtpClient();
-                    smtpClient.Host = Settings.EmailServer;
-                    smtpClient.Port = Settings.EmailServerPort;
-                    smtpClient.EnableSsl = Settings.IsEmailTlsEnabled;
-                    if (Settings.IsEmailAuthRequired)
-                    {
-                        smtpClient.Credentials = new NetworkCredential(Settings.EmailUsername, Settings.EmailPassword);
-                    }
-                    message.From = Settings.EmailSenderDisplayName.Length > 0 ?
-                        new MailAddress(Settings.EmailSender, Settings.EmailSenderDisplayName)
+                    message.Subject = UserVariableExpansion.GetExpandedString(Settings.EmailSubject, ipInterface);
+                    message.Body = UserVariableExpansion.GetExpandedString(Settings.EmailBody, ipInterface);
+                    message.From = Settings.EmailSenderDisplayName.Length > 0
+                        ? new MailAddress(Settings.EmailSender, Settings.EmailSenderDisplayName)
                         : new MailAddress(Settings.EmailSender);
                     for (int i = 0; i < Settings.EmailRecipients.Count; i++)
                     {
@@ -218,19 +212,27 @@ namespace tcpTrigger
                             message.To.Add(Settings.EmailRecipients[i].Trim());
                         }
                     }
-                    message.Subject = UserVariableExpansion.GetExpandedString(Settings.EmailSubject, ipInterface);
-                    message.Body = UserVariableExpansion.GetExpandedString(Settings.EmailBody, ipInterface);
 
-                    //Send the email.
-                    smtpClient.Send(message);
+                    using (SmtpClient smtpClient = new SmtpClient())
+                    {
+                        smtpClient.Host = Settings.EmailServer;
+                        smtpClient.Port = Settings.EmailServerPort;
+                        smtpClient.EnableSsl = Settings.IsEmailTlsEnabled;
+                        if (Settings.IsEmailAuthRequired)
+                        {
+                            smtpClient.Credentials = new NetworkCredential(Settings.EmailUsername, Settings.EmailPassword);
+                        }
+                        await smtpClient.SendMailAsync(message);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Logger.WriteError(
-                        $"Email action triggered, but the message failed to send.{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.InnerException.Message}",
-                        Logger.EventCode.Error);
-                    return;
-                }
+            }
+
+            catch (Exception ex)
+            {
+                Logger.WriteError(
+                    $"Email action triggered, but the message failed to send.{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.InnerException.Message}",
+                    Logger.EventCode.Error);
+                return;
             }
         }
     }
