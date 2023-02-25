@@ -178,7 +178,6 @@ namespace tcpTrigger.Monitor
                             }
                             Topmost = true;
                             Topmost = false;
-                            Focus();
                         }
                     }));
                 }
