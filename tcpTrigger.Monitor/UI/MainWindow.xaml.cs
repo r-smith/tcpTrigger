@@ -32,6 +32,7 @@ namespace tcpTrigger.Monitor
 
             Settings.Load();
             SetCheckboxState();
+            SetTrayIconState();
             RefreshMaximizeRestoreButton();
 
             DetectionEventsView = CollectionViewSource.GetDefaultView(DetectionEvents);
@@ -295,6 +296,7 @@ namespace tcpTrigger.Monitor
         private void MinimizeToTrayOption_Click(object sender, RoutedEventArgs e)
         {
             Settings.MinimizeToTray = MinimizeToTrayOption.IsChecked;
+            SetTrayIconState();
             try
             {
                 Registry.SetValue(keyName: @"HKEY_CURRENT_USER\SOFTWARE\tcpTrigger",
@@ -311,6 +313,7 @@ namespace tcpTrigger.Monitor
         private void ExitToTrayOption_Click(object sender, RoutedEventArgs e)
         {
             Settings.ExitToTray = ExitToTrayOption.IsChecked;
+            SetTrayIconState();
             try
             {
                 Registry.SetValue(keyName: @"HKEY_CURRENT_USER\SOFTWARE\tcpTrigger",
@@ -370,12 +373,11 @@ namespace tcpTrigger.Monitor
             }
         }
 
-        private void HideToTray()
+        private void SetTrayIconState()
         {
-            Visibility = Visibility.Hidden;
             try
             {
-                if (NotifyIcon == null)
+                if ((Settings.ExitToTray || Settings.MinimizeToTray) && NotifyIcon == null)
                 {
                     // Build context menu for tray icon.
                     System.Windows.Forms.ContextMenuStrip menuStrip = new System.Windows.Forms.ContextMenuStrip();
@@ -399,13 +401,32 @@ namespace tcpTrigger.Monitor
                         ContextMenuStrip = menuStrip
                     };
                     NotifyIcon.MouseUp += NotifyIcon_MouseUp;
+                    NotifyIcon.Visible = true;
                 }
-                NotifyIcon.Visible = true;
+
+                if (Settings.ExitToTray == false && Settings.MinimizeToTray == false && NotifyIcon != null)
+                {
+                    NotifyIcon.Dispose();
+                    NotifyIcon = null;
+                }
             }
             catch
             {
-                Visibility = Visibility.Visible;
+                // Failed to create a tray icon. Disable minimize and exit to tray options.
+                if (NotifyIcon != null)
+                {
+                    NotifyIcon.Dispose();
+                    NotifyIcon = null;
+                }
+                Settings.ExitToTray = false;
+                Settings.MinimizeToTray = false;
+                SetCheckboxState();
             }
+        }
+
+        private void HideToTray()
+        {
+            Visibility = Visibility.Hidden;
         }
 
         private void NotifyIcon_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
