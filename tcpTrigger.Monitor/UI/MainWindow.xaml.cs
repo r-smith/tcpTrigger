@@ -165,17 +165,9 @@ namespace tcpTrigger.Monitor
 
                         if (Settings.FocusOnUpdate)
                         {
-                            if (NotifyIcon != null)
-                            {
-                                NotifyIcon.Visible = false;
-                                Visibility = Visibility.Visible;
-                                Show();
-                                WindowState = WindowState.Normal;
-                            }
-                            if (WindowState == WindowState.Minimized)
-                            {
-                                WindowState = WindowState.Normal;
-                            }
+                            Visibility = Visibility.Visible;
+                            Show();
+                            WindowState = WindowState.Normal;
                             Topmost = true;
                             Topmost = false;
                         }
@@ -388,7 +380,8 @@ namespace tcpTrigger.Monitor
                     // Build context menu for tray icon.
                     System.Windows.Forms.ContextMenuStrip menuStrip = new System.Windows.Forms.ContextMenuStrip();
                     System.Windows.Forms.ToolStripMenuItem menuExit = new System.Windows.Forms.ToolStripMenuItem("Exit tcpTrigger Monitor");
-                    menuExit.Click += (s, args) => {
+                    menuExit.Click += (s, args) =>
+                    {
                         if (NotifyIcon != null)
                         {
                             NotifyIcon.Icon = null;
@@ -420,7 +413,6 @@ namespace tcpTrigger.Monitor
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
             {
                 // Left click. Restore application window.
-                NotifyIcon.Visible = false;
                 Visibility = Visibility.Visible;
                 Show();
                 WindowState = WindowState.Normal;
@@ -538,17 +530,9 @@ namespace tcpTrigger.Monitor
             else if (msg == App.NativeMethods.WM_SHOWME)
             {
                 // Single instance application. If app is already running, bring window to front.
-                if (NotifyIcon != null)
-                {
-                    NotifyIcon.Visible = false;
-                    Visibility = Visibility.Visible;
-                    Show();
-                    WindowState = WindowState.Normal;
-                }
-                if (WindowState == WindowState.Minimized)
-                {
-                    WindowState = WindowState.Normal;
-                }
+                Visibility = Visibility.Visible;
+                Show();
+                WindowState = WindowState.Normal;
                 Topmost = true;
                 Topmost = false;
                 Focus();
