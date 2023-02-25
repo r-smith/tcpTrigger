@@ -174,6 +174,13 @@ namespace tcpTrigger.Monitor
                             Topmost = false;
                         }
                     }));
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        if (Log.ItemsSource != null)
+                        {
+                            Log.ScrollIntoView(Log.Items[0]);
+                        }
+                    }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
                 }
             }
         }
