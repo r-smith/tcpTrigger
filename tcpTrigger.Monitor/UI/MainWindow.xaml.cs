@@ -389,7 +389,14 @@ namespace tcpTrigger.Monitor
                     // Build context menu for tray icon.
                     System.Windows.Forms.ContextMenuStrip menuStrip = new System.Windows.Forms.ContextMenuStrip();
                     System.Windows.Forms.ToolStripMenuItem menuExit = new System.Windows.Forms.ToolStripMenuItem("Exit tcpTrigger Monitor");
-                    menuExit.Click += (s, args) => Application.Current.Shutdown();
+                    menuExit.Click += (s, args) => {
+                        if (NotifyIcon != null)
+                        {
+                            NotifyIcon.Icon = null;
+                            NotifyIcon.Dispose();
+                        }
+                        Application.Current.Shutdown();
+                    };
                     menuStrip.Items.Add(menuExit);
 
                     // Create tray icon.
@@ -438,7 +445,7 @@ namespace tcpTrigger.Monitor
             }
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
             if (Settings.ExitToTray)
             {
@@ -447,6 +454,7 @@ namespace tcpTrigger.Monitor
             }
             else if (NotifyIcon != null)
             {
+                NotifyIcon.Icon = null;
                 NotifyIcon.Dispose();
             }
         }
