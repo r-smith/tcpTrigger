@@ -14,6 +14,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media.Media3D;
 
 namespace tcpTrigger.Monitor
 {
@@ -93,9 +94,13 @@ namespace tcpTrigger.Monitor
                 }
             });
             // Initial loading of events is complete.
-            // Restore the previous FocusOnUpdate setting and bind collection to DataGrid.
+            // Restore the previous FocusOnUpdate setting,
+            // bind collection to DataGrid,
+            // and remove the initial loading overlay.
             Settings.FocusOnUpdate = isAutoFocusEnabled;
             Log.ItemsSource = DetectionEventsView;
+            LoadingOverlay.Child = null;
+            LoadingOverlay.Visibility = Visibility.Collapsed;
         }
 
         private void EventLogEventRead(object obj, EventRecordWrittenEventArgs arg)
