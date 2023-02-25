@@ -21,7 +21,7 @@ namespace tcpTrigger.Monitor
                 using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\tcpTrigger"))
                 {
                     FocusOnUpdate = ((int)key.GetValue(name: "FocusOnUpdate", defaultValue: 1)) != 0;
-                    ExitToTray = ((int)key.GetValue(name: "ExitToTray", defaultValue: 0)) != 0;
+                    ExitToTray = ((int)key.GetValue(name: "ExitToTray", defaultValue: 1)) != 0;
                     MinimizeToTray = ((int)key.GetValue(name:  "MinimizeToTray", defaultValue: 0)) != 0;
                     EventLog_MaxDays = (int)key.GetValue(name: "EventLog_MaxDays", defaultValue: 0);
                     EventLog_FromDate = (string)key.GetValue(name: "EventLog_FromDate", defaultValue: string.Empty);
