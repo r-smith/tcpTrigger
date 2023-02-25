@@ -37,7 +37,6 @@ namespace tcpTrigger.Monitor
 
             DetectionEventsView = CollectionViewSource.GetDefaultView(DetectionEvents);
             DetectionEventsView.Filter = LogFilter;
-            Log.ItemsSource = DetectionEventsView;
 
             SubscribeToDetectionEvents();
             ProcessCommandLineArgs();
@@ -93,8 +92,10 @@ namespace tcpTrigger.Monitor
                     }
                 }
             });
-            // Initial loading of events is complete. Restore previous FocusOnUpdate setting.
+            // Initial loading of events is complete.
+            // Restore the previous FocusOnUpdate setting and bind collection to DataGrid.
             Settings.FocusOnUpdate = isAutoFocusEnabled;
+            Log.ItemsSource = DetectionEventsView;
         }
 
         private void EventLogEventRead(object obj, EventRecordWrittenEventArgs arg)
