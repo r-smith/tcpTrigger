@@ -1,6 +1,5 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.Eventing.Reader;
 using System.IO;
@@ -14,7 +13,6 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Media.Media3D;
 
 namespace tcpTrigger.Monitor
 {
@@ -23,7 +21,7 @@ namespace tcpTrigger.Monitor
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly ObservableCollection<DetectionEvent> DetectionEvents = new ObservableCollection<DetectionEvent>();
+        private readonly LimitedObservableCollection<DetectionEvent> DetectionEvents = new LimitedObservableCollection<DetectionEvent>(10_000);
         private readonly ICollectionView DetectionEventsView;
         private System.Windows.Forms.NotifyIcon NotifyIcon;
 
