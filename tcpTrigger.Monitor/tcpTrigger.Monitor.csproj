@@ -117,6 +117,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Classes\DetectionEvent.cs" />
+    <Compile Include="Classes\LimitedObservableCollection.cs" />
     <Compile Include="Classes\Settings.cs" />
     <Compile Include="Controls\Spinner.xaml.cs">
       <DependentUpon>Spinner.xaml</DependentUpon>
