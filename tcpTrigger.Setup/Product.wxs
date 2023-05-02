@@ -65,6 +65,16 @@
 		<!-- Reference for OSInfo well-known SID for Local Service account -->
 		<util:QueryWindowsWellKnownSIDs />
 
+		<!-- Get the tcpTrigger event log's maximum size. This is used to preserve the value on upgrades and repairs. -->
+		<!-- If a max size isn't found (new installs), then default to 10 MB. -->
+		<Property Id="EVENTLOGMAXSIZE" Value="#10485760">
+			<RegistrySearch Id="MaxSizeValue"
+							Root="HKLM"
+							Key="SYSTEM\CurrentControlSet\Services\EventLog\tcpTrigger"
+							Name="MaxSize"
+							Type="raw" />
+		</Property>
+
 		<!-- Install the components -->
 		<Feature Id="FullInstallation" Level="1">
 			<ComponentRef Id="MainExecutable" />
@@ -110,7 +120,7 @@
 									Name="tcpTrigger"
 									Wait="no" />
 				</Component>
-
+				
 				<!-- Register Windows event log source and create a dedicated event log file -->
 				<!-- Register using the generic event message file included with .NET -->
 				<!-- Register event source using .NET 4 Full (64-bit) -->
@@ -121,6 +131,19 @@
 					<util:EventSource Name="$(var.ProductName)"
 									  Log="tcpTrigger"
 									  EventMessageFile="[NETFRAMEWORK40FULLINSTALLROOTDIR64]EventLogMessages.dll" />
+					<!-- Set the event log's max size. This registry value is read beforehand; -->
+					<!-- If the user has set the value, it's preserved on upgrades and repairs. -->
+					<!-- Otherwise, it defaults to 10 MB -->
+					<!-- Note that the value is actually of type DWORD, this post explain why type is set to 'string': -->
+					<!-- https://sourceforge.net/p/wix/mailman/message/30028676/ -->
+					<RegistryValue Root="HKLM"
+								   Key="SYSTEM\CurrentControlSet\Services\EventLog\tcpTrigger"
+								   Name="MaxSize"
+								   Type="string"
+								   Value="[EVENTLOGMAXSIZE]" />
+					<RemoveRegistryKey Root="HKLM"
+									   Key="SYSTEM\CurrentControlSet\Services\EventLog\tcpTrigger"
+									   Action="removeOnUninstall" />
 				</Component>
 				<!-- Register event source using .NET 4 Full (32-bit) -->
 				<Component Id="CreateEventSource32BitNet4Full"
@@ -130,6 +153,19 @@
 					<util:EventSource Name="$(var.ProductName)"
 									  Log="tcpTrigger"
 									  EventMessageFile="[NETFRAMEWORK40FULLINSTALLROOTDIR]EventLogMessages.dll" />
+					<!-- Set the event log's max size. This registry value is read beforehand; -->
+					<!-- If the user has set the value, it's preserved on upgrades and repairs. -->
+					<!-- Otherwise, it defaults to 10 MB -->
+					<!-- Note that the value is actually of type DWORD, this post explain why type is set to 'string': -->
+					<!-- https://sourceforge.net/p/wix/mailman/message/30028676/ -->
+					<RegistryValue Root="HKLM"
+								   Key="SYSTEM\CurrentControlSet\Services\EventLog\tcpTrigger"
+								   Name="MaxSize"
+								   Type="string"
+								   Value="[EVENTLOGMAXSIZE]" />
+					<RemoveRegistryKey Root="HKLM"
+									   Key="SYSTEM\CurrentControlSet\Services\EventLog\tcpTrigger"
+									   Action="removeOnUninstall" />
 				</Component>
 
 				<!-- Install tcpTrigger Manager -->
