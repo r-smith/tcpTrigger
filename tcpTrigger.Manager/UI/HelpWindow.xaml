@@ -609,9 +609,8 @@
                     Enable this option to record detected connections to the Windows event log.
                     This option is highly recommended and is used by the included log monitoring utility.
                     Events are written to the
-                    <Run FontWeight="SemiBold" FontStyle="Italic">Application</Run> log using
-                    <Run FontWeight="SemiBold" FontStyle="Italic">tcpTrigger</Run>
-                    as the event source. This option is useful for sending tcpTrigger events to a SIEM.
+                    <Run FontWeight="SemiBold" FontStyle="Italic">'Applications and Services Logs > tcpTrigger'</Run> event log.
+                    This option is useful for sending tcpTrigger events to a SIEM.
                     <LineBreak/>
                     <LineBreak/>
                     <Run FontWeight="SemiBold" Foreground="#ffffff" FontFamily="Consolas">[Event code: 200]</Run>
@@ -945,8 +944,7 @@
                     from the tcpTrigger service will show here. Alternatively,
                     the same information can be viewed using the Windows event
                     viewer. Events relating to the tcpTrigger service are found
-                    in the <Italic>Application</Italic> log and use
-                    <Italic>tcpTrigger</Italic> for the event source.
+                    in the <Run FontWeight="SemiBold" FontStyle="Italic">'Applications and Services Logs > tcpTrigger'</Run> event log.
                     <LineBreak/>
                     <LineBreak/>
                     Additionally, events that involve Windows shutting down

@@ -80,7 +80,7 @@ namespace tcpTrigger.Manager
             const string _successIcon = "icon.check-circle";
             const string _successBrush = "#2263e6be";
             const string _failTitle = "Unable to restart service";
-            const string _failMessage = "Check the Windows Application event log for additional details.";
+            const string _failMessage = "The tcpTrigger service failed to restart. Examine the 'tcpTrigger' event log in the Windows Event Viewer for additional details.";
             const string _failIcon = "icon.exclamation-circle";
             const string _failBrush = "#22ffd43b";
             const string _cancelTitle = "Cancelled";

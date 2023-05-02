@@ -56,8 +56,8 @@ namespace tcpTrigger.Manager
             string _detectionQuery =
                 "<QueryList>"
                 + "<Query Id='0'>"
-                + $"  <Select Path='Application'>*[System[Provider[@Name='tcpTrigger'] {timeSpan}]]</Select>"
-                + "  <Suppress Path='Application'>*[System[( (EventID &gt;= 200 and EventID &lt;= 210) )]]</Suppress>"
+                + $"  <Select Path='tcpTrigger'>*[System[Provider[@Name='tcpTrigger'] {timeSpan}]]</Select>"
+                + "  <Suppress Path='tcpTrigger'>*[System[( (EventID &gt;= 200 and EventID &lt;= 210) )]]</Suppress>"
                 + "</Query>"
                 + "<Query Id='1'>"
                 + "  <Select Path='System'>*[System[Provider[@Name='Microsoft-Windows-Eventlog' or @Name='Microsoft-Windows-Kernel-General' or @Name='User32']"
@@ -72,7 +72,7 @@ namespace tcpTrigger.Manager
                 try
                 {
                     // Start event log watcher, while also retrieving all existing events that match our query.
-                    EventLogQuery logQuery = new EventLogQuery("Application", PathType.LogName, _detectionQuery);
+                    EventLogQuery logQuery = new EventLogQuery("tcpTrigger", PathType.LogName, _detectionQuery);
                     watcher = new EventLogWatcher(eventQuery: logQuery,
                                                   bookmark: null,
                                                   readExistingEvents: true);

@@ -16,7 +16,7 @@ namespace tcpTrigger
         {
             InitializeComponent();
 
-            EventLog.Log = "Application";
+            EventLog.Log = "tcpTrigger";
         }
 
         protected override void OnStart(string[] args)

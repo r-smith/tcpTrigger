@@ -24,7 +24,7 @@
 		<!-- Allow upgrades and prevent downgrades -->
 		<MajorUpgrade DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."
 					  Schedule="afterInstallValidate" />
-
+		
 		<Media Id="1" Cabinet="tcptrigger.cab" EmbedCab="yes" />
 
 		<!-- Check for required .NET framework versions -->
@@ -111,14 +111,15 @@
 									Wait="no" />
 				</Component>
 
-				<!-- Register Windows event log source to use the generic event message file included with .NET -->
+				<!-- Register Windows event log source and create a dedicated event log file -->
+				<!-- Register using the generic event message file included with .NET -->
 				<!-- Register event source using .NET 4 Full (64-bit) -->
 				<Component Id="CreateEventSource64BitNet4Full"
 						   Guid="{D1AE9132-D983-4678-9716-CE04FC6D6A24}"
 						   Condition="NETFRAMEWORK40FULLINSTALLROOTDIR64 AND VersionNT64">
 					<CreateFolder />
 					<util:EventSource Name="$(var.ProductName)"
-									  Log="Application"
+									  Log="tcpTrigger"
 									  EventMessageFile="[NETFRAMEWORK40FULLINSTALLROOTDIR64]EventLogMessages.dll" />
 				</Component>
 				<!-- Register event source using .NET 4 Full (32-bit) -->
@@ -127,7 +128,7 @@
 						   Condition="NETFRAMEWORK40FULLINSTALLROOTDIR AND NOT VersionNT64">
 					<CreateFolder />
 					<util:EventSource Name="$(var.ProductName)"
-									  Log="Application"
+									  Log="tcpTrigger"
 									  EventMessageFile="[NETFRAMEWORK40FULLINSTALLROOTDIR]EventLogMessages.dll" />
 				</Component>
 
