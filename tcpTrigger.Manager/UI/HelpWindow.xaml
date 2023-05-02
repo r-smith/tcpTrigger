@@ -551,27 +551,6 @@
                     <LineBreak/>
                     Disabled
                 </Paragraph>
-                <!-- DHCP -->
-                <Paragraph Style="{StaticResource SubHeaderText}">
-                    Rogue DHCP detection
-                </Paragraph>
-                <Paragraph Style="{StaticResource ParagraphText}">
-                    Enabling this option detects any acting DHCP server on the network.
-                    Rogue DHCP servers are not always malicious, and can come from network misconfigurations,
-                    or someone carelessly plugging in a home router or other device onto the network.
-                    Detection is limited to the broadcast traffic visible to your computer. As such,
-                    detection across subnets is unlikely. If unsure, leave this option disabled.
-                    <LineBreak/>
-                    <LineBreak/>
-                    To setup, type your known good and expected DHCP servers into the
-                    <Italic>Known DHCP servers</Italic> field.
-                    Servers must be entered by their IP address. Use a comma to enter multiple addresses.
-                </Paragraph>
-                <Paragraph Style="{StaticResource DefaultsText}">
-                    <Run Foreground="#30aacc">[Default]</Run>
-                    <LineBreak/>
-                    Disabled
-                </Paragraph>
 
                 <!-- Actions  -->
                 <Paragraph Name="Actions"
@@ -621,9 +600,6 @@
                     <LineBreak/>
                     <Run FontWeight="SemiBold" Foreground="#ffffff" FontFamily="Consolas">[Event code: 202]</Run>
                     <Run FontWeight="SemiBold" Foreground="#cd6ed1" FontFamily="Consolas">Detected UDP communication</Run>
-                    <LineBreak/>
-                    <Run FontWeight="SemiBold" Foreground="#ffffff" FontFamily="Consolas">[Event code: 203]</Run>
-                    <Run FontWeight="SemiBold" Foreground="#cd6ed1" FontFamily="Consolas">Detected rogue DHCP server</Run>
                     <LineBreak/>
                     <LineBreak/>
                     This option has no effect on the general diagnostic and status events used by the tcpTrigger service.

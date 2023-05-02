@@ -60,7 +60,6 @@ namespace tcpTrigger.Manager
                     writer.WriteElementString("tcp", MonitorTcpOption.IsChecked == true ? t : f);
                     writer.WriteElementString("udp", MonitorUdpOption.IsChecked == true ? t : f);
                     writer.WriteElementString("icmp", MonitorIcmpOption.IsChecked == true ? t : f);
-                    writer.WriteElementString("rogueDhcp", MonitorDhcpOption.IsChecked == true ? t : f);
                     writer.WriteEndElement();
 
                     // Monitored ports.
@@ -73,21 +72,6 @@ namespace tcpTrigger.Manager
                     writer.WriteElementString("include", (UdpAllPortsOption.IsChecked == true) ? "1-65535" : UdpIncludePorts.Text);
                     writer.WriteElementString("exclude", UdpExcludePorts.Text);
                     writer.WriteEndElement();
-                    writer.WriteEndElement();
-
-                    // DHCP ignore list.
-                    writer.WriteStartElement("dhcpServerIgnoreList");
-                    if (DhcpServers.Text.Trim().Length > 0)
-                    {
-                        string[] dhcpServers = DhcpServers.Text.Split(',');
-                        for (int i = 0; i < dhcpServers.Length; i++)
-                        {
-                            if (!string.IsNullOrEmpty(dhcpServers[i]))
-                            {
-                                writer.WriteElementString("ipAddress", dhcpServers[i].Trim());
-                            }
-                        }
-                    }
                     writer.WriteEndElement();
 
                     // Ignored endpoints.

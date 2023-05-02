@@ -176,19 +176,6 @@
                                          PreviewTextInput="TcpPorts_PreviewTextInput"
                                          DockPanel.Dock="Right"/>
                             </DockPanel>
-                            <!-- DHCP -->
-                            <CheckBox Content="Rogue DHCP server detection"
-                                      Name="MonitorDhcpOption"
-                                      Margin="0,7,0,0" />
-                            <DockPanel Margin="35,3,0,0">
-                                <Grid MinWidth="100">
-                                    <TextBlock Text="Known DHCP servers"/>
-                                </Grid>
-                                <TextBox Name="DhcpServers"
-                                         MaxLength="512"
-                                         FontFamily="Consolas"
-                                         DockPanel.Dock="Right"/>
-                            </DockPanel>
                         </StackPanel>
                     </GroupBox>
                 </DockPanel>

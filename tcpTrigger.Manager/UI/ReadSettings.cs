@@ -46,10 +46,6 @@ namespace tcpTrigger.Manager
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { MonitorIcmpOption.IsChecked = bool.Parse(xn.InnerText); }
 
-                currentNode = SettingsNode.enabledComponents_rogueDhcp;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null) { MonitorDhcpOption.IsChecked = bool.Parse(xn.InnerText); }
-
                 // tcpTrigger/monitoredPorts
                 currentNode = SettingsNode.monitoredPorts_tcp_include;
                 TcpIncludePorts.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
@@ -63,17 +59,6 @@ namespace tcpTrigger.Manager
                 if (_udpInclude.Equals("1-65535")) { UdpAllPortsOption.IsChecked = true; }
                 currentNode = SettingsNode.monitoredPorts_udp_exclude;
                 UdpExcludePorts.Text = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
-
-                // tcpTrigger/dhcpServerIgnoreList
-                currentNode = SettingsNode.dhcpServerIgnoreList_ipAddress;
-                nl = xd.DocumentElement.SelectNodes(currentNode);
-                List<string> ignoredDhcpServers = new List<string>();
-                for (int i = 0; i < nl.Count; i++)
-                {
-                    if (!string.IsNullOrEmpty(nl[i].InnerText))
-                        ignoredDhcpServers.Add(nl[i].InnerText);
-                }
-                DhcpServers.Text = string.Join(", ", ignoredDhcpServers.ToArray());
 
                 // tcpTrigger/endpointIgnoreList
                 currentNode = SettingsNode.endpointIgnoreList_ipAddress;

@@ -46,20 +46,6 @@ namespace tcpTrigger.Manager
                 }
             }
 
-            if (MonitorDhcpOption.IsChecked == true && DhcpServers.Text.Length > 0)
-            {
-                if (!IsIpAddressListValid(DhcpServers.Text))
-                {
-                    ShowMessageBox(
-                        message: "DHCP servers must be entered by IP address. If you have more than one server, use a comma to separate them.",
-                        title: "Invalid DHCP server(s)",
-                        type: DialogWindow.Type.Error,
-                        tab: MainTab,
-                        control: DhcpServers);
-                    return false;
-                }
-            }
-
             if (LogOption.IsChecked == true)
             {
                 if (LogPath.Text.Length == 0)
