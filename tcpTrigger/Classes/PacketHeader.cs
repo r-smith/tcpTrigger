@@ -19,7 +19,6 @@ namespace tcpTrigger
         IcmpRequest,
         TcpConnect,
         UdpCommunication,
-        RogueDhcp,
         None
     }
 
@@ -28,24 +27,6 @@ namespace tcpTrigger
         ping = 8,
         timestamp = 13,
         netmask = 17
-    }
-
-    public enum DhcpOperationCode
-    {
-        Request = 1,
-        Reply = 2
-    }
-
-    public enum DhcpMessageType
-    {
-        Discover = 1,
-        Offer = 2,
-        Request = 3,
-        Decline = 4,
-        Ack = 5,
-        Nak = 6,
-        Release = 7,
-        Inform = 8
     }
 
     class PacketHeader
@@ -65,8 +46,6 @@ namespace tcpTrigger
         public byte TcpFlags { get; set; }
         public byte IcmpType { get; set; }
         public Protocol ProtocolType { get; set; }
-        public IPAddress DhcpServerAddress { get; set; }
-        public uint DhcpTransactionId { get; set; }
         public PacketMatch MatchType { get; set; }
 
         public string TcpFlagsAsString
@@ -154,44 +133,6 @@ namespace tcpTrigger
 
                     // Read the UDP destination port - starting at byte [IP header length] + 2 (16 bits).
                     DestinationPort = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, headerLength + 2));
-
-                    // If rogue DHCP detection is enabled, determine if this is a DHCP packet.
-                    if (Settings.IsMonitorDhcpEnabled && (DestinationPort == 68 || DestinationPort == 67))
-                    {
-                        // Read the UDP length field (16 bits).
-                        ushort udpLength = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, headerLength + 4));
-
-                        // Read the DHCP transaction ID at byte 12 (UDP header is 8 bytes + 4 bytes to get to transaction ID field in DHCP packet).
-                        DhcpTransactionId = (uint)IPAddress.NetworkToHostOrder(BitConverter.ToInt32(buffer, headerLength + 12));
-
-                        // Offset starting at 8 (UDP header is 8 bytes).
-                        int offset = 8;
-
-                        // Skip to the DHCP options section.
-                        offset += 240;
-
-                        // Look for DHCP option 54 which gives us the DHCP server IP address.
-                        while (offset < udpLength && headerLength + offset <= buffer.Length - 6)
-                        {
-                            // Read the current DHCP option code.
-                            byte dhcpOption = buffer[headerLength + offset];
-                            ++offset;
-                            // Read the byte length of the current DHCP option
-                            byte dhcpOptionLength = buffer[headerLength + offset];
-                            ++offset;
-
-                            // Check if this is DHCP option 54 (DHCP server IP).
-                            if (dhcpOption == 54)
-                            {
-                                // Found. Read in DHCP server IP address and exit processing options.
-                                DhcpServerAddress = new IPAddress(BitConverter.ToUInt32(buffer, headerLength + offset));
-                                break;
-                            }
-
-                            // Skip to end of current DHCP option; ready to read next option.
-                            offset += dhcpOptionLength;
-                        }
-                    }
                     break;
 
                 case Protocol.Unknown:

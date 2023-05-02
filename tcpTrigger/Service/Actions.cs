@@ -84,9 +84,6 @@ namespace tcpTrigger
                 case PacketMatch.IcmpRequest:
                     logText = $"ICMP {Enum.GetName(typeof(IcmpTypeCode), packetHeader.IcmpType)} request from {packetHeader.SourceIP}";
                     break;
-                case PacketMatch.RogueDhcp:
-                    logText = $"Unrecognized DHCP server at {packetHeader.DhcpServerAddress}";
-                    break;
                 default:
                     logText = string.Empty;
                     break;
@@ -127,15 +124,6 @@ namespace tcpTrigger
                         + $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}"
                         + $"Destination port: {packetHeader.DestinationPort}",
                         Logger.EventCode.MatchedUdp);
-                    break;
-                case PacketMatch.RogueDhcp:
-                    Logger.Write(
-                        $"DHCP server detected.{Environment.NewLine}{Environment.NewLine}"
-                        + $"Match type: DHCP{Environment.NewLine}"
-                        + $"DHCP server IP: {packetHeader.DhcpServerAddress}{Environment.NewLine}"
-                        + $"DHCP transaction ID: {packetHeader.DhcpTransactionId}{Environment.NewLine}"
-                        + $"Interface IP: {packetHeader.DestinationIP}",
-                        Logger.EventCode.MatchedDhcp);
                     break;
             }
         }

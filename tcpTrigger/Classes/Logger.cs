@@ -15,7 +15,7 @@ namespace tcpTrigger
             MatchedIcmp = 200,
             MatchedTcp = 201,
             MatchedUdp = 202,
-            MatchedDhcp = 203,
+            //MatchedDhcp = 203, /* [Obsolete] */
         }
 
         public static void Write(string message, EventCode eventCode)

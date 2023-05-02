@@ -37,13 +37,6 @@ namespace tcpTrigger
                     packetHeader.MatchType = PacketMatch.TcpConnect;
                 else if (DoesPacketMatchUDP(packetHeader, ipInterface.IP))
                     packetHeader.MatchType = PacketMatch.UdpCommunication;
-                else if (DoesPacketMatchDHCP(packetHeader, ipInterface))
-                {
-                    packetHeader.DestinationIP = ipInterface.IP;
-                    packetHeader.SourceIP = packetHeader.DhcpServerAddress;
-                    packetHeader.MatchType = PacketMatch.RogueDhcp;
-                    ipInterface.DhcpLastTransactionId = packetHeader.DhcpTransactionId;
-                }
 
                 // Process actions.
                 if (packetHeader.MatchType != PacketMatch.None)

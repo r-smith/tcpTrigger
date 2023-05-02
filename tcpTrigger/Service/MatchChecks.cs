@@ -86,20 +86,5 @@ namespace tcpTrigger
                 return false;
             }
         }
-
-        private bool DoesPacketMatchDHCP(PacketHeader header, TcpTriggerInterface iface)
-        {
-            if (Settings.IsMonitorDhcpEnabled
-                && header.DhcpServerAddress != null
-                && !Settings.IgnoredDhcpServers.Contains(header.DhcpServerAddress)
-                && header.DhcpTransactionId != iface.DhcpLastTransactionId)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
     }
 }

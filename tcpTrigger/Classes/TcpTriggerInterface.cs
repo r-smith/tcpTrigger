@@ -36,7 +36,6 @@ namespace tcpTrigger
         }
         public string Description { get; }
         public Socket NetworkSocket { get; }
-        public uint DhcpLastTransactionId { get; set; }
         public DateTime EmailLastSentTimestamp { get; private set; }
         public string EmailLogBuffer { get; set; }
         public System.Timers.Timer EmailSendTimer { get; private set; }

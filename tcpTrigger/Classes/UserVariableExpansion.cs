@@ -58,9 +58,6 @@ namespace tcpTrigger
                     case PacketMatch.UdpCommunication:
                         t = "UDP";
                         break;
-                    case PacketMatch.RogueDhcp:
-                        t = "DHCP";
-                        break;
                     case PacketMatch.None:
                     default:
                         t = "None";

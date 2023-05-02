@@ -19,7 +19,6 @@ namespace tcpTrigger
         public static bool IsMonitorTcpEnabled { get; private set; }
         public static bool IsMonitorUdpEnabled { get; private set; }
         public static bool IsMonitorIcmpEnabled { get; private set; }
-        public static bool IsMonitorDhcpEnabled { get; private set; }
         public static HashSet<ushort> TcpPortsToMonitor { get; private set; }
         public static string TcpPortsToIncludeAsString { get; private set; }
         public static string TcpPortsToExcludeAsString { get; private set; }
@@ -36,7 +35,6 @@ namespace tcpTrigger
         public static string ExternalAppPath { get; private set; }
         public static string ExternalAppArguments { get; private set; }
         public static HashSet<string> ExcludedNetworkInterfaces { get; private set; } = new HashSet<string>();
-        public static HashSet<IPAddress> IgnoredDhcpServers { get; private set; } = new HashSet<IPAddress>();
         public static Dictionary<IPAddress, HashSet<int>> IgnoredEndpoints { get; private set; } = new Dictionary<IPAddress, HashSet<int>>();
         public static string TimestampFormat { get; private set; } = "yyyy-MM-dd HH:mm:ss";
         public static string EmailServer { get; private set; }
@@ -105,10 +103,6 @@ namespace tcpTrigger
                 xn = xd.DocumentElement.SelectSingleNode(currentNode);
                 if (xn != null) { IsMonitorIcmpEnabled = bool.Parse(xn.InnerText); }
 
-                currentNode = SettingsNode.enabledComponents_rogueDhcp;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null) { IsMonitorDhcpEnabled = bool.Parse(xn.InnerText); }
-
                 if (IsMonitorTcpEnabled)
                 {
                     // tcpTrigger/monitoredPorts
@@ -176,17 +170,6 @@ namespace tcpTrigger
                     }
                     // Final HashSet will contain all included ports except those excluded.
                     UdpPortsToMonitor = new HashSet<ushort>(includePorts.Except(excludePorts));
-                }
-                if (IsMonitorDhcpEnabled)
-                {
-                    // tcpTrigger/dhcpServerIgnoreList
-                    currentNode = SettingsNode.dhcpServerIgnoreList_ipAddress;
-                    nl = xd.DocumentElement.SelectNodes(currentNode);
-                    for (int i = 0; i < nl.Count; i++)
-                    {
-                        if (!string.IsNullOrEmpty(nl[i].InnerText))
-                            IgnoredDhcpServers.Add(IPAddress.Parse(nl[i].InnerText));
-                    }
                 }
 
                 // tcpTrigger/endpointIgnoreList
@@ -393,16 +376,6 @@ namespace tcpTrigger
                 sb.AppendLine($"Including UDP port(s): {UdpPortsToIncludeAsString}");
                 sb.AppendLine($"Excluding UDP port(s): {UdpPortsToExcludeAsString}");
             }
-            sb.AppendLine("Detect rogue DHCP: " + (IsMonitorDhcpEnabled ? "Enabled" : "Disabled"));
-
-            // Append DHCP server ignore list.
-            if (IgnoredDhcpServers.Count > 0)
-            {
-                foreach (IPAddress ip in IgnoredDhcpServers)
-                {
-                    sb.AppendLine("Ignore DHCP server: " + ip.ToString());
-                }
-            }
 
             // Append endpoint ignore list.
             if (IgnoredEndpoints.Count > 0)
@@ -466,12 +439,10 @@ namespace tcpTrigger
         public const string enabledComponents_tcp = "/tcpTrigger/enabledComponents/tcp";
         public const string enabledComponents_udp = "/tcpTrigger/enabledComponents/udp";
         public const string enabledComponents_icmp = "/tcpTrigger/enabledComponents/icmp";
-        public const string enabledComponents_rogueDhcp = "/tcpTrigger/enabledComponents/rogueDhcp";
         public const string monitoredPorts_tcp_include = "/tcpTrigger/monitoredPorts/tcp/include";
         public const string monitoredPorts_tcp_exclude = "/tcpTrigger/monitoredPorts/tcp/exclude";
         public const string monitoredPorts_udp_include = "/tcpTrigger/monitoredPorts/udp/include";
         public const string monitoredPorts_udp_exclude = "/tcpTrigger/monitoredPorts/udp/exclude";
-        public const string dhcpServerIgnoreList_ipAddress = "/tcpTrigger/dhcpServerIgnoreList/ipAddress";
         public const string endpointIgnoreList_ipAddress = "/tcpTrigger/endpointIgnoreList/ipAddress";
         public const string networkInterfaceExcludeList_deviceGuid = "/tcpTrigger/networkInterfaceExcludeList/deviceGuid";
         public const string enabledActions_log = "/tcpTrigger/enabledActions/log";
