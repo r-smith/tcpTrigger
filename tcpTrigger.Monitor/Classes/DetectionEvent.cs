@@ -7,8 +7,7 @@ namespace tcpTrigger.Monitor
     {
         ICMP,
         TCP,
-        UDP,
-        DHCP
+        UDP
     }
 
     class DetectionEvent
@@ -26,8 +25,6 @@ namespace tcpTrigger.Monitor
                         return "TCP connection";
                     case MatchType.UDP:
                         return "UDP connection";
-                    case MatchType.DHCP:
-                        return "DHCP server found";
                     default:
                         return string.Empty;
                 }

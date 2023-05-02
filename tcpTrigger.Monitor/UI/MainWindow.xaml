@@ -293,19 +293,9 @@
                                     <Setter.Value>
                                         <ControlTemplate TargetType="{x:Type DataGridCell}">
                                             <StackPanel Orientation="Horizontal">
-                                                <TextBlock Foreground="#808080"
-                                                           Padding="5,4,4,4">
-                                                    <TextBlock.Style>
-                                                        <Style TargetType="{x:Type TextBlock}">
-                                                            <Setter Property="Text" Value="from:"/>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding Action}" Value="DHCP server found">
-                                                                    <Setter Property="Text" Value="at:"/>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </TextBlock.Style>
-                                                </TextBlock>
+                                                <TextBlock Text="from:"
+                                                           Foreground="#808080"
+                                                           Padding="5,4,4,4" />
                                                 <TextBlock Text="{Binding SourceIP}"
                                                            Foreground="#ffd43b"
                                                            Padding="0,4,15,4" />

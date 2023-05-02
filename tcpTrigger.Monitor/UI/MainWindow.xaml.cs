@@ -59,7 +59,7 @@ namespace tcpTrigger.Monitor
                 + "<Query Id='0'>"
                 + "  <Select Path='tcpTrigger'>"
                 + "    *[System[Provider[@Name='tcpTrigger']"
-                + "      and (EventID &gt;= 200 and EventID &lt;= 203) "
+                + "      and (EventID &gt;= 200 and EventID &lt;= 202) "
                 + timeSpan + "]]"
                 + "  </Select>"
                 + "</Query>"
@@ -106,7 +106,6 @@ namespace tcpTrigger.Monitor
             const int DetectICMP = 200;
             const int DetectTCP = 201;
             const int DetectUDP = 202;
-            const int DetectDHCP = 203;
 
             if (arg.EventRecord != null)
             {
@@ -137,12 +136,6 @@ namespace tcpTrigger.Monitor
                                 + @"^Source port: (?<s_port>.*)\r\n"
                                 + @"^Destination IP: (?<d_ip>.*)\r\n"
                                 + @"^Destination port: (?<d_port>.*)$";
-                        break;
-                    case DetectDHCP:
-                        matchType = MatchType.DHCP;
-                        pattern = @"^DHCP server IP: (?<s_ip>.*)\r\n"
-                                + @".*\r\n"
-                                + @"^Interface IP: (?<d_ip>.*)$";
                         break;
                     default:
                         return;
