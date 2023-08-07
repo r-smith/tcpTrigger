@@ -1,4 +1,4 @@
-![tcpTrigger Logo](https://github.com/R-Smith/tcpTrigger/raw/master/tcpTrigger.Manager/Resources/tcpTrigger%20Logo.png?raw=true)
+![tcpTrigger Logo](https://github.com/R-Smith/tcpTrigger/raw/main/tcpTrigger.Manager/Resources/tcpTrigger%20Logo.png?raw=true)
 
 tcpTrigger
 ==========
