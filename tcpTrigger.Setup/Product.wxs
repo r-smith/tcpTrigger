@@ -1,6 +1,6 @@
 ﻿<?define ProductName = "tcpTrigger" ?>
 <?define ProductManufacturer = "Ryan Smith" ?>
-<?define ProductVersion = "1.3.4" ?>
+<?define ProductVersion = "1.3.5" ?>
 <?define ProductCode = "*" ?>
 <?define ProductUpgradeCode = "{68A80CF7-645A-48A6-9B13-BE7D639D519B}" ?>
 <?define ProductDisplayName = "$(var.ProductName)" ?>
