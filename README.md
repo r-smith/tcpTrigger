@@ -12,11 +12,11 @@ tcpTrigger is a Windows service intended to notify you of incoming network conne
 Download
 --------
 **[Click here to download latest .msi installer](https://github.com/R-Smith/tcpTrigger/releases/latest/download/tcpTrigger.Setup.msi)**
-##### (1.3.4 released on January 15, 2023)
+##### (1.3.5 released on August 7, 2023)
 
 ##### Notes
 * .NET 4.5 or greater is required.
-* My build environment is Microsoft Visual Studio Community 2022 and WiX Toolset v3.11.2.
+* My build environment is Microsoft Visual Studio Community 2022 and WiX Toolset v4.0.1.
 
 
 
