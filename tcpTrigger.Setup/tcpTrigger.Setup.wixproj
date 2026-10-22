@@ -47,10 +47,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.NetFx.wixext" Version="4.0.1" />
-    <PackageReference Include="WixToolset.Firewall.wixext" Version="4.0.1" />
-    <PackageReference Include="WixToolset.Util.wixext" Version="4.0.1" />
-    <PackageReference Include="WixToolset.UI.wixext" Version="4.0.1" />
+    <PackageReference Include="WixToolset.NetFx.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.Firewall.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="tcpTrigger.ico" />
