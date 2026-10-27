@@ -17,7 +17,7 @@
 			 UpgradeCode="$(var.ProductUpgradeCode)"
 			 Language="1033"
 			 Codepage="1252"
-			 InstallerVersion="300">
+			 InstallerVersion="500">
 
 		<SummaryInformation Keywords="Installer" />
 
@@ -110,7 +110,9 @@
 									Start="auto"
 									Vital="yes"
 									Account="NT AUTHORITY\LocalService"
-									ErrorControl="normal" />
+									ErrorControl="normal">
+						<ServiceConfig ServiceSid="unrestricted" OnInstall="yes" OnReinstall="yes" />
+					</ServiceInstall>
 
 					<!-- Start the service -->
 					<ServiceControl Id="StartService"
