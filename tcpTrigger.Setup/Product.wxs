@@ -247,10 +247,16 @@
 				<Component Id="CreateProgramDataFolder" Guid="{9D4FBF18-254D-4CBD-87D2-406EF81B9E95}">
 					<CreateFolder>
 						<!--
-                            <Permission User="Administrators" FileAllRights="yes"/>
-                            <Permission User="Users" GenericRead="yes" GenericExecute="yes" />
-                            -->
-						<util:PermissionEx User="[WIX_ACCOUNT_LOCALSERVICE]" GenericAll="yes" />
+							Disable inheritance on ProgramData\tcpTrigger and explicitly set permissions:
+							- SYSTEM                  Full control
+							- Administrators          Full control
+							- Users                   Read only
+							- NT SERVICE\tcpTrigger   Modify (reads config and writes logs)
+							D:P = Disable inheritance.
+							OICI = Permissions apply to this folder, subfolders, and files.
+							S-1-5-80-3722... = The SID of NT SERVICE\tcpTrigger.
+						-->
+						<PermissionEx Sddl="D:P(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICI;FR;;;BU)(A;OICI;0x1301bf;;;S-1-5-80-3722425076-1336804427-3633435087-2032177327-4273967854)" />
 					</CreateFolder>
 				</Component>
 			</Directory>
