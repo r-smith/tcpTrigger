@@ -15,6 +15,7 @@ namespace tcpTrigger
             // Bind socket to IP endpoint.
             try
             {
+                ipInterface.NetworkSocket = new Socket(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.IP);
                 ipInterface.NetworkSocket.Bind(new IPEndPoint(ipInterface.IP, 0));
                 ipInterface.NetworkSocket.IOControl(IOControlCode.ReceiveAll, BitConverter.GetBytes(1), null);
             }

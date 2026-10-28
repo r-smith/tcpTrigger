@@ -35,7 +35,7 @@ namespace tcpTrigger
             }
         }
         public string Description { get; }
-        public Socket NetworkSocket { get; }
+        public Socket NetworkSocket { get; set; }
         public DateTime EmailLastSentTimestamp { get; private set; }
         public string EmailLogBuffer { get; set; }
         public System.Timers.Timer EmailSendTimer { get; private set; }
@@ -48,7 +48,6 @@ namespace tcpTrigger
             MacAddress = macAddress;
             Guid = guid;
 
-            NetworkSocket = new Socket(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.IP);
             EmailSendTimer = new System.Timers.Timer();
             EmailSendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailBufferSeconds).TotalMilliseconds;
             EmailSendTimer.Elapsed += EmailBufferTimer_Elapsed;
