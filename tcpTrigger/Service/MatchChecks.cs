@@ -39,10 +39,7 @@ namespace tcpTrigger
                && header.ProtocolType == Protocol.TCP
                && header.DestinationIP.Equals(ip)
                && Settings.TcpPortsToMonitor.Contains(header.DestinationPort)
-               && (header.TcpFlags == 0x2           /*           SYN */
-                   || header.TcpFlags == 0xc2       /* CWR, ECE, SYN */
-                   || header.TcpFlags == 0x82       /* CWR,      SYN */
-                   || header.TcpFlags == 0x42))     /*      ECE, SYN */
+               && IsConnectionAttempt(header.TcpFlags))
             {
                 // So far match is good. Now check if source IP is in ignore list.
                 if (Settings.IgnoredEndpoints.TryGetValue(header.SourceIP, out HashSet<int> ports))
@@ -60,6 +57,18 @@ namespace tcpTrigger
             {
                 return false;
             }
+        }
+
+        // Returns true if the TCP flags indicate a connection attempt:
+        // SYN is set, and ACK, RST, FIN are not.
+        private static bool IsConnectionAttempt(byte tcpFlags)
+        {
+            const byte FIN = 0x01;
+            const byte SYN = 0x02;
+            const byte RST = 0x04;
+            const byte ACK = 0x10;
+
+            return (tcpFlags & (SYN | ACK | RST | FIN)) == SYN;
         }
 
         private bool DoesPacketMatchUDP(PacketHeader header, IPAddress ip)
