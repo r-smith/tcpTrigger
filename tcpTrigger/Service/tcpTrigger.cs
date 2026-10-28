@@ -10,6 +10,11 @@ namespace tcpTrigger
 {
     partial class tcpTrigger : ServiceBase
     {
+        // _detectedInterfaces stores all network interfaces on the system.
+        // Used to detect network changes.
+        private List<TcpTriggerInterface> _detectedInterfaces;
+
+        // _tcpTriggerInterfaces stores the interfaces with an active listener.
         private List<TcpTriggerInterface> _tcpTriggerInterfaces;
 
         public tcpTrigger()
@@ -106,11 +111,11 @@ namespace tcpTrigger
             // Get network interfaces that support listening.
             List<TcpTriggerInterface> networkInterfaces = TcpTriggerInterface.GetInterfaces();
 
-            // Check if tcpTrigger service is already running (_tcpTriggerInterfaces won't be null).
-            if (_tcpTriggerInterfaces != null)
+            // Check if tcpTrigger service is already running (_detectedInterfaces won't be null).
+            if (_detectedInterfaces != null)
             {
                 // Compare list of network interfaces to previously stored list of network interfaces.
-                if (networkInterfaces.SequenceEqual(_tcpTriggerInterfaces, new TcpTriggerInterfaceComparer()))
+                if (networkInterfaces.SequenceEqual(_detectedInterfaces, new TcpTriggerInterfaceComparer()))
                 {
                     // Lists are equal. Nothing to do; quit.
                     return;
@@ -124,7 +129,7 @@ namespace tcpTrigger
                         + $"Event ID {(int)Logger.EventCode.NetworkInterfaces} will be recorded when monitoring resumes."
                         + Environment.NewLine + Environment.NewLine
                         + "# Previous network configuration" + Environment.NewLine
-                        + NetworkInterfacesToString(_tcpTriggerInterfaces)
+                        + NetworkInterfacesToString(_detectedInterfaces)
                         + Environment.NewLine
                         + "# New network configuration" + Environment.NewLine
                         + NetworkInterfacesToString(networkInterfaces),
@@ -139,6 +144,7 @@ namespace tcpTrigger
             }
 
             // Clone retrieved list of network interfaces to global var.
+            _detectedInterfaces = networkInterfaces;
             _tcpTriggerInterfaces = new List<TcpTriggerInterface>(networkInterfaces);
 
             // Start listeners.
