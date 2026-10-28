@@ -155,7 +155,7 @@ namespace tcpTrigger
             }
         }
 
-        public static async Task SendEmail(TcpTriggerInterface ipInterface)
+        public static async Task SendEmail(TcpTriggerInterface ipInterface, string connectionLog)
         {
             if (Settings.EmailRecipients.Count == 0)
             {
@@ -190,8 +190,8 @@ namespace tcpTrigger
             {
                 using (MailMessage message = new MailMessage())
                 {
-                    message.Subject = UserVariableExpansion.GetExpandedString(Settings.EmailSubject, ipInterface);
-                    message.Body = UserVariableExpansion.GetExpandedString(Settings.EmailBody ?? string.Empty, ipInterface);
+                    message.Subject = UserVariableExpansion.GetExpandedString(Settings.EmailSubject, ipInterface, connectionLog);
+                    message.Body = UserVariableExpansion.GetExpandedString(Settings.EmailBody ?? string.Empty, ipInterface, connectionLog);
                     message.From = string.IsNullOrWhiteSpace(Settings.EmailSenderDisplayName)
                         ? new MailAddress(Settings.EmailSender)
                         : new MailAddress(Settings.EmailSender, Settings.EmailSenderDisplayName);

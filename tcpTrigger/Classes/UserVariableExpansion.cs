@@ -93,7 +93,7 @@ namespace tcpTrigger
             return message;
         }
 
-        public static string GetExpandedString(string message, TcpTriggerInterface ipInterface)
+        public static string GetExpandedString(string message, TcpTriggerInterface ipInterface, string connectionLog)
         {
             if (message.Contains(InterfaceIp))
                 message = message.Replace(InterfaceIp, ipInterface.IP?.ToString());
@@ -102,7 +102,7 @@ namespace tcpTrigger
             if (message.Contains(InterfaceDescription))
                 message = message.Replace(InterfaceDescription, ipInterface.Description);
             if (message.Contains(ConnectionLog))
-                message = message.Replace(ConnectionLog, ipInterface.EmailLogBuffer);
+                message = message.Replace(ConnectionLog, connectionLog);
 
             return message;
         }

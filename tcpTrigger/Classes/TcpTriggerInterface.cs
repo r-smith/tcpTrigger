@@ -74,17 +74,19 @@ namespace tcpTrigger
             }
             else
             {
-                // Send email using current log buffer.
-                _ = tcpTrigger.SendEmail(this);
-
-                // Email sent. Record current timestamp, reset log buffer, and reset timer settings.
+                // Copy and reset the log buffer, record the time, and reset the timer.
+                string connectionLog;
                 lock (EmailLock)
                 {
-                    EmailLastSentTimestamp = DateTime.Now;
+                    connectionLog = EmailLogBuffer;
                     EmailLogBuffer = string.Empty;
+                    EmailLastSentTimestamp = DateTime.Now;
                     EmailSendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailBufferSeconds).TotalMilliseconds;
                     EmailSendTimer.Enabled = false;
                 }
+
+                // Send the email. Not awaited. SendEmail catches and logs its own errors.
+                _ = tcpTrigger.SendEmail(this, connectionLog);
             }
         }
 
