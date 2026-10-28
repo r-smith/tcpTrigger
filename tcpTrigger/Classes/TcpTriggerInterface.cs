@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.Threading;
 
 namespace tcpTrigger
 {
@@ -23,7 +22,6 @@ namespace tcpTrigger
 
     public class TcpTriggerInterface
     {
-        public Mutex Mutex { get; private set; } = new Mutex();
         public string Guid { get; }
         public IPAddress IP { get; }
         public PhysicalAddress MacAddress { get; }
@@ -37,6 +35,7 @@ namespace tcpTrigger
         public string Description { get; }
         public Socket NetworkSocket { get; set; }
         public DateTime EmailLastSentTimestamp { get; private set; }
+        public object EmailLock { get; } = new object();
         public string EmailLogBuffer { get; set; }
         public System.Timers.Timer EmailSendTimer { get; private set; }
 
@@ -79,12 +78,13 @@ namespace tcpTrigger
                 _ = tcpTrigger.SendEmail(this);
 
                 // Email sent. Record current timestamp, reset log buffer, and reset timer settings.
-                Mutex.WaitOne();
-                EmailLastSentTimestamp = DateTime.Now;
-                EmailLogBuffer = string.Empty;
-                EmailSendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailBufferSeconds).TotalMilliseconds;
-                EmailSendTimer.Enabled = false;
-                Mutex.ReleaseMutex();
+                lock (EmailLock)
+                {
+                    EmailLastSentTimestamp = DateTime.Now;
+                    EmailLogBuffer = string.Empty;
+                    EmailSendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailBufferSeconds).TotalMilliseconds;
+                    EmailSendTimer.Enabled = false;
+                }
             }
         }
 
