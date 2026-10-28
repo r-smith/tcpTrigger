@@ -27,41 +27,19 @@ namespace tcpTrigger
             Action<IAsyncResult> OnReceive = null;
             OnReceive = (ar) =>
             {
-                // Packet received. Extract header information.
-                var packetHeader = new PacketHeader(buffer);
-
-                // Determine if the packet matches our trigger rules.
-                if (DoesPacketMatchICMP(packetHeader, ipInterface.IP))
-                    packetHeader.MatchType = PacketMatch.IcmpRequest;
-                else if (DoesPacketMatchTCP(packetHeader, ipInterface.IP))
-                    packetHeader.MatchType = PacketMatch.TcpConnect;
-                else if (DoesPacketMatchUDP(packetHeader, ipInterface.IP))
-                    packetHeader.MatchType = PacketMatch.UdpCommunication;
-
-                // Process actions.
-                if (packetHeader.MatchType != PacketMatch.None)
+                // Packet received.
+                try
                 {
-                    // A match was detected. Perform enabled actions.
-                    try
-                    {
-                        packetHeader.DestinationMac = ipInterface.MacAddress;
-                        if (Settings.IsLogEnabled)
-                            WriteLog(packetHeader);
-                        if (Settings.IsEventLogEnabled)
-                            WriteEventLog(packetHeader);
-                        if (Settings.IsExternalAppEnabled)
-                            LaunchApplication(packetHeader);
-                        if (Settings.IsEmailNotificationEnabled)
-                            TriggerEmail(packetHeader, ipInterface);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.WriteError(
-                            "A packet matched detection rules but tcpTrigger failed to perform configured actions. "
-                            + ex.Message,
-                            Logger.EventCode.Error);
-                    }
+                    ProcessPacket(buffer, ipInterface);
                 }
+                catch (Exception ex)
+                {
+                    Logger.WriteError(
+                        $"tcpTrigger failed to process a packet on network interface {ipInterface.IP} ({ipInterface.Description})."
+                        + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                        Logger.EventCode.Error);
+                }
+
                 // Reset buffer and continue listening for new data.
                 buffer = new byte[512];
                 try
@@ -73,10 +51,56 @@ namespace tcpTrigger
                     // Listener has been disposed by calling thread.
                     // This is expected behavior for cleanup. Do nothing.
                 }
+                catch (SocketException ex)
+                {
+                    Logger.WriteError(
+                        $"tcpTrigger stopped monitoring network interface {ipInterface.IP} ({ipInterface.Description}) because of an error accessing the interface."
+                        + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                        Logger.EventCode.Error);
+                }
             };
 
             // Begin listening for data.
             ipInterface.NetworkSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(OnReceive), null);
+        }
+
+        private void ProcessPacket(byte[] buffer, TcpTriggerInterface ipInterface)
+        {
+            // Extract header information.
+            var packetHeader = new PacketHeader(buffer);
+
+            // Determine if the packet matches our trigger rules.
+            if (DoesPacketMatchICMP(packetHeader, ipInterface.IP))
+                packetHeader.MatchType = PacketMatch.IcmpRequest;
+            else if (DoesPacketMatchTCP(packetHeader, ipInterface.IP))
+                packetHeader.MatchType = PacketMatch.TcpConnect;
+            else if (DoesPacketMatchUDP(packetHeader, ipInterface.IP))
+                packetHeader.MatchType = PacketMatch.UdpCommunication;
+
+            // Process actions.
+            if (packetHeader.MatchType != PacketMatch.None)
+            {
+                // A match was detected. Perform enabled actions.
+                try
+                {
+                    packetHeader.DestinationMac = ipInterface.MacAddress;
+                    if (Settings.IsLogEnabled)
+                        WriteLog(packetHeader);
+                    if (Settings.IsEventLogEnabled)
+                        WriteEventLog(packetHeader);
+                    if (Settings.IsExternalAppEnabled)
+                        LaunchApplication(packetHeader);
+                    if (Settings.IsEmailNotificationEnabled)
+                        TriggerEmail(packetHeader, ipInterface);
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteError(
+                        "A packet matched detection rules but tcpTrigger failed to perform configured actions. "
+                        + ex.Message,
+                        Logger.EventCode.Error);
+                }
+            }
         }
     }
 }
