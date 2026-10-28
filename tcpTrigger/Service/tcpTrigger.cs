@@ -17,6 +17,9 @@ namespace tcpTrigger
         // _tcpTriggerInterfaces stores the interfaces with an active listener.
         private List<TcpTriggerInterface> _tcpTriggerInterfaces;
 
+        // _networkCheckTimer checks for network changes and restarts listeners when one is found.
+        private System.Timers.Timer _networkCheckTimer;
+
         public tcpTrigger()
         {
             InitializeComponent();
@@ -85,10 +88,12 @@ namespace tcpTrigger
             // Retrieve network interfaces and start IP listener threads.
             // This is done on a timer so that the listener thread can automatically restart
             // if any changes to network interfaces are detected.
-            var networkInterfaceInitializeTimer = new System.Timers.Timer();
-            networkInterfaceInitializeTimer.Interval = TimeSpan.FromMinutes(1).TotalMilliseconds;
-            networkInterfaceInitializeTimer.Elapsed += InitializeNetworkListeners_Elapsed;
-            networkInterfaceInitializeTimer.Enabled = true;
+            _networkCheckTimer = new System.Timers.Timer
+            {
+                Interval = TimeSpan.FromMinutes(1).TotalMilliseconds
+            };
+            _networkCheckTimer.Elapsed += InitializeNetworkListeners_Elapsed;
+            _networkCheckTimer.Enabled = true;
             InitializeNetworkListeners_Elapsed(null, null);
 
             Logger.Write("The tcpTrigger service started successfully.", Logger.EventCode.ServiceStarted);
@@ -97,6 +102,10 @@ namespace tcpTrigger
         protected override void OnStop()
         {
             // The tcpTrigger service is stopping.
+
+            // Stop checking for network changes.
+            _networkCheckTimer.Stop();
+            _networkCheckTimer.Dispose();
 
             // Close (and dispose) all existing listeners.
             for (int i = 0; i < _tcpTriggerInterfaces.Count; i++)
