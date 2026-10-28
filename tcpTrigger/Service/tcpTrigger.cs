@@ -148,22 +148,24 @@ namespace tcpTrigger
         private void StartIpListeners()
         {
             // Start listeners.
-            for (int i = 0; i < _tcpTriggerInterfaces.Count; i++)
+            var listeningInterfaces = new List<TcpTriggerInterface>();
+            foreach (TcpTriggerInterface ipInterface in _tcpTriggerInterfaces)
             {
                 try
                 {
-                    RawSocketListener(_tcpTriggerInterfaces[i]);
+                    RawSocketListener(ipInterface);
+                    listeningInterfaces.Add(ipInterface);
                 }
                 catch (System.Net.Sockets.SocketException)
                 {
                     Logger.WriteError(
                         "tcpTrigger failed to bind to network interface "
-                        + $"{_tcpTriggerInterfaces[i].IP} ({_tcpTriggerInterfaces[i].Description}).",
+                        + $"{ipInterface.IP} ({ipInterface.Description}).",
                         Logger.EventCode.Error);
-                    _tcpTriggerInterfaces[i].NetworkSocket?.Dispose();
-                    _tcpTriggerInterfaces.RemoveAt(i);
+                    ipInterface.NetworkSocket?.Dispose();
                 }
             }
+            _tcpTriggerInterfaces = listeningInterfaces;
 
             // Listeners have started. Network monitoring is now active.
             // Record which adapters are being monitored to event log.
