@@ -29,7 +29,16 @@ namespace tcpTrigger
 
         internal void RunInConsole()
         {
-            OnStart(null);
+            try
+            {
+                OnStart(null);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"tcpTrigger failed to start: {ex.Message}");
+                Environment.ExitCode = 1;
+                return;
+            }
             Console.WriteLine("tcpTrigger is running. Press Enter to stop.");
             Console.ReadLine();
             OnStop();
@@ -51,8 +60,10 @@ namespace tcpTrigger
                     + Environment.NewLine + Environment.NewLine
                     + ex.Message,
                     Logger.EventCode.Error);
-                Environment.Exit(1);
-                return;
+
+                // Rethrow so Windows reports that the service failed to start,
+                // rather than seeing the process terminated unexpectedly.
+                throw;
             }
 
             // Validate log file path.
