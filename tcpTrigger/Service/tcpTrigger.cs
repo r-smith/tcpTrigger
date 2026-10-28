@@ -156,11 +156,12 @@ namespace tcpTrigger
                     RawSocketListener(ipInterface);
                     listeningInterfaces.Add(ipInterface);
                 }
-                catch (System.Net.Sockets.SocketException)
+                catch (System.Net.Sockets.SocketException ex)
                 {
                     Logger.WriteError(
                         "tcpTrigger failed to bind to network interface "
-                        + $"{ipInterface.IP} ({ipInterface.Description}).",
+                        + $"{ipInterface.IP} ({ipInterface.Description})."
+                        + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                         Logger.EventCode.Error);
                     ipInterface.NetworkSocket?.Dispose();
                 }
