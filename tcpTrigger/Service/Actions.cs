@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Net.Mail;
 using System.ServiceProcess;
+using System.Threading.Tasks;
 
 namespace tcpTrigger
 {
@@ -153,7 +154,7 @@ namespace tcpTrigger
             ipInterface.Mutex.ReleaseMutex();
         }
 
-        public static async void SendEmail(TcpTriggerInterface ipInterface)
+        public static async Task SendEmail(TcpTriggerInterface ipInterface)
         {
             if (Settings.EmailRecipients.Count == 0)
             {
@@ -162,21 +163,21 @@ namespace tcpTrigger
                     Logger.EventCode.Error);
                 return;
             }
-            if (Settings.EmailSender.Length == 0)
+            if (string.IsNullOrWhiteSpace(Settings.EmailSender))
             {
                 Logger.WriteError(
                     "Email event triggered, but no sender address is configured.",
                     Logger.EventCode.Error);
                 return;
             }
-            if (Settings.EmailServer.Length == 0)
+            if (string.IsNullOrWhiteSpace(Settings.EmailServer))
             {
                 Logger.WriteError(
                     "Email event triggered, but no mail server is configured.",
                     Logger.EventCode.Error);
                 return;
             }
-            if (Settings.EmailSubject.Length == 0)
+            if (string.IsNullOrWhiteSpace(Settings.EmailSubject))
             {
                 Logger.WriteError(
                     "Email event triggered, but no message subject is configured.",
@@ -189,13 +190,13 @@ namespace tcpTrigger
                 using (MailMessage message = new MailMessage())
                 {
                     message.Subject = UserVariableExpansion.GetExpandedString(Settings.EmailSubject, ipInterface);
-                    message.Body = UserVariableExpansion.GetExpandedString(Settings.EmailBody, ipInterface);
-                    message.From = Settings.EmailSenderDisplayName.Length > 0
-                        ? new MailAddress(Settings.EmailSender, Settings.EmailSenderDisplayName)
-                        : new MailAddress(Settings.EmailSender);
+                    message.Body = UserVariableExpansion.GetExpandedString(Settings.EmailBody ?? string.Empty, ipInterface);
+                    message.From = string.IsNullOrWhiteSpace(Settings.EmailSenderDisplayName)
+                        ? new MailAddress(Settings.EmailSender)
+                        : new MailAddress(Settings.EmailSender, Settings.EmailSenderDisplayName);
                     for (int i = 0; i < Settings.EmailRecipients.Count; i++)
                     {
-                        if (!string.IsNullOrEmpty(Settings.EmailRecipients[i]))
+                        if (!string.IsNullOrWhiteSpace(Settings.EmailRecipients[i]))
                         {
                             message.To.Add(Settings.EmailRecipients[i].Trim());
                         }
@@ -218,7 +219,7 @@ namespace tcpTrigger
             catch (Exception ex)
             {
                 Logger.WriteError(
-                    $"Email action triggered, but the message failed to send.{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.InnerException.Message}",
+                    $"Email action triggered, but the message failed to send.{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.InnerException?.Message}",
                     Logger.EventCode.Error);
                 return;
             }

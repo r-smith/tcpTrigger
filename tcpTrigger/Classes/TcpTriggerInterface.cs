@@ -77,7 +77,7 @@ namespace tcpTrigger
             else
             {
                 // Send email using current log buffer.
-                tcpTrigger.SendEmail(this);
+                _ = tcpTrigger.SendEmail(this);
 
                 // Email sent. Record current timestamp, reset log buffer, and reset timer settings.
                 Mutex.WaitOne();
