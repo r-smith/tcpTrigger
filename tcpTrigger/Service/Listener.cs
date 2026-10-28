@@ -24,8 +24,7 @@ namespace tcpTrigger
             }
 
             // Callback method for processing captured packets.
-            Action<IAsyncResult> OnReceive = null;
-            OnReceive = (ar) =>
+            void OnReceive(IAsyncResult ar)
             {
                 // Packet received.
                 try
@@ -44,7 +43,7 @@ namespace tcpTrigger
                 buffer = new byte[512];
                 try
                 {
-                    ipInterface.NetworkSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(OnReceive), null);
+                    ipInterface.NetworkSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, OnReceive, null);
                 }
                 catch (ObjectDisposedException)
                 {
@@ -58,10 +57,10 @@ namespace tcpTrigger
                         + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                         Logger.EventCode.Error);
                 }
-            };
+            }
 
             // Begin listening for data.
-            ipInterface.NetworkSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(OnReceive), null);
+            ipInterface.NetworkSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, OnReceive, null);
         }
 
         private void ProcessPacket(byte[] buffer, TcpTriggerInterface ipInterface)
