@@ -1,4 +1,5 @@
-﻿using System.ServiceProcess;
+﻿using System;
+using System.ServiceProcess;
 
 namespace tcpTrigger
 {
@@ -9,12 +10,16 @@ namespace tcpTrigger
         /// </summary>
         static void Main()
         {
-            ServiceBase[] ServicesToRun;
-            ServicesToRun = new ServiceBase[]
+            var service = new tcpTrigger();
+
+            if (Environment.UserInteractive)
             {
-                new tcpTrigger()
-            };
-            ServiceBase.Run(ServicesToRun);
+                service.RunInConsole();
+            }
+            else
+            {
+                ServiceBase.Run(service);
+            }
         }
     }
 }

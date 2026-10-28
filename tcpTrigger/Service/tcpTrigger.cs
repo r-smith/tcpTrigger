@@ -19,6 +19,14 @@ namespace tcpTrigger
             EventLog.Log = "tcpTrigger";
         }
 
+        internal void RunInConsole()
+        {
+            OnStart(null);
+            Console.WriteLine("tcpTrigger is running. Press Enter to stop.");
+            Console.ReadLine();
+            OnStop();
+        }
+
         protected override void OnStart(string[] args)
         {
             // The tcpTrigger service is starting.
