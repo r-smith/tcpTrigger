@@ -46,14 +46,13 @@ namespace tcpTrigger
             OnStop();
         }
 
+        // Called by Windows when the tcpTrigger service starts.
         protected override void OnStart(string[] args)
         {
-            // The tcpTrigger service is starting.
-
             // Read and parse the tcpTrigger configuration file.
             try
             {
-                Settings.Load();
+                LoadConfiguration();
             }
             catch (Exception ex)
             {
@@ -67,6 +66,25 @@ namespace tcpTrigger
                 // rather than seeing the process terminated unexpectedly.
                 throw;
             }
+
+            StartMonitoring();
+
+            Logger.Write("The tcpTrigger service started successfully.", Logger.EventCode.ServiceStarted);
+        }
+
+        // Called by Windows when the tcpTrigger service stops.
+        protected override void OnStop()
+        {
+            StopMonitoring();
+
+            Logger.Write("The tcpTrigger service stopped successfully.", Logger.EventCode.ServiceStopped);
+        }
+
+        // Reads the configuration file, corrects any settings that can't be used, and records
+        // the applied configuration to the event log. Throws if the file can't be read or parsed.
+        private void LoadConfiguration()
+        {
+            Settings.Load();
 
             // Validate log file path.
             if (Settings.IsLogEnabled)
@@ -97,7 +115,11 @@ namespace tcpTrigger
                 + Environment.NewLine + Environment.NewLine
                 + Settings.DumpToString(),
                 Logger.EventCode.ConfigurationApplied);
+        }
 
+        // Starts the action queue thread, the network listeners, and the network change detection.
+        private void StartMonitoring()
+        {
             // Start the action queue thread.
             _actionQueue = new ActionQueue();
             _actionQueue.Start();
@@ -112,14 +134,11 @@ namespace tcpTrigger
             _networkCheckTimer.Elapsed += InitializeNetworkListeners_Elapsed;
             _networkCheckTimer.Enabled = true;
             InitializeNetworkListeners_Elapsed(null, null);
-
-            Logger.Write("The tcpTrigger service started successfully.", Logger.EventCode.ServiceStarted);
         }
 
-        protected override void OnStop()
+        // Stops the network change detection, the network listeners, and the action queue thread.
+        private void StopMonitoring()
         {
-            // The tcpTrigger service is stopping.
-
             // Stop checking for network changes.
             _networkCheckTimer.Stop();
             _networkCheckTimer.Dispose();
@@ -133,7 +152,8 @@ namespace tcpTrigger
             // Let actions already queued finish before stopping.
             _actionQueue.Stop();
 
-            Logger.Write("The tcpTrigger service stopped successfully.", Logger.EventCode.ServiceStopped);
+            // Forget the detected interfaces, so the next start begins with a fresh network check.
+            _detectedInterfaces = null;
         }
 
         private void InitializeNetworkListeners_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
