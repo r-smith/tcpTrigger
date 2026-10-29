@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.ServiceProcess;
 
 namespace tcpTrigger
 {
-    partial class TcpTriggerService : ServiceBase
+    // Captures incoming packets on a network interface and runs the configured actions for any that match.
+    internal static class PacketListener
     {
-        private void RawSocketListener(TcpTriggerInterface ipInterface)
+        // Starts capturing packets on the interface. Throws a SocketException if the listener can't start.
+        public static void Start(TcpTriggerInterface ipInterface)
         {
             // Buffer for incoming data.
             byte[] buffer = new byte[512];
@@ -64,7 +65,13 @@ namespace tcpTrigger
             ipInterface.NetworkSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, OnReceive, null);
         }
 
-        private void ProcessPacket(byte[] buffer, TcpTriggerInterface ipInterface)
+        // Stops capturing packets on the interface.
+        public static void Stop(TcpTriggerInterface ipInterface)
+        {
+            ipInterface.NetworkSocket?.Close();
+        }
+
+        private static void ProcessPacket(byte[] buffer, TcpTriggerInterface ipInterface)
         {
             // Extract header information.
             var packetHeader = new PacketHeader(buffer);

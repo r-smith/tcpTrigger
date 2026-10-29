@@ -121,7 +121,7 @@ namespace tcpTrigger
             // Close (and dispose) all existing listeners.
             for (int i = 0; i < _tcpTriggerInterfaces.Count; i++)
             {
-                _tcpTriggerInterfaces[i].NetworkSocket.Close();
+                PacketListener.Stop(_tcpTriggerInterfaces[i]);
             }
             Logger.Write("The tcpTrigger service stopped successfully.", Logger.EventCode.ServiceStopped);
         }
@@ -158,7 +158,7 @@ namespace tcpTrigger
                     // Close (and dispose) all existing listeners.
                     for (int i = 0; i < _tcpTriggerInterfaces.Count; i++)
                     {
-                        _tcpTriggerInterfaces[i].NetworkSocket.Close();
+                        PacketListener.Stop(_tcpTriggerInterfaces[i]);
                     }
                 }
             }
@@ -179,7 +179,7 @@ namespace tcpTrigger
             {
                 try
                 {
-                    RawSocketListener(ipInterface);
+                    PacketListener.Start(ipInterface);
                     listeningInterfaces.Add(ipInterface);
                 }
                 catch (System.Net.Sockets.SocketException ex)
@@ -189,7 +189,7 @@ namespace tcpTrigger
                         + $"{ipInterface.IP} ({ipInterface.Description})."
                         + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                         Logger.EventCode.Error);
-                    ipInterface.NetworkSocket?.Dispose();
+                    PacketListener.Stop(ipInterface);
                 }
             }
             _tcpTriggerInterfaces = listeningInterfaces;
