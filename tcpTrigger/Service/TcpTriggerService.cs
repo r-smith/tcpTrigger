@@ -8,7 +8,7 @@ using System.Text;
 
 namespace tcpTrigger
 {
-    partial class tcpTrigger : ServiceBase
+    partial class TcpTriggerService : ServiceBase
     {
         // _detectedInterfaces stores all network interfaces on the system.
         // Used to detect network changes.
@@ -20,7 +20,7 @@ namespace tcpTrigger
         // _networkCheckTimer checks for network changes and restarts listeners when one is found.
         private System.Timers.Timer _networkCheckTimer;
 
-        public tcpTrigger()
+        public TcpTriggerService()
         {
             InitializeComponent();
 

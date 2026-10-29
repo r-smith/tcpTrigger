@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace tcpTrigger
 {
-    partial class tcpTrigger : ServiceBase
+    partial class TcpTriggerService : ServiceBase
     {
         // Ensures only one thread at a time rotates or writes to the log file.
         private static readonly object _logFileLock = new object();

@@ -91,11 +91,11 @@
     <Compile Include="Service\MatchChecks.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Service\tcpTrigger.cs">
+    <Compile Include="Service\TcpTriggerService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Service\tcpTrigger.Designer.cs">
-      <DependentUpon>tcpTrigger.cs</DependentUpon>
+    <Compile Include="Service\TcpTriggerService.Designer.cs">
+      <DependentUpon>TcpTriggerService.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -105,8 +105,8 @@
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Service\tcpTrigger.resx">
-      <DependentUpon>tcpTrigger.cs</DependentUpon>
+    <EmbeddedResource Include="Service\TcpTriggerService.resx">
+      <DependentUpon>TcpTriggerService.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

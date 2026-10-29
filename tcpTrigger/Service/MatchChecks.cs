@@ -4,7 +4,7 @@ using System.ServiceProcess;
 
 namespace tcpTrigger
 {
-    partial class tcpTrigger : ServiceBase
+    partial class TcpTriggerService : ServiceBase
     {
         private bool DoesPacketMatchICMP(PacketHeader header, IPAddress ip)
         {

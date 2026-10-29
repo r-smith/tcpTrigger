@@ -1,6 +1,6 @@
 ﻿namespace tcpTrigger
 {
-    partial class tcpTrigger
+    partial class TcpTriggerService
     {
         /// <summary> 
         /// Required designer variable.

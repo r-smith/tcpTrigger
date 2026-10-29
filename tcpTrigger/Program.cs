@@ -10,7 +10,7 @@ namespace tcpTrigger
         /// </summary>
         static void Main()
         {
-            var service = new tcpTrigger();
+            var service = new TcpTriggerService();
 
             if (Environment.UserInteractive)
             {
