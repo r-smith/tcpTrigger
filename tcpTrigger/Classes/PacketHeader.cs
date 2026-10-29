@@ -87,20 +87,9 @@ namespace tcpTrigger
             if (ProtocolType == Protocol.Unknown)
                 return;
 
-            // Read the first byte from the buffer.
-            // This should include the Version (4 bits) and Internet Header Length (4 bits) fields.
-            byte headerLength = buffer[0];
-
-            // We just want the header length in bytes, so drop the first 4 bits.
-            headerLength <<= 4;
-            headerLength >>= 4;
-
-            // The value of the IHL field is the number of 32-bit words.  Multiplying by 4 gives us the number of bytes.
-            headerLength *= 4;
-
-            // Safety check.  IP protocol defines a max header length of 60 bytes.
-            if (headerLength > 60)
-                return;
+            // Read the IP header length from the low 4 bits of byte 0 (the high 4 bits are the IP version).
+            // The value is a count of 32-bit words, so multiply by 4 for the length in bytes (at most 60).
+            int headerLength = (buffer[0] & 0x0F) * 4;
 
             // Read the source IP address - starting at byte 12 (32 bits).
             SourceIP = new IPAddress(BitConverter.ToUInt32(buffer, 12));
