@@ -122,6 +122,7 @@ namespace tcpTrigger
 
                 // tcpTrigger/endpointIgnoreList
                 _currentNode = SettingsNode.endpointIgnoreList_ipAddress;
+                var ignoredEndpoints = new Dictionary<IPAddress, HashSet<int>>();
                 XmlNodeList nl = xd.DocumentElement.SelectNodes(_currentNode);
                 for (int i = 0; i < nl.Count; i++)
                 {
@@ -143,17 +144,18 @@ namespace tcpTrigger
                         }
                         if (IPAddress.TryParse(nl[i].InnerText, out IPAddress ip))
                         {
-                            if (!IgnoredEndpoints.ContainsKey(ip))
+                            if (!ignoredEndpoints.ContainsKey(ip))
                             {
-                                IgnoredEndpoints.Add(ip, new HashSet<int>() { port } );
+                                ignoredEndpoints.Add(ip, new HashSet<int>() { port } );
                             }
                             else
                             {
-                                IgnoredEndpoints[ip].Add(port);
+                                ignoredEndpoints[ip].Add(port);
                             }
                         }
                     }
                 }
+                IgnoredEndpoints = ignoredEndpoints;
 
                 // tcpTrigger/networkInterfaceExcludeList
                 ExcludedNetworkInterfaces = new HashSet<string>(ReadList(xd, SettingsNode.networkInterfaceExcludeList_deviceGuid));
