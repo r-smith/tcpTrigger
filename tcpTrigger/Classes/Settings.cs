@@ -48,6 +48,10 @@ namespace tcpTrigger
         public static string EmailSubject { get; private set; }
         public static string EmailBody { get; private set; }
 
+        // The XML node path currently being read from the configuration file.
+        // Used to say which node caused an error when the file can't be parsed.
+        private static string _currentNode;
+
         private static string GetSettingsPath()
         {
             // Locate the tcpTrigger.xml configuration file.
@@ -86,31 +90,18 @@ namespace tcpTrigger
                 XmlDocument xd = new XmlDocument();
                 xd.Load(Path);
 
-                XmlNode xn;
-                XmlNodeList nl;
-                string encryptedValue;
                 // tcpTrigger/enabledComponents
-                currentNode = SettingsNode.enabledComponents_tcp;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null) { IsMonitorTcpEnabled = bool.Parse(xn.InnerText); }
-
-                currentNode = SettingsNode.enabledComponents_udp;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null) { IsMonitorUdpEnabled = bool.Parse(xn.InnerText); }
-
-                currentNode = SettingsNode.enabledComponents_icmp;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null) { IsMonitorIcmpEnabled = bool.Parse(xn.InnerText); }
+                IsMonitorTcpEnabled = ReadBool(xd, SettingsNode.enabledComponents_tcp, false);
+                IsMonitorUdpEnabled = ReadBool(xd, SettingsNode.enabledComponents_udp, false);
+                IsMonitorIcmpEnabled = ReadBool(xd, SettingsNode.enabledComponents_icmp, false);
 
                 if (IsMonitorTcpEnabled)
                 {
                     // tcpTrigger/monitoredPorts
-                    currentNode = SettingsNode.monitoredPorts_tcp_include;
-                    TcpPortsToIncludeAsString = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                    TcpPortsToIncludeAsString = ReadString(xd, SettingsNode.monitoredPorts_tcp_include);
                     HashSet<ushort> includePorts = ParsePorts(TcpPortsToIncludeAsString);
 
-                    currentNode = SettingsNode.monitoredPorts_tcp_exclude;
-                    TcpPortsToExcludeAsString = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                    TcpPortsToExcludeAsString = ReadString(xd, SettingsNode.monitoredPorts_tcp_exclude);
                     HashSet<ushort> excludePorts = ParsePorts(TcpPortsToExcludeAsString);
 
                     // Final set contains all included ports except those excluded.
@@ -120,12 +111,10 @@ namespace tcpTrigger
                 if (IsMonitorUdpEnabled)
                 {
                     // tcpTrigger/monitoredPorts
-                    currentNode = SettingsNode.monitoredPorts_udp_include;
-                    UdpPortsToIncludeAsString = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                    UdpPortsToIncludeAsString = ReadString(xd, SettingsNode.monitoredPorts_udp_include);
                     HashSet<ushort> includePorts = ParsePorts(UdpPortsToIncludeAsString);
 
-                    currentNode = SettingsNode.monitoredPorts_udp_exclude;
-                    UdpPortsToExcludeAsString = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                    UdpPortsToExcludeAsString = ReadString(xd, SettingsNode.monitoredPorts_udp_exclude);
                     HashSet<ushort> excludePorts = ParsePorts(UdpPortsToExcludeAsString);
 
                     // Final set contains all included ports except those excluded.
@@ -134,8 +123,8 @@ namespace tcpTrigger
                 }
 
                 // tcpTrigger/endpointIgnoreList
-                currentNode = SettingsNode.endpointIgnoreList_ipAddress;
-                nl = xd.DocumentElement.SelectNodes(currentNode);
+                _currentNode = SettingsNode.endpointIgnoreList_ipAddress;
+                XmlNodeList nl = xd.DocumentElement.SelectNodes(_currentNode);
                 for (int i = 0; i < nl.Count; i++)
                 {
                     if (!string.IsNullOrEmpty(nl[i].InnerText))
@@ -169,124 +158,37 @@ namespace tcpTrigger
                 }
 
                 // tcpTrigger/networkInterfaceExcludeList
-                currentNode = SettingsNode.networkInterfaceExcludeList_deviceGuid;
-                nl = xd.DocumentElement.SelectNodes(currentNode);
-                for (int i = 0; i < nl.Count; i++)
-                {
-                    if (!string.IsNullOrEmpty(nl[i].InnerText))
-                        ExcludedNetworkInterfaces.Add(nl[i].InnerText);
-                }
+                ExcludedNetworkInterfaces = new HashSet<string>(ReadList(xd, SettingsNode.networkInterfaceExcludeList_deviceGuid));
 
                 // tcpTrigger/enabledActions
-                currentNode = SettingsNode.enabledActions_log;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null) { IsLogEnabled = bool.Parse(xn.InnerText); }
-
-                currentNode = SettingsNode.enabledActions_windowsEventLog;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null) { IsEventLogEnabled = bool.Parse(xn.InnerText); }
-
-                currentNode = SettingsNode.enabledActions_emailNotification;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null) { IsEmailNotificationEnabled = bool.Parse(xn.InnerText); }
-
-                currentNode = SettingsNode.enabledActions_executeCommand;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null) { IsExternalAppEnabled = bool.Parse(xn.InnerText); }
+                IsLogEnabled = ReadBool(xd, SettingsNode.enabledActions_log, false);
+                IsEventLogEnabled = ReadBool(xd, SettingsNode.enabledActions_windowsEventLog, false);
+                IsEmailNotificationEnabled = ReadBool(xd, SettingsNode.enabledActions_emailNotification, false);
+                IsExternalAppEnabled = ReadBool(xd, SettingsNode.enabledActions_executeCommand, false);
 
                 // tcpTrigger/actionSettings
-                currentNode = SettingsNode.actionsSettings_logPath;
-                LogPath = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
-                currentNode = SettingsNode.actionsSettings_command_path;
-                ExternalAppPath = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
-                currentNode = SettingsNode.actionsSettings_command_arguments;
-                ExternalAppArguments = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                LogPath = ReadString(xd, SettingsNode.actionsSettings_logPath);
+                ExternalAppPath = ReadString(xd, SettingsNode.actionsSettings_command_path);
+                ExternalAppArguments = ReadString(xd, SettingsNode.actionsSettings_command_arguments);
 
                 // tcpTrigger/email
-                currentNode = SettingsNode.email_server;
-                EmailServer = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
-
-                currentNode = SettingsNode.email_port;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null && !string.IsNullOrEmpty(xn.InnerText)) { EmailServerPort = int.Parse(xn.InnerText); }
-                else { EmailServerPort = 25; }
-
-                currentNode = SettingsNode.email_isTlsEnabled;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null) { IsEmailTlsEnabled = bool.Parse(xn.InnerText); }
-
-                currentNode = SettingsNode.email_isAuthRequired;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null) { IsEmailAuthRequired = bool.Parse(xn.InnerText); }
-
-                // Decrypt username.
-                currentNode = SettingsNode.email_username;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null)
-                {
-                    if (xn.Attributes["encrypted"]?.InnerText == "true")
-                    {
-                        encryptedValue = xn.InnerText;
-                        if (!string.IsNullOrEmpty(encryptedValue))
-                            EmailUsername = StringCipher.Decrypt(encryptedValue);
-                        encryptedValue = null;
-                    }
-                    else
-                    {
-                        if (!string.IsNullOrEmpty(xn.InnerText))
-                            EmailUsername = xn.InnerText;
-                    }
-                }
-
-                // Decrypt password.
-                currentNode = SettingsNode.email_password;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null)
-                {
-                    if (xn.Attributes["encrypted"]?.InnerText == "true")
-                    {
-                        encryptedValue = xn.InnerText;
-                        if (!string.IsNullOrEmpty(encryptedValue))
-                            EmailPassword = StringCipher.Decrypt(encryptedValue);
-                        encryptedValue = null;
-                    }
-                    else
-                    {
-                        if (!string.IsNullOrEmpty(xn.InnerText))
-                            EmailPassword = xn.InnerText;
-                    }
-                }
-
-                currentNode = SettingsNode.email_recipientList_address;
-                nl = xd.DocumentElement.SelectNodes(currentNode);
-                for (int i = 0; i < nl.Count; i++)
-                {
-                    if (!string.IsNullOrEmpty(nl[i].InnerText))
-                        EmailRecipients.Add(nl[i].InnerText);
-                }
-
-                currentNode = SettingsNode.email_sender_address;
-                EmailSender = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
-                currentNode = SettingsNode.email_sender_displayName;
-                EmailSenderDisplayName = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                EmailServer = ReadString(xd, SettingsNode.email_server);
+                EmailServerPort = ReadInt(xd, SettingsNode.email_port, 25);
+                IsEmailTlsEnabled = ReadBool(xd, SettingsNode.email_isTlsEnabled, false);
+                IsEmailAuthRequired = ReadBool(xd, SettingsNode.email_isAuthRequired, false);
+                EmailUsername = ReadCredential(xd, SettingsNode.email_username);
+                EmailPassword = ReadCredential(xd, SettingsNode.email_password);
+                EmailRecipients = ReadList(xd, SettingsNode.email_recipientList_address);
+                EmailSender = ReadString(xd, SettingsNode.email_sender_address);
+                EmailSenderDisplayName = ReadString(xd, SettingsNode.email_sender_displayName);
 
                 // tcpTrigger/email/message
-                currentNode = SettingsNode.email_message_subject;
-                EmailSubject = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
-                currentNode = SettingsNode.email_message_body;
-                EmailBody = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
+                EmailSubject = ReadString(xd, SettingsNode.email_message_subject);
+                EmailBody = ReadString(xd, SettingsNode.email_message_body);
 
                 // tcpTrigger/email/options
-                currentNode = SettingsNode.email_options_rateLimitSeconds;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null && !string.IsNullOrEmpty(xn.InnerText)) { EmailRateLimitSeconds = int.Parse(xn.InnerText); }
-                else { EmailRateLimitSeconds = 300; }
-                if (EmailRateLimitSeconds <= 0) { EmailRateLimitSeconds = 1; }
-                currentNode = SettingsNode.email_options_bufferSeconds;
-                xn = xd.DocumentElement.SelectSingleNode(currentNode);
-                if (xn != null && !string.IsNullOrEmpty(xn.InnerText)) { EmailBufferSeconds = int.Parse(xn.InnerText); }
-                else { EmailBufferSeconds = 30; }
-                if (EmailBufferSeconds <= 0) { EmailBufferSeconds = 1; }
+                EmailRateLimitSeconds = Math.Max(1, ReadInt(xd, SettingsNode.email_options_rateLimitSeconds, 300));
+                EmailBufferSeconds = Math.Max(1, ReadInt(xd, SettingsNode.email_options_bufferSeconds, 30));
             }
 
             catch (Exception ex)
@@ -300,6 +202,54 @@ namespace tcpTrigger
                     + ex.Message
                     );
             }
+        }
+
+        // Returns the text of the XML node at path, or null if the node doesn't exist.
+        private static string ReadString(XmlDocument xd, string path)
+        {
+            _currentNode = path;
+            return xd.DocumentElement.SelectSingleNode(path)?.InnerText;
+        }
+
+        // Returns the node at path as a bool, or defaultValue if the node is missing or empty.
+        private static bool ReadBool(XmlDocument xd, string path, bool defaultValue)
+        {
+            string text = ReadString(xd, path);
+            return string.IsNullOrWhiteSpace(text) ? defaultValue : bool.Parse(text);
+        }
+
+        // Returns the node at path as an int, or defaultValue if the node is missing or empty.
+        private static int ReadInt(XmlDocument xd, string path, int defaultValue)
+        {
+            string text = ReadString(xd, path);
+            return string.IsNullOrWhiteSpace(text) ? defaultValue : int.Parse(text);
+        }
+
+        // Returns the text of the node at path, decrypting it if the node has encrypted="true".
+        // Returns null if the node is missing or empty.
+        private static string ReadCredential(XmlDocument xd, string path)
+        {
+            _currentNode = path;
+            XmlNode node = xd.DocumentElement.SelectSingleNode(path);
+            if (node == null || string.IsNullOrEmpty(node.InnerText))
+                return null;
+
+            return node.Attributes["encrypted"]?.InnerText == "true"
+                ? StringCipher.Decrypt(node.InnerText)
+                : node.InnerText;
+        }
+
+        // Returns the text of every XML node at path, skipping empty ones.
+        private static List<string> ReadList(XmlDocument xd, string path)
+        {
+            _currentNode = path;
+            var values = new List<string>();
+            foreach (XmlNode node in xd.DocumentElement.SelectNodes(path))
+            {
+                if (!string.IsNullOrEmpty(node.InnerText))
+                    values.Add(node.InnerText);
+            }
+            return values;
         }
 
         // Parses a comma-separated list of ports and port ranges, such as "22,80,8000-8100".
