@@ -70,6 +70,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\EmailNotifier.cs" />
     <Compile Include="Classes\Logger.cs" />
     <Compile Include="Classes\Settings.cs" />
     <Compile Include="Classes\StringCipher.cs" />

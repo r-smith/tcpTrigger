@@ -85,8 +85,8 @@ namespace tcpTrigger
                     EmailSendTimer.Enabled = false;
                 }
 
-                // Send the email. Not awaited. SendEmail catches and logs its own errors.
-                _ = TcpTriggerService.SendEmail(this, connectionLog);
+                // Send the email. Not awaited. EmailNotifier.Send catches and logs its own errors.
+                _ = EmailNotifier.Send(this, connectionLog);
             }
         }
 
