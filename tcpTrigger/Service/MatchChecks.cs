@@ -8,55 +8,40 @@ namespace tcpTrigger
     {
         private bool DoesPacketMatchICMP(PacketHeader header, IPAddress ip)
         {
-            if (Settings.IsMonitorIcmpEnabled
+            return Settings.IsMonitorIcmpEnabled
                 && header.ProtocolType == Protocol.ICMP
                 && header.DestinationIP.Equals(ip)
                 && (header.IcmpType == (int)IcmpTypeCode.ping
                     || header.IcmpType == (int)IcmpTypeCode.timestamp
-                    || header.IcmpType == (int)IcmpTypeCode.netmask))
-            {
-                // So far match is good. Now check if source IP is in ignore list.
-                if (Settings.IgnoredEndpoints.TryGetValue(header.SourceIP, out HashSet<int> ports))
-                {
-                    // Source IP is in ignore list. Now check if source IP also ignores ICMP or all.
-                    if (ports.Contains(Settings.IgnoreAll) || ports.Contains(Settings.IgnoreIcmp))
-                    {
-                        // Source IP with destination ICMP found in ignore list. Return false / no match.
-                        return false;
-                    }
-                }
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+                    || header.IcmpType == (int)IcmpTypeCode.netmask)
+                && !IsIgnored(header.SourceIP, Settings.IgnoreIcmp);
         }
 
         private bool DoesPacketMatchTCP(PacketHeader header, IPAddress ip)
         {
-            if (Settings.IsMonitorTcpEnabled
-               && header.ProtocolType == Protocol.TCP
-               && header.DestinationIP.Equals(ip)
-               && Settings.TcpPortsToMonitor.Contains(header.DestinationPort)
-               && IsConnectionAttempt(header.TcpFlags))
-            {
-                // So far match is good. Now check if source IP is in ignore list.
-                if (Settings.IgnoredEndpoints.TryGetValue(header.SourceIP, out HashSet<int> ports))
-                {
-                    // Source IP is in ignore list. Now check if source IP has matching destination port in ignore list.
-                    if (ports.Contains(Settings.IgnoreAll) || ports.Contains(header.DestinationPort))
-                    {
-                        // Source IP and destination port combo found in ignore list. Return false / no match.
-                        return false;
-                    }
-                }
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return Settings.IsMonitorTcpEnabled
+                && header.ProtocolType == Protocol.TCP
+                && header.DestinationIP.Equals(ip)
+                && Settings.TcpPortsToMonitor.Contains(header.DestinationPort)
+                && IsConnectionAttempt(header.TcpFlags)
+                && !IsIgnored(header.SourceIP, header.DestinationPort);
+        }
+
+        private bool DoesPacketMatchUDP(PacketHeader header, IPAddress ip)
+        {
+            return Settings.IsMonitorUdpEnabled
+                && header.ProtocolType == Protocol.UDP
+                && header.DestinationIP.Equals(ip)
+                && Settings.UdpPortsToMonitor.Contains(header.DestinationPort)
+                && !IsIgnored(header.SourceIP, header.DestinationPort);
+        }
+
+        // Returns true if the source IP is in the ignore list for all traffic, or for this port.
+        // For ICMP, port is Settings.IgnoreIcmp.
+        private static bool IsIgnored(IPAddress sourceIp, int port)
+        {
+            return Settings.IgnoredEndpoints.TryGetValue(sourceIp, out HashSet<int> ports)
+                && (ports.Contains(Settings.IgnoreAll) || ports.Contains(port));
         }
 
         // Returns true if the TCP flags indicate a connection attempt:
@@ -69,31 +54,6 @@ namespace tcpTrigger
             const byte ACK = 0x10;
 
             return (tcpFlags & (SYN | ACK | RST | FIN)) == SYN;
-        }
-
-        private bool DoesPacketMatchUDP(PacketHeader header, IPAddress ip)
-        {
-            if (Settings.IsMonitorUdpEnabled
-                && header.ProtocolType == Protocol.UDP
-                && header.DestinationIP.Equals(ip)
-                && Settings.UdpPortsToMonitor.Contains(header.DestinationPort))
-            {
-                // So far match is good. Now check if source IP is in ignore list.
-                if (Settings.IgnoredEndpoints.TryGetValue(header.SourceIP, out HashSet<int> ports))
-                {
-                    // Source IP is in ignore list. Now check if destination port is also in ignore list for this source IP.
-                    if (ports.Contains(Settings.IgnoreAll) || ports.Contains(header.DestinationPort))
-                    {
-                        // Source IP and destination port combo found in ignore list. Return false / no match.
-                        return false;
-                    }
-                }
-                return true;
-            }
-            else
-            {
-                return false;
-            }
         }
     }
 }
