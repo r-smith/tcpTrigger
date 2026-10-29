@@ -33,7 +33,6 @@ namespace tcpTrigger
             }
         }
         public string Description { get; }
-        public Socket NetworkSocket { get; set; }
         public DateTime EmailLastSentTimestamp { get; private set; }
         public object EmailLock { get; } = new object();
         public string EmailLogBuffer { get; set; }

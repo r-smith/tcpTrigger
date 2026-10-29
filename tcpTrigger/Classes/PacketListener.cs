@@ -5,10 +5,21 @@ using System.Net.Sockets;
 namespace tcpTrigger
 {
     // Captures incoming packets on a network interface and runs the configured actions for any that match.
-    internal static class PacketListener
+    internal class PacketListener
     {
+        // The raw socket capturing packets. Created by Start and closed by Stop.
+        private Socket _socket;
+
+        // The network interface this listener captures packets on.
+        public TcpTriggerInterface Interface { get; }
+
+        public PacketListener(TcpTriggerInterface ipInterface)
+        {
+            Interface = ipInterface;
+        }
+
         // Starts capturing packets on the interface. Throws a SocketException if the listener can't start.
-        public static void Start(TcpTriggerInterface ipInterface)
+        public void Start()
         {
             // Buffer for incoming data.
             byte[] buffer = new byte[512];
@@ -16,9 +27,9 @@ namespace tcpTrigger
             // Bind socket to IP endpoint.
             try
             {
-                ipInterface.NetworkSocket = new Socket(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.IP);
-                ipInterface.NetworkSocket.Bind(new IPEndPoint(ipInterface.IP, 0));
-                ipInterface.NetworkSocket.IOControl(IOControlCode.ReceiveAll, BitConverter.GetBytes(1), null);
+                _socket = new Socket(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.IP);
+                _socket.Bind(new IPEndPoint(Interface.IP, 0));
+                _socket.IOControl(IOControlCode.ReceiveAll, BitConverter.GetBytes(1), null);
             }
             catch
             {
@@ -31,12 +42,12 @@ namespace tcpTrigger
                 // Packet received.
                 try
                 {
-                    ProcessPacket(buffer, ipInterface);
+                    ProcessPacket(buffer, Interface);
                 }
                 catch (Exception ex)
                 {
                     Logger.WriteError(
-                        $"tcpTrigger failed to process a packet on network interface {ipInterface.IP} ({ipInterface.Description})."
+                        $"tcpTrigger failed to process a packet on network interface {Interface.IP} ({Interface.Description})."
                         + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                         Logger.EventCode.Error);
                 }
@@ -45,7 +56,7 @@ namespace tcpTrigger
                 buffer = new byte[512];
                 try
                 {
-                    ipInterface.NetworkSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, OnReceive, null);
+                    _socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, OnReceive, null);
                 }
                 catch (ObjectDisposedException)
                 {
@@ -55,20 +66,20 @@ namespace tcpTrigger
                 catch (SocketException ex)
                 {
                     Logger.WriteError(
-                        $"tcpTrigger stopped monitoring network interface {ipInterface.IP} ({ipInterface.Description}) because of an error accessing the interface."
+                        $"tcpTrigger stopped monitoring network interface {Interface.IP} ({Interface.Description}) because of an error accessing the interface."
                         + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                         Logger.EventCode.Error);
                 }
             }
 
             // Begin listening for data.
-            ipInterface.NetworkSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, OnReceive, null);
+            _socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, OnReceive, null);
         }
 
         // Stops capturing packets on the interface.
-        public static void Stop(TcpTriggerInterface ipInterface)
+        public void Stop()
         {
-            ipInterface.NetworkSocket?.Close();
+            _socket?.Close();
         }
 
         private static void ProcessPacket(byte[] buffer, TcpTriggerInterface ipInterface)

@@ -10,14 +10,13 @@ namespace tcpTrigger
 {
     partial class TcpTriggerService : ServiceBase
     {
-        // _detectedInterfaces stores all network interfaces on the system.
-        // Used to detect network changes.
+        // A running listener for each interface being monitored.
+        private List<PacketListener> _listeners;
+
+        // Stores all network interfaces on the system. Used to detect network changes.
         private List<TcpTriggerInterface> _detectedInterfaces;
 
-        // _tcpTriggerInterfaces stores the interfaces with an active listener.
-        private List<TcpTriggerInterface> _tcpTriggerInterfaces;
-
-        // _networkCheckTimer checks for network changes and restarts listeners when one is found.
+        // Time that checks for network changes and restarts listeners when one is found.
         private System.Timers.Timer _networkCheckTimer;
 
         public TcpTriggerService()
@@ -119,9 +118,9 @@ namespace tcpTrigger
             _networkCheckTimer.Dispose();
 
             // Close (and dispose) all existing listeners.
-            for (int i = 0; i < _tcpTriggerInterfaces.Count; i++)
+            foreach (PacketListener listener in _listeners)
             {
-                PacketListener.Stop(_tcpTriggerInterfaces[i]);
+                listener.Stop();
             }
             Logger.Write("The tcpTrigger service stopped successfully.", Logger.EventCode.ServiceStopped);
         }
@@ -156,31 +155,29 @@ namespace tcpTrigger
                         Logger.EventCode.NetworkChangeDetected);
 
                     // Close (and dispose) all existing listeners.
-                    for (int i = 0; i < _tcpTriggerInterfaces.Count; i++)
+                    foreach (PacketListener listener in _listeners)
                     {
-                        PacketListener.Stop(_tcpTriggerInterfaces[i]);
+                        listener.Stop();
                     }
                 }
             }
 
-            // Clone retrieved list of network interfaces to global var.
+            // Store the retrieved list of network interfaces and start listening on them.
             _detectedInterfaces = networkInterfaces;
-            _tcpTriggerInterfaces = new List<TcpTriggerInterface>(networkInterfaces);
-
-            // Start listeners.
-            StartIpListeners();
+            StartIpListeners(networkInterfaces);
         }
 
-        private void StartIpListeners()
+        private void StartIpListeners(List<TcpTriggerInterface> interfaces)
         {
-            // Start listeners.
-            var listeningInterfaces = new List<TcpTriggerInterface>();
-            foreach (TcpTriggerInterface ipInterface in _tcpTriggerInterfaces)
+            // Start a listener on each interface. Keep only the listeners that started successfully.
+            var listeners = new List<PacketListener>();
+            foreach (TcpTriggerInterface ipInterface in interfaces)
             {
+                var listener = new PacketListener(ipInterface);
                 try
                 {
-                    PacketListener.Start(ipInterface);
-                    listeningInterfaces.Add(ipInterface);
+                    listener.Start();
+                    listeners.Add(listener);
                 }
                 catch (System.Net.Sockets.SocketException ex)
                 {
@@ -189,20 +186,20 @@ namespace tcpTrigger
                         + $"{ipInterface.IP} ({ipInterface.Description})."
                         + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                         Logger.EventCode.Error);
-                    PacketListener.Stop(ipInterface);
+                    listener.Stop();
                 }
             }
-            _tcpTriggerInterfaces = listeningInterfaces;
+            _listeners = listeners;
 
             // Listeners have started. Network monitoring is now active.
             // Record which adapters are being monitored to event log.
             // Record an error if no adapters are monitored.
-            if (_tcpTriggerInterfaces.Count > 0)
+            if (_listeners.Count > 0)
             {
                 Logger.Write(
                     "The tcpTrigger service is actively monitoring the following network interfaces:"
                     + Environment.NewLine + Environment.NewLine
-                    + NetworkInterfacesToString(_tcpTriggerInterfaces),
+                    + NetworkInterfacesToString(_listeners.ConvertAll(listener => listener.Interface)),
                     Logger.EventCode.NetworkInterfaces);
             }
             else
