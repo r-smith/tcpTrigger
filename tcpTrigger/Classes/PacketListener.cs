@@ -10,12 +10,16 @@ namespace tcpTrigger
         // The raw socket capturing packets. Created by Start and closed by Stop.
         private Socket _socket;
 
+        // Matched packets are queued here for their actions to run.
+        private readonly ActionQueue _actionQueue;
+
         // The network interface this listener captures packets on.
         public TcpTriggerInterface Interface { get; }
 
-        public PacketListener(TcpTriggerInterface ipInterface)
+        public PacketListener(TcpTriggerInterface ipInterface, ActionQueue actionQueue)
         {
             Interface = ipInterface;
+            _actionQueue = actionQueue;
         }
 
         // Starts capturing packets on the interface. Throws a SocketException if the listener can't start.
@@ -54,7 +58,7 @@ namespace tcpTrigger
                 // Process the packet. Log any error and keep listening.
                 try
                 {
-                    ProcessPacket(buffer, Interface);
+                    ProcessPacket(buffer);
                 }
                 catch (Exception ex)
                 {
@@ -94,29 +98,19 @@ namespace tcpTrigger
             _socket?.Close();
         }
 
-        private static void ProcessPacket(byte[] buffer, TcpTriggerInterface ipInterface)
+        private void ProcessPacket(byte[] buffer)
         {
             // Extract header information.
             var packetHeader = new PacketHeader(buffer);
 
             // Determine if the packet matches our trigger rules.
-            packetHeader.MatchType = PacketMatcher.GetMatchType(packetHeader, ipInterface.IP);
+            packetHeader.MatchType = PacketMatcher.GetMatchType(packetHeader, Interface.IP);
 
-            // Process actions.
+            // Queue matches for the action thread.
             if (packetHeader.MatchType != PacketMatch.None)
             {
-                try
-                {
-                    packetHeader.DestinationMac = ipInterface.MacAddress;
-                    ActionRunner.Run(packetHeader, ipInterface);
-                }
-                catch (Exception ex)
-                {
-                    Logger.WriteError(
-                        "A packet matched detection rules but tcpTrigger failed to perform configured actions. "
-                        + ex.Message,
-                        Logger.EventCode.Error);
-                }
+                packetHeader.DestinationMac = Interface.MacAddress;
+                _actionQueue.Add(packetHeader, Interface);
             }
         }
     }

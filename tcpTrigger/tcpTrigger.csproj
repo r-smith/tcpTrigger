@@ -70,6 +70,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\ActionQueue.cs" />
     <Compile Include="Classes\ActionRunner.cs" />
     <Compile Include="Classes\EmailNotifier.cs" />
     <Compile Include="Classes\Logger.cs" />

@@ -19,6 +19,9 @@ namespace tcpTrigger
         // Time that checks for network changes and restarts listeners when one is found.
         private System.Timers.Timer _networkCheckTimer;
 
+        // Runs the actions for matched packets on a background thread.
+        private ActionQueue _actionQueue;
+
         public TcpTriggerService()
         {
             InitializeComponent();
@@ -95,6 +98,10 @@ namespace tcpTrigger
                 + Settings.DumpToString(),
                 Logger.EventCode.ConfigurationApplied);
 
+            // Start the action queue thread.
+            _actionQueue = new ActionQueue();
+            _actionQueue.Start();
+
             // Retrieve network interfaces and start IP listener threads.
             // This is done on a timer so that the listener thread can automatically restart
             // if any changes to network interfaces are detected.
@@ -122,6 +129,10 @@ namespace tcpTrigger
             {
                 listener.Stop();
             }
+
+            // Let actions already queued finish before stopping.
+            _actionQueue.Stop();
+
             Logger.Write("The tcpTrigger service stopped successfully.", Logger.EventCode.ServiceStopped);
         }
 
@@ -173,7 +184,7 @@ namespace tcpTrigger
             var listeners = new List<PacketListener>();
             foreach (TcpTriggerInterface ipInterface in interfaces)
             {
-                var listener = new PacketListener(ipInterface);
+                var listener = new PacketListener(ipInterface, _actionQueue);
                 try
                 {
                     listener.Start();
