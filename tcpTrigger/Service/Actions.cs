@@ -10,64 +10,59 @@ namespace tcpTrigger
 {
     partial class tcpTrigger : ServiceBase
     {
+        // Ensures only one thread at a time rotates or writes to the log file.
+        private static readonly object _logFileLock = new object();
+
         private void WriteLog(PacketHeader packetHeader)
         {
             // Log files have a defined maximum file size and will rotate one time if reached.
             const int _maxFileSizeInBytes = 15 * 1024 * 1024;
 
-            // Check if log file already exists.
-            if (File.Exists(Settings.LogPath))
+            lock(_logFileLock)
             {
+                // Check if log file already exists.
+                if (File.Exists(Settings.LogPath))
+                {
+                    try
+                    {
+                        // Get current file size.
+                        long currentFileSize = new FileInfo(Settings.LogPath).Length;
+                        if (currentFileSize >= _maxFileSizeInBytes)
+                        {
+                            // Log reached max size.
+                            // Rotate by copying current log to .1 suffix, overwriting if exists.
+                            File.Copy(Settings.LogPath, Settings.LogPath + ".1", true);
+                            // Clear contents of original log.
+                            using (FileStream fileStream = File.Open(Settings.LogPath, FileMode.Open))
+                            {
+                                fileStream.SetLength(0);
+                                fileStream.Close();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Settings.IsLogEnabled = false;
+                        Logger.WriteError(
+                            $"Maximum log size {_maxFileSizeInBytes} bytes has been reached. Error rotating log file '{Settings.LogPath}'. "
+                            + $"Logging has been disabled.{ Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            Logger.EventCode.Error);
+                    }
+                }
+
                 try
                 {
-                    Settings.FileLock.EnterWriteLock();
-
-                    // Get current file size.
-                    long currentFileSize = new FileInfo(Settings.LogPath).Length;
-                    if (currentFileSize >= _maxFileSizeInBytes)
+                    using (StreamWriter outputFile = new StreamWriter(Settings.LogPath, true))
                     {
-                        // Log reached max size.
-                        // Rotate by copying current log to .1 suffix, overwriting if exists.
-                        File.Copy(Settings.LogPath, Settings.LogPath + ".1", true);
-                        // Clear contents of original log.
-                        using (FileStream fileStream = File.Open(Settings.LogPath, FileMode.Open))
-                        {
-                            fileStream.SetLength(0);
-                            fileStream.Close();
-                        }
+                        outputFile.WriteLine(GetLogText(packetHeader));
                     }
                 }
                 catch (Exception ex)
                 {
-                    Settings.IsLogEnabled = false;
                     Logger.WriteError(
-                        $"Maximum log size {_maxFileSizeInBytes} bytes has been reached. Error rotating log file '{Settings.LogPath}'. "
-                        + $"Logging has been disabled.{ Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                        $"Error writing to log file '{Settings.LogPath}'.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                         Logger.EventCode.Error);
                 }
-                finally
-                {
-                    Settings.FileLock.ExitWriteLock();
-                }
-            }
-
-            try
-            {
-                Settings.FileLock.EnterWriteLock();
-                using (StreamWriter outputFile = new StreamWriter(Settings.LogPath, true))
-                {
-                    outputFile.WriteLine(GetLogText(packetHeader));
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.WriteError(
-                    $"Error writing to log file '{Settings.LogPath}'.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                    Logger.EventCode.Error);
-            }
-            finally
-            {
-                Settings.FileLock.ExitWriteLock();
             }
         }
 

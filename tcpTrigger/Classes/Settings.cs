@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Threading;
 using System.Xml;
 
 namespace tcpTrigger
@@ -13,7 +12,6 @@ namespace tcpTrigger
         internal const int IgnoreAll = 0;
         internal const int IgnoreIcmp = -1;
 
-        public static ReaderWriterLockSlim FileLock { get; private set; } = new ReaderWriterLockSlim();
         public static string Path { get; private set; }
         public static bool IsMonitorTcpEnabled { get; private set; }
         public static bool IsMonitorUdpEnabled { get; private set; }
