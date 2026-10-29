@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="Classes\EmailNotifier.cs" />
     <Compile Include="Classes\Logger.cs" />
+    <Compile Include="Classes\PacketMatcher.cs" />
     <Compile Include="Classes\Settings.cs" />
     <Compile Include="Classes\StringCipher.cs" />
     <Compile Include="Classes\TcpTriggerInterface.cs" />
@@ -87,9 +88,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Service\Listener.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Service\MatchChecks.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Service\TcpTriggerService.cs">

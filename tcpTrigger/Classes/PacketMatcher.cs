@@ -1,12 +1,25 @@
 ﻿using System.Collections.Generic;
 using System.Net;
-using System.ServiceProcess;
 
 namespace tcpTrigger
 {
-    partial class TcpTriggerService : ServiceBase
+    // Decides whether a captured packet matches the configured detection rules.
+    internal static class PacketMatcher
     {
-        private bool DoesPacketMatchICMP(PacketHeader header, IPAddress ip)
+        // Returns the type of match for a packet sent to the given interface IP,
+        // or PacketMatch.None if the packet doesn't match any rule.
+        public static PacketMatch GetMatchType(PacketHeader header, IPAddress ip)
+        {
+            if (DoesPacketMatchICMP(header, ip))
+                return PacketMatch.IcmpRequest;
+            if (DoesPacketMatchTCP(header, ip))
+                return PacketMatch.TcpConnect;
+            if (DoesPacketMatchUDP(header, ip))
+                return PacketMatch.UdpCommunication;
+            return PacketMatch.None;
+        }
+
+        private static bool DoesPacketMatchICMP(PacketHeader header, IPAddress ip)
         {
             return Settings.IsMonitorIcmpEnabled
                 && header.ProtocolType == Protocol.ICMP
@@ -17,7 +30,7 @@ namespace tcpTrigger
                 && !IsIgnored(header.SourceIP, Settings.IgnoreIcmp);
         }
 
-        private bool DoesPacketMatchTCP(PacketHeader header, IPAddress ip)
+        private static bool DoesPacketMatchTCP(PacketHeader header, IPAddress ip)
         {
             return Settings.IsMonitorTcpEnabled
                 && header.ProtocolType == Protocol.TCP
@@ -27,7 +40,7 @@ namespace tcpTrigger
                 && !IsIgnored(header.SourceIP, header.DestinationPort);
         }
 
-        private bool DoesPacketMatchUDP(PacketHeader header, IPAddress ip)
+        private static bool DoesPacketMatchUDP(PacketHeader header, IPAddress ip)
         {
             return Settings.IsMonitorUdpEnabled
                 && header.ProtocolType == Protocol.UDP
@@ -56,4 +69,5 @@ namespace tcpTrigger
             return (tcpFlags & (SYN | ACK | RST | FIN)) == SYN;
         }
     }
+
 }

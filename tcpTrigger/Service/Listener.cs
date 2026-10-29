@@ -70,12 +70,7 @@ namespace tcpTrigger
             var packetHeader = new PacketHeader(buffer);
 
             // Determine if the packet matches our trigger rules.
-            if (DoesPacketMatchICMP(packetHeader, ipInterface.IP))
-                packetHeader.MatchType = PacketMatch.IcmpRequest;
-            else if (DoesPacketMatchTCP(packetHeader, ipInterface.IP))
-                packetHeader.MatchType = PacketMatch.TcpConnect;
-            else if (DoesPacketMatchUDP(packetHeader, ipInterface.IP))
-                packetHeader.MatchType = PacketMatch.UdpCommunication;
+            packetHeader.MatchType = PacketMatcher.GetMatchType(packetHeader, ipInterface.IP);
 
             // Process actions.
             if (packetHeader.MatchType != PacketMatch.None)
