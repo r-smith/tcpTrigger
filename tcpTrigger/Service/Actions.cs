@@ -47,6 +47,7 @@ namespace tcpTrigger
                             $"Maximum log size {_maxFileSizeInBytes} bytes has been reached. Error rotating log file '{Settings.LogPath}'. "
                             + $"Logging has been disabled.{ Environment.NewLine}{Environment.NewLine}{ex.Message}",
                             Logger.EventCode.Error);
+                        return;
                     }
                 }
 
