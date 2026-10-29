@@ -1,5 +1,7 @@
 <Project Sdk="WixToolset.Sdk/5.0.2">
   <PropertyGroup>
+	<!-- WIX1149: the Windows Installer issue it warns about affects service recovery actions, not the SID type used in this project. -->
+	<SuppressSpecificWarnings>1149</SuppressSpecificWarnings>
     <OutputName>tcpTrigger Setup</OutputName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
