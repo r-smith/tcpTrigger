@@ -39,7 +39,19 @@ namespace tcpTrigger
             // Callback method for processing captured packets.
             void OnReceive(IAsyncResult ar)
             {
-                // Packet received.
+                // Complete the receive, as required for every BeginReceive.
+                // Errors and the number of bytes received are ignored.
+                try
+                {
+                    _socket.EndReceive(ar, out SocketError _);
+                }
+                catch (ObjectDisposedException)
+                {
+                    // The listener was stopped. Stop receiving.
+                    return;
+                }
+
+                // Process the packet. Log any error and keep listening.
                 try
                 {
                     ProcessPacket(buffer, Interface);
