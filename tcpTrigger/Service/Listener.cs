@@ -75,18 +75,10 @@ namespace tcpTrigger
             // Process actions.
             if (packetHeader.MatchType != PacketMatch.None)
             {
-                // A match was detected. Perform enabled actions.
                 try
                 {
                     packetHeader.DestinationMac = ipInterface.MacAddress;
-                    if (Settings.IsLogEnabled)
-                        WriteLog(packetHeader);
-                    if (Settings.IsEventLogEnabled)
-                        WriteEventLog(packetHeader);
-                    if (Settings.IsExternalAppEnabled)
-                        LaunchApplication(packetHeader);
-                    if (Settings.IsEmailNotificationEnabled)
-                        TriggerEmail(packetHeader, ipInterface);
+                    ActionRunner.Run(packetHeader, ipInterface);
                 }
                 catch (Exception ex)
                 {

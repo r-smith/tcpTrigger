@@ -70,6 +70,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\ActionRunner.cs" />
     <Compile Include="Classes\EmailNotifier.cs" />
     <Compile Include="Classes\Logger.cs" />
     <Compile Include="Classes\PacketMatcher.cs" />
@@ -84,9 +85,6 @@
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\UserVariableExpansion.cs" />
-    <Compile Include="Service\Actions.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Service\Listener.cs">
       <SubType>Component</SubType>
     </Compile>

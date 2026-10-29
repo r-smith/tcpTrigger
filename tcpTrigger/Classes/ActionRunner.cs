@@ -1,21 +1,34 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.ServiceProcess;
 
 namespace tcpTrigger
 {
-    partial class TcpTriggerService : ServiceBase
+    // Performs the configured actions when a packet matches the detection rules.
+    internal static class ActionRunner
     {
         // Ensures only one thread at a time rotates or writes to the log file.
         private static readonly object _logFileLock = new object();
 
-        private void WriteLog(PacketHeader packetHeader)
+        // Runs each enabled action for a matched packet.
+        public static void Run(PacketHeader packetHeader, TcpTriggerInterface ipInterface)
+        {
+            if (Settings.IsLogEnabled)
+                WriteLog(packetHeader);
+            if (Settings.IsEventLogEnabled)
+                WriteEventLog(packetHeader);
+            if (Settings.IsExternalAppEnabled)
+                LaunchApplication(packetHeader);
+            if (Settings.IsEmailNotificationEnabled)
+                TriggerEmail(packetHeader, ipInterface);
+        }
+
+        private static void WriteLog(PacketHeader packetHeader)
         {
             // Log files have a defined maximum file size and will rotate one time if reached.
             const int _maxFileSizeInBytes = 15 * 1024 * 1024;
 
-            lock(_logFileLock)
+            lock (_logFileLock)
             {
                 // Check if log file already exists.
                 if (File.Exists(Settings.LogPath))
@@ -42,7 +55,7 @@ namespace tcpTrigger
                         Settings.IsLogEnabled = false;
                         Logger.WriteError(
                             $"Maximum log size {_maxFileSizeInBytes} bytes has been reached. Error rotating log file '{Settings.LogPath}'. "
-                            + $"Logging has been disabled.{ Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            + $"Logging has been disabled.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                             Logger.EventCode.Error);
                         return;
                     }
@@ -64,7 +77,7 @@ namespace tcpTrigger
             }
         }
 
-        private string GetLogText(PacketHeader packetHeader)
+        private static string GetLogText(PacketHeader packetHeader)
         {
             string logText;
             switch (packetHeader.MatchType)
@@ -86,7 +99,7 @@ namespace tcpTrigger
                 DateTime.Now.ToString(Settings.TimestampFormat) + " [" + packetHeader.DestinationIP + "] " + logText;
         }
 
-        private void WriteEventLog(PacketHeader packetHeader)
+        private static void WriteEventLog(PacketHeader packetHeader)
         {
             switch (packetHeader.MatchType)
             {
@@ -122,7 +135,7 @@ namespace tcpTrigger
             }
         }
 
-        private void LaunchApplication(PacketHeader packetHeader)
+        private static void LaunchApplication(PacketHeader packetHeader)
         {
             try
             {
@@ -138,7 +151,7 @@ namespace tcpTrigger
             }
         }
 
-        private void TriggerEmail(PacketHeader packetHeader, TcpTriggerInterface ipInterface)
+        private static void TriggerEmail(PacketHeader packetHeader, TcpTriggerInterface ipInterface)
         {
             // Record matched connection to log buffer and enable timer, which handles sending the notification email.
             lock (ipInterface.EmailLock)
