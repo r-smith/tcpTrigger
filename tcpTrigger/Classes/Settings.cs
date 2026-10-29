@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -106,70 +105,32 @@ namespace tcpTrigger
                 if (IsMonitorTcpEnabled)
                 {
                     // tcpTrigger/monitoredPorts
-                    List<ushort> includePorts = new List<ushort>();
-                    List<ushort> excludePorts = new List<ushort>();
-                    // Included ports.
                     currentNode = SettingsNode.monitoredPorts_tcp_include;
                     TcpPortsToIncludeAsString = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
-                    if (!string.IsNullOrEmpty(TcpPortsToIncludeAsString))
-                    {
-                        includePorts = (from part in TcpPortsToIncludeAsString.Split(',')
-                                        let range = part.Split('-')
-                                        let start = ushort.Parse(range[0])
-                                        let end = ushort.Parse(range[range.Length - 1])
-                                        from i in Enumerable.Range(start, end - start + 1)
-                                        orderby i
-                                        select (ushort)i).Distinct().ToList();
-                    }
-                    // Excluded ports.
+                    HashSet<ushort> includePorts = ParsePorts(TcpPortsToIncludeAsString);
+
                     currentNode = SettingsNode.monitoredPorts_tcp_exclude;
                     TcpPortsToExcludeAsString = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
-                    if (!string.IsNullOrEmpty(TcpPortsToExcludeAsString))
-                    {
-                        excludePorts = (from part in TcpPortsToExcludeAsString.Split(',')
-                                        let range = part.Split('-')
-                                        let start = ushort.Parse(range[0])
-                                        let end = ushort.Parse(range[range.Length - 1])
-                                        from i in Enumerable.Range(start, end - start + 1)
-                                        orderby i
-                                        select (ushort)i).Distinct().ToList();
-                    }
-                    // Final HashSet will contain all included ports except those excluded.
-                    TcpPortsToMonitor = new HashSet<ushort>(includePorts.Except(excludePorts));
+                    HashSet<ushort> excludePorts = ParsePorts(TcpPortsToExcludeAsString);
+
+                    // Final set contains all included ports except those excluded.
+                    includePorts.ExceptWith(excludePorts);
+                    TcpPortsToMonitor = includePorts;
                 }
                 if (IsMonitorUdpEnabled)
                 {
                     // tcpTrigger/monitoredPorts
-                    List<ushort> includePorts = new List<ushort>();
-                    List<ushort> excludePorts = new List<ushort>();
-                    // Included ports.
                     currentNode = SettingsNode.monitoredPorts_udp_include;
                     UdpPortsToIncludeAsString = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
-                    if (!string.IsNullOrEmpty(UdpPortsToIncludeAsString))
-                    {
-                        includePorts = (from part in UdpPortsToIncludeAsString.Split(',')
-                                        let range = part.Split('-')
-                                        let start = ushort.Parse(range[0])
-                                        let end = ushort.Parse(range[range.Length - 1])
-                                        from i in Enumerable.Range(start, end - start + 1)
-                                        orderby i
-                                        select (ushort)i).Distinct().ToList();
-                    }
-                    // Excluded ports.
+                    HashSet<ushort> includePorts = ParsePorts(UdpPortsToIncludeAsString);
+
                     currentNode = SettingsNode.monitoredPorts_udp_exclude;
                     UdpPortsToExcludeAsString = xd.DocumentElement.SelectSingleNode(currentNode)?.InnerText;
-                    if (!string.IsNullOrEmpty(UdpPortsToExcludeAsString))
-                    {
-                        excludePorts = (from part in UdpPortsToExcludeAsString.Split(',')
-                                        let range = part.Split('-')
-                                        let start = ushort.Parse(range[0])
-                                        let end = ushort.Parse(range[range.Length - 1])
-                                        from i in Enumerable.Range(start, end - start + 1)
-                                        orderby i
-                                        select (ushort)i).Distinct().ToList();
-                    }
-                    // Final HashSet will contain all included ports except those excluded.
-                    UdpPortsToMonitor = new HashSet<ushort>(includePorts.Except(excludePorts));
+                    HashSet<ushort> excludePorts = ParsePorts(UdpPortsToExcludeAsString);
+
+                    // Final set contains all included ports except those excluded.
+                    includePorts.ExceptWith(excludePorts);
+                    UdpPortsToMonitor = includePorts;
                 }
 
                 // tcpTrigger/endpointIgnoreList
@@ -339,6 +300,29 @@ namespace tcpTrigger
                     + ex.Message
                     );
             }
+        }
+
+        // Parses a comma-separated list of ports and port ranges, such as "22,80,8000-8100".
+        // Returns an empty set if the list is null or empty.
+        private static HashSet<ushort> ParsePorts(string portList)
+        {
+            var ports = new HashSet<ushort>();
+            if (string.IsNullOrWhiteSpace(portList))
+                return ports;
+
+            foreach (string part in portList.Split(','))
+            {
+                string[] range = part.Split('-');
+                ushort start = ushort.Parse(range[0]);
+                ushort end = ushort.Parse(range[range.Length - 1]);
+                if (start > end)
+                    throw new FormatException($"Port range '{part.Trim()}' has its start after its end.");
+
+                // Use an int counter (a ushort would wrap from 65535 back to 0).
+                for (int port = start; port <= end; port++)
+                    ports.Add((ushort)port);
+            }
+            return ports;
         }
 
         public static string DumpToString()
