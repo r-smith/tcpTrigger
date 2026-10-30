@@ -19,7 +19,7 @@ namespace tcpTrigger
         // Stores all network interfaces on the system. Used to detect network changes.
         private List<TcpTriggerInterface> _detectedInterfaces;
 
-        // Time that checks for network changes and restarts listeners when one is found.
+        // Timer that checks for network changes and restarts listeners when one is found.
         private System.Timers.Timer _networkCheckTimer;
 
         // Runs the actions for matched packets on a background thread.
