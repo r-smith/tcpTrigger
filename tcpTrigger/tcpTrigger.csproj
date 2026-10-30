@@ -60,7 +60,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
-    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
     <Reference Include="System.Xml.Linq" />
@@ -80,12 +79,6 @@
     <Compile Include="Classes\StringCipher.cs" />
     <Compile Include="Classes\TcpTriggerInterface.cs" />
     <Compile Include="Classes\PacketHeader.cs" />
-    <Compile Include="ProjectInstaller.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="ProjectInstaller.Designer.cs">
-      <DependentUpon>ProjectInstaller.cs</DependentUpon>
-    </Compile>
     <Compile Include="Classes\UserVariableExpansion.cs" />
     <Compile Include="Service\TcpTriggerService.cs">
       <SubType>Component</SubType>
@@ -97,10 +90,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ProjectInstaller.resx">
-      <DependentUpon>ProjectInstaller.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Service\TcpTriggerService.resx">
       <DependentUpon>TcpTriggerService.cs</DependentUpon>
     </EmbeddedResource>
