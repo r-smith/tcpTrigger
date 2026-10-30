@@ -10,6 +10,9 @@ namespace tcpTrigger
 {
     partial class TcpTriggerService : ServiceBase
     {
+        // Custom service command to reload the configuration file.
+        public const int ReloadConfigurationCommand = 128;
+
         // A running listener for each interface being monitored.
         private List<PacketListener> _listeners;
 
@@ -21,6 +24,12 @@ namespace tcpTrigger
 
         // Runs the actions for matched packets on a background thread.
         private ActionQueue _actionQueue;
+
+        // Ensures starting monitoring, stopping monitoring, and the network change check never run at the same time.
+        private readonly object _monitoringLock = new object();
+
+        // True while monitoring is running.
+        private bool _isMonitoring;
 
         public TcpTriggerService()
         {
@@ -80,6 +89,45 @@ namespace tcpTrigger
             Logger.Write("The tcpTrigger service stopped successfully.", Logger.EventCode.ServiceStopped);
         }
 
+        // Called by Windows when a custom command is sent to the tcpTrigger service.
+        protected override void OnCustomCommand(int command)
+        {
+            if (command == ReloadConfigurationCommand)
+                ReloadConfiguration();
+        }
+
+        // Stops monitoring, loads the configuration file again, and restarts monitoring with the new settings.
+        // If that fails, the service stops.
+        private void ReloadConfiguration()
+        {
+            // Windows runs each custom command on its own thread, so hold the lock for the reload.
+            lock (_monitoringLock)
+            {
+                try
+                {
+                    StopMonitoring();
+                    LoadConfiguration();
+                    StartMonitoring();
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteError(
+                        "Failed to reload the tcpTrigger configuration. The service is stopping."
+                        + Environment.NewLine + Environment.NewLine
+                        + ex.Message,
+                        Logger.EventCode.Error);
+
+                    // Stop with an error code, so Windows records the stop as a failure.
+                    const int ErrorExceptionInService = 1064;
+                    ExitCode = ErrorExceptionInService;
+                    Stop();
+                    return;
+                }
+
+                Logger.Write("The tcpTrigger configuration was reloaded.", Logger.EventCode.ConfigurationReloaded);
+            }
+        }
+
         // Reads the configuration file, corrects any settings that can't be used, and records
         // the applied configuration to the event log. Throws if the file can't be read or parsed.
         private void LoadConfiguration()
@@ -111,7 +159,7 @@ namespace tcpTrigger
 
             // Write final applied configuration to event log.
             Logger.Write(
-                "The tcpTrigger service is starting."
+                "The tcpTrigger configuration has been applied."
                 + Environment.NewLine + Environment.NewLine
                 + Settings.DumpToString(),
                 Logger.EventCode.ConfigurationApplied);
@@ -120,82 +168,103 @@ namespace tcpTrigger
         // Starts the action queue thread, the network listeners, and the network change detection.
         private void StartMonitoring()
         {
-            // Start the action queue thread.
-            _actionQueue = new ActionQueue();
-            _actionQueue.Start();
-
-            // Retrieve network interfaces and start IP listener threads.
-            // This is done on a timer so that the listener thread can automatically restart
-            // if any changes to network interfaces are detected.
-            _networkCheckTimer = new System.Timers.Timer
+            lock (_monitoringLock)
             {
-                Interval = TimeSpan.FromMinutes(1).TotalMilliseconds
-            };
-            _networkCheckTimer.Elapsed += InitializeNetworkListeners_Elapsed;
-            _networkCheckTimer.Enabled = true;
-            InitializeNetworkListeners_Elapsed(null, null);
+                _isMonitoring = true;
+
+                // Start the action queue thread.
+                _actionQueue = new ActionQueue();
+                _actionQueue.Start();
+
+                // Retrieve network interfaces and start IP listener threads.
+                // This is done on a timer so that the listener thread can automatically restart
+                // if any changes to network interfaces are detected.
+                _networkCheckTimer = new System.Timers.Timer
+                {
+                    Interval = TimeSpan.FromMinutes(1).TotalMilliseconds
+                };
+                _networkCheckTimer.Elapsed += InitializeNetworkListeners_Elapsed;
+                _networkCheckTimer.Enabled = true;
+                InitializeNetworkListeners_Elapsed(null, null);
+            }
         }
 
         // Stops the network change detection, the network listeners, and the action queue thread.
         private void StopMonitoring()
         {
-            // Stop checking for network changes.
-            _networkCheckTimer.Stop();
-            _networkCheckTimer.Dispose();
-
-            // Close (and dispose) all existing listeners.
-            foreach (PacketListener listener in _listeners)
+            lock (_monitoringLock)
             {
-                listener.Stop();
+                // Exit if already stopped (such as after a failed reload).
+                if (!_isMonitoring)
+                    return;
+
+                _isMonitoring = false;
+
+                // Stop checking for network changes.
+                _networkCheckTimer.Stop();
+                _networkCheckTimer.Dispose();
+
+                // Close (and dispose) all existing listeners.
+                foreach (PacketListener listener in _listeners)
+                {
+                    listener.Stop();
+                }
+
+                // Let actions already queued finish before stopping.
+                _actionQueue.Stop();
+
+                // Forget the detected interfaces, so the next start begins with a fresh network check.
+                _detectedInterfaces = null;
             }
-
-            // Let actions already queued finish before stopping.
-            _actionQueue.Stop();
-
-            // Forget the detected interfaces, so the next start begins with a fresh network check.
-            _detectedInterfaces = null;
         }
 
         private void InitializeNetworkListeners_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            // Get network interfaces that support listening.
-            List<TcpTriggerInterface> networkInterfaces = TcpTriggerInterface.GetInterfaces();
-
-            // Check if tcpTrigger service is already running (_detectedInterfaces won't be null).
-            if (_detectedInterfaces != null)
+            lock (_monitoringLock)
             {
-                // Compare list of network interfaces to previously stored list of network interfaces.
-                if (networkInterfaces.SequenceEqual(_detectedInterfaces, new TcpTriggerInterfaceComparer()))
-                {
-                    // Lists are equal. Nothing to do; quit.
+                // Do nothing if monitoring has stopped.
+                if (!_isMonitoring)
                     return;
-                }
-                else
-                {
-                    // Network interfaces have changed. Record to event log that a change was detected.
-                    Logger.Write(
-                        "The tcpTrigger service detected a change in the network configuration in Windows. "
-                        + "Monitoring has stopped and will immediately resume with the new network configuration. "
-                        + $"Event ID {(int)Logger.EventCode.NetworkInterfaces} will be recorded when monitoring resumes."
-                        + Environment.NewLine + Environment.NewLine
-                        + "# Previous network configuration" + Environment.NewLine
-                        + NetworkInterfacesToString(_detectedInterfaces)
-                        + Environment.NewLine
-                        + "# New network configuration" + Environment.NewLine
-                        + NetworkInterfacesToString(networkInterfaces),
-                        Logger.EventCode.NetworkChangeDetected);
 
-                    // Close (and dispose) all existing listeners.
-                    foreach (PacketListener listener in _listeners)
+                // Get network interfaces that support listening.
+                List<TcpTriggerInterface> networkInterfaces = TcpTriggerInterface.GetInterfaces();
+
+                // Check if tcpTrigger service is already running (_detectedInterfaces won't be null).
+                if (_detectedInterfaces != null)
+                {
+                    // Compare list of network interfaces to previously stored list of network interfaces.
+                    if (networkInterfaces.SequenceEqual(_detectedInterfaces, new TcpTriggerInterfaceComparer()))
                     {
-                        listener.Stop();
+                        // Lists are equal. Nothing to do; quit.
+                        return;
+                    }
+                    else
+                    {
+                        // Network interfaces have changed. Record to event log that a change was detected.
+                        Logger.Write(
+                            "The tcpTrigger service detected a change in the network configuration in Windows. "
+                            + "Monitoring has stopped and will immediately resume with the new network configuration. "
+                            + $"Event ID {(int)Logger.EventCode.NetworkInterfaces} will be recorded when monitoring resumes."
+                            + Environment.NewLine + Environment.NewLine
+                            + "# Previous network configuration" + Environment.NewLine
+                            + NetworkInterfacesToString(_detectedInterfaces)
+                            + Environment.NewLine
+                            + "# New network configuration" + Environment.NewLine
+                            + NetworkInterfacesToString(networkInterfaces),
+                            Logger.EventCode.NetworkChangeDetected);
+
+                        // Close (and dispose) all existing listeners.
+                        foreach (PacketListener listener in _listeners)
+                        {
+                            listener.Stop();
+                        }
                     }
                 }
-            }
 
-            // Store the retrieved list of network interfaces and start listening on them.
-            _detectedInterfaces = networkInterfaces;
-            StartIpListeners(networkInterfaces);
+                // Store the retrieved list of network interfaces and start listening on them.
+                _detectedInterfaces = networkInterfaces;
+                StartIpListeners(networkInterfaces);
+            }
         }
 
         private void StartIpListeners(List<TcpTriggerInterface> interfaces)

@@ -11,6 +11,7 @@ namespace tcpTrigger
             ConfigurationApplied = 100,
             NetworkChangeDetected = 101,
             NetworkInterfaces = 102,
+            ConfigurationReloaded = 103,
             Error = 400,
             MatchedIcmp = 200,
             MatchedTcp = 201,
