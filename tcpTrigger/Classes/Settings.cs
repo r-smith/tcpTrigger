@@ -79,10 +79,7 @@ namespace tcpTrigger
                     );
             }
 
-            // currentNode is updated with the XML node path for every element that is read
-            // from the configuration file. This aids in debugging and provides more useful
-            // error messages when something goes wrong.
-            string currentNode = string.Empty;
+            _currentNode = string.Empty;
             try
             {
                 XmlDocument xd = new XmlDocument();
@@ -197,7 +194,7 @@ namespace tcpTrigger
                 throw new FileLoadException(
                     $"Unable to parse the configuration file '{Path}'."
                     + $"{Environment.NewLine}{Environment.NewLine}"
-                    + $"Error parsing XML node: '{currentNode}'."
+                    + $"Error parsing XML node: '{_currentNode}'."
                     + $"{Environment.NewLine}{Environment.NewLine}"
                     + ex.Message
                     );
