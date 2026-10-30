@@ -16,7 +16,6 @@ namespace tcpTrigger
             MatchedIcmp = 200,
             MatchedTcp = 201,
             MatchedUdp = 202,
-            //MatchedDhcp = 203, /* [Obsolete] */
         }
 
         public static void Write(string message, EventCode eventCode)
@@ -31,7 +30,14 @@ namespace tcpTrigger
 
         private static void WriteEventLog(string message, EventLogEntryType type, EventCode eventCode)
         {
-            EventLog.WriteEntry("tcpTrigger", message, type, (int)eventCode);
+            try
+            {
+                EventLog.WriteEntry("tcpTrigger", message, type, (int)eventCode);
+            }
+            catch
+            {
+                // The event log couldn't be written.
+            }
         }
     }
 }
