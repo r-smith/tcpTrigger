@@ -46,8 +46,10 @@ namespace tcpTrigger
             MacAddress = macAddress;
             Guid = guid;
 
-            EmailSendTimer = new System.Timers.Timer();
-            EmailSendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailBufferSeconds).TotalMilliseconds;
+            EmailSendTimer = new System.Timers.Timer
+            {
+                Interval = TimeSpan.FromSeconds(Settings.EmailBufferSeconds).TotalMilliseconds
+            };
             EmailSendTimer.Elapsed += EmailBufferTimer_Elapsed;
             EmailSendTimer.Enabled = false;
         }
@@ -55,8 +57,7 @@ namespace tcpTrigger
         // Methods.
         private void EmailBufferTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (EmailLastSentTimestamp != null
-                && EmailLastSentTimestamp > DateTime.Now.AddSeconds(-Settings.EmailRateLimitSeconds))
+            if (EmailLastSentTimestamp > DateTime.Now.AddSeconds(-Settings.EmailRateLimitSeconds))
             {
                 // Too soon to send another email. Apply rate limiting by changing the timer interval.
                 double secondsSinceLastEmail = (DateTime.Now - EmailLastSentTimestamp).TotalSeconds;
