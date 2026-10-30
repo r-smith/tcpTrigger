@@ -141,7 +141,7 @@ namespace tcpTrigger
             {
                 Process.Start(
                     Settings.ExternalAppPath,
-                    UserVariableExpansion.GetExpandedString(Settings.ExternalAppArguments, packetHeader));
+                    UserVariableExpansion.GetExpandedString(Settings.ExternalAppArguments ?? string.Empty, packetHeader));
             }
             catch (Exception ex)
             {
