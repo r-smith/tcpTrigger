@@ -35,11 +35,9 @@ namespace tcpTrigger.Manager
         {
             try
             {
-                // To restart the tcpTrigger service, a new process is started that requests UAC elevation.
+                // To apply settings to the tcpTrigger service, a new process is started that requests UAC elevation.
                 // The process is a new instance of this application, but with command line arguments
-                // passed in to tell the new instance of this app to restart the tcpTrigger service and exit.
-                // See Application_Startup() method in App.xaml.cs for handling of command line arguments.
-
+                // passed in to tell the new instance of this app to apply the settings and exit.
                 e.Result = EXIT_SUCCESS;
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
@@ -47,7 +45,7 @@ namespace tcpTrigger.Manager
                     UseShellExecute = true,
                     WorkingDirectory = Environment.CurrentDirectory,
                     FileName = System.Reflection.Assembly.GetExecutingAssembly().Location,
-                    Arguments = "--restart-service"
+                    Arguments = "--apply-settings"
                 };
                 using (Process process = Process.Start(startInfo))
                 {
@@ -76,11 +74,11 @@ namespace tcpTrigger.Manager
         private void Thread_RestartServiceCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             const string _successTitle = "Your settings were applied";
-            const string _successMessage = "The tcpTrigger service restarted successfully with your new settings applied.";
+            const string _successMessage = "The tcpTrigger service applied your new settings.";
             const string _successIcon = "icon.check-circle";
             const string _successBrush = "#2263e6be";
-            const string _failTitle = "Unable to restart service";
-            const string _failMessage = "The tcpTrigger service failed to restart. Examine the 'tcpTrigger' event log in the Windows Event Viewer for additional details.";
+            const string _failTitle = "Unable to apply settings";
+            const string _failMessage = "The tcpTrigger service could not apply your settings and may have stopped. Examine the 'tcpTrigger' event log in the Windows Event Viewer for additional details.";
             const string _failIcon = "icon.exclamation-circle";
             const string _failBrush = "#22ffd43b";
             const string _cancelTitle = "Cancelled";

@@ -9,8 +9,8 @@ namespace tcpTrigger.Manager
     public partial class ApplySettingsWindow : Window
     {
         private const string _serviceName = "tcpTrigger";
-        private const string _isRunningMessage = "To apply your changes, the tcpTrigger service must restart. "
-                                                 + "Would you like to restart the service and apply your new settings now?";
+        private const string _isRunningMessage = "To apply your changes, the tcpTrigger service must reload its settings. "
+                                                 + "Would you like to apply your new settings now?";
         private const string _isStoppedMessage = "The tcpTrigger service is not currently running. "
                                                  + "Would you like to start the serivce now?";
         private const string _isUnknownMessage = "Could not determine the status of the tcpTrigger service. "
