@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 
 namespace tcpTrigger
 {
+    // Sends notification emails using the email settings.
     internal static class EmailNotifier
     {
+        // Sends a notification email for the interface. Errors are logged, not thrown.
         public static async Task Send(TcpTriggerInterface ipInterface, string connectionLog)
         {
             if (Settings.EmailRecipients.Count == 0)

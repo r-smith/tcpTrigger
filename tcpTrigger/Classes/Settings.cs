@@ -7,11 +7,13 @@ using System.Xml;
 
 namespace tcpTrigger
 {
+    // The configuration settings, loaded from tcpTrigger.xml.
     public static class Settings
     {
         internal const int IgnoreAll = 0;
         internal const int IgnoreIcmp = -1;
 
+        // Full path of the configuration file that was loaded.
         public static string Path { get; private set; }
         public static bool IsMonitorTcpEnabled { get; private set; }
         public static bool IsMonitorUdpEnabled { get; private set; }
@@ -50,6 +52,8 @@ namespace tcpTrigger
         // Used to say which node caused an error when the file can't be parsed.
         private static string _currentNode;
 
+        // Returns the configuration file path: in the executable's path if present, otherwise in ProgramData.
+        // Returns an empty string if neither exists.
         private static string GetSettingsPath()
         {
             // Locate the tcpTrigger.xml configuration file.
@@ -64,6 +68,7 @@ namespace tcpTrigger
                 return string.Empty;
         }
 
+        // Loads all settings from the configuration file. Throws if the file is missing or can't be parsed.
         public static void Load()
         {
             Path = GetSettingsPath();
@@ -274,6 +279,7 @@ namespace tcpTrigger
             return ports;
         }
 
+        // Returns the settings as readable text for the event log.
         public static string DumpToString()
         {
             StringBuilder sb = new StringBuilder();

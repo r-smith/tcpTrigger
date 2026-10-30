@@ -5,9 +5,8 @@ namespace tcpTrigger
 {
     static class Program
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
+        // The main entry point.
+        // Runs as a Windows service, or in a console window when started directly.
         static void Main()
         {
             var service = new TcpTriggerService();

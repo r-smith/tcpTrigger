@@ -6,6 +6,7 @@ using System.Text;
 
 namespace tcpTrigger
 {
+    // IP protocol numbers, as found in byte 9 of the IP header.
     public enum Protocol
     {
         ICMP = 1,
@@ -14,6 +15,7 @@ namespace tcpTrigger
         Unknown = -1
     }
 
+    // The detection rule a packet matched.
     public enum PacketMatch
     {
         IcmpRequest,
@@ -22,6 +24,7 @@ namespace tcpTrigger
         None
     }
 
+    // ICMP message types that tcpTrigger detects.
     public enum IcmpTypeCode
     {
         ping = 8,
@@ -29,6 +32,7 @@ namespace tcpTrigger
         netmask = 17
     }
 
+    // The fields tcpTrigger reads from a captured packet's IP/TCP/UDP/ICMP headers.
     class PacketHeader
     {
         public IPAddress SourceIP { get; set; }
@@ -79,6 +83,7 @@ namespace tcpTrigger
             }
         }
 
+        // Reads the header fields from a captured packet. The buffer starts with the IP header.
         public PacketHeader(byte[] buffer)
         {
             MatchType = PacketMatch.None;

@@ -7,6 +7,7 @@ using System.Net.Sockets;
 
 namespace tcpTrigger
 {
+    // Compares interfaces by IP and MAC address, to detect network changes.
     public class TcpTriggerInterfaceComparer : IEqualityComparer<TcpTriggerInterface>
     {
         public bool Equals(TcpTriggerInterface x, TcpTriggerInterface y)
@@ -20,10 +21,17 @@ namespace tcpTrigger
         }
     }
 
+    // A network interface address that tcpTrigger can monitor, and its email notification buffer.
+    // An adapter with several IPv4 addresses has one of these per address.
     public class TcpTriggerInterface
     {
+        // The network adapter's ID, as reported by Windows.
         public string Guid { get; }
+
+        // The network adapter's IP address.
         public IPAddress IP { get; }
+
+        // The network adapter's physical (MAC) address.
         public PhysicalAddress MacAddress { get; }
         public string MacAddressAsString
         {
@@ -32,13 +40,22 @@ namespace tcpTrigger
                 return string.Join("-", (from x in MacAddress.GetAddressBytes() select x.ToString("X2")).ToArray());
             }
         }
+
+        // The network adapter's text description, as reported by Windows.
         public string Description { get; }
+
+        // Used to apply the email rate limit.
         public DateTime EmailLastSentTimestamp { get; private set; }
+
+        // Protects EmailLogBuffer and EmailSendTimer, which the action thread and the email timer both use.
         public object EmailLock { get; } = new object();
+
+        // Matches waiting to be sent in the next notification email.
         public string EmailLogBuffer { get; set; }
+
+        // Sends the buffered matches once the buffer period has passed and the rate limit allows it.
         public System.Timers.Timer EmailSendTimer { get; private set; }
 
-        // Constructor.
         public TcpTriggerInterface(IPAddress address, string description, PhysicalAddress macAddress, string guid)
         {
             IP = address;
@@ -54,7 +71,7 @@ namespace tcpTrigger
             EmailSendTimer.Enabled = false;
         }
 
-        // Methods.
+        // Sends the buffered matches, or delays the timer if an email was sent too recently.
         private void EmailBufferTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             if (EmailLastSentTimestamp > DateTime.Now.AddSeconds(-Settings.EmailRateLimitSeconds))
@@ -90,6 +107,8 @@ namespace tcpTrigger
             }
         }
 
+        // Returns an entry for each IPv4 address on adapters that are up, excluding loopback and
+        // any adapters excluded in the configuration.
         public static List<TcpTriggerInterface> GetInterfaces()
         {
             var networkInterfaces = new List<TcpTriggerInterface>();

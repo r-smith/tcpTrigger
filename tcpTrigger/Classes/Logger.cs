@@ -2,8 +2,10 @@
 
 namespace tcpTrigger
 {
+    // Writes to the tcpTrigger log in the Windows event log.
     public static class Logger
     {
+        // Event IDs used in the tcpTrigger event log.
         public enum EventCode
         {
             ServiceStarted = 90,

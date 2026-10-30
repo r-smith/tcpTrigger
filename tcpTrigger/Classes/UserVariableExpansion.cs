@@ -3,6 +3,7 @@ using System.Net;
 
 namespace tcpTrigger
 {
+    // Replaces {VARIABLE} placeholders in user-configured text with details of a match.
     internal static class UserVariableExpansion
     {
         public const string InterfaceIp = "{INTERFACE_IP}";
@@ -20,7 +21,7 @@ namespace tcpTrigger
         public const string Timestamp = "{TIMESTAMP}";
         public const string MatchType = "{MATCH_TYPE}";
         public const string TcpFlags = "{TCP_FLAGS}";
-        
+
         public static string GetExpandedString(string message, PacketHeader header)
         {
             if (message.Contains(SourceIp))

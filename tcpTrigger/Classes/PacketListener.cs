@@ -91,6 +91,7 @@ namespace tcpTrigger
             _socket?.Close();
         }
 
+        // Reads the packet header and queues the packet for its actions if it matches a detection rule.
         private void ProcessPacket(byte[] buffer)
         {
             // Extract header information.

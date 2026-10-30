@@ -10,7 +10,8 @@ namespace tcpTrigger
 {
     partial class TcpTriggerService : ServiceBase
     {
-        // Custom service command to reload the configuration file.
+        // Custom service command to reload the configuration file. The GUI uses thie value
+        // to trigger a config reload.
         public const int ReloadConfigurationCommand = 128;
 
         // A running listener for each interface being monitored.
@@ -25,10 +26,11 @@ namespace tcpTrigger
         // Runs the actions for matched packets on a background thread.
         private ActionQueue _actionQueue;
 
-        // Ensures starting monitoring, stopping monitoring, and the network change check never run at the same time.
+        // Held while starting monitoring, stopping monitoring, or checking for network changes
+        // so they never run at the same time.
         private readonly object _monitoringLock = new object();
 
-        // True while monitoring is running.
+        // False once monitoring stops, so a network check that was already scheduled does nothing.
         private bool _isMonitoring;
 
         public TcpTriggerService()
@@ -38,6 +40,7 @@ namespace tcpTrigger
             EventLog.Log = "tcpTrigger";
         }
 
+        // Runs the service in a console window for debugging.
         internal void RunInConsole()
         {
             try
@@ -218,6 +221,8 @@ namespace tcpTrigger
             }
         }
 
+        // Runs on startup and every minute. Starts listeners on startup, and restarts them when the
+        // network interfaces on the system have changed.
         private void InitializeNetworkListeners_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             lock (_monitoringLock)
@@ -277,6 +282,7 @@ namespace tcpTrigger
             }
         }
 
+        // Starts a listener on each network interface and logs which interfaces are being monitored.
         private void StartIpListeners(List<TcpTriggerInterface> interfaces)
         {
             // Start a listener on each interface. Keep only the listeners that started successfully.

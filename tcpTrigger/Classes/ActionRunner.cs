@@ -23,6 +23,7 @@ namespace tcpTrigger
                 TriggerEmail(packetHeader, ipInterface);
         }
 
+        // Appends the match to a text log file, rotating if needed.
         private static void WriteLog(PacketHeader packetHeader)
         {
             // Log files have a defined maximum file size and will rotate one time if reached.
@@ -77,6 +78,7 @@ namespace tcpTrigger
             }
         }
 
+        // Returns a one-line description of a matched packet. Used in the text log and in email notifications.
         private static string GetLogText(PacketHeader packetHeader)
         {
             string logText;
@@ -151,6 +153,7 @@ namespace tcpTrigger
             }
         }
 
+        // Adds the match to the interface's email buffer. The interface's email timer sends it later.
         private static void TriggerEmail(PacketHeader packetHeader, TcpTriggerInterface ipInterface)
         {
             // Record matched connection to log buffer and enable timer, which handles sending the notification email.
