@@ -358,8 +358,8 @@ namespace tcpTrigger
                 sb.AppendLine($"Sender address: {EmailSender}");
                 sb.AppendLine($"Sender display name: {EmailSenderDisplayName}");
                 sb.AppendLine($"Message subject: {EmailSubject}");
-                sb.AppendLine($"Rate limit: " + (EmailRateLimitSeconds > 0 ? EmailRateLimitSeconds.ToString() + " seconds" : "Disabled"));
-                sb.AppendLine($"Buffer: " + (EmailBufferSeconds > 0 ? EmailBufferSeconds.ToString() + " seconds" : "Disabled"));
+                sb.AppendLine($"Rate limit: {EmailRateLimitSeconds} seconds");
+                sb.AppendLine($"Buffer: {EmailBufferSeconds} seconds");
             }
 
             return sb.ToString();
