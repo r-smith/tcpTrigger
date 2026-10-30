@@ -96,7 +96,7 @@ namespace tcpTrigger
                     break;
             }
             return
-                DateTime.Now.ToString(Settings.TimestampFormat) + " [" + packetHeader.DestinationIP + "] " + logText;
+                packetHeader.Timestamp.ToString(Settings.TimestampFormat) + " [" + packetHeader.DestinationIP + "] " + logText;
         }
 
         private static void WriteEventLog(PacketHeader packetHeader)

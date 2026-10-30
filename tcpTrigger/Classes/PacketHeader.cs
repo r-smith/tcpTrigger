@@ -48,6 +48,9 @@ namespace tcpTrigger
         public Protocol ProtocolType { get; set; }
         public PacketMatch MatchType { get; set; }
 
+        // The time the packet was captured.
+        public DateTime Timestamp { get; } = DateTime.Now;
+
         public string TcpFlagsAsString
         {
             get

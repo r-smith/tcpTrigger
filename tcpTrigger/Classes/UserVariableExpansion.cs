@@ -42,7 +42,7 @@ namespace tcpTrigger
                 message = message.Replace(TcpFlags, header.TcpFlagsAsString);
 
             if (message.Contains(Timestamp))
-                message = message.Replace(Timestamp, DateTime.Now.ToString(Settings.TimestampFormat));
+                message = message.Replace(Timestamp, header.Timestamp.ToString(Settings.TimestampFormat));
 
             if (message.Contains(MatchType))
             {
