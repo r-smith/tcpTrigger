@@ -130,13 +130,15 @@ namespace tcpTrigger
 
                         if (!string.IsNullOrEmpty(portAttr))
                         {
-                            if (portAttr.ToLower().Equals("icmp"))
+                            if (string.Equals(portAttr, "icmp", StringComparison.OrdinalIgnoreCase))
                             {
                                 port = IgnoreIcmp;
                             }
                             else if (!int.TryParse(portAttr, out port) || port < 1 || port > 65535)
                             {
-                                port = IgnoreAll;
+                                throw new FormatException(
+                                    $"'{portAttr}' is not a valid port for ignored IP address '{nl[i].InnerText}'. "
+                                    + "Use a port number from 1 to 65535, or 'icmp'.");
                             }
                         }
                         if (IPAddress.TryParse(nl[i].InnerText, out IPAddress ip))
