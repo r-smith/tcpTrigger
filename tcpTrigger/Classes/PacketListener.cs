@@ -29,16 +29,9 @@ namespace tcpTrigger
             byte[] buffer = new byte[512];
 
             // Bind socket to IP endpoint.
-            try
-            {
-                _socket = new Socket(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.IP);
-                _socket.Bind(new IPEndPoint(Interface.IP, 0));
-                _socket.IOControl(IOControlCode.ReceiveAll, BitConverter.GetBytes(1), null);
-            }
-            catch
-            {
-                throw new SocketException();
-            }
+            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.IP);
+            _socket.Bind(new IPEndPoint(Interface.IP, 0));
+            _socket.IOControl(IOControlCode.ReceiveAll, BitConverter.GetBytes(1), null);
 
             // Callback method for processing captured packets.
             void OnReceive(IAsyncResult ar)

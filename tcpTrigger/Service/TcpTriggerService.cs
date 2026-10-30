@@ -279,7 +279,7 @@ namespace tcpTrigger
                     listener.Start();
                     listeners.Add(listener);
                 }
-                catch (System.Net.Sockets.SocketException ex)
+                catch (Exception ex)
                 {
                     Logger.WriteError(
                         "tcpTrigger failed to bind to network interface "
