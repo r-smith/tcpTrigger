@@ -43,11 +43,11 @@ namespace tcpTrigger
                 if (Settings.IsDetectTcpEnabled)
                 {
                     // tcpTrigger/monitoredPorts
-                    Settings.TcpPortsToIncludeAsString = ReadString(xd, ConfigNames.MonitoredPortsTcpInclude);
-                    HashSet<ushort> includePorts = ParsePorts(Settings.TcpPortsToIncludeAsString);
+                    Settings.TcpPortsToInclude = ReadString(xd, ConfigNames.MonitoredPortsTcpInclude);
+                    HashSet<ushort> includePorts = ParsePorts(Settings.TcpPortsToInclude);
 
-                    Settings.TcpPortsToExcludeAsString = ReadString(xd, ConfigNames.MonitoredPortsTcpExclude);
-                    HashSet<ushort> excludePorts = ParsePorts(Settings.TcpPortsToExcludeAsString);
+                    Settings.TcpPortsToExclude = ReadString(xd, ConfigNames.MonitoredPortsTcpExclude);
+                    HashSet<ushort> excludePorts = ParsePorts(Settings.TcpPortsToExclude);
 
                     // Final set contains all included ports except those excluded.
                     includePorts.ExceptWith(excludePorts);
@@ -56,11 +56,11 @@ namespace tcpTrigger
                 if (Settings.IsDetectUdpEnabled)
                 {
                     // tcpTrigger/monitoredPorts
-                    Settings.UdpPortsToIncludeAsString = ReadString(xd, ConfigNames.MonitoredPortsUdpInclude);
-                    HashSet<ushort> includePorts = ParsePorts(Settings.UdpPortsToIncludeAsString);
+                    Settings.UdpPortsToInclude = ReadString(xd, ConfigNames.MonitoredPortsUdpInclude);
+                    HashSet<ushort> includePorts = ParsePorts(Settings.UdpPortsToInclude);
 
-                    Settings.UdpPortsToExcludeAsString = ReadString(xd, ConfigNames.MonitoredPortsUdpExclude);
-                    HashSet<ushort> excludePorts = ParsePorts(Settings.UdpPortsToExcludeAsString);
+                    Settings.UdpPortsToExclude = ReadString(xd, ConfigNames.MonitoredPortsUdpExclude);
+                    HashSet<ushort> excludePorts = ParsePorts(Settings.UdpPortsToExclude);
 
                     // Final set contains all included ports except those excluded.
                     includePorts.ExceptWith(excludePorts);

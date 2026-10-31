@@ -16,11 +16,11 @@ namespace tcpTrigger
         public static bool IsDetectUdpEnabled { get; internal set; }
         public static bool IsDetectIcmpEnabled { get; internal set; }
         public static HashSet<ushort> TcpPortsToMonitor { get; internal set; }
-        public static string TcpPortsToIncludeAsString { get; internal set; }
-        public static string TcpPortsToExcludeAsString { get; internal set; }
+        public static string TcpPortsToInclude { get; internal set; }
+        public static string TcpPortsToExclude { get; internal set; }
         public static HashSet<ushort> UdpPortsToMonitor { get; internal set; }
-        public static string UdpPortsToIncludeAsString { get; internal set; }
-        public static string UdpPortsToExcludeAsString { get; internal set; }
+        public static string UdpPortsToInclude { get; internal set; }
+        public static string UdpPortsToExclude { get; internal set; }
         public static bool IsLogEnabled { get; set; }
         public static bool IsEventLogEnabled { get; internal set; }
         public static bool IsEmailNotificationEnabled { get; internal set; }
@@ -78,14 +78,14 @@ namespace tcpTrigger
             sb.AppendLine("Detect incoming TCP: " + (IsDetectTcpEnabled ? "Enabled" : "Disabled"));
             if (IsDetectTcpEnabled)
             {
-                sb.AppendLine($"Including TCP port(s): {TcpPortsToIncludeAsString}");
-                sb.AppendLine($"Excluding TCP port(s): {TcpPortsToExcludeAsString}");
+                sb.AppendLine($"Including TCP port(s): {TcpPortsToInclude}");
+                sb.AppendLine($"Excluding TCP port(s): {TcpPortsToExclude}");
             }
             sb.AppendLine("Detect incoming UDP: " + (IsDetectUdpEnabled ? "Enabled" : "Disabled"));
             if (IsDetectUdpEnabled)
             {
-                sb.AppendLine($"Including UDP port(s): {UdpPortsToIncludeAsString}");
-                sb.AppendLine($"Excluding UDP port(s): {UdpPortsToExcludeAsString}");
+                sb.AppendLine($"Including UDP port(s): {UdpPortsToInclude}");
+                sb.AppendLine($"Excluding UDP port(s): {UdpPortsToExclude}");
             }
 
             // Append endpoint ignore list.
