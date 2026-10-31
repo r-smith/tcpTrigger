@@ -35,106 +35,14 @@ namespace tcpTrigger
                 XmlDocument xd = new XmlDocument();
                 xd.Load(Settings.Path);
 
-                // tcpTrigger/enabledComponents
-                Settings.IsDetectTcpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsTcp, false);
-                Settings.IsDetectUdpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsUdp, false);
-                Settings.IsDetectIcmpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsIcmp, false);
+                ReadExcludedInterfaces(xd);
 
-                if (Settings.IsDetectTcpEnabled)
-                {
-                    // tcpTrigger/monitoredPorts
-                    Settings.TcpPortsToInclude = ReadString(xd, ConfigNames.MonitoredPortsTcpInclude);
-                    HashSet<ushort> includePorts = ParsePorts(Settings.TcpPortsToInclude);
-
-                    Settings.TcpPortsToExclude = ReadString(xd, ConfigNames.MonitoredPortsTcpExclude);
-                    HashSet<ushort> excludePorts = ParsePorts(Settings.TcpPortsToExclude);
-
-                    // Final set contains all included ports except those excluded.
-                    includePorts.ExceptWith(excludePorts);
-                    Settings.TcpPortsToMonitor = includePorts;
-                }
-                if (Settings.IsDetectUdpEnabled)
-                {
-                    // tcpTrigger/monitoredPorts
-                    Settings.UdpPortsToInclude = ReadString(xd, ConfigNames.MonitoredPortsUdpInclude);
-                    HashSet<ushort> includePorts = ParsePorts(Settings.UdpPortsToInclude);
-
-                    Settings.UdpPortsToExclude = ReadString(xd, ConfigNames.MonitoredPortsUdpExclude);
-                    HashSet<ushort> excludePorts = ParsePorts(Settings.UdpPortsToExclude);
-
-                    // Final set contains all included ports except those excluded.
-                    includePorts.ExceptWith(excludePorts);
-                    Settings.UdpPortsToMonitor = includePorts;
-                }
-
-                // tcpTrigger/endpointIgnoreList
-                var ignoredEndpoints = new Dictionary<IPAddress, HashSet<int>>();
-                XmlNodeList nl = SelectNodes(xd, ConfigNames.EndpointIgnoreListIpAddress);
-                for (int i = 0; i < nl.Count; i++)
-                {
-                    if (!string.IsNullOrEmpty(nl[i].InnerText))
-                    {
-                        string portAttr = nl[i].Attributes["port"]?.Value;
-                        int port = Settings.IgnoreAll;
-
-                        if (!string.IsNullOrEmpty(portAttr))
-                        {
-                            if (string.Equals(portAttr, "icmp", StringComparison.OrdinalIgnoreCase))
-                            {
-                                port = Settings.IgnoreIcmp;
-                            }
-                            else if (!int.TryParse(portAttr, out port) || port < 1 || port > 65535)
-                            {
-                                throw new FormatException(
-                                    $"'{portAttr}' is not a valid port for ignored IP address '{nl[i].InnerText}'. "
-                                    + "Use a port number from 1 to 65535, or 'icmp'.");
-                            }
-                        }
-                        if (IPAddress.TryParse(nl[i].InnerText, out IPAddress ip))
-                        {
-                            if (!ignoredEndpoints.ContainsKey(ip))
-                            {
-                                ignoredEndpoints.Add(ip, new HashSet<int>() { port });
-                            }
-                            else
-                            {
-                                ignoredEndpoints[ip].Add(port);
-                            }
-                        }
-                    }
-                }
-                Settings.IgnoredEndpoints = ignoredEndpoints;
-
-                // tcpTrigger/networkInterfaceExcludeList
-                Settings.ExcludedNetworkInterfaces = new HashSet<string>(ReadList(xd, ConfigNames.NetworkInterfaceExcludeListDeviceGuid));
-
-                // tcpTrigger/enabledActions
-                Settings.IsLogEnabled = ReadBool(xd, ConfigNames.EnabledActionsLog, false);
-                Settings.IsEmailNotificationEnabled = ReadBool(xd, ConfigNames.EnabledActionsEmailNotification, false);
-                Settings.IsExternalAppEnabled = ReadBool(xd, ConfigNames.EnabledActionsExecuteCommand, false);
-
-                // tcpTrigger/actionSettings
-                Settings.LogPath = ReadString(xd, ConfigNames.ActionSettingsLogPath);
-                Settings.ExternalAppPath = ReadString(xd, ConfigNames.ActionSettingsCommandPath);
-                Settings.ExternalAppArguments = ReadString(xd, ConfigNames.ActionSettingsCommandArguments);
-
-                // tcpTrigger/email
-                Settings.EmailSmtpServer = ReadString(xd, ConfigNames.EmailServer);
-                Settings.EmailPort = ReadInt(xd, ConfigNames.EmailPort, 25);
-                Settings.IsEmailStartTlsEnabled = ReadBool(xd, ConfigNames.EmailIsTlsEnabled, false);
-                Settings.EmailUsername = ReadCredential(xd, ConfigNames.EmailUsername);
-                Settings.EmailPassword = ReadCredential(xd, ConfigNames.EmailPassword);
-                Settings.EmailRecipients = ReadList(xd, ConfigNames.EmailRecipientListAddress);
-                Settings.EmailFromAddress = ReadString(xd, ConfigNames.EmailSenderAddress);
-                Settings.EmailFromDisplayName = ReadString(xd, ConfigNames.EmailSenderDisplayName);
-
-                // tcpTrigger/email/message
-                Settings.EmailSubject = ReadString(xd, ConfigNames.EmailMessageSubject);
-                Settings.EmailBody = ReadString(xd, ConfigNames.EmailMessageBody);
-
-                // tcpTrigger/email/options
-                Settings.EmailRateLimitSeconds = Math.Max(1, ReadInt(xd, ConfigNames.EmailOptionsRateLimitSeconds, 300));
-                Settings.EmailBufferSeconds = Math.Max(1, ReadInt(xd, ConfigNames.EmailOptionsBufferSeconds, 30));
+                ReadLegacyEnabledComponents(xd);
+                ReadLegacyMonitoredPorts(xd);
+                ReadLegacyEndpointIgnoreList(xd);
+                ReadLegacyLogAction(xd);
+                ReadLegacyExecuteCommandAction(xd);
+                ReadLegacyEmailAction(xd);
             }
 
             catch (Exception ex)
@@ -149,6 +57,131 @@ namespace tcpTrigger
                     );
             }
         }
+
+        // tcpTrigger/networkInterfaceExcludeList
+        // Same in the current and legacy formats.
+        private static void ReadExcludedInterfaces(XmlDocument xd)
+        {
+            Settings.ExcludedNetworkInterfaces = new HashSet<string>(ReadList(xd, ConfigNames.NetworkInterfaceExcludeListDeviceGuid));
+        }
+
+        // ----- Legacy format -----
+
+        // tcpTrigger/enabledComponents
+        private static void ReadLegacyEnabledComponents(XmlDocument xd)
+        {
+            Settings.IsDetectIcmpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsIcmp, false);
+            Settings.IsDetectTcpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsTcp, false);
+            Settings.IsDetectUdpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsUdp, false);
+        }
+
+        // tcpTrigger/monitoredPorts
+        // Ports are only read for protocols that are enabled.
+        private static void ReadLegacyMonitoredPorts(XmlDocument xd)
+        {
+            if (Settings.IsDetectTcpEnabled)
+            {
+                Settings.TcpPortsToInclude = ReadString(xd, ConfigNames.MonitoredPortsTcpInclude);
+                HashSet<ushort> includePorts = ParsePorts(Settings.TcpPortsToInclude);
+
+                Settings.TcpPortsToExclude = ReadString(xd, ConfigNames.MonitoredPortsTcpExclude);
+                HashSet<ushort> excludePorts = ParsePorts(Settings.TcpPortsToExclude);
+
+                // Final set contains all included ports except those excluded.
+                includePorts.ExceptWith(excludePorts);
+                Settings.TcpPortsToMonitor = includePorts;
+            }
+            if (Settings.IsDetectUdpEnabled)
+            {
+                Settings.UdpPortsToInclude = ReadString(xd, ConfigNames.MonitoredPortsUdpInclude);
+                HashSet<ushort> includePorts = ParsePorts(Settings.UdpPortsToInclude);
+
+                Settings.UdpPortsToExclude = ReadString(xd, ConfigNames.MonitoredPortsUdpExclude);
+                HashSet<ushort> excludePorts = ParsePorts(Settings.UdpPortsToExclude);
+
+                // Final set contains all included ports except those excluded.
+                includePorts.ExceptWith(excludePorts);
+                Settings.UdpPortsToMonitor = includePorts;
+            }
+        }
+
+        // tcpTrigger/endpointIgnoreList
+        private static void ReadLegacyEndpointIgnoreList(XmlDocument xd)
+        {
+            var ignoredEndpoints = new Dictionary<IPAddress, HashSet<int>>();
+            XmlNodeList nl = SelectNodes(xd, ConfigNames.EndpointIgnoreListIpAddress);
+            for (int i = 0; i < nl.Count; i++)
+            {
+                if (!string.IsNullOrEmpty(nl[i].InnerText))
+                {
+                    string portAttr = nl[i].Attributes["port"]?.Value;
+                    int port = Settings.IgnoreAll;
+
+                    if (!string.IsNullOrEmpty(portAttr))
+                    {
+                        if (string.Equals(portAttr, "icmp", StringComparison.OrdinalIgnoreCase))
+                        {
+                            port = Settings.IgnoreIcmp;
+                        }
+                        else if (!int.TryParse(portAttr, out port) || port < 1 || port > 65535)
+                        {
+                            throw new FormatException(
+                                $"'{portAttr}' is not a valid port for ignored IP address '{nl[i].InnerText}'. "
+                                + "Use a port number from 1 to 65535, or 'icmp'.");
+                        }
+                    }
+                    if (IPAddress.TryParse(nl[i].InnerText, out IPAddress ip))
+                    {
+                        if (!ignoredEndpoints.ContainsKey(ip))
+                        {
+                            ignoredEndpoints.Add(ip, new HashSet<int>() { port });
+                        }
+                        else
+                        {
+                            ignoredEndpoints[ip].Add(port);
+                        }
+                    }
+                }
+            }
+            Settings.IgnoredEndpoints = ignoredEndpoints;
+        }
+
+        // tcpTrigger/enabledActions/log + tcpTrigger/actionSettings
+        private static void ReadLegacyLogAction(XmlDocument xd)
+        {
+            Settings.IsLogEnabled = ReadBool(xd, ConfigNames.EnabledActionsLog, false);
+            Settings.LogPath = ReadString(xd, ConfigNames.ActionSettingsLogPath);
+        }
+
+        // tcpTrigger/enabledActions/executeCommand + tcpTrigger/actionSettings
+        private static void ReadLegacyExecuteCommandAction(XmlDocument xd)
+        {
+            Settings.IsExternalAppEnabled = ReadBool(xd, ConfigNames.EnabledActionsExecuteCommand, false);
+            Settings.ExternalAppPath = ReadString(xd, ConfigNames.ActionSettingsCommandPath);
+            Settings.ExternalAppArguments = ReadString(xd, ConfigNames.ActionSettingsCommandArguments);
+        }
+
+        // tcpTrigger/enabledActions/emailNotification + tcpTrigger/email
+        private static void ReadLegacyEmailAction(XmlDocument xd)
+        {
+            Settings.IsEmailNotificationEnabled = ReadBool(xd, ConfigNames.EnabledActionsEmailNotification, false);
+            Settings.EmailSmtpServer = ReadString(xd, ConfigNames.EmailServer);
+            Settings.EmailPort = ReadInt(xd, ConfigNames.EmailPort, 25);
+            Settings.IsEmailStartTlsEnabled = ReadBool(xd, ConfigNames.EmailIsTlsEnabled, false);
+            Settings.EmailUsername = ReadCredential(xd, ConfigNames.EmailUsername);
+            Settings.EmailPassword = ReadCredential(xd, ConfigNames.EmailPassword);
+            Settings.EmailRecipients = ReadList(xd, ConfigNames.EmailRecipientListAddress);
+            Settings.EmailFromAddress = ReadString(xd, ConfigNames.EmailSenderAddress);
+            Settings.EmailFromDisplayName = ReadString(xd, ConfigNames.EmailSenderDisplayName);
+            Settings.EmailSubject = ReadString(xd, ConfigNames.EmailMessageSubject);
+            Settings.EmailBody = ReadString(xd, ConfigNames.EmailMessageBody);
+
+            // A value of 0 or less is treated as 1 second.
+            Settings.EmailRateLimitSeconds = Math.Max(1, ReadInt(xd, ConfigNames.EmailOptionsRateLimitSeconds, 300));
+            Settings.EmailBufferSeconds = Math.Max(1, ReadInt(xd, ConfigNames.EmailOptionsBufferSeconds, 30));
+        }
+
+        // ----- Read helpers -----
 
         // The read helpers below take the node to read from: the XmlDocument for an
         // absolute path ("/tcpTrigger/..."), or an element for a path relative to it ("enabled").
