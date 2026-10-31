@@ -14,6 +14,7 @@ namespace tcpTrigger
         private static string _currentNode;
 
         // Loads all settings from the configuration file. Throws if the file is missing or can't be parsed.
+        // A missing or unreadable file throws its own exception (e.g. FileNotFoundException), not FileLoadException.
         public static void Load()
         {
             Settings.Path = ConfigPaths.GetConfigPath();
@@ -29,32 +30,35 @@ namespace tcpTrigger
                     );
             }
 
-            _currentNode = string.Empty;
-            try
+            // Opened outside the try block below so file errors aren't reported as parse errors.
+            using (FileStream stream = new FileStream(Settings.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
-                XmlDocument xd = new XmlDocument();
-                xd.Load(Settings.Path);
+                _currentNode = string.Empty;
+                try
+                {
+                    XmlDocument xd = new XmlDocument();
+                    xd.Load(stream);
 
-                ReadExcludedInterfaces(xd);
+                    ReadExcludedInterfaces(xd);
 
-                ReadLegacyEnabledComponents(xd);
-                ReadLegacyMonitoredPorts(xd);
-                ReadLegacyEndpointIgnoreList(xd);
-                ReadLegacyLogAction(xd);
-                ReadLegacyExecuteCommandAction(xd);
-                ReadLegacyEmailAction(xd);
-            }
-
-            catch (Exception ex)
-            {
-                // Error: Failed to parse XML configuration.
-                throw new FileLoadException(
-                    $"Unable to parse the configuration file '{Settings.Path}'."
-                    + $"{Environment.NewLine}{Environment.NewLine}"
-                    + $"Error parsing XML node: '{_currentNode}'."
-                    + $"{Environment.NewLine}{Environment.NewLine}"
-                    + ex.Message
-                    );
+                    ReadLegacyEnabledComponents(xd);
+                    ReadLegacyMonitoredPorts(xd);
+                    ReadLegacyEndpointIgnoreList(xd);
+                    ReadLegacyLogAction(xd);
+                    ReadLegacyExecuteCommandAction(xd);
+                    ReadLegacyEmailAction(xd);
+                }
+                catch (Exception ex)
+                {
+                    // Error: Failed to parse XML configuration.
+                    throw new FileLoadException(
+                        $"Unable to parse the configuration file '{Settings.Path}'."
+                        + $"{Environment.NewLine}{Environment.NewLine}"
+                        + $"Error parsing XML node: '{_currentNode}'."
+                        + $"{Environment.NewLine}{Environment.NewLine}"
+                        + ex.Message,
+                        ex);
+                }
             }
         }
 
