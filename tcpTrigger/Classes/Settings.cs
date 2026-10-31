@@ -33,15 +33,15 @@ namespace tcpTrigger
         public static HashSet<string> ExcludedNetworkInterfaces { get; internal set; } = new HashSet<string>();
         public static Dictionary<IPAddress, HashSet<int>> IgnoredEndpoints { get; internal set; } = new Dictionary<IPAddress, HashSet<int>>();
         public static string TimestampFormat { get; private set; } = "yyyy-MM-dd HH:mm:ss";
-        public static string EmailServer { get; internal set; }
-        public static int EmailServerPort { get; internal set; }
-        public static bool IsEmailTlsEnabled { get; internal set; }
+        public static string EmailSmtpServer { get; internal set; }
+        public static int EmailPort { get; internal set; }
+        public static bool IsEmailStartTlsEnabled { get; internal set; }
         public static bool IsEmailAuthRequired { get; internal set; }
         public static string EmailUsername { get; internal set; }
         public static string EmailPassword { get; internal set; }
         public static List<string> EmailRecipients { get; internal set; } = new List<string>();
-        public static string EmailSender { get; internal set; }
-        public static string EmailSenderDisplayName { get; internal set; }
+        public static string EmailFromAddress { get; internal set; }
+        public static string EmailFromDisplayName { get; internal set; }
         public static string EmailSubject { get; internal set; }
         public static string EmailBody { get; internal set; }
 
@@ -128,13 +128,13 @@ namespace tcpTrigger
             {
                 sb.AppendLine();
                 sb.AppendLine("# Email");
-                sb.AppendLine($"Server: {EmailServer}");
-                sb.AppendLine($"Port: {EmailServerPort}");
-                sb.AppendLine($"SSL / TLS: {(IsEmailTlsEnabled ? "Enabled" : "Disabled")}");
+                sb.AppendLine($"Server: {EmailSmtpServer}");
+                sb.AppendLine($"Port: {EmailPort}");
+                sb.AppendLine($"SSL / TLS: {(IsEmailStartTlsEnabled ? "Enabled" : "Disabled")}");
                 sb.AppendLine("Use authentication? " + (IsEmailAuthRequired ? "Yes" : "No"));
                 sb.AppendLine("Recipient(s): " + string.Join(", ", EmailRecipients.ToArray()));
-                sb.AppendLine($"Sender address: {EmailSender}");
-                sb.AppendLine($"Sender display name: {EmailSenderDisplayName}");
+                sb.AppendLine($"Sender address: {EmailFromAddress}");
+                sb.AppendLine($"Sender display name: {EmailFromDisplayName}");
                 sb.AppendLine($"Message subject: {EmailSubject}");
                 sb.AppendLine($"Rate limit: {EmailRateLimitSeconds} seconds");
                 sb.AppendLine($"Buffer: {EmailBufferSeconds} seconds");

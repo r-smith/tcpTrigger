@@ -18,14 +18,14 @@ namespace tcpTrigger
                     Logger.EventCode.Error);
                 return;
             }
-            if (string.IsNullOrWhiteSpace(Settings.EmailSender))
+            if (string.IsNullOrWhiteSpace(Settings.EmailFromAddress))
             {
                 Logger.WriteError(
                     "Email event triggered, but no sender address is configured.",
                     Logger.EventCode.Error);
                 return;
             }
-            if (string.IsNullOrWhiteSpace(Settings.EmailServer))
+            if (string.IsNullOrWhiteSpace(Settings.EmailSmtpServer))
             {
                 Logger.WriteError(
                     "Email event triggered, but no mail server is configured.",
@@ -46,9 +46,9 @@ namespace tcpTrigger
                 {
                     message.Subject = UserVariableExpansion.GetExpandedString(Settings.EmailSubject, ipInterface, connectionLog);
                     message.Body = UserVariableExpansion.GetExpandedString(Settings.EmailBody ?? string.Empty, ipInterface, connectionLog);
-                    message.From = string.IsNullOrWhiteSpace(Settings.EmailSenderDisplayName)
-                        ? new MailAddress(Settings.EmailSender)
-                        : new MailAddress(Settings.EmailSender, Settings.EmailSenderDisplayName);
+                    message.From = string.IsNullOrWhiteSpace(Settings.EmailFromDisplayName)
+                        ? new MailAddress(Settings.EmailFromAddress)
+                        : new MailAddress(Settings.EmailFromAddress, Settings.EmailFromDisplayName);
                     for (int i = 0; i < Settings.EmailRecipients.Count; i++)
                     {
                         if (!string.IsNullOrWhiteSpace(Settings.EmailRecipients[i]))
@@ -59,9 +59,9 @@ namespace tcpTrigger
 
                     using (SmtpClient smtpClient = new SmtpClient())
                     {
-                        smtpClient.Host = Settings.EmailServer;
-                        smtpClient.Port = Settings.EmailServerPort;
-                        smtpClient.EnableSsl = Settings.IsEmailTlsEnabled;
+                        smtpClient.Host = Settings.EmailSmtpServer;
+                        smtpClient.Port = Settings.EmailPort;
+                        smtpClient.EnableSsl = Settings.IsEmailStartTlsEnabled;
                         if (Settings.IsEmailAuthRequired)
                         {
                             smtpClient.Credentials = new NetworkCredential(Settings.EmailUsername, Settings.EmailPassword);

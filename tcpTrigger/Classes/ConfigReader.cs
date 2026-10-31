@@ -120,15 +120,15 @@ namespace tcpTrigger
                 Settings.ExternalAppArguments = ReadString(xd, ConfigNames.ActionSettingsCommandArguments);
 
                 // tcpTrigger/email
-                Settings.EmailServer = ReadString(xd, ConfigNames.EmailServer);
-                Settings.EmailServerPort = ReadInt(xd, ConfigNames.EmailPort, 25);
-                Settings.IsEmailTlsEnabled = ReadBool(xd, ConfigNames.EmailIsTlsEnabled, false);
+                Settings.EmailSmtpServer = ReadString(xd, ConfigNames.EmailServer);
+                Settings.EmailPort = ReadInt(xd, ConfigNames.EmailPort, 25);
+                Settings.IsEmailStartTlsEnabled = ReadBool(xd, ConfigNames.EmailIsTlsEnabled, false);
                 Settings.IsEmailAuthRequired = ReadBool(xd, ConfigNames.EmailIsAuthRequired, false);
                 Settings.EmailUsername = ReadCredential(xd, ConfigNames.EmailUsername);
                 Settings.EmailPassword = ReadCredential(xd, ConfigNames.EmailPassword);
                 Settings.EmailRecipients = ReadList(xd, ConfigNames.EmailRecipientListAddress);
-                Settings.EmailSender = ReadString(xd, ConfigNames.EmailSenderAddress);
-                Settings.EmailSenderDisplayName = ReadString(xd, ConfigNames.EmailSenderDisplayName);
+                Settings.EmailFromAddress = ReadString(xd, ConfigNames.EmailSenderAddress);
+                Settings.EmailFromDisplayName = ReadString(xd, ConfigNames.EmailSenderDisplayName);
 
                 // tcpTrigger/email/message
                 Settings.EmailSubject = ReadString(xd, ConfigNames.EmailMessageSubject);
