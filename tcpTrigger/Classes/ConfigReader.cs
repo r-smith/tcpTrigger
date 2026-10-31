@@ -13,35 +13,19 @@ namespace tcpTrigger
         // Used to say which node caused an error when the file can't be parsed.
         private static string _currentNode;
 
-        // Returns the configuration file path: in the executable's path if present, otherwise in ProgramData.
-        // Returns an empty string if neither exists.
-        private static string GetSettingsPath()
-        {
-            // Locate the tcpTrigger.xml configuration file.
-            // First check the current directory. If not found, check ProgramData.
-            // A typical installation will have the configuration stored in ProgramData.
-            const string fileName = "tcpTrigger.xml";
-            if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + fileName))
-                return AppDomain.CurrentDomain.BaseDirectory + fileName;
-            else if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\" + fileName))
-                return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\" + fileName;
-            else
-                return string.Empty;
-        }
-
         // Loads all settings from the configuration file. Throws if the file is missing or can't be parsed.
         public static void Load()
         {
-            Settings.Path = GetSettingsPath();
+            Settings.Path = ConfigPaths.GetConfigPath();
 
-            if (string.IsNullOrEmpty(Settings.Path))
+            if (!File.Exists(Settings.Path))
             {
                 // Error: A configuration file could not be found.
                 throw new FileNotFoundException(
                     "A configuration file for tcpTrigger could not be found. Use 'tcpTrigger Manager.exe' to generate the file."
                     + $"{Environment.NewLine}{Environment.NewLine}"
-                    + $"First path checked: '{AppDomain.CurrentDomain.BaseDirectory + "tcpTrigger.xml"}'{Environment.NewLine}"
-                    + $"Second path checked: '{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\tcpTrigger\tcpTrigger.xml'"}"
+                    + $"First path checked: '{ConfigPaths.LocalPath}'{Environment.NewLine}"
+                    + $"Second path checked: '{ConfigPaths.ProgramDataPath}'"
                     );
             }
 

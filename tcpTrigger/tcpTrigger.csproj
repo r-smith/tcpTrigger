@@ -74,6 +74,7 @@
     <Compile Include="Classes\ActionQueue.cs" />
     <Compile Include="Classes\ActionRunner.cs" />
     <Compile Include="Classes\ConfigNames.cs" />
+    <Compile Include="Classes\ConfigPaths.cs" />
     <Compile Include="Classes\ConfigReader.cs" />
     <Compile Include="Classes\EmailNotifier.cs" />
     <Compile Include="Classes\Logger.cs" />
