@@ -68,9 +68,8 @@ namespace tcpTrigger
                 }
 
                 // tcpTrigger/endpointIgnoreList
-                _currentNode = ConfigNames.EndpointIgnoreListIpAddress;
                 var ignoredEndpoints = new Dictionary<IPAddress, HashSet<int>>();
-                XmlNodeList nl = xd.DocumentElement.SelectNodes(_currentNode);
+                XmlNodeList nl = SelectNodes(xd, ConfigNames.EndpointIgnoreListIpAddress);
                 for (int i = 0; i < nl.Count; i++)
                 {
                     if (!string.IsNullOrEmpty(nl[i].InnerText))
@@ -153,52 +152,77 @@ namespace tcpTrigger
             }
         }
 
+        // The read helpers below take the node to read from: the XmlDocument for an
+        // absolute path ("/tcpTrigger/..."), or an element for a path relative to it ("enabled").
+
         // Returns the text of the XML node at path, or null if the node doesn't exist.
-        private static string ReadString(XmlDocument xd, string path)
+        private static string ReadString(XmlNode node, string path)
         {
-            _currentNode = path;
-            return xd.DocumentElement.SelectSingleNode(path)?.InnerText;
+            _currentNode = GetNodePath(node, path);
+            return node.SelectSingleNode(path)?.InnerText;
         }
 
         // Returns the node at path as a bool, or defaultValue if the node is missing or empty.
-        private static bool ReadBool(XmlDocument xd, string path, bool defaultValue)
+        private static bool ReadBool(XmlNode node, string path, bool defaultValue)
         {
-            string text = ReadString(xd, path);
+            string text = ReadString(node, path);
             return string.IsNullOrWhiteSpace(text) ? defaultValue : bool.Parse(text);
         }
 
         // Returns the node at path as an int, or defaultValue if the node is missing or empty.
-        private static int ReadInt(XmlDocument xd, string path, int defaultValue)
+        private static int ReadInt(XmlNode node, string path, int defaultValue)
         {
-            string text = ReadString(xd, path);
+            string text = ReadString(node, path);
             return string.IsNullOrWhiteSpace(text) ? defaultValue : int.Parse(text);
         }
 
         // Returns the text of the node at path, decrypting it if the node has encrypted="true".
         // Returns null if the node is missing or empty.
-        private static string ReadCredential(XmlDocument xd, string path)
+        private static string ReadCredential(XmlNode node, string path)
         {
-            _currentNode = path;
-            XmlNode node = xd.DocumentElement.SelectSingleNode(path);
-            if (node == null || string.IsNullOrEmpty(node.InnerText))
+            _currentNode = GetNodePath(node, path);
+            XmlNode credentialNode = node.SelectSingleNode(path);
+            if (credentialNode == null || string.IsNullOrEmpty(credentialNode.InnerText))
                 return null;
 
-            return node.Attributes["encrypted"]?.InnerText == "true"
-                ? StringCipher.Decrypt(node.InnerText)
-                : node.InnerText;
+            return credentialNode.Attributes["encrypted"]?.InnerText == "true"
+                ? StringCipher.Decrypt(credentialNode.InnerText)
+                : credentialNode.InnerText;
         }
 
         // Returns the text of every XML node at path, skipping empty ones.
-        private static List<string> ReadList(XmlDocument xd, string path)
+        private static List<string> ReadList(XmlNode node, string path)
         {
-            _currentNode = path;
             var values = new List<string>();
-            foreach (XmlNode node in xd.DocumentElement.SelectNodes(path))
+            foreach (XmlNode item in SelectNodes(node, path))
             {
-                if (!string.IsNullOrEmpty(node.InnerText))
-                    values.Add(node.InnerText);
+                if (!string.IsNullOrEmpty(item.InnerText))
+                    values.Add(item.InnerText);
             }
             return values;
+        }
+
+        // Returns every XML node at path. The list is empty if there are none.
+        private static XmlNodeList SelectNodes(XmlNode node, string path)
+        {
+            _currentNode = GetNodePath(node, path);
+            return node.SelectNodes(path);
+        }
+
+        // Returns the full path of the node being read, for error messages.
+        // For a relative path, adds the element's own path in front,
+        // e.g. "/tcpTrigger/notificationRules/notification/enabled".
+        private static string GetNodePath(XmlNode node, string path)
+        {
+            if (!(node is XmlElement))
+                return path;
+
+            string elementPath = string.Empty;
+            for (XmlNode n = node; n is XmlElement; n = n.ParentNode)
+            {
+                elementPath = "/" + n.Name + elementPath;
+            }
+            return elementPath + "/" + path;
         }
 
         // Parses a comma-separated list of ports and port ranges, such as "22,80,8000-8100".
