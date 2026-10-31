@@ -36,11 +36,11 @@ namespace tcpTrigger
                 xd.Load(Settings.Path);
 
                 // tcpTrigger/enabledComponents
-                Settings.IsMonitorTcpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsTcp, false);
-                Settings.IsMonitorUdpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsUdp, false);
-                Settings.IsMonitorIcmpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsIcmp, false);
+                Settings.IsDetectTcpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsTcp, false);
+                Settings.IsDetectUdpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsUdp, false);
+                Settings.IsDetectIcmpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsIcmp, false);
 
-                if (Settings.IsMonitorTcpEnabled)
+                if (Settings.IsDetectTcpEnabled)
                 {
                     // tcpTrigger/monitoredPorts
                     Settings.TcpPortsToIncludeAsString = ReadString(xd, ConfigNames.MonitoredPortsTcpInclude);
@@ -53,7 +53,7 @@ namespace tcpTrigger
                     includePorts.ExceptWith(excludePorts);
                     Settings.TcpPortsToMonitor = includePorts;
                 }
-                if (Settings.IsMonitorUdpEnabled)
+                if (Settings.IsDetectUdpEnabled)
                 {
                     // tcpTrigger/monitoredPorts
                     Settings.UdpPortsToIncludeAsString = ReadString(xd, ConfigNames.MonitoredPortsUdpInclude);

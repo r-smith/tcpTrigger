@@ -21,7 +21,7 @@ namespace tcpTrigger
 
         private static bool DoesPacketMatchICMP(PacketHeader header, IPAddress ip)
         {
-            return Settings.IsMonitorIcmpEnabled
+            return Settings.IsDetectIcmpEnabled
                 && header.ProtocolType == Protocol.ICMP
                 && header.DestinationIP.Equals(ip)
                 && (header.IcmpType == (int)IcmpTypeCode.ping
@@ -32,7 +32,7 @@ namespace tcpTrigger
 
         private static bool DoesPacketMatchTCP(PacketHeader header, IPAddress ip)
         {
-            return Settings.IsMonitorTcpEnabled
+            return Settings.IsDetectTcpEnabled
                 && header.ProtocolType == Protocol.TCP
                 && header.DestinationIP.Equals(ip)
                 && Settings.TcpPortsToMonitor.Contains(header.DestinationPort)
@@ -42,7 +42,7 @@ namespace tcpTrigger
 
         private static bool DoesPacketMatchUDP(PacketHeader header, IPAddress ip)
         {
-            return Settings.IsMonitorUdpEnabled
+            return Settings.IsDetectUdpEnabled
                 && header.ProtocolType == Protocol.UDP
                 && header.DestinationIP.Equals(ip)
                 && Settings.UdpPortsToMonitor.Contains(header.DestinationPort)

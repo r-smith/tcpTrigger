@@ -12,9 +12,9 @@ namespace tcpTrigger
 
         // Full path of the configuration file that was loaded.
         public static string Path { get; internal set; }
-        public static bool IsMonitorTcpEnabled { get; internal set; }
-        public static bool IsMonitorUdpEnabled { get; internal set; }
-        public static bool IsMonitorIcmpEnabled { get; internal set; }
+        public static bool IsDetectTcpEnabled { get; internal set; }
+        public static bool IsDetectUdpEnabled { get; internal set; }
+        public static bool IsDetectIcmpEnabled { get; internal set; }
         public static HashSet<ushort> TcpPortsToMonitor { get; internal set; }
         public static string TcpPortsToIncludeAsString { get; internal set; }
         public static string TcpPortsToExcludeAsString { get; internal set; }
@@ -74,15 +74,15 @@ namespace tcpTrigger
             // Append monitoring configuration.
             sb.AppendLine();
             sb.AppendLine("# Rules");
-            sb.AppendLine("Detect incoming ICMP: " + (IsMonitorIcmpEnabled ? "Enabled" : "Disabled"));
-            sb.AppendLine("Detect incoming TCP: " + (IsMonitorTcpEnabled ? "Enabled" : "Disabled"));
-            if (IsMonitorTcpEnabled)
+            sb.AppendLine("Detect incoming ICMP: " + (IsDetectIcmpEnabled ? "Enabled" : "Disabled"));
+            sb.AppendLine("Detect incoming TCP: " + (IsDetectTcpEnabled ? "Enabled" : "Disabled"));
+            if (IsDetectTcpEnabled)
             {
                 sb.AppendLine($"Including TCP port(s): {TcpPortsToIncludeAsString}");
                 sb.AppendLine($"Excluding TCP port(s): {TcpPortsToExcludeAsString}");
             }
-            sb.AppendLine("Detect incoming UDP: " + (IsMonitorUdpEnabled ? "Enabled" : "Disabled"));
-            if (IsMonitorUdpEnabled)
+            sb.AppendLine("Detect incoming UDP: " + (IsDetectUdpEnabled ? "Enabled" : "Disabled"));
+            if (IsDetectUdpEnabled)
             {
                 sb.AppendLine($"Including UDP port(s): {UdpPortsToIncludeAsString}");
                 sb.AppendLine($"Excluding UDP port(s): {UdpPortsToExcludeAsString}");
