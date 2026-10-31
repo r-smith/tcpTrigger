@@ -41,9 +41,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-	<PlatformTarget>AnyCPU</PlatformTarget>
-	<Deterministic>true</Deterministic>
-	<PathMap>$(MSBuildThisFileDirectory)=C:\src\</PathMap>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Deterministic>true</Deterministic>
+    <PathMap>$(MSBuildThisFileDirectory)=C:\src\</PathMap>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="Classes\ActionQueue.cs" />
     <Compile Include="Classes\ActionRunner.cs" />
+    <Compile Include="Classes\ConfigNames.cs" />
     <Compile Include="Classes\EmailNotifier.cs" />
     <Compile Include="Classes\Logger.cs" />
     <Compile Include="Classes\PacketListener.cs" />

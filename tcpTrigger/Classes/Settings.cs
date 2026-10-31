@@ -72,7 +72,7 @@ namespace tcpTrigger
         public static void Load()
         {
             Path = GetSettingsPath();
-            
+
             if (string.IsNullOrEmpty(Path))
             {
                 // Error: A configuration file could not be found.
@@ -91,17 +91,17 @@ namespace tcpTrigger
                 xd.Load(Path);
 
                 // tcpTrigger/enabledComponents
-                IsMonitorTcpEnabled = ReadBool(xd, SettingsNode.enabledComponents_tcp, false);
-                IsMonitorUdpEnabled = ReadBool(xd, SettingsNode.enabledComponents_udp, false);
-                IsMonitorIcmpEnabled = ReadBool(xd, SettingsNode.enabledComponents_icmp, false);
+                IsMonitorTcpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsTcp, false);
+                IsMonitorUdpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsUdp, false);
+                IsMonitorIcmpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsIcmp, false);
 
                 if (IsMonitorTcpEnabled)
                 {
                     // tcpTrigger/monitoredPorts
-                    TcpPortsToIncludeAsString = ReadString(xd, SettingsNode.monitoredPorts_tcp_include);
+                    TcpPortsToIncludeAsString = ReadString(xd, ConfigNames.MonitoredPortsTcpInclude);
                     HashSet<ushort> includePorts = ParsePorts(TcpPortsToIncludeAsString);
 
-                    TcpPortsToExcludeAsString = ReadString(xd, SettingsNode.monitoredPorts_tcp_exclude);
+                    TcpPortsToExcludeAsString = ReadString(xd, ConfigNames.MonitoredPortsTcpExclude);
                     HashSet<ushort> excludePorts = ParsePorts(TcpPortsToExcludeAsString);
 
                     // Final set contains all included ports except those excluded.
@@ -111,10 +111,10 @@ namespace tcpTrigger
                 if (IsMonitorUdpEnabled)
                 {
                     // tcpTrigger/monitoredPorts
-                    UdpPortsToIncludeAsString = ReadString(xd, SettingsNode.monitoredPorts_udp_include);
+                    UdpPortsToIncludeAsString = ReadString(xd, ConfigNames.MonitoredPortsUdpInclude);
                     HashSet<ushort> includePorts = ParsePorts(UdpPortsToIncludeAsString);
 
-                    UdpPortsToExcludeAsString = ReadString(xd, SettingsNode.monitoredPorts_udp_exclude);
+                    UdpPortsToExcludeAsString = ReadString(xd, ConfigNames.MonitoredPortsUdpExclude);
                     HashSet<ushort> excludePorts = ParsePorts(UdpPortsToExcludeAsString);
 
                     // Final set contains all included ports except those excluded.
@@ -123,7 +123,7 @@ namespace tcpTrigger
                 }
 
                 // tcpTrigger/endpointIgnoreList
-                _currentNode = SettingsNode.endpointIgnoreList_ipAddress;
+                _currentNode = ConfigNames.EndpointIgnoreListIpAddress;
                 var ignoredEndpoints = new Dictionary<IPAddress, HashSet<int>>();
                 XmlNodeList nl = xd.DocumentElement.SelectNodes(_currentNode);
                 for (int i = 0; i < nl.Count; i++)
@@ -150,7 +150,7 @@ namespace tcpTrigger
                         {
                             if (!ignoredEndpoints.ContainsKey(ip))
                             {
-                                ignoredEndpoints.Add(ip, new HashSet<int>() { port } );
+                                ignoredEndpoints.Add(ip, new HashSet<int>() { port });
                             }
                             else
                             {
@@ -162,37 +162,37 @@ namespace tcpTrigger
                 IgnoredEndpoints = ignoredEndpoints;
 
                 // tcpTrigger/networkInterfaceExcludeList
-                ExcludedNetworkInterfaces = new HashSet<string>(ReadList(xd, SettingsNode.networkInterfaceExcludeList_deviceGuid));
+                ExcludedNetworkInterfaces = new HashSet<string>(ReadList(xd, ConfigNames.NetworkInterfaceExcludeListDeviceGuid));
 
                 // tcpTrigger/enabledActions
-                IsLogEnabled = ReadBool(xd, SettingsNode.enabledActions_log, false);
-                IsEventLogEnabled = ReadBool(xd, SettingsNode.enabledActions_windowsEventLog, false);
-                IsEmailNotificationEnabled = ReadBool(xd, SettingsNode.enabledActions_emailNotification, false);
-                IsExternalAppEnabled = ReadBool(xd, SettingsNode.enabledActions_executeCommand, false);
+                IsLogEnabled = ReadBool(xd, ConfigNames.EnabledActionsLog, false);
+                IsEventLogEnabled = ReadBool(xd, ConfigNames.EnabledActionsWindowsEventLog, false);
+                IsEmailNotificationEnabled = ReadBool(xd, ConfigNames.EnabledActionsEmailNotification, false);
+                IsExternalAppEnabled = ReadBool(xd, ConfigNames.EnabledActionsExecuteCommand, false);
 
                 // tcpTrigger/actionSettings
-                LogPath = ReadString(xd, SettingsNode.actionsSettings_logPath);
-                ExternalAppPath = ReadString(xd, SettingsNode.actionsSettings_command_path);
-                ExternalAppArguments = ReadString(xd, SettingsNode.actionsSettings_command_arguments);
+                LogPath = ReadString(xd, ConfigNames.ActionSettingsLogPath);
+                ExternalAppPath = ReadString(xd, ConfigNames.ActionSettingsCommandPath);
+                ExternalAppArguments = ReadString(xd, ConfigNames.ActionSettingsCommandArguments);
 
                 // tcpTrigger/email
-                EmailServer = ReadString(xd, SettingsNode.email_server);
-                EmailServerPort = ReadInt(xd, SettingsNode.email_port, 25);
-                IsEmailTlsEnabled = ReadBool(xd, SettingsNode.email_isTlsEnabled, false);
-                IsEmailAuthRequired = ReadBool(xd, SettingsNode.email_isAuthRequired, false);
-                EmailUsername = ReadCredential(xd, SettingsNode.email_username);
-                EmailPassword = ReadCredential(xd, SettingsNode.email_password);
-                EmailRecipients = ReadList(xd, SettingsNode.email_recipientList_address);
-                EmailSender = ReadString(xd, SettingsNode.email_sender_address);
-                EmailSenderDisplayName = ReadString(xd, SettingsNode.email_sender_displayName);
+                EmailServer = ReadString(xd, ConfigNames.EmailServer);
+                EmailServerPort = ReadInt(xd, ConfigNames.EmailPort, 25);
+                IsEmailTlsEnabled = ReadBool(xd, ConfigNames.EmailIsTlsEnabled, false);
+                IsEmailAuthRequired = ReadBool(xd, ConfigNames.EmailIsAuthRequired, false);
+                EmailUsername = ReadCredential(xd, ConfigNames.EmailUsername);
+                EmailPassword = ReadCredential(xd, ConfigNames.EmailPassword);
+                EmailRecipients = ReadList(xd, ConfigNames.EmailRecipientListAddress);
+                EmailSender = ReadString(xd, ConfigNames.EmailSenderAddress);
+                EmailSenderDisplayName = ReadString(xd, ConfigNames.EmailSenderDisplayName);
 
                 // tcpTrigger/email/message
-                EmailSubject = ReadString(xd, SettingsNode.email_message_subject);
-                EmailBody = ReadString(xd, SettingsNode.email_message_body);
+                EmailSubject = ReadString(xd, ConfigNames.EmailMessageSubject);
+                EmailBody = ReadString(xd, ConfigNames.EmailMessageBody);
 
                 // tcpTrigger/email/options
-                EmailRateLimitSeconds = Math.Max(1, ReadInt(xd, SettingsNode.email_options_rateLimitSeconds, 300));
-                EmailBufferSeconds = Math.Max(1, ReadInt(xd, SettingsNode.email_options_bufferSeconds, 30));
+                EmailRateLimitSeconds = Math.Max(1, ReadInt(xd, ConfigNames.EmailOptionsRateLimitSeconds, 300));
+                EmailBufferSeconds = Math.Max(1, ReadInt(xd, ConfigNames.EmailOptionsBufferSeconds, 30));
             }
 
             catch (Exception ex)
@@ -370,40 +370,5 @@ namespace tcpTrigger
 
             return sb.ToString();
         }
-    }
-
-    internal class SettingsNode
-    {
-        // XML node paths for the tcpTrigger configuration file.
-        public const string enabledComponents_tcp = "/tcpTrigger/enabledComponents/tcp";
-        public const string enabledComponents_udp = "/tcpTrigger/enabledComponents/udp";
-        public const string enabledComponents_icmp = "/tcpTrigger/enabledComponents/icmp";
-        public const string monitoredPorts_tcp_include = "/tcpTrigger/monitoredPorts/tcp/include";
-        public const string monitoredPorts_tcp_exclude = "/tcpTrigger/monitoredPorts/tcp/exclude";
-        public const string monitoredPorts_udp_include = "/tcpTrigger/monitoredPorts/udp/include";
-        public const string monitoredPorts_udp_exclude = "/tcpTrigger/monitoredPorts/udp/exclude";
-        public const string endpointIgnoreList_ipAddress = "/tcpTrigger/endpointIgnoreList/ipAddress";
-        public const string networkInterfaceExcludeList_deviceGuid = "/tcpTrigger/networkInterfaceExcludeList/deviceGuid";
-        public const string enabledActions_log = "/tcpTrigger/enabledActions/log";
-        public const string enabledActions_windowsEventLog = "/tcpTrigger/enabledActions/windowsEventLog";
-        public const string enabledActions_emailNotification = "/tcpTrigger/enabledActions/emailNotification";
-        public const string enabledActions_popupNotification = "/tcpTrigger/enabledActions/popupNotification";
-        public const string enabledActions_executeCommand = "/tcpTrigger/enabledActions/executeCommand";
-        public const string actionsSettings_logPath = "/tcpTrigger/actionSettings/logPath";
-        public const string actionsSettings_command_path = "/tcpTrigger/actionSettings/command/path";
-        public const string actionsSettings_command_arguments = "/tcpTrigger/actionSettings/command/arguments";
-        public const string email_server = "/tcpTrigger/email/server";
-        public const string email_port = "/tcpTrigger/email/port";
-        public const string email_isTlsEnabled = "/tcpTrigger/email/isTlsEnabled";
-        public const string email_isAuthRequired = "/tcpTrigger/email/isAuthRequired";
-        public const string email_username = "/tcpTrigger/email/username";
-        public const string email_password = "/tcpTrigger/email/password";
-        public const string email_recipientList_address = "/tcpTrigger/email/recipientList/address";
-        public const string email_sender_address = "/tcpTrigger/email/sender/address";
-        public const string email_sender_displayName = "/tcpTrigger/email/sender/displayName";
-        public const string email_message_subject = "/tcpTrigger/email/message/subject";
-        public const string email_message_body = "/tcpTrigger/email/message/body";
-        public const string email_options_rateLimitSeconds = "/tcpTrigger/email/options/rateLimitSeconds";
-        public const string email_options_bufferSeconds = "/tcpTrigger/email/options/bufferSeconds";
     }
 }
