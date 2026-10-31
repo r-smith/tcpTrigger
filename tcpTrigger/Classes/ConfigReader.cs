@@ -23,7 +23,7 @@ namespace tcpTrigger
             {
                 // Error: A configuration file could not be found.
                 throw new FileNotFoundException(
-                    "A configuration file for tcpTrigger could not be found. Use 'tcpTrigger Manager.exe' to generate the file."
+                    "A configuration file for tcpTrigger could not be found. Use the tcpTrigger GUI to generate the file."
                     + $"{Environment.NewLine}{Environment.NewLine}"
                     + $"First path checked: '{ConfigPaths.LocalPath}'{Environment.NewLine}"
                     + $"Second path checked: '{ConfigPaths.ProgramDataPath}'"
