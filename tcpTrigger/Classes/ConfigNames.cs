@@ -21,7 +21,6 @@
         public const string EmailServer = "/tcpTrigger/email/server";
         public const string EmailPort = "/tcpTrigger/email/port";
         public const string EmailIsTlsEnabled = "/tcpTrigger/email/isTlsEnabled";
-        public const string EmailIsAuthRequired = "/tcpTrigger/email/isAuthRequired";
         public const string EmailUsername = "/tcpTrigger/email/username";
         public const string EmailPassword = "/tcpTrigger/email/password";
         public const string EmailRecipientListAddress = "/tcpTrigger/email/recipientList/address";

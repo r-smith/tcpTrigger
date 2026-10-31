@@ -35,7 +35,6 @@ namespace tcpTrigger
         public static string EmailSmtpServer { get; internal set; }
         public static int EmailPort { get; internal set; }
         public static bool IsEmailStartTlsEnabled { get; internal set; }
-        public static bool IsEmailAuthRequired { get; internal set; }
         public static string EmailUsername { get; internal set; }
         public static string EmailPassword { get; internal set; }
         public static List<string> EmailRecipients { get; internal set; } = new List<string>();
@@ -129,7 +128,7 @@ namespace tcpTrigger
                 sb.AppendLine($"Server: {EmailSmtpServer}");
                 sb.AppendLine($"Port: {EmailPort}");
                 sb.AppendLine($"SSL / TLS: {(IsEmailStartTlsEnabled ? "Enabled" : "Disabled")}");
-                sb.AppendLine("Use authentication? " + (IsEmailAuthRequired ? "Yes" : "No"));
+                sb.AppendLine("Use authentication? " + (string.IsNullOrWhiteSpace(EmailUsername) ? "No" : "Yes"));
                 sb.AppendLine("Recipient(s): " + string.Join(", ", EmailRecipients.ToArray()));
                 sb.AppendLine($"Sender address: {EmailFromAddress}");
                 sb.AppendLine($"Sender display name: {EmailFromDisplayName}");

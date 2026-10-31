@@ -122,7 +122,6 @@ namespace tcpTrigger
                 Settings.EmailSmtpServer = ReadString(xd, ConfigNames.EmailServer);
                 Settings.EmailPort = ReadInt(xd, ConfigNames.EmailPort, 25);
                 Settings.IsEmailStartTlsEnabled = ReadBool(xd, ConfigNames.EmailIsTlsEnabled, false);
-                Settings.IsEmailAuthRequired = ReadBool(xd, ConfigNames.EmailIsAuthRequired, false);
                 Settings.EmailUsername = ReadCredential(xd, ConfigNames.EmailUsername);
                 Settings.EmailPassword = ReadCredential(xd, ConfigNames.EmailPassword);
                 Settings.EmailRecipients = ReadList(xd, ConfigNames.EmailRecipientListAddress);

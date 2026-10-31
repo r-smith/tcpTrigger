@@ -62,7 +62,7 @@ namespace tcpTrigger
                         smtpClient.Host = Settings.EmailSmtpServer;
                         smtpClient.Port = Settings.EmailPort;
                         smtpClient.EnableSsl = Settings.IsEmailStartTlsEnabled;
-                        if (Settings.IsEmailAuthRequired)
+                        if (!string.IsNullOrWhiteSpace(Settings.EmailUsername))
                         {
                             smtpClient.Credentials = new NetworkCredential(Settings.EmailUsername, Settings.EmailPassword);
                         }
