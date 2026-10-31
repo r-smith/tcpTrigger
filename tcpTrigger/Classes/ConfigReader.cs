@@ -110,7 +110,6 @@ namespace tcpTrigger
 
                 // tcpTrigger/enabledActions
                 Settings.IsLogEnabled = ReadBool(xd, ConfigNames.EnabledActionsLog, false);
-                Settings.IsEventLogEnabled = ReadBool(xd, ConfigNames.EnabledActionsWindowsEventLog, false);
                 Settings.IsEmailNotificationEnabled = ReadBool(xd, ConfigNames.EnabledActionsEmailNotification, false);
                 Settings.IsExternalAppEnabled = ReadBool(xd, ConfigNames.EnabledActionsExecuteCommand, false);
 

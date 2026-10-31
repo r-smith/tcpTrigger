@@ -13,10 +13,10 @@ namespace tcpTrigger
         // Runs each enabled action for a matched packet.
         public static void Run(PacketHeader packetHeader, TcpTriggerInterface ipInterface)
         {
+            WriteEventLog(packetHeader);
+
             if (Settings.IsLogEnabled)
                 WriteLog(packetHeader);
-            if (Settings.IsEventLogEnabled)
-                WriteEventLog(packetHeader);
             if (Settings.IsExternalAppEnabled)
                 LaunchApplication(packetHeader);
             if (Settings.IsEmailNotificationEnabled)

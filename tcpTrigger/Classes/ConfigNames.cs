@@ -13,7 +13,6 @@
         public const string EndpointIgnoreListIpAddress = "/tcpTrigger/endpointIgnoreList/ipAddress";
         public const string NetworkInterfaceExcludeListDeviceGuid = "/tcpTrigger/networkInterfaceExcludeList/deviceGuid";
         public const string EnabledActionsLog = "/tcpTrigger/enabledActions/log";
-        public const string EnabledActionsWindowsEventLog = "/tcpTrigger/enabledActions/windowsEventLog";
         public const string EnabledActionsEmailNotification = "/tcpTrigger/enabledActions/emailNotification";
         public const string EnabledActionsExecuteCommand = "/tcpTrigger/enabledActions/executeCommand";
         public const string ActionSettingsLogPath = "/tcpTrigger/actionSettings/logPath";

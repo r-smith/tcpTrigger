@@ -22,7 +22,6 @@ namespace tcpTrigger
         public static string UdpPortsToInclude { get; internal set; }
         public static string UdpPortsToExclude { get; internal set; }
         public static bool IsLogEnabled { get; set; }
-        public static bool IsEventLogEnabled { get; internal set; }
         public static bool IsEmailNotificationEnabled { get; internal set; }
         public static bool IsExternalAppEnabled { get; internal set; }
         public static int EmailRateLimitSeconds { get; internal set; }
@@ -114,7 +113,6 @@ namespace tcpTrigger
             sb.AppendLine("Write to text log: " + (IsLogEnabled ? "Enabled" : "Disabled"));
             if (IsLogEnabled)
                 sb.AppendLine($"Log path: '{LogPath}'");
-            sb.AppendLine("Write to Windows event log: " + (IsEventLogEnabled ? "Enabled" : "Disabled"));
             sb.AppendLine("Email notifications: " + (IsEmailNotificationEnabled ? "Enabled" : "Disabled"));
             sb.AppendLine("Launch external application: " + (IsExternalAppEnabled ? "Enabled" : "Disabled"));
             if (IsExternalAppEnabled)
