@@ -77,6 +77,7 @@
     <Compile Include="Classes\ConfigPaths.cs" />
     <Compile Include="Classes\ConfigReader.cs" />
     <Compile Include="Classes\EmailNotifier.cs" />
+    <Compile Include="Classes\JsonLogLine.cs" />
     <Compile Include="Classes\Logger.cs" />
     <Compile Include="Classes\PacketListener.cs" />
     <Compile Include="Classes\PacketMatcher.cs" />

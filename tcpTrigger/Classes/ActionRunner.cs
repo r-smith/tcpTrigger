@@ -66,7 +66,7 @@ namespace tcpTrigger
                 {
                     using (StreamWriter outputFile = new StreamWriter(Settings.LogPath, true))
                     {
-                        outputFile.WriteLine(GetLogText(packetHeader));
+                        outputFile.WriteLine(JsonLogLine.Build(packetHeader));
                     }
                 }
                 catch (Exception ex)
@@ -78,7 +78,7 @@ namespace tcpTrigger
             }
         }
 
-        // Returns a one-line description of a matched packet. Used in the text log and in email notifications.
+        // Returns a one-line description of a matched packet. Used in email notifications.
         private static string GetLogText(PacketHeader packetHeader)
         {
             string logText;
