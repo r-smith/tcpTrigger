@@ -121,7 +121,7 @@ namespace tcpTrigger
                         + $"Source port: {packetHeader.SourcePort}{Environment.NewLine}"
                         + $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}"
                         + $"Destination port: {packetHeader.DestinationPort}{Environment.NewLine}{Environment.NewLine}"
-                        + $"TCP flags: {packetHeader.TcpFlagsAsString}",
+                        + $"TCP flags: {packetHeader.TcpFlagNames}",
                         Logger.EventCode.MatchedTcp);
                     break;
                 case PacketMatch.UdpCommunication:

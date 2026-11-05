@@ -40,7 +40,7 @@ namespace tcpTrigger
                 message = message.Replace(DestinationMac, header.DestinationMacAsString);
 
             if (message.Contains(TcpFlags))
-                message = message.Replace(TcpFlags, header.TcpFlagsAsString);
+                message = message.Replace(TcpFlags, header.TcpFlagNames);
 
             if (message.Contains(Timestamp))
                 message = message.Replace(Timestamp, header.Timestamp.ToString(Settings.TimestampFormat));

@@ -55,31 +55,23 @@ namespace tcpTrigger
         // The time the packet was captured.
         public DateTime Timestamp { get; } = DateTime.Now;
 
-        public string TcpFlagsAsString
+        // The names of the TCP flags that are set, such as "SYN,ECE".
+        public string TcpFlagNames
         {
             get
             {
-                var sb = new StringBuilder();
-                sb.AppendFormat("0x{0:X2} (", TcpFlags);
+                var flags = new StringBuilder();
 
-                if ((TcpFlags & 0x01) != 0)
-                    sb.Append("FIN,");
-                if ((TcpFlags & 0x02) != 0)
-                    sb.Append("SYN,");
-                if ((TcpFlags & 0x04) != 0)
-                    sb.Append("RST,");
-                if ((TcpFlags & 0x08) != 0)
-                    sb.Append("PSH,");
-                if ((TcpFlags & 0x10) != 0)
-                    sb.Append("ACK,");
-                if ((TcpFlags & 0x20) != 0)
-                    sb.Append("URG,");
-                if ((TcpFlags & 0x40) != 0)
-                    sb.Append("ECE,");
-                if ((TcpFlags & 0x80) != 0)
-                    sb.Append("CWR,");
+                if ((TcpFlags & 0x01) != 0) flags.Append("FIN,");
+                if ((TcpFlags & 0x02) != 0) flags.Append("SYN,");
+                if ((TcpFlags & 0x04) != 0) flags.Append("RST,");
+                if ((TcpFlags & 0x08) != 0) flags.Append("PSH,");
+                if ((TcpFlags & 0x10) != 0) flags.Append("ACK,");
+                if ((TcpFlags & 0x20) != 0) flags.Append("URG,");
+                if ((TcpFlags & 0x40) != 0) flags.Append("ECE,");
+                if ((TcpFlags & 0x80) != 0) flags.Append("CWR,");
 
-                return sb.ToString().TrimEnd(',') + ")";
+                return flags.ToString().TrimEnd(',');
             }
         }
 
