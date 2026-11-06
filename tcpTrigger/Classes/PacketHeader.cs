@@ -75,6 +75,9 @@ namespace tcpTrigger
             }
         }
 
+        // The name of the ICMP type, such as "ping", or its type code if it has no name.
+        public string IcmpTypeName => Enum.GetName(typeof(IcmpTypeCode), IcmpType) ?? IcmpType.ToString();
+
         // Reads the header fields from a captured packet. The buffer starts with the IP header.
         public PacketHeader(byte[] buffer)
         {

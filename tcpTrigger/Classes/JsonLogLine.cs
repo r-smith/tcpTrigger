@@ -53,8 +53,7 @@ namespace tcpTrigger
 
             if (packetHeader.MatchType == PacketMatch.IcmpRequest)
             {
-                AppendField(json, "icmp_type",
-                    Enum.GetName(typeof(IcmpTypeCode), packetHeader.IcmpType) ?? packetHeader.IcmpType.ToString());
+                AppendField(json, "icmp_type", packetHeader.IcmpTypeName);
             }
             json.Append('}');
 

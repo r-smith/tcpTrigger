@@ -91,7 +91,7 @@ namespace tcpTrigger
                     logText = $"UDP communication to port {packetHeader.DestinationPort} from {packetHeader.SourceIP}";
                     break;
                 case PacketMatch.IcmpRequest:
-                    logText = $"ICMP {Enum.GetName(typeof(IcmpTypeCode), packetHeader.IcmpType)} request from {packetHeader.SourceIP}";
+                    logText = $"ICMP {packetHeader.IcmpTypeName} request from {packetHeader.SourceIP}";
                     break;
                 default:
                     logText = string.Empty;
@@ -107,7 +107,7 @@ namespace tcpTrigger
             {
                 case PacketMatch.IcmpRequest:
                     Logger.Write(
-                        $"ICMP {Enum.GetName(typeof(IcmpTypeCode), packetHeader.IcmpType)} request detected.{Environment.NewLine}{Environment.NewLine}"
+                        $"ICMP {packetHeader.IcmpTypeName} request detected.{Environment.NewLine}{Environment.NewLine}"
                         + $"Match type: ICMP{Environment.NewLine}"
                         + $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}"
                         + $"Destination IP: {packetHeader.DestinationIP}",
