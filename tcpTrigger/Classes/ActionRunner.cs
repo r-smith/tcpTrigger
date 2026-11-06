@@ -111,8 +111,9 @@ namespace tcpTrigger
                         + $"Protocol: ICMP{Environment.NewLine}"
                         + $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}"
                         + $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}{Environment.NewLine}"
+                        + $"TTL: {packetHeader.Ttl}{Environment.NewLine}"
                         + $"ICMP type: {packetHeader.IcmpTypeName}",
-                        Logger.EventCode.MatchedIcmp);
+                    Logger.EventCode.MatchedIcmp);
                     break;
                 case PacketMatch.TcpConnect:
                     Logger.Write(
@@ -122,6 +123,7 @@ namespace tcpTrigger
                         + $"Source port: {packetHeader.SourcePort}{Environment.NewLine}"
                         + $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}"
                         + $"Destination port: {packetHeader.DestinationPort}{Environment.NewLine}{Environment.NewLine}"
+                        + $"TTL: {packetHeader.Ttl}{Environment.NewLine}"
                         + $"TCP flags: {packetHeader.TcpFlagNames}",
                         Logger.EventCode.MatchedTcp);
                     break;
@@ -132,7 +134,8 @@ namespace tcpTrigger
                         + $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}"
                         + $"Source port: {packetHeader.SourcePort}{Environment.NewLine}"
                         + $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}"
-                        + $"Destination port: {packetHeader.DestinationPort}",
+                        + $"Destination port: {packetHeader.DestinationPort}{Environment.NewLine}{Environment.NewLine}"
+                        + $"TTL: {packetHeader.Ttl}{Environment.NewLine}",
                         Logger.EventCode.MatchedUdp);
                     break;
             }

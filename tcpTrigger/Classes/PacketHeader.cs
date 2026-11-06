@@ -47,6 +47,7 @@ namespace tcpTrigger
                 return string.Join("-", (from x in DestinationMac.GetAddressBytes() select x.ToString("X2")).ToArray());
             }
         }
+        public byte Ttl { get; set; }
         public byte TcpFlags { get; set; }
         public byte IcmpType { get; set; }
         public Protocol ProtocolType { get; set; }
@@ -93,6 +94,9 @@ namespace tcpTrigger
             // Read the IP header length from the low 4 bits of byte 0 (the high 4 bits are the IP version).
             // The value is a count of 32-bit words, so multiply by 4 for the length in bytes (at most 60).
             int headerLength = (buffer[0] & 0x0F) * 4;
+
+            // Read the time to live - byte 8 (8 bits).
+            Ttl = buffer[8];
 
             // Read the source IP address - starting at byte 12 (32 bits).
             SourceIP = new IPAddress(BitConverter.ToUInt32(buffer, 12));

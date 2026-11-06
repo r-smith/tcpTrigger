@@ -46,6 +46,8 @@ namespace tcpTrigger
                 AppendField(json, "destination_port", packetHeader.DestinationPort);
             }
 
+            AppendField(json, "ttl", packetHeader.Ttl);
+
             if (packetHeader.MatchType == PacketMatch.TcpConnect)
             {
                 AppendField(json, "tcp_flags", packetHeader.TcpFlagNames);
