@@ -107,16 +107,17 @@ namespace tcpTrigger
             {
                 case PacketMatch.IcmpRequest:
                     Logger.Write(
-                        $"ICMP {packetHeader.IcmpTypeName} request detected.{Environment.NewLine}{Environment.NewLine}"
-                        + $"Match type: ICMP{Environment.NewLine}"
+                        $"ICMP {packetHeader.IcmpTypeName} request from {packetHeader.SourceIP}.{Environment.NewLine}{Environment.NewLine}"
+                        + $"Protocol: ICMP{Environment.NewLine}"
                         + $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}"
-                        + $"Destination IP: {packetHeader.DestinationIP}",
+                        + $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}{Environment.NewLine}"
+                        + $"ICMP type: {packetHeader.IcmpTypeName}",
                         Logger.EventCode.MatchedIcmp);
                     break;
                 case PacketMatch.TcpConnect:
                     Logger.Write(
-                        $"TCP connection detected.{Environment.NewLine}{Environment.NewLine}"
-                        + $"Match type: TCP{Environment.NewLine}"
+                        $"TCP connection attempt to port {packetHeader.DestinationPort} from {packetHeader.SourceIP}.{Environment.NewLine}{Environment.NewLine}"
+                        + $"Protocol: TCP{Environment.NewLine}"
                         + $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}"
                         + $"Source port: {packetHeader.SourcePort}{Environment.NewLine}"
                         + $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}"
@@ -126,8 +127,8 @@ namespace tcpTrigger
                     break;
                 case PacketMatch.UdpCommunication:
                     Logger.Write(
-                        $"UDP connection detected.{Environment.NewLine}{Environment.NewLine}"
-                        + $"Match type: UDP{Environment.NewLine}"
+                        $"UDP packet to port {packetHeader.DestinationPort} from {packetHeader.SourceIP}.{Environment.NewLine}{Environment.NewLine}"
+                        + $"Protocol: UDP{Environment.NewLine}"
                         + $"Source IP: {packetHeader.SourceIP}{Environment.NewLine}"
                         + $"Source port: {packetHeader.SourcePort}{Environment.NewLine}"
                         + $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}"
