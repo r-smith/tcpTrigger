@@ -135,7 +135,7 @@ namespace tcpTrigger
                         + $"Source port: {packetHeader.SourcePort}{Environment.NewLine}"
                         + $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}"
                         + $"Destination port: {packetHeader.DestinationPort}{Environment.NewLine}{Environment.NewLine}"
-                        + $"TTL: {packetHeader.Ttl}{Environment.NewLine}",
+                        + $"TTL: {packetHeader.Ttl}",
                         Logger.EventCode.MatchedUdp);
                     break;
             }
