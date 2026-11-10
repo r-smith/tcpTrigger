@@ -44,7 +44,7 @@ namespace tcpTrigger
         // The network adapter's text description, as reported by Windows.
         public string Description { get; }
 
-        // Used to apply the email rate limit.
+        // When the last email was sent, in UTC. Used to apply the email rate limit.
         public DateTime EmailLastSentTimestamp { get; private set; }
 
         // Protects EmailLogBuffer and EmailSendTimer, which the action thread and the email timer both use.
@@ -74,10 +74,10 @@ namespace tcpTrigger
         // Sends the buffered matches, or delays the timer if an email was sent too recently.
         private void EmailBufferTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (EmailLastSentTimestamp > DateTime.Now.AddSeconds(-Settings.EmailRateLimitSeconds))
+            if (EmailLastSentTimestamp > DateTime.UtcNow.AddSeconds(-Settings.EmailRateLimitSeconds))
             {
                 // Too soon to send another email. Apply rate limiting by changing the timer interval.
-                double secondsSinceLastEmail = (DateTime.Now - EmailLastSentTimestamp).TotalSeconds;
+                double secondsSinceLastEmail = (DateTime.UtcNow - EmailLastSentTimestamp).TotalSeconds;
                 if (secondsSinceLastEmail > 0 && secondsSinceLastEmail < Settings.EmailRateLimitSeconds)
                 {
                     // Set timer interval to rate limit setting minus seconds since the last send email.
@@ -97,7 +97,7 @@ namespace tcpTrigger
                 {
                     connectionLog = EmailLogBuffer;
                     EmailLogBuffer = string.Empty;
-                    EmailLastSentTimestamp = DateTime.Now;
+                    EmailLastSentTimestamp = DateTime.UtcNow;
                     EmailSendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailBufferSeconds).TotalMilliseconds;
                     EmailSendTimer.Enabled = false;
                 }
