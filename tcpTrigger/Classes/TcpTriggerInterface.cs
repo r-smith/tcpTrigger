@@ -60,12 +60,12 @@ namespace tcpTrigger
             {
                 Interval = TimeSpan.FromSeconds(Settings.EmailBufferSeconds).TotalMilliseconds
             };
-            EmailSendTimer.Elapsed += EmailBufferTimer_Elapsed;
+            EmailSendTimer.Elapsed += EmailSendTimer_Elapsed;
             EmailSendTimer.Enabled = false;
         }
 
         // Sends the buffered matches, or delays the timer if an email was sent too recently.
-        private void EmailBufferTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private void EmailSendTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             if (EmailLastSentTimestamp > DateTime.UtcNow.AddSeconds(-Settings.EmailRateLimitSeconds))
             {
@@ -95,8 +95,8 @@ namespace tcpTrigger
                     EmailSendTimer.Enabled = false;
                 }
 
-                // Send the email. Not awaited. EmailNotifier.Send catches and logs its own errors.
-                _ = EmailNotifier.Send(this, connectionLog);
+                // Send the email. Not awaited. EmailNotifier.SendAsync catches and logs its own errors.
+                _ = EmailNotifier.SendAsync(this, connectionLog);
             }
         }
 

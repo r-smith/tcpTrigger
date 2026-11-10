@@ -187,9 +187,9 @@ namespace tcpTrigger
                 {
                     Interval = TimeSpan.FromMinutes(1).TotalMilliseconds
                 };
-                _networkCheckTimer.Elapsed += InitializeNetworkListeners_Elapsed;
+                _networkCheckTimer.Elapsed += NetworkCheckTimer_Elapsed;
                 _networkCheckTimer.Enabled = true;
-                InitializeNetworkListeners_Elapsed(null, null);
+                CheckNetworkInterfaces();
             }
         }
 
@@ -222,9 +222,15 @@ namespace tcpTrigger
             }
         }
 
+        // Checks for network changes every minute.
+        private void NetworkCheckTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            CheckNetworkInterfaces();
+        }
+
         // Runs on startup and every minute. Starts listeners on startup, and restarts them when the
         // network interfaces on the system have changed.
-        private void InitializeNetworkListeners_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private void CheckNetworkInterfaces()
         {
             lock (_monitoringLock)
             {
@@ -269,7 +275,7 @@ namespace tcpTrigger
 
                     // Store the retrieved list of network interfaces and start listening on them.
                     _detectedInterfaces = networkInterfaces;
-                    StartIpListeners(networkInterfaces);
+                    StartListeners(networkInterfaces);
                 }
                 catch (Exception ex)
                 {
@@ -282,7 +288,7 @@ namespace tcpTrigger
         }
 
         // Starts a listener on each network interface and logs which interfaces are being monitored.
-        private void StartIpListeners(List<TcpTriggerInterface> interfaces)
+        private void StartListeners(List<TcpTriggerInterface> interfaces)
         {
             // Start a listener on each interface. Keep only the listeners that started successfully.
             var listeners = new List<PacketListener>();

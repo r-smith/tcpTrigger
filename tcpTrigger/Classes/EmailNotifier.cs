@@ -9,7 +9,7 @@ namespace tcpTrigger
     internal static class EmailNotifier
     {
         // Sends a notification email for the interface. Errors are logged, not thrown.
-        public static async Task Send(TcpTriggerInterface ipInterface, string connectionLog)
+        public static async Task SendAsync(TcpTriggerInterface ipInterface, string connectionLog)
         {
             if (Settings.EmailRecipients.Count == 0)
             {
