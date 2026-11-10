@@ -8,9 +8,9 @@ namespace tcpTrigger
     // IP protocol numbers, as found in byte 9 of the IP header.
     public enum Protocol
     {
-        ICMP = 1,
-        TCP = 6,
-        UDP = 17,
+        Icmp = 1,
+        Tcp = 6,
+        Udp = 17,
         Unknown = -1
     }
 
@@ -118,12 +118,12 @@ namespace tcpTrigger
 
             switch (ProtocolType)
             {
-                case Protocol.ICMP:
+                case Protocol.Icmp:
                     // Read the ICMP Type field - starting at byte [IP header length] + 0 (8 bits).
                     IcmpType = buffer[headerLength];
                     break;
 
-                case Protocol.TCP:
+                case Protocol.Tcp:
                     // Read the TCP source port - starting at byte [IP header length] + 0 (16 bits).
                     SourcePort = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, headerLength));
 
@@ -135,7 +135,7 @@ namespace tcpTrigger
                     TcpFlags = buffer[headerLength + 13];
                     break;
 
-                case Protocol.UDP:
+                case Protocol.Udp:
                     // Read the UDP source port - starting at byte [IP header length] + 0 (16 bits).
                     SourcePort = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, headerLength));
 
@@ -149,12 +149,12 @@ namespace tcpTrigger
         {
             switch (b)
             {
-                case (int)Protocol.ICMP:
-                    return Protocol.ICMP;
-                case (int)Protocol.TCP:
-                    return Protocol.TCP;
-                case (int)Protocol.UDP:
-                    return Protocol.UDP;
+                case (int)Protocol.Icmp:
+                    return Protocol.Icmp;
+                case (int)Protocol.Tcp:
+                    return Protocol.Tcp;
+                case (int)Protocol.Udp:
+                    return Protocol.Udp;
                 default:
                     return Protocol.Unknown;
             }

@@ -10,19 +10,19 @@ namespace tcpTrigger
         // or PacketMatch.None if the packet doesn't match any rule.
         public static PacketMatch GetMatchType(PacketHeader header, IPAddress ip)
         {
-            if (DoesPacketMatchICMP(header, ip))
+            if (DoesPacketMatchIcmp(header, ip))
                 return PacketMatch.IcmpRequest;
-            if (DoesPacketMatchTCP(header, ip))
+            if (DoesPacketMatchTcp(header, ip))
                 return PacketMatch.TcpConnect;
-            if (DoesPacketMatchUDP(header, ip))
+            if (DoesPacketMatchUdp(header, ip))
                 return PacketMatch.UdpCommunication;
             return PacketMatch.None;
         }
 
-        private static bool DoesPacketMatchICMP(PacketHeader header, IPAddress ip)
+        private static bool DoesPacketMatchIcmp(PacketHeader header, IPAddress ip)
         {
             return Settings.IsDetectIcmpEnabled
-                && header.ProtocolType == Protocol.ICMP
+                && header.ProtocolType == Protocol.Icmp
                 && header.DestinationIP.Equals(ip)
                 && (header.IcmpType == (int)IcmpTypeCode.ping
                     || header.IcmpType == (int)IcmpTypeCode.timestamp
@@ -30,20 +30,20 @@ namespace tcpTrigger
                 && !IsIgnored(header.SourceIP, Settings.IgnoreIcmp);
         }
 
-        private static bool DoesPacketMatchTCP(PacketHeader header, IPAddress ip)
+        private static bool DoesPacketMatchTcp(PacketHeader header, IPAddress ip)
         {
             return Settings.IsDetectTcpEnabled
-                && header.ProtocolType == Protocol.TCP
+                && header.ProtocolType == Protocol.Tcp
                 && header.DestinationIP.Equals(ip)
                 && Settings.TcpPortsToMonitor.Contains(header.DestinationPort)
                 && IsConnectionAttempt(header.TcpFlags)
                 && !IsIgnored(header.SourceIP, header.DestinationPort);
         }
 
-        private static bool DoesPacketMatchUDP(PacketHeader header, IPAddress ip)
+        private static bool DoesPacketMatchUdp(PacketHeader header, IPAddress ip)
         {
             return Settings.IsDetectUdpEnabled
-                && header.ProtocolType == Protocol.UDP
+                && header.ProtocolType == Protocol.Udp
                 && header.DestinationIP.Equals(ip)
                 && Settings.UdpPortsToMonitor.Contains(header.DestinationPort)
                 && !IsIgnored(header.SourceIP, header.DestinationPort);
