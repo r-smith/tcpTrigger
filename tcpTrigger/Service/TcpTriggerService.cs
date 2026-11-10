@@ -8,7 +8,7 @@ using System.Text;
 
 namespace tcpTrigger
 {
-    partial class TcpTriggerService : ServiceBase
+    internal partial class TcpTriggerService : ServiceBase
     {
         // Custom service command to reload the configuration file. The GUI uses thie value
         // to trigger a config reload.

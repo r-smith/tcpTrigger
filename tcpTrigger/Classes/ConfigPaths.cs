@@ -4,7 +4,7 @@ using System.IO;
 namespace tcpTrigger
 {
     // Locates the tcpTrigger.xml configuration file.
-    public static class ConfigPaths
+    internal static class ConfigPaths
     {
         public const string FileName = "tcpTrigger.xml";
 

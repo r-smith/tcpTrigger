@@ -5,7 +5,7 @@ using System.Text;
 namespace tcpTrigger
 {
     // The configuration settings, loaded from tcpTrigger.xml.
-    public static class Settings
+    internal static class Settings
     {
         internal const int IgnoreAll = 0;
         internal const int IgnoreIcmp = -1;
@@ -22,7 +22,7 @@ namespace tcpTrigger
         public static HashSet<ushort> UdpPortsToMonitor { get; internal set; }
         public static string UdpPortsToInclude { get; internal set; }
         public static string UdpPortsToExclude { get; internal set; }
-        public static bool IsLogEnabled { get; set; }
+        public static bool IsLogEnabled { get; internal set; }
         public static bool IsEmailNotificationEnabled { get; internal set; }
         public static bool IsExternalAppEnabled { get; internal set; }
         public static int EmailRateLimitSeconds { get; internal set; }

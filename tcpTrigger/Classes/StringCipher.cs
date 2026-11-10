@@ -8,7 +8,7 @@ namespace tcpTrigger
 {
     // This entire class was derived from https://stackoverflow.com/questions/10168240/encrypting-decrypting-a-string-in-c-sharp
     // Code posted by CraigTP https://stackoverflow.com/users/57477/craigtp
-    public static class StringCipher
+    internal static class StringCipher
     {
         // This constant is used to determine the keysize of the encryption algorithm in bits.
         // We divide this by 8 within the code below to get the equivalent number of bytes.

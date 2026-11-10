@@ -7,7 +7,7 @@ using System.Net.Sockets;
 namespace tcpTrigger
 {
     // Compares interfaces by IP and MAC address, to detect network changes.
-    public class TcpTriggerInterfaceComparer : IEqualityComparer<TcpTriggerInterface>
+    internal class TcpTriggerInterfaceComparer : IEqualityComparer<TcpTriggerInterface>
     {
         public bool Equals(TcpTriggerInterface x, TcpTriggerInterface y)
         {
@@ -22,7 +22,7 @@ namespace tcpTrigger
 
     // A network interface address that tcpTrigger can monitor, and its email notification buffer.
     // An adapter with several IPv4 addresses has one of these per address.
-    public class TcpTriggerInterface
+    internal class TcpTriggerInterface
     {
         // The network adapter's ID, as reported by Windows.
         public string Guid { get; }

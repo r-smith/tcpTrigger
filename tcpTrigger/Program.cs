@@ -3,7 +3,7 @@ using System.ServiceProcess;
 
 namespace tcpTrigger
 {
-    static class Program
+    internal static class Program
     {
         // The main entry point.
         // Runs as a Windows service, or in a console window when started directly.
