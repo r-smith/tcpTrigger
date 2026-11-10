@@ -27,7 +27,7 @@ namespace tcpTrigger
         private static void WriteLog(PacketHeader packetHeader)
         {
             // Log files have a defined maximum file size and will rotate one time if reached.
-            const int _maxFileSizeInBytes = 15 * 1024 * 1024;
+            const int MaxFileSizeInBytes = 15 * 1024 * 1024;
 
             lock (s_logFileLock)
             {
@@ -38,7 +38,7 @@ namespace tcpTrigger
                     {
                         // Get current file size.
                         long currentFileSize = new FileInfo(Settings.LogPath).Length;
-                        if (currentFileSize >= _maxFileSizeInBytes)
+                        if (currentFileSize >= MaxFileSizeInBytes)
                         {
                             // Log reached max size.
                             // Rotate by copying current log to .1 suffix, overwriting if exists.
@@ -54,7 +54,7 @@ namespace tcpTrigger
                     {
                         Settings.IsLogEnabled = false;
                         Logger.WriteError(
-                            $"Maximum log size {_maxFileSizeInBytes} bytes has been reached. Error rotating log file '{Settings.LogPath}'. "
+                            $"Maximum log size {MaxFileSizeInBytes} bytes has been reached. Error rotating log file '{Settings.LogPath}'. "
                             + $"Logging has been disabled.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                             Logger.EventCode.Error);
                         return;
