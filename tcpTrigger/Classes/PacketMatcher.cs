@@ -24,9 +24,9 @@ namespace tcpTrigger
             return Settings.IsDetectIcmpEnabled
                 && header.ProtocolType == Protocol.Icmp
                 && header.DestinationIP.Equals(ip)
-                && (header.IcmpType == (int)IcmpTypeCode.ping
-                    || header.IcmpType == (int)IcmpTypeCode.timestamp
-                    || header.IcmpType == (int)IcmpTypeCode.netmask)
+                && (header.IcmpType == (int)IcmpTypeCode.Ping
+                    || header.IcmpType == (int)IcmpTypeCode.Timestamp
+                    || header.IcmpType == (int)IcmpTypeCode.Netmask)
                 && !IsIgnored(header.SourceIP, Settings.IgnoreIcmp);
         }
 

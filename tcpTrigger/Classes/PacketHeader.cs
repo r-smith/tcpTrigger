@@ -26,9 +26,9 @@ namespace tcpTrigger
     // ICMP message types that tcpTrigger detects.
     public enum IcmpTypeCode
     {
-        ping = 8,
-        timestamp = 13,
-        netmask = 17
+        Ping = 8,
+        Timestamp = 13,
+        Netmask = 17
     }
 
     // The fields tcpTrigger reads from a captured packet's IP/TCP/UDP/ICMP headers.
@@ -89,7 +89,7 @@ namespace tcpTrigger
         }
 
         // The name of the ICMP type, such as "ping", or its type code if it has no name.
-        public string IcmpTypeName => Enum.GetName(typeof(IcmpTypeCode), IcmpType) ?? IcmpType.ToString();
+        public string IcmpTypeName => Enum.GetName(typeof(IcmpTypeCode), IcmpType)?.ToLowerInvariant() ?? IcmpType.ToString();
 
         // Reads the header fields from a captured packet. The buffer starts with the IP header.
         public PacketHeader(byte[] buffer)
