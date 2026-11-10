@@ -154,8 +154,9 @@ namespace tcpTrigger
             {
                 if (string.IsNullOrEmpty(Settings.ExternalAppPath))
                 {
+                    Settings.IsExternalAppEnabled = false;
                     Logger.WriteError(
-                        $"You have enabled the action to launch an external application, but no path is set. Update your tcpTrigger configuration to point to a valid executable.",
+                        $"You have enabled the action to launch an external application, but no path is set. The action has been disabled. Update your tcpTrigger configuration to point to a valid executable.",
                         Logger.EventCode.Error);
                 }
             }
