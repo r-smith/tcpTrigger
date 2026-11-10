@@ -218,7 +218,9 @@ namespace tcpTrigger
             _currentNode = GetNodePath(node, path);
             XmlNode credentialNode = node.SelectSingleNode(path);
             if (credentialNode == null || string.IsNullOrEmpty(credentialNode.InnerText))
+            {
                 return null;
+            }
 
             return credentialNode.Attributes["encrypted"]?.InnerText == "true"
                 ? StringCipher.Decrypt(credentialNode.InnerText)
@@ -232,7 +234,9 @@ namespace tcpTrigger
             foreach (XmlNode item in SelectNodes(node, path))
             {
                 if (!string.IsNullOrEmpty(item.InnerText))
+                {
                     values.Add(item.InnerText);
+                }
             }
             return values;
         }
@@ -250,7 +254,9 @@ namespace tcpTrigger
         private static string GetNodePath(XmlNode node, string path)
         {
             if (!(node is XmlElement))
+            {
                 return path;
+            }
 
             string elementPath = string.Empty;
             for (XmlNode n = node; n is XmlElement; n = n.ParentNode)
@@ -266,7 +272,9 @@ namespace tcpTrigger
         {
             var ports = new HashSet<ushort>();
             if (string.IsNullOrWhiteSpace(portList))
+            {
                 return ports;
+            }
 
             foreach (string part in portList.Split(','))
             {
@@ -274,11 +282,15 @@ namespace tcpTrigger
                 ushort start = ushort.Parse(range[0]);
                 ushort end = ushort.Parse(range[range.Length - 1]);
                 if (start > end)
+                {
                     throw new FormatException($"Port range '{part.Trim()}' has its start after its end.");
+                }
 
                 // Use an int counter (a ushort would wrap from 65535 back to 0).
                 for (int port = start; port <= end; port++)
+                {
                     ports.Add((ushort)port);
+                }
             }
             return ports;
         }
