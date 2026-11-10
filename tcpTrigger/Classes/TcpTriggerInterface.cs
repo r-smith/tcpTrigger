@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -33,13 +32,7 @@ namespace tcpTrigger
 
         // The network adapter's physical (MAC) address.
         public PhysicalAddress MacAddress { get; }
-        public string MacAddressAsString
-        {
-            get
-            {
-                return string.Join("-", (from x in MacAddress.GetAddressBytes() select x.ToString("X2")).ToArray());
-            }
-        }
+        public string MacAddressAsString => BitConverter.ToString(MacAddress.GetAddressBytes());
 
         // The network adapter's text description, as reported by Windows.
         public string Description { get; }

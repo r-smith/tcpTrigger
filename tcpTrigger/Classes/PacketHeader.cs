@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
@@ -40,13 +39,7 @@ namespace tcpTrigger
         public ushort SourcePort { get; set; }
         public ushort DestinationPort { get; set; }
         public PhysicalAddress DestinationMac { get; set; }
-        public string DestinationMacAsString
-        {
-            get
-            {
-                return string.Join("-", (from x in DestinationMac.GetAddressBytes() select x.ToString("X2")).ToArray());
-            }
-        }
+        public string DestinationMacAsString => BitConverter.ToString(DestinationMac.GetAddressBytes());
         public byte Ttl { get; set; }
         public byte TcpFlags { get; set; }
         public byte IcmpType { get; set; }
