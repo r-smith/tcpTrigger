@@ -116,7 +116,7 @@ namespace tcpTrigger
                 if (Settings.ExcludedNetworkInterfaces.Contains(networkInterface.Id)
                     || networkInterface.NetworkInterfaceType == NetworkInterfaceType.Loopback
                     || networkInterface.OperationalStatus != OperationalStatus.Up
-                    || networkInterface.Supports(NetworkInterfaceComponent.IPv4) == false)
+                    || !networkInterface.Supports(NetworkInterfaceComponent.IPv4))
                 {
                     continue;
                 }

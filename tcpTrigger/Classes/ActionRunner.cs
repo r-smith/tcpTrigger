@@ -47,7 +47,6 @@ namespace tcpTrigger
                             using (FileStream fileStream = File.Open(Settings.LogPath, FileMode.Open))
                             {
                                 fileStream.SetLength(0);
-                                fileStream.Close();
                             }
                         }
                     }

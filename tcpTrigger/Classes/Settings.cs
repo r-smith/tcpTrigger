@@ -9,6 +9,7 @@ namespace tcpTrigger
     {
         internal const int IgnoreAll = 0;
         internal const int IgnoreIcmp = -1;
+        internal const string TimestampFormat = "yyyy-MM-dd HH:mm:ss";
 
         // Full path of the configuration file that was loaded.
         public static string Path { get; internal set; }
@@ -31,7 +32,6 @@ namespace tcpTrigger
         public static string ExternalAppArguments { get; internal set; }
         public static HashSet<string> ExcludedNetworkInterfaces { get; internal set; } = new HashSet<string>();
         public static Dictionary<IPAddress, HashSet<int>> IgnoredEndpoints { get; internal set; } = new Dictionary<IPAddress, HashSet<int>>();
-        public static string TimestampFormat { get; private set; } = "yyyy-MM-dd HH:mm:ss";
         public static string EmailSmtpServer { get; internal set; }
         public static int EmailPort { get; internal set; }
         public static bool IsEmailStartTlsEnabled { get; internal set; }
@@ -129,7 +129,7 @@ namespace tcpTrigger
                 sb.AppendLine($"Port: {EmailPort}");
                 sb.AppendLine($"SSL / TLS: {(IsEmailStartTlsEnabled ? "Enabled" : "Disabled")}");
                 sb.AppendLine("Use authentication? " + (string.IsNullOrWhiteSpace(EmailUsername) ? "No" : "Yes"));
-                sb.AppendLine("Recipient(s): " + string.Join(", ", EmailRecipients.ToArray()));
+                sb.AppendLine("Recipient(s): " + string.Join(", ", EmailRecipients));
                 sb.AppendLine($"Sender address: {EmailFromAddress}");
                 sb.AppendLine($"Sender display name: {EmailFromDisplayName}");
                 sb.AppendLine($"Message subject: {EmailSubject}");

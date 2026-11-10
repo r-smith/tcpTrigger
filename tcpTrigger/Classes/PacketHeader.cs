@@ -142,12 +142,6 @@ namespace tcpTrigger
                     // Read the UDP destination port - starting at byte [IP header length] + 2 (16 bits).
                     DestinationPort = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, headerLength + 2));
                     break;
-
-                case Protocol.Unknown:
-                    break;
-
-                default:
-                    break;
             }
         }
 

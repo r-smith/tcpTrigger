@@ -246,26 +246,24 @@ namespace tcpTrigger
                             // Lists are equal. Nothing to do; quit.
                             return;
                         }
-                        else
-                        {
-                            // Network interfaces have changed. Record to event log that a change was detected.
-                            Logger.Write(
-                                "The tcpTrigger service detected a change in the network configuration in Windows. "
-                                + "Monitoring has stopped and will immediately resume with the new network configuration. "
-                                + $"Event ID {(int)Logger.EventCode.NetworkInterfaces} will be recorded when monitoring resumes."
-                                + Environment.NewLine + Environment.NewLine
-                                + "# Previous network configuration" + Environment.NewLine
-                                + NetworkInterfacesToString(_detectedInterfaces)
-                                + Environment.NewLine
-                                + "# New network configuration" + Environment.NewLine
-                                + NetworkInterfacesToString(networkInterfaces),
-                                Logger.EventCode.NetworkChangeDetected);
 
-                            // Close (and dispose) all existing listeners.
-                            foreach (PacketListener listener in _listeners)
-                            {
-                                listener.Stop();
-                            }
+                        // Network interfaces have changed. Record to event log that a change was detected.
+                        Logger.Write(
+                            "The tcpTrigger service detected a change in the network configuration in Windows. "
+                            + "Monitoring has stopped and will immediately resume with the new network configuration. "
+                            + $"Event ID {(int)Logger.EventCode.NetworkInterfaces} will be recorded when monitoring resumes."
+                            + Environment.NewLine + Environment.NewLine
+                            + "# Previous network configuration" + Environment.NewLine
+                            + NetworkInterfacesToString(_detectedInterfaces)
+                            + Environment.NewLine
+                            + "# New network configuration" + Environment.NewLine
+                            + NetworkInterfacesToString(networkInterfaces),
+                            Logger.EventCode.NetworkChangeDetected);
+
+                        // Close (and dispose) all existing listeners.
+                        foreach (PacketListener listener in _listeners)
+                        {
+                            listener.Stop();
                         }
                     }
 

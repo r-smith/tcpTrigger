@@ -76,7 +76,6 @@ namespace tcpTrigger
                 Logger.WriteError(
                     $"Email action triggered, but the message failed to send.{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.InnerException?.Message}",
                     Logger.EventCode.Error);
-                return;
             }
         }
     }
