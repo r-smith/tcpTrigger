@@ -8,7 +8,7 @@ namespace tcpTrigger
     internal static class ActionRunner
     {
         // Ensures only one thread at a time rotates or writes to the log file.
-        private static readonly object _logFileLock = new object();
+        private static readonly object s_logFileLock = new object();
 
         // Runs each enabled action for a matched packet.
         public static void Run(PacketHeader packetHeader, TcpTriggerInterface ipInterface)
@@ -29,7 +29,7 @@ namespace tcpTrigger
             // Log files have a defined maximum file size and will rotate one time if reached.
             const int _maxFileSizeInBytes = 15 * 1024 * 1024;
 
-            lock (_logFileLock)
+            lock (s_logFileLock)
             {
                 // Check if log file already exists.
                 if (File.Exists(Settings.LogPath))

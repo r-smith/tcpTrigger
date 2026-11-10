@@ -11,7 +11,7 @@ namespace tcpTrigger
     {
         // The XML node path currently being read from the configuration file.
         // Used to say which node caused an error when the file can't be parsed.
-        private static string _currentNode;
+        private static string s_currentNode;
 
         // Loads all settings from the configuration file. Throws if the file is missing or can't be parsed.
         // A missing or unreadable file throws its own exception (e.g. FileNotFoundException), not FileLoadException.
@@ -33,7 +33,7 @@ namespace tcpTrigger
             // Opened outside the try block below so file errors aren't reported as parse errors.
             using (FileStream stream = new FileStream(Settings.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
-                _currentNode = string.Empty;
+                s_currentNode = string.Empty;
                 try
                 {
                     XmlDocument xd = new XmlDocument();
@@ -54,7 +54,7 @@ namespace tcpTrigger
                     throw new FileLoadException(
                         $"Unable to parse the configuration file '{Settings.Path}'."
                         + $"{Environment.NewLine}{Environment.NewLine}"
-                        + $"Error parsing XML node: '{_currentNode}'."
+                        + $"Error parsing XML node: '{s_currentNode}'."
                         + $"{Environment.NewLine}{Environment.NewLine}"
                         + ex.Message,
                         ex);
@@ -193,7 +193,7 @@ namespace tcpTrigger
         // Returns the text of the XML node at path, or null if the node doesn't exist.
         private static string ReadString(XmlNode node, string path)
         {
-            _currentNode = GetNodePath(node, path);
+            s_currentNode = GetNodePath(node, path);
             return node.SelectSingleNode(path)?.InnerText;
         }
 
@@ -215,7 +215,7 @@ namespace tcpTrigger
         // Returns null if the node is missing or empty.
         private static string ReadCredential(XmlNode node, string path)
         {
-            _currentNode = GetNodePath(node, path);
+            s_currentNode = GetNodePath(node, path);
             XmlNode credentialNode = node.SelectSingleNode(path);
             if (credentialNode == null || string.IsNullOrEmpty(credentialNode.InnerText))
             {
@@ -244,7 +244,7 @@ namespace tcpTrigger
         // Returns every XML node at path. The list is empty if there are none.
         private static XmlNodeList SelectNodes(XmlNode node, string path)
         {
-            _currentNode = GetNodePath(node, path);
+            s_currentNode = GetNodePath(node, path);
             return node.SelectNodes(path);
         }
 

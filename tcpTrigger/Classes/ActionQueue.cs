@@ -9,7 +9,7 @@ namespace tcpTrigger
     internal class ActionQueue
     {
         // Maximum time Stop waits for queued actions to finish.
-        private static readonly TimeSpan StopTimeout = TimeSpan.FromSeconds(10);
+        private static readonly TimeSpan s_stopTimeout = TimeSpan.FromSeconds(10);
 
         // Matches waiting for their actions to run, with the interface each was captured on.
         private readonly BlockingCollection<(PacketHeader Header, TcpTriggerInterface Interface)> _matches =
@@ -44,10 +44,10 @@ namespace tcpTrigger
         public void Stop()
         {
             _matches.CompleteAdding();
-            if (!_worker.Join(StopTimeout))
+            if (!_worker.Join(s_stopTimeout))
             {
                 Logger.WriteError(
-                    $"tcpTrigger stopped before all queued actions finished. Actions still queued after {StopTimeout.TotalSeconds} seconds were not run.",
+                    $"tcpTrigger stopped before all queued actions finished. Actions still queued after {s_stopTimeout.TotalSeconds} seconds were not run.",
                     Logger.EventCode.Error);
             }
         }
