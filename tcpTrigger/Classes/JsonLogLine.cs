@@ -13,26 +13,14 @@ namespace tcpTrigger
         // Returns the packet's details as a single-line JSON object, with no trailing line ending.
         public static string Build(PacketHeader packetHeader)
         {
-            string protocol;
-            switch (packetHeader.MatchType)
-            {
-                case PacketMatch.TcpConnect:
-                    protocol = "tcp";
-                    break;
-                case PacketMatch.UdpCommunication:
-                    protocol = "udp";
-                    break;
-                default:
-                    protocol = "icmp";
-                    break;
-            }
-            bool hasPorts = protocol != "icmp";
+            bool hasPorts = packetHeader.MatchType == PacketMatch.TcpConnect
+                || packetHeader.MatchType == PacketMatch.UdpCommunication;
 
             var json = new StringBuilder("{");
             AppendField(json, "time", packetHeader.Timestamp.ToString(TimeFormat, CultureInfo.InvariantCulture));
             AppendField(json, "sensor_name", Environment.MachineName);
             AppendField(json, "event_type", "connection");
-            AppendField(json, "protocol", protocol);
+            AppendField(json, "protocol", packetHeader.MatchTypeName.ToLowerInvariant());
 
             AppendField(json, "source_ip", packetHeader.SourceIP.ToString());
             if (hasPorts)

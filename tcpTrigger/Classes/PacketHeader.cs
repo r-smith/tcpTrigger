@@ -69,6 +69,25 @@ namespace tcpTrigger
             }
         }
 
+        // The protocol of the rule the packet matched: "ICMP", "TCP", "UDP", or "None" if it didn't match.
+        public string MatchTypeName
+        {
+            get
+            {
+                switch (MatchType)
+                {
+                    case PacketMatch.IcmpRequest:
+                        return "ICMP";
+                    case PacketMatch.TcpConnect:
+                        return "TCP";
+                    case PacketMatch.UdpCommunication:
+                        return "UDP";
+                    default:
+                        return "None";
+                }
+            }
+        }
+
         // The name of the ICMP type, such as "ping", or its type code if it has no name.
         public string IcmpTypeName => Enum.GetName(typeof(IcmpTypeCode), IcmpType) ?? IcmpType.ToString();
 

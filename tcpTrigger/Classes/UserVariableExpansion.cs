@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 
 namespace tcpTrigger
 {
@@ -46,26 +45,7 @@ namespace tcpTrigger
                 message = message.Replace(Timestamp, header.Timestamp.ToString(Settings.TimestampFormat));
 
             if (message.Contains(MatchType))
-            {
-                string t;
-                switch (header.MatchType)
-                {
-                    case PacketMatch.IcmpRequest:
-                        t = "ICMP";
-                        break;
-                    case PacketMatch.TcpConnect:
-                        t = "TCP";
-                        break;
-                    case PacketMatch.UdpCommunication:
-                        t = "UDP";
-                        break;
-                    case PacketMatch.None:
-                    default:
-                        t = "None";
-                        break;
-                }
-                message = message.Replace(MatchType, t);
-            }
+                message = message.Replace(MatchType, header.MatchTypeName);
 
             if (message.Contains(SourceHostname))
             {
