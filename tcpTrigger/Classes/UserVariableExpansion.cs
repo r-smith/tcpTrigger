@@ -23,29 +23,14 @@ namespace tcpTrigger
 
         public static string GetExpandedString(string message, PacketHeader header)
         {
-            if (message.Contains(SourceIp))
-                message = message.Replace(SourceIp, header.SourceIP?.ToString());
-
-            if (message.Contains(SourcePort))
-                message = message.Replace(SourcePort, header.SourcePort.ToString());
-
-            if (message.Contains(DestinationIp))
-                message = message.Replace(DestinationIp, header.DestinationIP?.ToString());
-
-            if (message.Contains(DestinationPort))
-                message = message.Replace(DestinationPort, header.DestinationPort.ToString());
-
-            if (message.Contains(DestinationMac))
-                message = message.Replace(DestinationMac, header.DestinationMacAsString);
-
-            if (message.Contains(TcpFlags))
-                message = message.Replace(TcpFlags, header.TcpFlagNames);
-
-            if (message.Contains(Timestamp))
-                message = message.Replace(Timestamp, header.Timestamp.ToString(Settings.TimestampFormat));
-
-            if (message.Contains(MatchType))
-                message = message.Replace(MatchType, header.MatchTypeName);
+            message = message.Replace(SourceIp, header.SourceIP?.ToString());
+            message = message.Replace(SourcePort, header.SourcePort.ToString());
+            message = message.Replace(DestinationIp, header.DestinationIP?.ToString());
+            message = message.Replace(DestinationPort, header.DestinationPort.ToString());
+            message = message.Replace(DestinationMac, header.DestinationMacAsString);
+            message = message.Replace(TcpFlags, header.TcpFlagNames);
+            message = message.Replace(Timestamp, header.Timestamp.ToString(Settings.TimestampFormat));
+            message = message.Replace(MatchType, header.MatchTypeName);
 
             if (message.Contains(SourceHostname))
             {
@@ -76,14 +61,10 @@ namespace tcpTrigger
 
         public static string GetExpandedString(string message, TcpTriggerInterface ipInterface, string connectionLog)
         {
-            if (message.Contains(InterfaceIp))
-                message = message.Replace(InterfaceIp, ipInterface.IP?.ToString());
-            if (message.Contains(InterfaceMac))
-                message = message.Replace(InterfaceMac, ipInterface.MacAddressAsString);
-            if (message.Contains(InterfaceDescription))
-                message = message.Replace(InterfaceDescription, ipInterface.Description);
-            if (message.Contains(ConnectionLog))
-                message = message.Replace(ConnectionLog, connectionLog);
+            message = message.Replace(InterfaceIp, ipInterface.IP?.ToString());
+            message = message.Replace(InterfaceMac, ipInterface.MacAddressAsString);
+            message = message.Replace(InterfaceDescription, ipInterface.Description);
+            message = message.Replace(ConnectionLog, connectionLog);
 
             return message;
         }
