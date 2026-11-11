@@ -34,7 +34,10 @@ namespace tcpTrigger
         public PhysicalAddress MacAddress { get; }
         public string MacAddressAsString => BitConverter.ToString(MacAddress.GetAddressBytes());
 
-        // The network adapter's text description, as reported by Windows.
+        // The network adapter's name in Windows.
+        public string Name { get; }
+
+        // The network adapter's description in Windows.
         public string Description { get; }
 
         // When the last email was sent, in UTC. Used to apply the email rate limit.
@@ -49,9 +52,10 @@ namespace tcpTrigger
         // Sends the buffered matches once the buffer period has passed and the rate limit allows it.
         public System.Timers.Timer EmailSendTimer { get; private set; }
 
-        public TcpTriggerInterface(IPAddress address, string description, PhysicalAddress macAddress, string guid)
+        public TcpTriggerInterface(IPAddress address, string name, string description, PhysicalAddress macAddress, string guid)
         {
             IP = address;
+            Name = name;
             Description = description;
             MacAddress = macAddress;
             Guid = guid;
@@ -130,6 +134,7 @@ namespace tcpTrigger
                     networkInterfaces.Add(
                         new TcpTriggerInterface(
                             address: address.Address,
+                            name: networkInterface.Name,
                             description: networkInterface.Description,
                             macAddress: networkInterface.GetPhysicalAddress(),
                             guid: networkInterface.Id)

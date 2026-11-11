@@ -362,7 +362,7 @@ namespace tcpTrigger
                 catch (Exception ex)
                 {
                     Logger.WriteError(
-                        $"tcpTrigger failed to start monitoring network interface {ipInterface.IP} ({ipInterface.Description}). "
+                        $"tcpTrigger failed to start monitoring network interface {ipInterface.Name} ({ipInterface.IP}). "
                         + "This interface is not being monitored."
                         + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                         Logger.EventCode.InterfaceBindFailed);
@@ -396,7 +396,7 @@ namespace tcpTrigger
             StringBuilder sb = new StringBuilder();
             foreach (TcpTriggerInterface adapter in interfaces)
             {
-                sb.AppendLine($"{adapter.IP} => {adapter.Description}");
+                sb.AppendLine($"{adapter.Name}: {adapter.IP} | {adapter.Description}");
             }
             return sb.ToString();
         }
