@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace tcpTrigger
 {
@@ -39,6 +40,9 @@ namespace tcpTrigger
             ActionFailed = 451,
         }
 
+        // The event log rejects messages longer than 31,839 bytes. Leave room for the message.
+        private const int MaxMessageLength = 31000;
+
         public static void Write(string message, EventCode eventCode)
         {
             WriteEventLog(message, EventLogEntryType.Information, eventCode);
@@ -56,6 +60,11 @@ namespace tcpTrigger
 
         private static void WriteEventLog(string message, EventLogEntryType type, EventCode eventCode)
         {
+            if (message.Length > MaxMessageLength)
+            {
+                message = message.Substring(0, MaxMessageLength) + $"{Environment.NewLine}{Environment.NewLine}(Message truncated.)";
+            }
+
             try
             {
                 EventLog.WriteEntry("tcpTrigger", message, type, (int)eventCode);
