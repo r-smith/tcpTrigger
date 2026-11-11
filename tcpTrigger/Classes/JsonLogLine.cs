@@ -70,9 +70,13 @@ namespace tcpTrigger
                         // Other control characters are escaped as \u and four hex digits.
                         // All other characters are written as-is.
                         if (c < ' ')
+                        {
                             json.Append("\\u").Append(((int)c).ToString("x4"));
+                        }
                         else
+                        {
                             json.Append(c);
+                        }
                         break;
                 }
             }

@@ -97,11 +97,17 @@ namespace tcpTrigger
                     {
                         sb.Append($"Ignore IP: {pair.Key}");
                         if (port == IgnoreIcmp)
+                        {
                             sb.AppendLine(":icmp");
+                        }
                         else if (port == IgnoreAll)
+                        {
                             sb.AppendLine();
+                        }
                         else
+                        {
                             sb.AppendLine($":{port}");
+                        }
                     }
                 }
             }
@@ -111,7 +117,9 @@ namespace tcpTrigger
             sb.AppendLine("# Actions");
             sb.AppendLine("Write to text log: " + (IsLogEnabled ? "Enabled" : "Disabled"));
             if (IsLogEnabled)
+            {
                 sb.AppendLine($"Log path: '{LogPath}'");
+            }
             sb.AppendLine("Email notifications: " + (IsEmailNotificationEnabled ? "Enabled" : "Disabled"));
             sb.AppendLine("Launch external application: " + (IsExternalAppEnabled ? "Enabled" : "Disabled"));
             if (IsExternalAppEnabled)

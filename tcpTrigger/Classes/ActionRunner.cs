@@ -16,11 +16,17 @@ namespace tcpTrigger
             WriteEventLog(packetHeader);
 
             if (Settings.IsLogEnabled)
+            {
                 WriteLog(packetHeader);
+            }
             if (Settings.IsExternalAppEnabled)
+            {
                 LaunchApplication(packetHeader);
+            }
             if (Settings.IsEmailNotificationEnabled)
+            {
                 TriggerEmail(packetHeader, ipInterface);
+            }
         }
 
         // Appends the match to a text log file, rotating if needed.

@@ -11,11 +11,17 @@ namespace tcpTrigger
         public static PacketMatch GetMatchType(PacketHeader header, IPAddress ip)
         {
             if (DoesPacketMatchIcmp(header, ip))
+            {
                 return PacketMatch.IcmpRequest;
+            }
             if (DoesPacketMatchTcp(header, ip))
+            {
                 return PacketMatch.TcpConnect;
+            }
             if (DoesPacketMatchUdp(header, ip))
+            {
                 return PacketMatch.UdpCommunication;
+            }
             return PacketMatch.None;
         }
 

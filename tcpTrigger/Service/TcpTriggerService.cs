@@ -96,7 +96,9 @@ namespace tcpTrigger
         protected override void OnCustomCommand(int command)
         {
             if (command == ReloadConfigurationCommand)
+            {
                 ReloadConfiguration();
+            }
         }
 
         // Stops monitoring, loads the configuration file again, and restarts monitoring with the new settings.
@@ -200,7 +202,9 @@ namespace tcpTrigger
             {
                 // Exit if already stopped (such as after a failed reload).
                 if (!_isMonitoring)
+                {
                     return;
+                }
 
                 _isMonitoring = false;
 
@@ -236,7 +240,9 @@ namespace tcpTrigger
             {
                 // Do nothing if monitoring has stopped.
                 if (!_isMonitoring)
+                {
                     return;
+                }
 
                 try
                 {

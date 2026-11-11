@@ -101,7 +101,9 @@ namespace tcpTrigger
 
             // We only want TCP, UDP, or ICMP packets.
             if (ProtocolType == Protocol.Unknown)
+            {
                 return;
+            }
 
             // Read the IP header length from the low 4 bits of byte 0 (the high 4 bits are the IP version).
             // The value is a count of 32-bit words, so multiply by 4 for the length in bytes (at most 60).
