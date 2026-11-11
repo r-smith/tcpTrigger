@@ -1,8 +1,18 @@
 ﻿namespace tcpTrigger
 {
     // XML node paths for the tcpTrigger configuration file.
+    // Uses the same names as ConfigNames in the GUI.
     internal static class ConfigNames
     {
+        // ----- Current format -----
+
+        public const string DetectionRulesIcmp = "/tcpTrigger/detectionRules/icmp";
+        public const string DetectionRulesTcp = "/tcpTrigger/detectionRules/tcp";
+        public const string DetectionRulesUdp = "/tcpTrigger/detectionRules/udp";
+
+        // ----- Legacy format -----
+        // NetworkInterfaceExcludeListDeviceGuid is also used by the current format.
+
         public const string EnabledComponentsTcp = "/tcpTrigger/enabledComponents/tcp";
         public const string EnabledComponentsUdp = "/tcpTrigger/enabledComponents/udp";
         public const string EnabledComponentsIcmp = "/tcpTrigger/enabledComponents/icmp";

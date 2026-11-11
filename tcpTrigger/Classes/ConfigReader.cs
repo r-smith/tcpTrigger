@@ -7,8 +7,11 @@ using System.Xml;
 namespace tcpTrigger
 {
     // Reads tcpTrigger.xml into the Settings class.
+    // Reads the current format, then the legacy format.
     internal static class ConfigReader
     {
+        private const string AllPorts = "1-65535";
+
         // The XML node path currently being read from the configuration file.
         // Used to say which node caused an error when the file can't be parsed.
         private static string s_currentNode;
@@ -37,8 +40,11 @@ namespace tcpTrigger
                     XmlDocument xd = new XmlDocument();
                     xd.Load(stream);
 
+                    ReadDetectionRules(xd);
+
                     ReadExcludedInterfaces(xd);
 
+                    // Legacy values, if present, override the values above.
                     ReadLegacyEnabledComponents(xd);
                     ReadLegacyMonitoredPorts(xd);
                     ReadLegacyEndpointIgnoreList(xd);
@@ -59,6 +65,16 @@ namespace tcpTrigger
             }
         }
 
+        // ----- Current format -----
+
+        // tcpTrigger/detectionRules
+        private static void ReadDetectionRules(XmlDocument xd)
+        {
+            Settings.IsDetectIcmpEnabled = ReadBool(xd, ConfigNames.DetectionRulesIcmp + "/enabled", false);
+            Settings.IsDetectTcpEnabled = ReadBool(xd, ConfigNames.DetectionRulesTcp + "/enabled", false);
+            Settings.IsDetectUdpEnabled = ReadBool(xd, ConfigNames.DetectionRulesUdp + "/enabled", false);
+        }
+
         // tcpTrigger/networkInterfaceExcludeList
         // Same in the current and legacy formats.
         private static void ReadExcludedInterfaces(XmlDocument xd)
@@ -67,22 +83,28 @@ namespace tcpTrigger
         }
 
         // ----- Legacy format -----
+        // Missing values keep what was read from the current format.
 
         // tcpTrigger/enabledComponents
         private static void ReadLegacyEnabledComponents(XmlDocument xd)
         {
-            Settings.IsDetectIcmpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsIcmp, false);
-            Settings.IsDetectTcpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsTcp, false);
-            Settings.IsDetectUdpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsUdp, false);
+            Settings.IsDetectIcmpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsIcmp, Settings.IsDetectIcmpEnabled);
+            Settings.IsDetectTcpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsTcp, Settings.IsDetectTcpEnabled);
+            Settings.IsDetectUdpEnabled = ReadBool(xd, ConfigNames.EnabledComponentsUdp, Settings.IsDetectUdpEnabled);
         }
 
         // tcpTrigger/monitoredPorts
-        // Ports are only read for protocols that are enabled.
+        // Ports are only read for protocols that are enabled. Runs after ReadLegacyEnabledComponents.
+        // An empty or missing include list means all ports.
         private static void ReadLegacyMonitoredPorts(XmlDocument xd)
         {
             if (Settings.IsDetectTcpEnabled)
             {
                 Settings.TcpPortsToInclude = ReadString(xd, ConfigNames.MonitoredPortsTcpInclude);
+                if (string.IsNullOrWhiteSpace(Settings.TcpPortsToInclude))
+                {
+                    Settings.TcpPortsToInclude = AllPorts;
+                }
                 HashSet<ushort> includePorts = ParsePorts(Settings.TcpPortsToInclude);
 
                 Settings.TcpPortsToExclude = ReadString(xd, ConfigNames.MonitoredPortsTcpExclude);
@@ -95,6 +117,10 @@ namespace tcpTrigger
             if (Settings.IsDetectUdpEnabled)
             {
                 Settings.UdpPortsToInclude = ReadString(xd, ConfigNames.MonitoredPortsUdpInclude);
+                if (string.IsNullOrWhiteSpace(Settings.UdpPortsToInclude))
+                {
+                    Settings.UdpPortsToInclude = AllPorts;
+                }
                 HashSet<ushort> includePorts = ParsePorts(Settings.UdpPortsToInclude);
 
                 Settings.UdpPortsToExclude = ReadString(xd, ConfigNames.MonitoredPortsUdpExclude);
