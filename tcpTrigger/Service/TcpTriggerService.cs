@@ -295,10 +295,10 @@ namespace tcpTrigger
         private void StartListeners(List<TcpTriggerInterface> interfaces)
         {
             // Start a listener on each interface. Keep only the listeners that started successfully.
-            var listeners = new List<PacketListener>();
+            List<PacketListener> listeners = new List<PacketListener>();
             foreach (TcpTriggerInterface ipInterface in interfaces)
             {
-                var listener = new PacketListener(ipInterface, _actionQueue);
+                PacketListener listener = new PacketListener(ipInterface, _actionQueue);
                 try
                 {
                     listener.Start();

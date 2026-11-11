@@ -9,7 +9,7 @@ namespace tcpTrigger
         // Runs as a Windows service, or in a console window when started directly.
         static void Main()
         {
-            var service = new TcpTriggerService();
+            TcpTriggerService service = new TcpTriggerService();
 
             if (Environment.UserInteractive)
             {

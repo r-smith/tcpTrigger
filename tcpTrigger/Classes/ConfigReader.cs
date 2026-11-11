@@ -109,7 +109,7 @@ namespace tcpTrigger
         // tcpTrigger/endpointIgnoreList
         private static void ReadLegacyEndpointIgnoreList(XmlDocument xd)
         {
-            var ignoredEndpoints = new Dictionary<IPAddress, HashSet<int>>();
+            Dictionary<IPAddress, HashSet<int>> ignoredEndpoints = new Dictionary<IPAddress, HashSet<int>>();
             foreach (XmlNode node in SelectNodes(xd, ConfigNames.EndpointIgnoreListIpAddress))
             {
                 if (!string.IsNullOrEmpty(node.InnerText))
@@ -226,7 +226,7 @@ namespace tcpTrigger
         // Returns the text of every XML node at path, skipping empty ones.
         private static List<string> ReadList(XmlNode node, string path)
         {
-            var values = new List<string>();
+            List<string> values = new List<string>();
             foreach (XmlNode item in SelectNodes(node, path))
             {
                 if (!string.IsNullOrEmpty(item.InnerText))
@@ -266,7 +266,7 @@ namespace tcpTrigger
         // Returns an empty set if the list is null or empty.
         private static HashSet<ushort> ParsePorts(string portList)
         {
-            var ports = new HashSet<ushort>();
+            HashSet<ushort> ports = new HashSet<ushort>();
             if (string.IsNullOrWhiteSpace(portList))
             {
                 return ports;

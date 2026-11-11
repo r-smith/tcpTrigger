@@ -104,7 +104,7 @@ namespace tcpTrigger
         // any adapters excluded in the configuration.
         public static List<TcpTriggerInterface> GetInterfaces()
         {
-            var networkInterfaces = new List<TcpTriggerInterface>();
+            List<TcpTriggerInterface> networkInterfaces = new List<TcpTriggerInterface>();
 
             // Enumerate network interfaces. Determine and record which interfaces to listen on.
             foreach (NetworkInterface networkInterface in NetworkInterface.GetAllNetworkInterfaces())

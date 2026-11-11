@@ -54,7 +54,7 @@ namespace tcpTrigger
         {
             get
             {
-                var flags = new StringBuilder();
+                StringBuilder flags = new StringBuilder();
 
                 if ((TcpFlags & 0x01) != 0) flags.Append("FIN,");
                 if ((TcpFlags & 0x02) != 0) flags.Append("SYN,");

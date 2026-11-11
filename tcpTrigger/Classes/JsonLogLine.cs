@@ -16,7 +16,7 @@ namespace tcpTrigger
             bool hasPorts = packetHeader.MatchType == PacketMatch.TcpConnect
                 || packetHeader.MatchType == PacketMatch.UdpCommunication;
 
-            var json = new StringBuilder("{");
+            StringBuilder json = new StringBuilder("{");
             AppendField(json, "time", packetHeader.Timestamp.ToString(TimeFormat, CultureInfo.InvariantCulture));
             AppendField(json, "sensor_name", Environment.MachineName);
             AppendField(json, "event_type", "connection");

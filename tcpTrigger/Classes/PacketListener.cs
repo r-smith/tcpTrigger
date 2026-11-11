@@ -95,7 +95,7 @@ namespace tcpTrigger
         private void ProcessPacket(byte[] buffer)
         {
             // Extract header information.
-            var packetHeader = new PacketHeader(buffer);
+            PacketHeader packetHeader = new PacketHeader(buffer);
 
             // Determine if the packet matches our trigger rules.
             packetHeader.MatchType = PacketMatcher.GetMatchType(packetHeader, Interface.IP);
