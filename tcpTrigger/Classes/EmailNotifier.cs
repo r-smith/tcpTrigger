@@ -20,11 +20,11 @@ namespace tcpTrigger
                     message.From = string.IsNullOrWhiteSpace(Settings.EmailFromDisplayName)
                         ? new MailAddress(Settings.EmailFromAddress)
                         : new MailAddress(Settings.EmailFromAddress, Settings.EmailFromDisplayName);
-                    for (int i = 0; i < Settings.EmailRecipients.Count; i++)
+                    foreach (string recipient in Settings.EmailRecipients)
                     {
-                        if (!string.IsNullOrWhiteSpace(Settings.EmailRecipients[i]))
+                        if (!string.IsNullOrWhiteSpace(recipient))
                         {
-                            message.To.Add(Settings.EmailRecipients[i].Trim());
+                            message.To.Add(recipient.Trim());
                         }
                     }
 
