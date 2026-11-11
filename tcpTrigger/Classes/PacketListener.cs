@@ -56,8 +56,9 @@ namespace tcpTrigger
                 catch (Exception ex)
                 {
                     Logger.WriteError(
-                        $"tcpTrigger failed to process a packet on network interface {Interface.IP} ({Interface.Description})."
-                        + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                        $"tcpTrigger failed to read a packet on network interface {Interface.IP} ({Interface.Description}). "
+                        + "Monitoring continues."
+                        + $"{Environment.NewLine}{Environment.NewLine}{ex.GetType().Name}: {ex.Message}",
                         Logger.EventCode.PacketProcessingFailed);
                 }
 
@@ -74,7 +75,8 @@ namespace tcpTrigger
                 catch (SocketException ex)
                 {
                     Logger.WriteError(
-                        $"tcpTrigger stopped monitoring network interface {Interface.IP} ({Interface.Description}) because of an error accessing the interface."
+                        $"tcpTrigger stopped monitoring network interface {Interface.IP} ({Interface.Description}) because of an error. "
+                        + "It will be monitored again after the next network change or service restart."
                         + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                         Logger.EventCode.InterfaceMonitoringStopped);
                 }

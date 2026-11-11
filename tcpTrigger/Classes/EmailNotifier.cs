@@ -44,7 +44,9 @@ namespace tcpTrigger
             catch (Exception ex)
             {
                 Logger.WriteError(
-                    $"Email action triggered, but the message failed to send.{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.InnerException?.Message}",
+                    $"tcpTrigger failed to send the email notification through {Settings.EmailSmtpServer}:{Settings.EmailPort}."
+                    + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}"
+                    + (ex.InnerException != null ? $"{Environment.NewLine}{ex.InnerException.Message}" : string.Empty),
                     Logger.EventCode.EmailSendFailed);
             }
         }

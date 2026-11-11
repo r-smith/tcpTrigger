@@ -65,8 +65,8 @@ namespace tcpTrigger
                 catch (Exception ex)
                 {
                     Logger.WriteError(
-                        "A packet matched detection rules but tcpTrigger failed to perform configured actions. "
-                        + ex.Message,
+                        "tcpTrigger failed to run the actions for a detection."
+                        + $"{Environment.NewLine}{Environment.NewLine}{ex.GetType().Name}: {ex.Message}",
                         Logger.EventCode.ActionFailed);
                 }
             }

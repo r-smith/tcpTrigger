@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.ServiceProcess;
 using System.Text;
 
@@ -71,7 +72,8 @@ namespace tcpTrigger
             catch (Exception ex)
             {
                 Logger.WriteError(
-                    "Failed to start the tcpTrigger service."
+                    "The tcpTrigger service failed to start because its configuration couldn't be read. "
+                    + "Check that the configuration file exists and is valid."
                     + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                     Logger.EventCode.StartFailed);
 
@@ -82,7 +84,8 @@ namespace tcpTrigger
 
             StartMonitoring();
 
-            Logger.Write("The tcpTrigger service started successfully.", Logger.EventCode.ServiceStarted);
+            string version = Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
+            Logger.Write($"The tcpTrigger service (version {version}) started successfully.", Logger.EventCode.ServiceStarted);
         }
 
         // Called by Windows when the tcpTrigger service stops.
@@ -133,7 +136,8 @@ namespace tcpTrigger
                 catch (Exception ex)
                 {
                     Logger.WriteError(
-                        "Failed to reload the tcpTrigger configuration. The service is stopping."
+                        "The tcpTrigger configuration failed to reload, so the service is stopping. "
+                        + "Fix the configuration file, then start the service."
                         + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                         Logger.EventCode.ReloadFailed);
 
@@ -160,8 +164,11 @@ namespace tcpTrigger
                 if (string.IsNullOrEmpty(Settings.LogPath) || !Directory.Exists(Path.GetDirectoryName(Settings.LogPath)))
                 {
                     Settings.IsLogEnabled = false;
+                    string reason = string.IsNullOrEmpty(Settings.LogPath)
+                        ? "no log path is set"
+                        : $"the folder for the log path '{Settings.LogPath}' doesn't exist";
                     Logger.WriteWarning(
-                        $"Log file path '{Settings.LogPath}' is inaccessible. Logging has been disabled. Update your tcpTrigger configuration with a valid path.",
+                        $"Logging to a file has been disabled because {reason}. Update your tcpTrigger configuration with a valid path.",
                         Logger.EventCode.LogPathInaccessible);
                 }
             }
@@ -173,7 +180,8 @@ namespace tcpTrigger
                 {
                     Settings.IsExternalAppEnabled = false;
                     Logger.WriteWarning(
-                        "You have enabled the action to launch an external application, but no path is set. The action has been disabled. Update your tcpTrigger configuration to point to a valid executable.",
+                        "Launching an application has been disabled because no application path is set. "
+                        + "Update your tcpTrigger configuration with the application to launch.",
                         Logger.EventCode.LaunchAppPathMissing);
                 }
             }
@@ -352,8 +360,8 @@ namespace tcpTrigger
                 catch (Exception ex)
                 {
                     Logger.WriteError(
-                        "tcpTrigger failed to bind to network interface "
-                        + $"{ipInterface.IP} ({ipInterface.Description})."
+                        $"tcpTrigger failed to start monitoring network interface {ipInterface.IP} ({ipInterface.Description}). "
+                        + "This interface is not being monitored."
                         + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                         Logger.EventCode.InterfaceBindFailed);
                     listener.Stop();
@@ -375,7 +383,8 @@ namespace tcpTrigger
             else
             {
                 Logger.WriteError(
-                    "The tcpTrigger service is running, but no network interfaces are being monitored.",
+                    "The tcpTrigger service is running, but no network interfaces are being monitored, so nothing will be detected. "
+                    + "Check that an interface has an IPv4 address and isn't excluded in the configuration.",
                     Logger.EventCode.NoInterfacesMonitored);
             }
         }
