@@ -178,6 +178,37 @@ namespace tcpTrigger
                 }
             }
 
+            // Validate email settings.
+            if (Settings.IsEmailNotificationEnabled)
+            {
+                List<string> missing = new List<string>();
+                if (Settings.EmailRecipients.Count == 0)
+                {
+                    missing.Add("recipient address");
+                }
+                if (string.IsNullOrWhiteSpace(Settings.EmailFromAddress))
+                {
+                    missing.Add("sender address");
+                }
+                if (string.IsNullOrWhiteSpace(Settings.EmailSmtpServer))
+                {
+                    missing.Add("mail server");
+                }
+                if (string.IsNullOrWhiteSpace(Settings.EmailSubject))
+                {
+                    missing.Add("message subject");
+                }
+
+                if (missing.Count > 0)
+                {
+                    Settings.IsEmailNotificationEnabled = false;
+                    Logger.WriteWarning(
+                        $"Email notifications have been disabled because these settings are missing: {string.Join(", ", missing)}. "
+                        + "Update your tcpTrigger configuration with the missing settings.",
+                        Logger.EventCode.EmailSettingsIncomplete);
+                }
+            }
+
             // Write final applied configuration to event log.
             Logger.Write(
                 "The tcpTrigger configuration has been applied."

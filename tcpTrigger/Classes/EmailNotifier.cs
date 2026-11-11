@@ -11,35 +11,6 @@ namespace tcpTrigger
         // Sends a notification email for the interface. Errors are logged, not thrown.
         public static async Task SendAsync(TcpTriggerInterface ipInterface, string connectionLog)
         {
-            if (Settings.EmailRecipients.Count == 0)
-            {
-                Logger.WriteError(
-                    "Email action triggered, but no recipient address is configured.",
-                    Logger.EventCode.EmailSettingsMissing);
-                return;
-            }
-            if (string.IsNullOrWhiteSpace(Settings.EmailFromAddress))
-            {
-                Logger.WriteError(
-                    "Email action triggered, but no sender address is configured.",
-                    Logger.EventCode.EmailSettingsMissing);
-                return;
-            }
-            if (string.IsNullOrWhiteSpace(Settings.EmailSmtpServer))
-            {
-                Logger.WriteError(
-                    "Email action triggered, but no mail server is configured.",
-                    Logger.EventCode.EmailSettingsMissing);
-                return;
-            }
-            if (string.IsNullOrWhiteSpace(Settings.EmailSubject))
-            {
-                Logger.WriteError(
-                    "Email action triggered, but no message subject is configured.",
-                    Logger.EventCode.EmailSettingsMissing);
-                return;
-            }
-
             try
             {
                 using (MailMessage message = new MailMessage())
