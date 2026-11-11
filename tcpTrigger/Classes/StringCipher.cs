@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace tcpTrigger
 {
@@ -23,7 +23,7 @@ namespace tcpTrigger
         public static string Encrypt(string plainText)
         {
             // Salt and IV is randomly generated each time, but is preprended to encrypted cipher text
-            // so that the same Salt and IV values can be used when decrypting.  
+            // so that the same Salt and IV values can be used when decrypting.
             byte[] saltStringBytes = Generate256BitsOfRandomEntropy();
             byte[] ivStringBytes = Generate256BitsOfRandomEntropy();
             byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
