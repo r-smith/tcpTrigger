@@ -52,6 +52,11 @@ namespace tcpTrigger
                             {
                                 fileStream.SetLength(0);
                             }
+
+                            Logger.Write(
+                                $"The log file '{Settings.LogPath}' reached its {MaxFileSizeInBytes / 1024 / 1024} MB limit. "
+                                + $"Its contents were moved to '{Settings.LogPath}.1', replacing any previous copy.",
+                                Logger.EventCode.LogRotated);
                         }
                     }
                     catch (Exception ex)

@@ -39,6 +39,14 @@ namespace tcpTrigger
                         }
                         await smtpClient.SendMailAsync(message);
                     }
+
+                    int detectionCount = connectionLog.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).Length;
+                    Logger.Write(
+                        $"An email notification was sent through {Settings.EmailSmtpServer}:{Settings.EmailPort}."
+                        + $"{Environment.NewLine}{Environment.NewLine}"
+                        + $"Recipients: {string.Join(", ", message.To)}{Environment.NewLine}"
+                        + $"Detections: {detectionCount}",
+                        Logger.EventCode.EmailSent);
                 }
             }
             catch (Exception ex)

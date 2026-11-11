@@ -135,8 +135,8 @@ namespace tcpTrigger
                 sb.AppendLine("# Email");
                 sb.AppendLine($"Server: {EmailSmtpServer}");
                 sb.AppendLine($"Port: {EmailPort}");
-                sb.AppendLine($"SSL / TLS: {(IsEmailStartTlsEnabled ? "Enabled" : "Disabled")}");
-                sb.AppendLine("Use authentication? " + (string.IsNullOrWhiteSpace(EmailUsername) ? "No" : "Yes"));
+                sb.AppendLine($"STARTTLS: {(IsEmailStartTlsEnabled ? "Enabled" : "Disabled")}");
+                sb.AppendLine("Authentication: " + (string.IsNullOrWhiteSpace(EmailUsername) ? "Disabled" : "Enabled"));
                 sb.AppendLine("Recipient(s): " + string.Join(", ", EmailRecipients));
                 sb.AppendLine($"Sender address: {EmailFromAddress}");
                 sb.AppendLine($"Sender display name: {EmailFromDisplayName}");
