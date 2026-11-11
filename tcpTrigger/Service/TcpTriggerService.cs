@@ -70,8 +70,7 @@ namespace tcpTrigger
             {
                 Logger.WriteError(
                     "Failed to start the tcpTrigger service."
-                    + Environment.NewLine + Environment.NewLine
-                    + ex.Message,
+                    + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                     Logger.EventCode.Error);
 
                 // Rethrow so Windows reports that the service failed to start,
@@ -118,8 +117,7 @@ namespace tcpTrigger
                 {
                     Logger.WriteError(
                         "Failed to reload the tcpTrigger configuration. The service is stopping."
-                        + Environment.NewLine + Environment.NewLine
-                        + ex.Message,
+                        + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                         Logger.EventCode.Error);
 
                     // Stop with an error code, so Windows records the stop as a failure.
@@ -166,7 +164,7 @@ namespace tcpTrigger
             // Write final applied configuration to event log.
             Logger.Write(
                 "The tcpTrigger configuration has been applied."
-                + Environment.NewLine + Environment.NewLine
+                + $"{Environment.NewLine}{Environment.NewLine}"
                 + Settings.DumpToString(),
                 Logger.EventCode.ConfigurationApplied);
         }
@@ -264,11 +262,11 @@ namespace tcpTrigger
                             "The tcpTrigger service detected a change in the network configuration in Windows. "
                             + "Monitoring has stopped and will immediately resume with the new network configuration. "
                             + $"Event ID {(int)Logger.EventCode.NetworkInterfaces} will be recorded when monitoring resumes."
-                            + Environment.NewLine + Environment.NewLine
-                            + "# Previous network configuration" + Environment.NewLine
+                            + $"{Environment.NewLine}{Environment.NewLine}"
+                            + $"# Previous network configuration{Environment.NewLine}"
                             + NetworkInterfacesToString(_detectedInterfaces)
-                            + Environment.NewLine
-                            + "# New network configuration" + Environment.NewLine
+                            + $"{Environment.NewLine}"
+                            + $"# New network configuration{Environment.NewLine}"
                             + NetworkInterfacesToString(networkInterfaces),
                             Logger.EventCode.NetworkChangeDetected);
 
@@ -325,7 +323,7 @@ namespace tcpTrigger
             {
                 Logger.Write(
                     "The tcpTrigger service is actively monitoring the following network interfaces:"
-                    + Environment.NewLine + Environment.NewLine
+                    + $"{Environment.NewLine}{Environment.NewLine}"
                     + NetworkInterfacesToString(_listeners.ConvertAll(listener => listener.Interface)),
                     Logger.EventCode.NetworkInterfaces);
             }
