@@ -14,10 +14,10 @@ namespace tcpTrigger
             NetworkChangeDetected = 101,
             NetworkInterfaces = 102,
             ConfigurationReloaded = 103,
-            Error = 400,
             MatchedIcmp = 200,
             MatchedTcp = 201,
             MatchedUdp = 202,
+            Error = 400,
         }
 
         public static void Write(string message, EventCode eventCode)

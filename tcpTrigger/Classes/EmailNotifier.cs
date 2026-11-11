@@ -14,28 +14,28 @@ namespace tcpTrigger
             if (Settings.EmailRecipients.Count == 0)
             {
                 Logger.WriteError(
-                    "Email event triggered, but no recipient address is configured.",
+                    "Email action triggered, but no recipient address is configured.",
                     Logger.EventCode.Error);
                 return;
             }
             if (string.IsNullOrWhiteSpace(Settings.EmailFromAddress))
             {
                 Logger.WriteError(
-                    "Email event triggered, but no sender address is configured.",
+                    "Email action triggered, but no sender address is configured.",
                     Logger.EventCode.Error);
                 return;
             }
             if (string.IsNullOrWhiteSpace(Settings.EmailSmtpServer))
             {
                 Logger.WriteError(
-                    "Email event triggered, but no mail server is configured.",
+                    "Email action triggered, but no mail server is configured.",
                     Logger.EventCode.Error);
                 return;
             }
             if (string.IsNullOrWhiteSpace(Settings.EmailSubject))
             {
                 Logger.WriteError(
-                    "Email event triggered, but no message subject is configured.",
+                    "Email action triggered, but no message subject is configured.",
                     Logger.EventCode.Error);
                 return;
             }
@@ -70,7 +70,6 @@ namespace tcpTrigger
                     }
                 }
             }
-
             catch (Exception ex)
             {
                 Logger.WriteError(

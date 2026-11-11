@@ -40,7 +40,9 @@ namespace tcpTrigger
                     hostname = Dns.GetHostEntry(header.SourceIP).HostName;
                 }
                 catch
-                { }
+                {
+                    // Leave the hostname empty if the lookup fails.
+                }
                 message = message.Replace(SourceHostname, hostname);
             }
 
@@ -52,7 +54,9 @@ namespace tcpTrigger
                     hostname = Dns.GetHostEntry(header.DestinationIP).HostName;
                 }
                 catch
-                { }
+                {
+                    // Leave the hostname empty if the lookup fails.
+                }
                 message = message.Replace(DestinationHostname, hostname);
             }
 

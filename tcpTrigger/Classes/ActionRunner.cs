@@ -102,8 +102,7 @@ namespace tcpTrigger
                     logText = string.Empty;
                     break;
             }
-            return
-                packetHeader.Timestamp.ToString(Settings.TimestampFormat) + " [" + packetHeader.DestinationIP + "] " + logText;
+            return $"{packetHeader.Timestamp.ToString(Settings.TimestampFormat)} [{packetHeader.DestinationIP}] {logText}";
         }
 
         private static void WriteEventLog(PacketHeader packetHeader)
@@ -118,7 +117,7 @@ namespace tcpTrigger
                         + $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}{Environment.NewLine}"
                         + $"TTL: {packetHeader.Ttl}{Environment.NewLine}"
                         + $"ICMP type: {packetHeader.IcmpTypeName}",
-                    Logger.EventCode.MatchedIcmp);
+                        Logger.EventCode.MatchedIcmp);
                     break;
                 case PacketMatch.TcpConnect:
                     Logger.Write(
