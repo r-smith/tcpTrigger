@@ -20,6 +20,7 @@ namespace tcpTrigger
             NetworkInterfaces = 102,
             ConfigurationReloaded = 103,
             LogRotated = 104,
+            InterfaceMonitoringResumed = 105,
             EmailSent = 110,
             MatchedIcmp = 200,
             MatchedTcp = 201,

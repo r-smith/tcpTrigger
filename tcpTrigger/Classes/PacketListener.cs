@@ -16,6 +16,10 @@ namespace tcpTrigger
         // The network interface this listener captures packets on.
         public TcpTriggerInterface Interface { get; }
 
+        // Set when the listener stops because of an error, so the network check can restart it.
+        private volatile bool _hasFailed;
+        public bool HasFailed => _hasFailed;
+
         public PacketListener(TcpTriggerInterface ipInterface, ActionQueue actionQueue)
         {
             Interface = ipInterface;
@@ -74,9 +78,10 @@ namespace tcpTrigger
                 }
                 catch (SocketException ex)
                 {
+                    _hasFailed = true;
                     Logger.WriteError(
                         $"tcpTrigger stopped monitoring network interface {Interface.Name} ({Interface.IP}) because of an error. "
-                        + "It will be monitored again after the next network change or service restart."
+                        + "Monitoring will be retried in one minute."
                         + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                         Logger.EventCode.InterfaceMonitoringStopped);
                 }

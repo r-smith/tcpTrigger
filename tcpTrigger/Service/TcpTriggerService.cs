@@ -307,7 +307,8 @@ namespace tcpTrigger
                         TcpTriggerInterfaceComparer comparer = new TcpTriggerInterfaceComparer();
                         if (networkInterfaces.SequenceEqual(_detectedInterfaces, comparer))
                         {
-                            // Lists are equal. Nothing to do; quit.
+                            // No network change. Restart any listeners that stopped because of an error.
+                            RestartFailedListeners();
                             return;
                         }
 
@@ -353,20 +354,10 @@ namespace tcpTrigger
             List<PacketListener> listeners = new List<PacketListener>();
             foreach (TcpTriggerInterface ipInterface in interfaces)
             {
-                PacketListener listener = new PacketListener(ipInterface, _actionQueue);
-                try
+                PacketListener listener = TryStartListener(ipInterface);
+                if (listener != null)
                 {
-                    listener.Start();
                     listeners.Add(listener);
-                }
-                catch (Exception ex)
-                {
-                    Logger.WriteError(
-                        $"tcpTrigger failed to start monitoring network interface {ipInterface.Name} ({ipInterface.IP}). "
-                        + "This interface is not being monitored."
-                        + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                        Logger.EventCode.InterfaceBindFailed);
-                    listener.Stop();
                 }
             }
             _listeners = listeners;
@@ -387,6 +378,46 @@ namespace tcpTrigger
                 Logger.WriteError(
                     "The tcpTrigger service is running, but it isn't monitoring any network interfaces, so nothing will be detected.",
                     Logger.EventCode.NoInterfacesMonitored);
+            }
+        }
+
+        // Replaces each listener that stopped because of an error with a new one on the same interface.
+        private void RestartFailedListeners()
+        {
+            foreach (PacketListener failed in _listeners.FindAll(listener => listener.HasFailed))
+            {
+                failed.Stop();
+                _listeners.Remove(failed);
+
+                PacketListener listener = TryStartListener(failed.Interface);
+                if (listener != null)
+                {
+                    _listeners.Add(listener);
+                    Logger.Write(
+                        $"tcpTrigger resumed monitoring network interface {listener.Interface.Name} ({listener.Interface.IP}).",
+                        Logger.EventCode.InterfaceMonitoringResumed);
+                }
+            }
+        }
+
+        // Starts a listener on the interface. Returns null and logs an error if it can't start.
+        private PacketListener TryStartListener(TcpTriggerInterface ipInterface)
+        {
+            PacketListener listener = new PacketListener(ipInterface, _actionQueue);
+            try
+            {
+                listener.Start();
+                return listener;
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteError(
+                    $"tcpTrigger failed to start monitoring network interface {ipInterface.Name} ({ipInterface.IP}). "
+                    + "This interface is not being monitored."
+                    + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                    Logger.EventCode.InterfaceBindFailed);
+                listener.Stop();
+                return null;
             }
         }
 
