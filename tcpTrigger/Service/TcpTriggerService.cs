@@ -70,7 +70,7 @@ namespace tcpTrigger
                 Logger.WriteError(
                     "Failed to start the tcpTrigger service."
                     + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                    Logger.EventCode.Error);
+                    Logger.EventCode.StartFailed);
 
                 // Rethrow so Windows reports that the service failed to start,
                 // rather than seeing the process terminated unexpectedly.
@@ -117,7 +117,7 @@ namespace tcpTrigger
                     Logger.WriteError(
                         "Failed to reload the tcpTrigger configuration. The service is stopping."
                         + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                        Logger.EventCode.Error);
+                        Logger.EventCode.ReloadFailed);
 
                     // Stop with an error code, so Windows records the stop as a failure.
                     const int ErrorExceptionInService = 1064;
@@ -142,9 +142,9 @@ namespace tcpTrigger
                 if (string.IsNullOrEmpty(Settings.LogPath) || !Directory.Exists(Path.GetDirectoryName(Settings.LogPath)))
                 {
                     Settings.IsLogEnabled = false;
-                    Logger.WriteError(
+                    Logger.WriteWarning(
                         $"Log file path '{Settings.LogPath}' is inaccessible. Logging has been disabled. Update your tcpTrigger configuration with a valid path.",
-                        Logger.EventCode.Error);
+                        Logger.EventCode.LogPathInaccessible);
                 }
             }
 
@@ -154,9 +154,9 @@ namespace tcpTrigger
                 if (string.IsNullOrEmpty(Settings.ExternalAppPath))
                 {
                     Settings.IsExternalAppEnabled = false;
-                    Logger.WriteError(
+                    Logger.WriteWarning(
                         "You have enabled the action to launch an external application, but no path is set. The action has been disabled. Update your tcpTrigger configuration to point to a valid executable.",
-                        Logger.EventCode.Error);
+                        Logger.EventCode.LaunchAppPathMissing);
                 }
             }
 
@@ -282,7 +282,7 @@ namespace tcpTrigger
                     Logger.WriteError(
                         "tcpTrigger failed to check the network configuration. The check will be retried in one minute."
                         + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                        Logger.EventCode.Error);
+                        Logger.EventCode.NetworkCheckFailed);
                 }
             }
         }
@@ -306,7 +306,7 @@ namespace tcpTrigger
                         "tcpTrigger failed to bind to network interface "
                         + $"{ipInterface.IP} ({ipInterface.Description})."
                         + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                        Logger.EventCode.Error);
+                        Logger.EventCode.InterfaceBindFailed);
                     listener.Stop();
                 }
             }
@@ -327,7 +327,7 @@ namespace tcpTrigger
             {
                 Logger.WriteError(
                     "The tcpTrigger service is running, but no network interfaces are being monitored.",
-                    Logger.EventCode.Error);
+                    Logger.EventCode.NoInterfacesMonitored);
             }
         }
 

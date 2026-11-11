@@ -6,6 +6,8 @@ namespace tcpTrigger
     internal static class Logger
     {
         // Event IDs used in the tcpTrigger event log.
+        // 90s: service. 100s: configuration and network. 200s: detections.
+        // 300s: warnings. 400s: errors.
         public enum EventCode
         {
             ServiceStarted = 90,
@@ -17,12 +19,32 @@ namespace tcpTrigger
             MatchedIcmp = 200,
             MatchedTcp = 201,
             MatchedUdp = 202,
-            Error = 400,
+            LogPathInaccessible = 300,
+            LaunchAppPathMissing = 301,
+            StartFailed = 400,
+            ReloadFailed = 401,
+            QueuedActionsDropped = 402,
+            InterfaceBindFailed = 410,
+            InterfaceMonitoringStopped = 411,
+            NoInterfacesMonitored = 412,
+            NetworkCheckFailed = 413,
+            LogWriteFailed = 420,
+            LogRotationFailed = 421,
+            EmailSendFailed = 430,
+            EmailSettingsMissing = 431,
+            LaunchAppFailed = 440,
+            PacketProcessingFailed = 450,
+            ActionFailed = 451,
         }
 
         public static void Write(string message, EventCode eventCode)
         {
             WriteEventLog(message, EventLogEntryType.Information, eventCode);
+        }
+
+        public static void WriteWarning(string message, EventCode eventCode)
+        {
+            WriteEventLog(message, EventLogEntryType.Warning, eventCode);
         }
 
         public static void WriteError(string message, EventCode eventCode)

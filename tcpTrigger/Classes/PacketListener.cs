@@ -58,7 +58,7 @@ namespace tcpTrigger
                     Logger.WriteError(
                         $"tcpTrigger failed to process a packet on network interface {Interface.IP} ({Interface.Description})."
                         + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                        Logger.EventCode.Error);
+                        Logger.EventCode.PacketProcessingFailed);
                 }
 
                 // Reset buffer and continue listening for new data.
@@ -76,7 +76,7 @@ namespace tcpTrigger
                     Logger.WriteError(
                         $"tcpTrigger stopped monitoring network interface {Interface.IP} ({Interface.Description}) because of an error accessing the interface."
                         + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                        Logger.EventCode.Error);
+                        Logger.EventCode.InterfaceMonitoringStopped);
                 }
             }
 

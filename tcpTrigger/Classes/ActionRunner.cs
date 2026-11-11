@@ -60,7 +60,7 @@ namespace tcpTrigger
                         Logger.WriteError(
                             $"Maximum log size {MaxFileSizeInBytes} bytes has been reached. Error rotating log file '{Settings.LogPath}'. "
                             + $"Logging has been disabled.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                            Logger.EventCode.Error);
+                            Logger.EventCode.LogRotationFailed);
                         return;
                     }
                 }
@@ -76,7 +76,7 @@ namespace tcpTrigger
                 {
                     Logger.WriteError(
                         $"Error writing to log file '{Settings.LogPath}'.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                        Logger.EventCode.Error);
+                        Logger.EventCode.LogWriteFailed);
                 }
             }
         }
@@ -157,7 +157,7 @@ namespace tcpTrigger
             {
                 Logger.WriteError(
                     $"Error launching external application '{Settings.ExternalAppPath}'.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                    Logger.EventCode.Error);
+                    Logger.EventCode.LaunchAppFailed);
             }
         }
 

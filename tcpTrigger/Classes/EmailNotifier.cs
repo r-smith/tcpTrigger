@@ -15,28 +15,28 @@ namespace tcpTrigger
             {
                 Logger.WriteError(
                     "Email action triggered, but no recipient address is configured.",
-                    Logger.EventCode.Error);
+                    Logger.EventCode.EmailSettingsMissing);
                 return;
             }
             if (string.IsNullOrWhiteSpace(Settings.EmailFromAddress))
             {
                 Logger.WriteError(
                     "Email action triggered, but no sender address is configured.",
-                    Logger.EventCode.Error);
+                    Logger.EventCode.EmailSettingsMissing);
                 return;
             }
             if (string.IsNullOrWhiteSpace(Settings.EmailSmtpServer))
             {
                 Logger.WriteError(
                     "Email action triggered, but no mail server is configured.",
-                    Logger.EventCode.Error);
+                    Logger.EventCode.EmailSettingsMissing);
                 return;
             }
             if (string.IsNullOrWhiteSpace(Settings.EmailSubject))
             {
                 Logger.WriteError(
                     "Email action triggered, but no message subject is configured.",
-                    Logger.EventCode.Error);
+                    Logger.EventCode.EmailSettingsMissing);
                 return;
             }
 
@@ -74,7 +74,7 @@ namespace tcpTrigger
             {
                 Logger.WriteError(
                     $"Email action triggered, but the message failed to send.{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.InnerException?.Message}",
-                    Logger.EventCode.Error);
+                    Logger.EventCode.EmailSendFailed);
             }
         }
     }

@@ -48,7 +48,7 @@ namespace tcpTrigger
             {
                 Logger.WriteError(
                     $"tcpTrigger stopped before all queued actions finished. Actions still queued after {s_stopTimeout.TotalSeconds} seconds were not run.",
-                    Logger.EventCode.Error);
+                    Logger.EventCode.QueuedActionsDropped);
             }
         }
 
@@ -67,7 +67,7 @@ namespace tcpTrigger
                     Logger.WriteError(
                         "A packet matched detection rules but tcpTrigger failed to perform configured actions. "
                         + ex.Message,
-                        Logger.EventCode.Error);
+                        Logger.EventCode.ActionFailed);
                 }
             }
         }
