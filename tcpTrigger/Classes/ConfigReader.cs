@@ -21,13 +21,11 @@ namespace tcpTrigger
 
             if (!File.Exists(Settings.Path))
             {
-                // Error: A configuration file could not be found.
                 throw new FileNotFoundException(
                     "A configuration file for tcpTrigger could not be found. Use the tcpTrigger GUI to generate the file."
                     + $"{Environment.NewLine}{Environment.NewLine}"
                     + $"First path checked: '{ConfigPaths.LocalPath}'{Environment.NewLine}"
-                    + $"Second path checked: '{ConfigPaths.ProgramDataPath}'"
-                    );
+                    + $"Second path checked: '{ConfigPaths.ProgramDataPath}'");
             }
 
             // Opened outside the try block below so file errors aren't reported as parse errors.
@@ -50,7 +48,6 @@ namespace tcpTrigger
                 }
                 catch (Exception ex)
                 {
-                    // Error: Failed to parse XML configuration.
                     throw new FileLoadException(
                         $"Unable to parse the configuration file '{Settings.Path}'."
                         + $"{Environment.NewLine}{Environment.NewLine}"
@@ -113,12 +110,11 @@ namespace tcpTrigger
         private static void ReadLegacyEndpointIgnoreList(XmlDocument xd)
         {
             var ignoredEndpoints = new Dictionary<IPAddress, HashSet<int>>();
-            XmlNodeList nl = SelectNodes(xd, ConfigNames.EndpointIgnoreListIpAddress);
-            for (int i = 0; i < nl.Count; i++)
+            foreach (XmlNode node in SelectNodes(xd, ConfigNames.EndpointIgnoreListIpAddress))
             {
-                if (!string.IsNullOrEmpty(nl[i].InnerText))
+                if (!string.IsNullOrEmpty(node.InnerText))
                 {
-                    string portAttr = nl[i].Attributes["port"]?.Value;
+                    string portAttr = node.Attributes["port"]?.Value;
                     int port = Settings.IgnoreAll;
 
                     if (!string.IsNullOrEmpty(portAttr))
@@ -130,19 +126,19 @@ namespace tcpTrigger
                         else if (!int.TryParse(portAttr, out port) || port < 1 || port > 65535)
                         {
                             throw new FormatException(
-                                $"'{portAttr}' is not a valid port for ignored IP address '{nl[i].InnerText}'. "
+                                $"'{portAttr}' is not a valid port for ignored IP address '{node.InnerText}'. "
                                 + "Use a port number from 1 to 65535, or 'icmp'.");
                         }
                     }
-                    if (IPAddress.TryParse(nl[i].InnerText, out IPAddress ip))
+                    if (IPAddress.TryParse(node.InnerText, out IPAddress ip))
                     {
-                        if (!ignoredEndpoints.ContainsKey(ip))
+                        if (ignoredEndpoints.TryGetValue(ip, out HashSet<int> ports))
                         {
-                            ignoredEndpoints.Add(ip, new HashSet<int>() { port });
+                            ports.Add(port);
                         }
                         else
                         {
-                            ignoredEndpoints[ip].Add(port);
+                            ignoredEndpoints.Add(ip, new HashSet<int> { port });
                         }
                     }
                 }
