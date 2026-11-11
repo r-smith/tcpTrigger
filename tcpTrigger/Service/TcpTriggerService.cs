@@ -304,23 +304,25 @@ namespace tcpTrigger
                     if (_detectedInterfaces != null)
                     {
                         // Compare list of network interfaces to previously stored list of network interfaces.
-                        if (networkInterfaces.SequenceEqual(_detectedInterfaces, new TcpTriggerInterfaceComparer()))
+                        TcpTriggerInterfaceComparer comparer = new TcpTriggerInterfaceComparer();
+                        if (networkInterfaces.SequenceEqual(_detectedInterfaces, comparer))
                         {
                             // Lists are equal. Nothing to do; quit.
                             return;
                         }
 
                         // Network interfaces have changed. Record to event log that a change was detected.
+                        List<TcpTriggerInterface> added = networkInterfaces.Except(_detectedInterfaces, comparer).ToList();
+                        List<TcpTriggerInterface> removed = _detectedInterfaces.Except(networkInterfaces, comparer).ToList();
                         Logger.Write(
-                            "The tcpTrigger service detected a change in the network configuration in Windows. "
-                            + "Monitoring has stopped and will immediately resume with the new network configuration. "
-                            + $"Event ID {(int)Logger.EventCode.NetworkInterfaces} will be recorded when monitoring resumes."
+                            "tcpTrigger detected a network change and is restarting monitoring. "
+                            + $"Event {(int)Logger.EventCode.NetworkInterfaces} will list the interfaces being monitored."
                             + $"{Environment.NewLine}{Environment.NewLine}"
-                            + $"# Previous network configuration{Environment.NewLine}"
-                            + NetworkInterfacesToString(_detectedInterfaces)
+                            + $"# Added{Environment.NewLine}"
+                            + (added.Count > 0 ? NetworkInterfacesToString(added) : $"None{Environment.NewLine}")
                             + $"{Environment.NewLine}"
-                            + $"# New network configuration{Environment.NewLine}"
-                            + NetworkInterfacesToString(networkInterfaces),
+                            + $"# Removed{Environment.NewLine}"
+                            + (removed.Count > 0 ? NetworkInterfacesToString(removed) : "None"),
                             Logger.EventCode.NetworkChangeDetected);
 
                         // Stop all existing listeners.
@@ -375,7 +377,7 @@ namespace tcpTrigger
             if (_listeners.Count > 0)
             {
                 Logger.Write(
-                    "The tcpTrigger service is actively monitoring the following network interfaces:"
+                    "The tcpTrigger service is monitoring the following network interfaces:"
                     + $"{Environment.NewLine}{Environment.NewLine}"
                     + NetworkInterfacesToString(_listeners.ConvertAll(listener => listener.Interface)),
                     Logger.EventCode.NetworkInterfaces);
@@ -383,8 +385,7 @@ namespace tcpTrigger
             else
             {
                 Logger.WriteError(
-                    "The tcpTrigger service is running, but no network interfaces are being monitored, so nothing will be detected. "
-                    + "Check that an interface has an IPv4 address and isn't excluded in the configuration.",
+                    "The tcpTrigger service is running, but it isn't monitoring any network interfaces, so nothing will be detected.",
                     Logger.EventCode.NoInterfacesMonitored);
             }
         }
