@@ -87,7 +87,15 @@ namespace tcpTrigger
         {
             StopMonitoring();
 
-            Logger.Write("The tcpTrigger service stopped successfully.", Logger.EventCode.ServiceStopped);
+            // ExitCode is only set when the service stops itself because of an error.
+            if (ExitCode != 0)
+            {
+                Logger.WriteError("The tcpTrigger service stopped because of an error.", Logger.EventCode.ServiceStoppedOnError);
+            }
+            else
+            {
+                Logger.Write("The tcpTrigger service stopped successfully.", Logger.EventCode.ServiceStopped);
+            }
         }
 
         // Called by Windows when a custom command is sent to the tcpTrigger service.
