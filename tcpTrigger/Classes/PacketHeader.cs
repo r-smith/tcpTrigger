@@ -99,7 +99,7 @@ namespace tcpTrigger
             // Read the protocol number - byte 9.
             ProtocolType = GetProtocolFromByte(buffer[9]);
 
-            // We only want TCP, UDP, or ICMP packets.
+            // Only TCP, UDP, and ICMP packets are read.
             if (ProtocolType == Protocol.Unknown)
             {
                 return;
@@ -133,7 +133,7 @@ namespace tcpTrigger
                     DestinationPort = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, headerLength + 2));
 
                     // Read the TCP flag fields - eight 1-bit flags starting at byte [IP header length] + 13
-                    // (I'm skipping over the ECN nonce (NS) flag).
+                    // (The ECN nonce (NS) flag in the previous byte isn't read.)
                     TcpFlags = buffer[headerLength + 13];
                     break;
 
@@ -147,6 +147,7 @@ namespace tcpTrigger
             }
         }
 
+        // Returns the protocol for an IP protocol number, or Unknown if it isn't ICMP, TCP or UDP.
         private Protocol GetProtocolFromByte(byte b)
         {
             switch (b)

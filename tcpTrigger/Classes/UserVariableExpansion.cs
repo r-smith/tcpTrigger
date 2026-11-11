@@ -21,6 +21,7 @@ namespace tcpTrigger
         public const string MatchType = "{MATCH_TYPE}";
         public const string TcpFlags = "{TCP_FLAGS}";
 
+        // Replaces the packet variables in the text, such as {SOURCE_IP}.
         public static string GetExpandedString(string message, PacketHeader header)
         {
             message = message.Replace(SourceIp, header.SourceIP?.ToString());
@@ -63,6 +64,7 @@ namespace tcpTrigger
             return message;
         }
 
+        // Replaces the interface variables and {CONNECTION_LOG} in the text.
         public static string GetExpandedString(string message, TcpTriggerInterface ipInterface, string connectionLog)
         {
             message = message.Replace(InterfaceIp, ipInterface.IP?.ToString());

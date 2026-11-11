@@ -37,12 +37,10 @@ namespace tcpTrigger
 
             lock (s_logFileLock)
             {
-                // Check if log file already exists.
                 if (File.Exists(Settings.LogPath))
                 {
                     try
                     {
-                        // Get current file size.
                         long currentFileSize = new FileInfo(Settings.LogPath).Length;
                         if (currentFileSize >= MaxFileSizeInBytes)
                         {
@@ -105,6 +103,7 @@ namespace tcpTrigger
             return $"{packetHeader.Timestamp.ToString(Settings.TimestampFormat)} [{packetHeader.DestinationIP}] {logText}";
         }
 
+        // Writes the matched packet's details to the event log.
         private static void WriteEventLog(PacketHeader packetHeader)
         {
             switch (packetHeader.MatchType)
@@ -145,6 +144,7 @@ namespace tcpTrigger
             }
         }
 
+        // Starts the configured application, with any variables in its arguments replaced.
         private static void LaunchApplication(PacketHeader packetHeader)
         {
             try

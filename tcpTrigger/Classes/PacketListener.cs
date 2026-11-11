@@ -69,8 +69,7 @@ namespace tcpTrigger
                 }
                 catch (ObjectDisposedException)
                 {
-                    // Listener has been disposed by calling thread.
-                    // This is expected behavior for cleanup. Do nothing.
+                    // The listener was stopped.
                 }
                 catch (SocketException ex)
                 {
@@ -94,10 +93,8 @@ namespace tcpTrigger
         // Reads the packet header and queues the packet for its actions if it matches a detection rule.
         private void ProcessPacket(byte[] buffer)
         {
-            // Extract header information.
             PacketHeader packetHeader = new PacketHeader(buffer);
 
-            // Determine if the packet matches our trigger rules.
             packetHeader.MatchType = PacketMatcher.GetMatchType(packetHeader, Interface.IP);
 
             // Queue matches for the action thread.

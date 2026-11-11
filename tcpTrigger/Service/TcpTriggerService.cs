@@ -10,7 +10,7 @@ namespace tcpTrigger
 {
     internal partial class TcpTriggerService : ServiceBase
     {
-        // Custom service command to reload the configuration file. The GUI uses thie value
+        // Custom service command to reload the configuration file. The GUI uses this value
         // to trigger a config reload.
         public const int ReloadConfigurationCommand = 128;
 
@@ -61,7 +61,6 @@ namespace tcpTrigger
         // Called by Windows when the tcpTrigger service starts.
         protected override void OnStart(string[] args)
         {
-            // Read and parse the tcpTrigger configuration file.
             try
             {
                 LoadConfiguration();
@@ -180,9 +179,8 @@ namespace tcpTrigger
                 _actionQueue = new ActionQueue();
                 _actionQueue.Start();
 
-                // Retrieve network interfaces and start IP listener threads.
-                // This is done on a timer so that the listener thread can automatically restart
-                // if any changes to network interfaces are detected.
+                // Start the listeners now, then check every minute for network changes
+                // and restart the listeners when the interfaces change.
                 _networkCheckTimer = new System.Timers.Timer
                 {
                     Interval = TimeSpan.FromMinutes(1).TotalMilliseconds
@@ -206,11 +204,10 @@ namespace tcpTrigger
 
                 _isMonitoring = false;
 
-                // Stop checking for network changes.
                 _networkCheckTimer.Stop();
                 _networkCheckTimer.Dispose();
 
-                // Close (and dispose) all existing listeners.
+                // Stop all existing listeners.
                 foreach (PacketListener listener in _listeners)
                 {
                     listener.Stop();
@@ -236,7 +233,6 @@ namespace tcpTrigger
         {
             lock (_monitoringLock)
             {
-                // Do nothing if monitoring has stopped.
                 if (!_isMonitoring)
                 {
                     return;
@@ -270,7 +266,7 @@ namespace tcpTrigger
                             + NetworkInterfacesToString(networkInterfaces),
                             Logger.EventCode.NetworkChangeDetected);
 
-                        // Close (and dispose) all existing listeners.
+                        // Stop all existing listeners.
                         foreach (PacketListener listener in _listeners)
                         {
                             listener.Stop();
@@ -335,6 +331,7 @@ namespace tcpTrigger
             }
         }
 
+        // Returns one line per interface, with its IP address and description.
         private string NetworkInterfacesToString(List<TcpTriggerInterface> interfaces)
         {
             StringBuilder sb = new StringBuilder();

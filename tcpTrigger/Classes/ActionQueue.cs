@@ -58,7 +58,6 @@ namespace tcpTrigger
             // Take each match as it's queued. The loop ends once Stop is called and the queue is empty.
             foreach (var match in _matches.GetConsumingEnumerable())
             {
-                // This runs on the action thread. Failed actions are logged.
                 try
                 {
                     ActionRunner.Run(match.Header, match.Interface);

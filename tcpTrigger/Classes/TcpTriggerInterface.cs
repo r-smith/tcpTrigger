@@ -73,12 +73,10 @@ namespace tcpTrigger
                 double secondsSinceLastEmail = (DateTime.UtcNow - EmailLastSentTimestamp).TotalSeconds;
                 if (secondsSinceLastEmail > 0 && secondsSinceLastEmail < Settings.EmailRateLimitSeconds)
                 {
-                    // Set timer interval to rate limit setting minus seconds since the last send email.
                     EmailSendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailRateLimitSeconds - secondsSinceLastEmail).TotalMilliseconds;
                 }
                 else
                 {
-                    // Set timer interval to rate limit setting.
                     EmailSendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailRateLimitSeconds).TotalMilliseconds;
                 }
             }
@@ -124,13 +122,11 @@ namespace tcpTrigger
                 // Get adapter properties.
                 foreach (UnicastIPAddressInformation address in networkInterface.GetIPProperties().UnicastAddresses)
                 {
-                    // Skip if IP address is not IPv4.
                     if (address.Address.AddressFamily != AddressFamily.InterNetwork)
                     {
                         continue;
                     }
 
-                    // Add adapter to tcpTrigger network interface list.
                     networkInterfaces.Add(
                         new TcpTriggerInterface(
                             address: address.Address,
