@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace tcpTrigger
@@ -46,6 +47,22 @@ namespace tcpTrigger
         // The event log rejects messages longer than 31,839 bytes. Leave room for the message.
         private const int MaxMessageLength = 31000;
 
+        // Errors that can repeat for every detection. Each is written at most once every 5 minutes.
+        private static readonly HashSet<EventCode> s_repeatingErrors = new HashSet<EventCode>
+        {
+            EventCode.LogWriteFailed,
+            EventCode.EmailSendFailed,
+            EventCode.LaunchAppFailed,
+            EventCode.PacketProcessingFailed,
+            EventCode.ActionFailed,
+        };
+
+        private static readonly TimeSpan s_repeatWindow = TimeSpan.FromMinutes(5);
+
+        // When each repeating error was last written.
+        private static readonly Dictionary<EventCode, DateTime> s_lastWritten = new Dictionary<EventCode, DateTime>();
+        private static readonly object s_lastWrittenLock = new object();
+
         public static void Write(string message, EventCode eventCode)
         {
             WriteEventLog(message, EventLogEntryType.Information, eventCode);
@@ -58,6 +75,20 @@ namespace tcpTrigger
 
         public static void WriteError(string message, EventCode eventCode)
         {
+            if (s_repeatingErrors.Contains(eventCode))
+            {
+                lock (s_lastWrittenLock)
+                {
+                    if (s_lastWritten.TryGetValue(eventCode, out DateTime last)
+                        && DateTime.UtcNow - last < s_repeatWindow)
+                    {
+                        return;
+                    }
+                    s_lastWritten[eventCode] = DateTime.UtcNow;
+                }
+                message += $"{Environment.NewLine}{Environment.NewLine}If this error repeats, it won't be logged again for 5 minutes.";
+            }
+
             WriteEventLog(message, EventLogEntryType.Error, eventCode);
         }
 
