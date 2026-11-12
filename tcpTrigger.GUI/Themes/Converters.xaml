@@ -1,0 +1,8 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:convert="clr-namespace:tcpTrigger.GUI.Converters">
+
+    <convert:BoolToVisibilityConverter x:Key="TrueToCollapsed" TrueValue="Collapsed" FalseValue="Visible"/>
+    <convert:BoolToVisibilityConverter x:Key="TrueToVisible" TrueValue="Visible" FalseValue="Collapsed"/>
+    <convert:VisibilityToEnabledConverter x:Key="VisibleToDisabled"/>
+</ResourceDictionary>

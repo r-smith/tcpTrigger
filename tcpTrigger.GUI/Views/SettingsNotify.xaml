@@ -1,0 +1,156 @@
+﻿<UserControl x:Class="tcpTrigger.GUI.Views.SettingsNotify"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:convert="clr-namespace:tcpTrigger.GUI.Converters"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800"
+             FontSize="14">
+
+    <UserControl.Resources>
+        <convert:NotificationTypeToIconConverter x:Key="TypeToIcon"/>
+    </UserControl.Resources>
+
+    <ScrollViewer Style="{StaticResource TabScrollViewer}">
+        <Grid Margin="25,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <!-- Title -->
+            <StackPanel>
+                <TextBlock Text="Notifications"
+                           Style="{StaticResource PageHeading}"/>
+                <Separator Background="#9184EE"/>
+
+                <!-- New notification button -->
+                <Button Content="_New notification"
+                        Style="{StaticResource AddButton}"
+                        HorizontalAlignment="Left"
+                        Margin="0,20,0,5"
+                        Click="NewNotification_Click"/>
+            </StackPanel>
+
+            <!-- Content -->
+            <Border Grid.Row="1"
+                    Margin="0,10,0,5"
+                    CornerRadius="2"
+                    Background="#000000"
+                    BorderBrush="#1B1F23"
+                    BorderThickness="0">
+                <ItemsControl x:Name="NotificationsControl" Focusable="False">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border PreviewMouseLeftButtonDown="ItemBorder_PreviewMouseLeftButtonDown"
+                                    PreviewKeyDown="ItemBorder_PreviewKeyDown"
+                                    x:Name="ItemBorder"
+                                    Focusable="True"
+                                    BorderThickness="1"
+                                    Cursor="Hand"
+                                    CornerRadius="2"
+                                    Padding="8,20,0,20"
+                                    FocusVisualStyle="{StaticResource ListFocusVisual}"
+                                    SnapsToDevicePixels="True">
+                                <Border.Style>
+                                    <Style TargetType="{x:Type Border}">
+                                        <Setter Property="Background" Value="#000000"/>
+                                        <Setter Property="BorderBrush" Value="Transparent"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#111111"/>
+                                                <Setter Property="BorderBrush" Value="#444455"/>
+                                            </Trigger>
+                                            <Trigger Property="IsFocused" Value="True">
+                                                <Setter Property="Background" Value="#222233"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <!-- Styling for disabled state -->
+                                    <Grid.Resources>
+                                        <Style x:Key="OpacityToggle" TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Opacity" Value="1"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Visibility, ElementName=DisabledTag}" Value="Visible">
+                                                    <Setter Property="Opacity" Value="0.5"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Resources>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <!-- Icon -->
+                                        <Image Source="{Binding Type, Converter={StaticResource TypeToIcon}}"
+                                               Width="18"
+                                               Height="18"
+                                               Margin="0,0,15,0">
+                                            <Image.Style>
+                                                <Style TargetType="{x:Type Image}">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Setter Property="Opacity" Value="0.9"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Visibility, ElementName=DisabledTag}" Value="Visible">
+                                                            <Setter Property="Opacity" Value="0.35"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Image.Style>
+                                        </Image>
+                                        <!-- Notification name -->
+                                        <TextBlock Text="{Binding Name}"
+                                                   Style="{StaticResource OpacityToggle}"
+                                                   FontSize="17"
+                                                   FontWeight="Regular"
+                                                   Foreground="#EEEEFF"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   VerticalAlignment="Center"/>
+                                        <!-- Disabled badge -->
+                                        <ContentControl x:Name="DisabledTag"
+                                                        Style="{StaticResource DisabledBadge}"
+                                                        Visibility="{Binding IsEnabled, Converter={StaticResource TrueToCollapsed}}"
+                                                        Margin="10,0,0,0"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1"
+                                               Visibility="{Binding IsMouseOver, ElementName=ItemBorder, Converter={StaticResource TrueToVisible}}"
+                                               Text="&#x203A;"
+                                               FontSize="17"
+                                               Padding="0,0,16,0"
+                                               Foreground="#707070"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Border>
+
+            <!-- Shown when the list is empty -->
+            <TextBlock Grid.Row="1"
+                       Text="No notifications yet. Detections appear in the tcpTrigger window. Add a notification to also send an email, run a program, or write to a log file."
+                       FontSize="16"
+                       Foreground="#9A9A9A"
+                       TextWrapping="Wrap"
+                       VerticalAlignment="Top"
+                       Margin="0,14,0,0">
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Items.Count, ElementName=NotificationsControl}" Value="0">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

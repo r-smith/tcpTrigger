@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="tcpTrigger.GUI.Views.Dialogs.DialogUnsavedChanges"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:Width="600" d:Height="500"
+             UseLayoutRounding="True">
+    <Grid Background="#88000000">
+        <Border Background="#181818"
+                CornerRadius="4"
+                Padding="25"
+                BorderBrush="#FFD43B"
+                BorderThickness="2"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+            <StackPanel>
+                <TextBlock Text="Save changes?"
+                           FontSize="19"
+                           FontFamily="Segoe UI"
+                           FontWeight="Regular"
+                           Foreground="#FFFFFF"/>
+                <TextBlock Text="Your changes to tcpTrigger haven't been saved."
+                           TextWrapping="Wrap"
+                           Margin="0,12,0,0"
+                           FontSize="14"
+                           HorizontalAlignment="Left"
+                           Foreground="#FFFFFF"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,45,0,0">
+                    <Button x:Name="SaveButton"
+                            Content="_Save"
+                            Click="Save_Click"
+                            Width="130"
+                            Margin="0,0,10,0"/>
+                    <Button Content="Do_n't save"
+                            Style="{StaticResource SecondaryButton}"
+                            Click="DontSave_Click"
+                            Width="130"
+                            Margin="0,0,10,0"/>
+                    <Button Content="Cancel"
+                            Style="{StaticResource SecondaryButton}"
+                            Click="Cancel_Click"
+                            IsCancel="True"
+                            Width="130"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

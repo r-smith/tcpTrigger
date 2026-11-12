@@ -1,0 +1,234 @@
+﻿<UserControl x:Class="tcpTrigger.GUI.Views.SettingsIgnore"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:convert="clr-namespace:tcpTrigger.GUI.Converters"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <!-- The most lines a rule's sources or services take in the list -->
+        <convert:ListPreviewConverter x:Key="SourcesPreview" MaxItems="6" AnyText="Any IP address"/>
+        <convert:ListPreviewConverter x:Key="ServicesPreview" MaxItems="6" AnyText="Any destination" AnyTextWithDestinations="Any port"/>
+        <convert:ListPreviewConverter x:Key="DestinationsPreview" MaxItems="3" HideAny="True"/>
+    </UserControl.Resources>
+
+    <ScrollViewer Style="{StaticResource TabScrollViewer}">
+        <Grid Margin="25,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <!-- Title -->
+            <StackPanel>
+                <TextBlock Text="Ignore rules"
+                           Style="{StaticResource PageHeading}"/>
+                <Separator Background="#9184EE"/>
+
+                <!-- New rule button -->
+                <Button Content="_New rule"
+                        Style="{StaticResource AddButton}"
+                        HorizontalAlignment="Left"
+                        Margin="0,20,0,5"
+                        Click="NewRule_Click"/>
+            </StackPanel>
+
+            <!-- Column headers (sources and destinations) -->
+            <Border Grid.Row="1"
+                    Margin="0,14,0,0"
+                    Padding="11,0,1,6"
+                    BorderBrush="#262A33"
+                    BorderThickness="0,0,0,1">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Items.Count, ElementName=RulesControl}" Value="0">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.6*" MaxWidth="250"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Sources" FontSize="12" Foreground="#8A8A8A"/>
+                    <TextBlock Text="Destinations" Grid.Column="1" FontSize="12" Foreground="#8A8A8A"/>
+                </Grid>
+            </Border>
+
+            <!-- Content -->
+            <ItemsControl x:Name="RulesControl" Grid.Row="2" Margin="0,0,0,5" Focusable="False">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <!-- Rule border -->
+                        <Border PreviewMouseLeftButtonDown="ItemBorder_PreviewMouseLeftButtonDown"
+                                PreviewKeyDown="ItemBorder_PreviewKeyDown"
+                                x:Name="ItemBorder"
+                                Focusable="True"
+                                BorderThickness="1"
+                                Cursor="Hand"
+                                CornerRadius="2"
+                                Margin="0,0"
+                                Padding="10,17,0,17"
+                                FocusVisualStyle="{StaticResource ListFocusVisual}"
+                                SnapsToDevicePixels="True">
+                            <Border.Style>
+                                <Style TargetType="{x:Type Border}">
+                                    <Setter Property="Background" Value="#000000"/>
+                                    <Setter Property="BorderBrush" Value="Transparent"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#111111"/>
+                                            <Setter Property="BorderBrush" Value="#444455"/>
+                                        </Trigger>
+                                        <Trigger Property="IsFocused" Value="True">
+                                            <Setter Property="Background" Value="#222233"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1.6*" MaxWidth="250"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <!-- Styling for disabled state -->
+                                <Grid.Resources>
+                                    <Style x:Key="OpacityToggle" TargetType="{x:Type TextBlock}">
+                                        <Setter Property="Opacity" Value="1"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Visibility, ElementName=DisabledTag}" Value="Visible">
+                                                <Setter Property="Opacity" Value="0.5"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                    <!-- "+N more" under a shortened list. Hidden when the list isn't shortened. -->
+                                    <Style x:Key="MoreLine" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource OpacityToggle}">
+                                        <Setter Property="FontFamily" Value="Segoe UI"/>
+                                        <Setter Property="FontSize" Value="13"/>
+                                        <Setter Property="Foreground" Value="#8A8A8A"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="Text" Value="">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Resources>
+
+                                <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2">
+                                    <!-- Rule name -->
+                                    <TextBlock Text="{Binding Name}"
+                                               Style="{StaticResource OpacityToggle}"
+                                               FontSize="17"
+                                               FontWeight="Regular"
+                                               Foreground="#EEEEFF"
+                                               TextTrimming="CharacterEllipsis"
+                                               Margin="0,0,0,4"/>
+                                    <!-- Disabled badge -->
+                                    <ContentControl x:Name="DisabledTag"
+                                                    Style="{StaticResource DisabledBadge}"
+                                                    Visibility="{Binding IsEnabled, Converter={StaticResource TrueToCollapsed}}"
+                                                    Margin="10,0,0,4"/>
+                                </StackPanel>
+
+                                <!-- Rule sources -->
+                                <StackPanel Grid.Row="2">
+                                    <ItemsControl ItemsSource="{Binding Sources, Converter={StaticResource SourcesPreview}}" Focusable="False">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding}"
+                                                           Style="{StaticResource OpacityToggle}"
+                                                           Foreground="#44CCDD"
+                                                           FontFamily="Consolas"
+                                                           FontSize="14"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <TextBlock Text="{Binding Sources, Converter={StaticResource SourcesPreview}, ConverterParameter=more}"
+                                               Style="{StaticResource MoreLine}"/>
+                                </StackPanel>
+
+                                <!-- Rule destinations: addresses first (unless they're "any") then services -->
+                                <StackPanel Grid.Row="2" Grid.Column="1">
+                                    <ItemsControl ItemsSource="{Binding Destinations, Converter={StaticResource DestinationsPreview}}" Focusable="False">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding}"
+                                                           Style="{StaticResource OpacityToggle}"
+                                                           Foreground="#B7A6FF"
+                                                           FontFamily="Consolas"
+                                                           FontSize="14"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <TextBlock Text="{Binding Destinations, Converter={StaticResource DestinationsPreview}, ConverterParameter=more}"
+                                               Style="{StaticResource MoreLine}"/>
+                                    <ItemsControl Focusable="False">
+                                        <ItemsControl.ItemsSource>
+                                            <MultiBinding Converter="{StaticResource ServicesPreview}">
+                                                <Binding Path="Services"/>
+                                                <Binding Path="Destinations"/>
+                                            </MultiBinding>
+                                        </ItemsControl.ItemsSource>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding}"
+                                                           Style="{StaticResource OpacityToggle}"
+                                                           Foreground="#DD66DD"
+                                                           FontFamily="Consolas"
+                                                           FontSize="14"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <TextBlock Text="{Binding Services, Converter={StaticResource ServicesPreview}, ConverterParameter=more}"
+                                               Style="{StaticResource MoreLine}"/>
+                                </StackPanel>
+                                <TextBlock Grid.Column="1"
+                                           Grid.RowSpan="3"
+                                           Visibility="{Binding IsMouseOver, ElementName=ItemBorder, Converter={StaticResource TrueToVisible}}"
+                                           Text="&#x203A;"
+                                           FontSize="17"
+                                           Padding="0,0,16,0"
+                                           Foreground="#707070"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Shown when the list is empty -->
+            <TextBlock Grid.Row="2"
+                       Text="No ignore rules yet. Add rules to stop detections from sources you expect, such as a monitoring server or a vulnerability scanner."
+                       FontSize="16"
+                       Foreground="#9A9A9A"
+                       TextWrapping="Wrap"
+                       VerticalAlignment="Top"
+                       Margin="0,14,0,0">
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Items.Count, ElementName=RulesControl}" Value="0">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

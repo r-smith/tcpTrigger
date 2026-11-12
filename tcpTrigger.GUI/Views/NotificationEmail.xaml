@@ -1,0 +1,268 @@
+﻿<UserControl x:Class="tcpTrigger.GUI.Views.NotificationEmail"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:models="clr-namespace:tcpTrigger.GUI.Models"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=models:NotificationEmail}"
+             d:DesignHeight="450" d:DesignWidth="800"
+             Loaded="UserControl_Loaded">
+
+    <UserControl.Resources>
+        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="Padding" Value="0,0,12,0"/>
+        </Style>
+        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="Padding" Value="6,8"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
+        </Style>
+        <Style TargetType="{x:Type PasswordBox}" BasedOn="{StaticResource {x:Type PasswordBox}}">
+            <Setter Property="Padding" Value="6,8"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
+        </Style>
+        <Style TargetType="{x:Type Grid}">
+            <Setter Property="Margin" Value="0,9,0,0"/>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer Style="{StaticResource TabScrollViewer}">
+        <StackPanel x:Name="MainPanel" Margin="60,0,60,5" Grid.IsSharedSizeScope="True">
+            <!-- Name and enabled state, on one row -->
+            <Grid Margin="0,23,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Name"/>
+                <TextBox x:Name="FriendlyName"
+                         Text="{Binding Name, UpdateSourceTrigger=Explicit}"
+                         Grid.Column="1"/>
+                <CheckBox x:Name="EnabledState"
+                          Grid.Column="2"
+                          IsChecked="{Binding IsEnabled, UpdateSourceTrigger=Explicit}"
+                          Content="Enabled"
+                          VerticalAlignment="Center"
+                          Margin="18,0,0,0"/>
+            </Grid>
+
+            <!-- Server settings -->
+            <TextBlock Text="SMTP server"
+                       Style="{StaticResource SectionHeading}"
+                       Margin="0,40,0,1"/>
+            <Separator Background="#9184EE"/>
+            <StackPanel Grid.IsSharedSizeScope="True" Margin="0,12,0,0">
+                <!-- Server address -->
+                <Grid Margin="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Server address"/>
+                    <TextBox x:Name="Server"
+                             Text="{Binding SmtpServer, UpdateSourceTrigger=Explicit}"
+                             Grid.Column="1"/>
+                </Grid>
+
+                <!-- Port -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Port"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <TextBox x:Name="Port"
+                                 Text="{Binding Port, UpdateSourceTrigger=Explicit}"
+                                 Width="140"
+                                 MaxLength="5"/>
+                        <TextBlock Text="Usually 25, or 587 with STARTTLS"
+                                   Style="{StaticResource HintText}"
+                                   Margin="12,0,0,0"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Security -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Security"/>
+                    <ComboBox Grid.Column="1"
+                              HorizontalAlignment="Left"
+                              MinWidth="140"
+                              Padding="10,8.5">
+                        <ComboBoxItem x:Name="EncryptionNone"
+                                      Content="none"
+                                      IsSelected="True"/>
+                        <ComboBoxItem x:Name="EncryptionStartTls"
+                                      Content="STARTTLS"/>
+                    </ComboBox>
+                </Grid>
+
+                <!-- Username -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Username (optional)"/>
+                    <TextBox x:Name="Username"
+                             Text="{Binding Username, UpdateSourceTrigger=Explicit}"
+                             Grid.Column="1"/>
+                </Grid>
+
+                <!-- Password -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Password (optional)"/>
+                    <PasswordBox x:Name="Password"
+                                 Grid.Column="1"/>
+                </Grid>
+            </StackPanel>
+
+            <!-- Addresses -->
+            <TextBlock Text="Addresses"
+                       Style="{StaticResource SectionHeading}"
+                       Margin="0,40,0,1"/>
+            <Separator Background="#9184EE"/>
+            <StackPanel Grid.IsSharedSizeScope="True" Margin="0,12,0,0">
+                <!-- Recipients -->
+                <Grid Margin="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Recipient(s)"/>
+                    <TextBox x:Name="Recipients"
+                             Grid.Column="1"/>
+                    <TextBlock Grid.Row="1"
+                               Grid.Column="1"
+                               Text="Separate addresses with commas or semicolons"
+                               Style="{StaticResource HintText}"/>
+                </Grid>
+
+                <!-- From address -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="From address"/>
+                    <TextBox x:Name="FromAddress"
+                             Text="{Binding FromAddress, UpdateSourceTrigger=Explicit}"
+                             Grid.Column="1"/>
+                </Grid>
+
+                <!-- From display name -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="From display name (optional)"/>
+                    <TextBox x:Name="FromDisplayName"
+                             Text="{Binding FromDisplayName, UpdateSourceTrigger=Explicit}"
+                             Grid.Column="1"/>
+                </Grid>
+            </StackPanel>
+
+            <!-- Message content -->
+            <TextBlock Text="Message customization"
+                       Style="{StaticResource SectionHeading}"
+                       Margin="0,40,0,1"/>
+            <Separator Background="#9184EE"/>
+            <StackPanel Grid.IsSharedSizeScope="True" Margin="0,12,0,0">
+                <!-- Subject -->
+                <Grid Margin="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Email subject"/>
+                    <TextBox x:Name="Subject"
+                             Text="{Binding Subject, UpdateSourceTrigger=Explicit}"
+                             Grid.Column="1"/>
+                </Grid>
+
+                <!-- Body -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Email body"
+                               VerticalAlignment="Top"
+                               Margin="0,12,0,0"/>
+                    <TextBox x:Name="Body"
+                             Text="{Binding Body, UpdateSourceTrigger=Explicit}"
+                             Grid.Column="1"
+                             Padding="0,8,2,8"
+                             AcceptsReturn="True"
+                             Height="140"
+                             TextWrapping="Wrap"
+                             VerticalContentAlignment="Top"
+                             VerticalScrollBarVisibility="Auto">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type ScrollViewer}">
+                                <Setter Property="Margin" Value="6,4,4,4"/>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
+                    <TextBlock Grid.Row="1"
+                               Grid.Column="1"
+                               Text="The subject and body can include {CONNECTION_LOG} (the detections being reported), {INTERFACE_IP}, {INTERFACE_MAC}, and {INTERFACE_DESCRIPTION}."
+                               Style="{StaticResource HintText}"/>
+                </Grid>
+            </StackPanel>
+
+            <!-- Sending: rate limit and buffer -->
+            <TextBlock Text="Sending"
+                       Style="{StaticResource SectionHeading}"
+                       Margin="0,40,0,1"/>
+            <Separator Background="#9184EE"/>
+            <StackPanel Margin="0,15,0,15">
+                <!-- Rate limit -->
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Send at most one email every"/>
+                    <TextBox Width="65"
+                             x:Name="RateLimitSeconds"
+                             Text="{Binding RateLimitSeconds, Mode=OneWay}"
+                             Padding="5,7"
+                             MaxLength="5"/>
+                    <TextBlock Text="seconds"
+                               Padding="11,0,0,0"/>
+                </StackPanel>
+                <!-- Buffer -->
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,12,0,0">
+                    <TextBlock Text="Wait"/>
+                    <TextBox Width="65"
+                             x:Name="BufferSeconds"
+                             Text="{Binding BufferSeconds, Mode=OneWay}"
+                             Padding="5,7"
+                             MaxLength="5"/>
+                    <TextBlock Text="seconds to collect detections before sending"
+                               Padding="11,0,0,0"/>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

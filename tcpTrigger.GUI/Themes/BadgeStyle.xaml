@@ -1,0 +1,42 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- A small rounded label. The styles below set the text and colors. -->
+    <Style x:Key="Badge" TargetType="{x:Type ContentControl}">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ContentControl}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="9"
+                            Padding="8,1">
+                        <ContentPresenter TextElement.FontFamily="Segoe UI"
+                                          TextElement.FontSize="12"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Marks a disabled notification or ignore rule in the settings lists.
+         Use: <ContentControl Style="{StaticResource DisabledBadge}"/> -->
+    <Style x:Key="DisabledBadge" TargetType="{x:Type ContentControl}" BasedOn="{StaticResource Badge}">
+        <Setter Property="Content" Value="Disabled"/>
+        <Setter Property="Background" Value="#1AFFD43B"/>
+        <Setter Property="BorderBrush" Value="#8CFFD43B"/>
+        <Setter Property="Foreground" Value="#FFD43B"/>
+    </Style>
+
+    <!-- Marks a setting for experienced users, such as UDP detection.
+         Use: <ContentControl Style="{StaticResource AdvancedBadge}"/> -->
+    <Style x:Key="AdvancedBadge" TargetType="{x:Type ContentControl}" BasedOn="{StaticResource Badge}">
+        <Setter Property="Content" Value="Advanced"/>
+        <Setter Property="Background" Value="#268E6EFF"/>
+        <Setter Property="BorderBrush" Value="#8C8E6EFF"/>
+        <Setter Property="Foreground" Value="#B7A6FF"/>
+    </Style>
+</ResourceDictionary>
