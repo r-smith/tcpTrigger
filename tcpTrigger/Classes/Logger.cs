@@ -12,14 +12,14 @@ namespace tcpTrigger
         // 300s: warnings. 400s: errors.
         public enum EventCode
         {
-            ServiceStarted = 90,
+            ServiceStarting = 90,
             ServiceStopped = 91,
             ServiceStoppedOnError = 92,
             ServiceShuttingDown = 93,
             ConfigurationApplied = 100,
             NetworkChangeDetected = 101,
             NetworkInterfaces = 102,
-            ConfigurationReloaded = 103,
+            ConfigurationReloading = 103,
             LogRotated = 104,
             InterfaceMonitoringResumed = 105,
             EmailSent = 110,

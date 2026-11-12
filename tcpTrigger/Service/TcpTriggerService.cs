@@ -65,6 +65,12 @@ namespace tcpTrigger
         // Called by Windows when the tcpTrigger service starts.
         protected override void OnStart(string[] args)
         {
+            string version = Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
+            Logger.Write(
+                "The tcpTrigger service is starting."
+                + $"{Environment.NewLine}{Environment.NewLine}Version: {version}",
+                Logger.EventCode.ServiceStarting);
+
             try
             {
                 LoadConfiguration();
@@ -83,9 +89,6 @@ namespace tcpTrigger
             }
 
             StartMonitoring();
-
-            string version = Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
-            Logger.Write($"The tcpTrigger service (version {version}) started successfully.", Logger.EventCode.ServiceStarted);
         }
 
         // Called by Windows when the tcpTrigger service stops.
@@ -127,6 +130,8 @@ namespace tcpTrigger
             // Windows runs each custom command on its own thread, so hold the lock for the reload.
             lock (_monitoringLock)
             {
+                Logger.Write("The tcpTrigger service is reloading its configuration.", Logger.EventCode.ConfigurationReloading);
+
                 try
                 {
                     StopMonitoring();
@@ -145,10 +150,7 @@ namespace tcpTrigger
                     const int ErrorExceptionInService = 1064;
                     ExitCode = ErrorExceptionInService;
                     Stop();
-                    return;
                 }
-
-                Logger.Write("The tcpTrigger configuration was reloaded.", Logger.EventCode.ConfigurationReloaded);
             }
         }
 
