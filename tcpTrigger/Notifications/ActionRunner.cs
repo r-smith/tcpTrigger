@@ -15,9 +15,14 @@ namespace tcpTrigger
         {
             WriteEventLog(packetHeader);
 
-            if (Settings.IsLogEnabled)
+            foreach (Notification notification in Settings.Notifications)
             {
-                WriteLog(packetHeader);
+                switch (notification)
+                {
+                    case NotificationLogFile logFile:
+                        WriteLog(packetHeader, logFile);
+                        break;
+                }
             }
             if (Settings.IsExternalAppEnabled)
             {
@@ -30,40 +35,45 @@ namespace tcpTrigger
         }
 
         // Appends the match to a text log file, rotating if needed.
-        private static void WriteLog(PacketHeader packetHeader)
+        private static void WriteLog(PacketHeader packetHeader, NotificationLogFile logFile)
         {
             // Log files have a defined maximum file size and will rotate one time if reached.
             const int MaxFileSizeInBytes = 15 * 1024 * 1024;
 
+            if (logFile.HasFailed)
+            {
+                return;
+            }
+
             lock (s_logFileLock)
             {
-                if (File.Exists(Settings.LogPath))
+                if (File.Exists(logFile.Path))
                 {
                     try
                     {
-                        long currentFileSize = new FileInfo(Settings.LogPath).Length;
+                        long currentFileSize = new FileInfo(logFile.Path).Length;
                         if (currentFileSize >= MaxFileSizeInBytes)
                         {
                             // Log reached max size.
                             // Rotate by copying current log to .1 suffix, overwriting if exists.
-                            File.Copy(Settings.LogPath, Settings.LogPath + ".1", true);
+                            File.Copy(logFile.Path, logFile.Path + ".1", true);
                             // Clear contents of original log.
-                            using (FileStream fileStream = File.Open(Settings.LogPath, FileMode.Open))
+                            using (FileStream fileStream = File.Open(logFile.Path, FileMode.Open))
                             {
                                 fileStream.SetLength(0);
                             }
 
                             Logger.Write(
-                                $"The log file '{Settings.LogPath}' reached its {MaxFileSizeInBytes / 1024 / 1024} MB limit. "
-                                + $"Its contents were moved to '{Settings.LogPath}.1', replacing any previous copy.",
+                                $"The log file '{logFile.Path}' reached its {MaxFileSizeInBytes / 1024 / 1024} MB limit. "
+                                + $"Its contents were moved to '{logFile.Path}.1', replacing any previous copy.",
                                 Logger.EventCode.LogRotated);
                         }
                     }
                     catch (Exception ex)
                     {
-                        Settings.IsLogEnabled = false;
+                        logFile.HasFailed = true;
                         Logger.WriteError(
-                            $"Logging to a file has been disabled because the log file '{Settings.LogPath}' "
+                            $"Logging to the file '{logFile.Path}' has been disabled because it "
                             + $"reached its {MaxFileSizeInBytes / 1024 / 1024} MB limit and failed to rotate."
                             + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                             Logger.EventCode.LogRotationFailed);
@@ -73,7 +83,7 @@ namespace tcpTrigger
 
                 try
                 {
-                    using (StreamWriter outputFile = new StreamWriter(Settings.LogPath, true))
+                    using (StreamWriter outputFile = new StreamWriter(logFile.Path, true))
                     {
                         outputFile.WriteLine(JsonLogLine.Build(packetHeader));
                     }
@@ -81,7 +91,7 @@ namespace tcpTrigger
                 catch (Exception ex)
                 {
                     Logger.WriteError(
-                        $"tcpTrigger failed to write a detection to the log file '{Settings.LogPath}'."
+                        $"tcpTrigger failed to write a detection to the log file '{logFile.Path}'."
                         + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                         Logger.EventCode.LogWriteFailed);
                 }

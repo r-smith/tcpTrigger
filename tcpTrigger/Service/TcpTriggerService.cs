@@ -160,20 +160,16 @@ namespace tcpTrigger
         {
             Settings.Load();
 
-            // Validate log file path.
-            if (Settings.IsLogEnabled)
+            // Validate notifications. Notifications that can't be used are removed.
+            List<Notification> usableNotifications = new List<Notification>();
+            foreach (Notification notification in Settings.Notifications)
             {
-                if (string.IsNullOrEmpty(Settings.LogPath) || !Directory.Exists(Path.GetDirectoryName(Settings.LogPath)))
+                if (IsNotificationUsable(notification))
                 {
-                    Settings.IsLogEnabled = false;
-                    string reason = string.IsNullOrEmpty(Settings.LogPath)
-                        ? "no log path is set"
-                        : $"the folder for the log path '{Settings.LogPath}' doesn't exist";
-                    Logger.WriteWarning(
-                        $"Logging to a file has been disabled because {reason}. Update your tcpTrigger configuration with a valid path.",
-                        Logger.EventCode.LogPathInaccessible);
+                    usableNotifications.Add(notification);
                 }
             }
+            Settings.Notifications = usableNotifications;
 
             // Validate external app path.
             if (Settings.IsExternalAppEnabled)
@@ -252,6 +248,32 @@ namespace tcpTrigger
                 + $"{Environment.NewLine}{Environment.NewLine}"
                 + Settings.DumpToString(),
                 Logger.EventCode.ConfigurationApplied);
+        }
+
+        // Returns false and writes a warning if the notification is missing a setting it needs.
+        private static bool IsNotificationUsable(Notification notification)
+        {
+            string name = string.IsNullOrEmpty(notification.Name)
+                ? "An unnamed notification"
+                : $"The notification '{notification.Name}'";
+
+            switch (notification)
+            {
+                case NotificationLogFile logFile:
+                    if (string.IsNullOrEmpty(logFile.Path) || !Directory.Exists(Path.GetDirectoryName(logFile.Path)))
+                    {
+                        string reason = string.IsNullOrEmpty(logFile.Path)
+                            ? "no log path is set"
+                            : $"the folder for the log path '{logFile.Path}' doesn't exist";
+                        Logger.WriteWarning(
+                            $"{name} has been disabled because {reason}. Update your tcpTrigger configuration with a valid path.",
+                            Logger.EventCode.LogPathInaccessible);
+                        return false;
+                    }
+                    return true;
+                default:
+                    return true;
+            }
         }
 
         // Starts the action queue thread, the network listeners, and the network change detection.

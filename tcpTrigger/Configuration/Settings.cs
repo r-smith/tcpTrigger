@@ -20,15 +20,14 @@ namespace tcpTrigger
         public static HashSet<ushort> UdpPortsToMonitor { get; internal set; }
         public static string UdpPortsToInclude { get; internal set; }
         public static string UdpPortsToExclude { get; internal set; }
-        public static bool IsLogEnabled { get; internal set; }
         public static bool IsEmailNotificationEnabled { get; internal set; }
         public static bool IsExternalAppEnabled { get; internal set; }
         public static int EmailRateLimitSeconds { get; internal set; }
         public static int EmailBufferSeconds { get; internal set; } = 30;
-        public static string LogPath { get; internal set; }
         public static string ExternalAppPath { get; internal set; }
         public static string ExternalAppArguments { get; internal set; }
         public static HashSet<string> ExcludedNetworkInterfaces { get; internal set; } = new HashSet<string>();
+        public static List<Notification> Notifications { get; internal set; } = new List<Notification>();
         public static List<IgnoreRule> IgnoreRules { get; internal set; } = new List<IgnoreRule>();
         public static string EmailSmtpServer { get; internal set; }
         public static int EmailPort { get; internal set; }
@@ -84,13 +83,19 @@ namespace tcpTrigger
                 sb.AppendLine($"Excluding UDP port(s): {UdpPortsToExclude}");
             }
 
-            // Append enabled actions and settings.
+            // Append notifications.
             sb.AppendLine();
             sb.AppendLine("# Notify");
-            sb.AppendLine("Write to text log: " + (IsLogEnabled ? "Enabled" : "Disabled"));
-            if (IsLogEnabled)
+            foreach (Notification notification in Notifications)
             {
-                sb.AppendLine($"Log path: '{LogPath}'");
+                sb.AppendLine(string.IsNullOrEmpty(notification.Name) ? "Unnamed notification" : notification.Name);
+                switch (notification)
+                {
+                    case NotificationLogFile logFile:
+                        sb.AppendLine("  Type: Log file");
+                        sb.AppendLine($"  Path: {logFile.Path}");
+                        break;
+                }
             }
             sb.AppendLine("Email notifications: " + (IsEmailNotificationEnabled ? "Enabled" : "Disabled"));
             sb.AppendLine("Launch external application: " + (IsExternalAppEnabled ? "Enabled" : "Disabled"));

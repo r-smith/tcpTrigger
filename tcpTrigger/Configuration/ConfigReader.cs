@@ -40,6 +40,7 @@ namespace tcpTrigger
                     xd.Load(stream);
 
                     ReadDetection(xd);
+                    ReadNotifications(xd);
                     ReadIgnoreRules(xd);
 
                     ReadExcludedInterfaces(xd);
@@ -73,6 +74,34 @@ namespace tcpTrigger
             Settings.IsDetectIcmpEnabled = ReadBool(xd, ConfigNames.DetectionIcmp + "/enabled", false);
             Settings.IsDetectTcpEnabled = ReadBool(xd, ConfigNames.DetectionTcp + "/enabled", false);
             Settings.IsDetectUdpEnabled = ReadBool(xd, ConfigNames.DetectionUdp + "/enabled", false);
+        }
+
+        // tcpTrigger/notifications
+        private static void ReadNotifications(XmlDocument xd)
+        {
+            Settings.Notifications = new List<Notification>();
+            foreach (XmlNode node in SelectNodes(xd, ConfigNames.Notifications))
+            {
+                // The service only uses enabled notifications.
+                if (!ReadBool(node, "enabled", false))
+                {
+                    continue;
+                }
+
+                // Read the `type` attribute for each <notification> element and parse accordingly.
+                switch (node.Attributes["type"]?.Value)
+                {
+                    case ConfigNames.NotificationTypeLogFile:
+                        Settings.Notifications.Add(new NotificationLogFile
+                        {
+                            Name = ReadString(node, "name"),
+                            Path = ReadString(node, "path"),
+                        });
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         // tcpTrigger/ignoreRules
@@ -175,10 +204,16 @@ namespace tcpTrigger
         }
 
         // tcpTrigger/enabledActions/log + tcpTrigger/actionSettings
+        // Becomes a log file notification if the legacy <log> element is true.
         private static void ReadLegacyLogAction(XmlDocument xd)
         {
-            Settings.IsLogEnabled = ReadBool(xd, ConfigNames.EnabledActionsLog, false);
-            Settings.LogPath = ReadString(xd, ConfigNames.ActionSettingsLogPath);
+            if (ReadBool(xd, ConfigNames.EnabledActionsLog, false))
+            {
+                Settings.Notifications.Add(new NotificationLogFile
+                {
+                    Path = ReadString(xd, ConfigNames.ActionSettingsLogPath),
+                });
+            }
         }
 
         // tcpTrigger/enabledActions/executeCommand + tcpTrigger/actionSettings
