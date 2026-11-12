@@ -22,11 +22,10 @@ namespace tcpTrigger
                     case NotificationLogFile logFile:
                         WriteLog(packetHeader, logFile);
                         break;
+                    case NotificationCommand command:
+                        RunCommand(packetHeader, command);
+                        break;
                 }
-            }
-            if (Settings.IsExternalAppEnabled)
-            {
-                LaunchApplication(packetHeader);
             }
             if (Settings.IsEmailNotificationEnabled)
             {
@@ -161,19 +160,19 @@ namespace tcpTrigger
             }
         }
 
-        // Starts the configured application, with any variables in its arguments replaced.
-        private static void LaunchApplication(PacketHeader packetHeader)
+        // Runs the command, with any variables in its arguments replaced.
+        private static void RunCommand(PacketHeader packetHeader, NotificationCommand command)
         {
             try
             {
                 Process.Start(
-                    Settings.ExternalAppPath,
-                    UserVariableExpansion.GetExpandedString(Settings.ExternalAppArguments ?? string.Empty, packetHeader));
+                    command.Path,
+                    UserVariableExpansion.GetExpandedString(command.Arguments ?? string.Empty, packetHeader));
             }
             catch (Exception ex)
             {
                 Logger.WriteError(
-                    $"tcpTrigger failed to launch the application '{Settings.ExternalAppPath}' for a detection."
+                    $"tcpTrigger failed to run the command '{command.Path}' for a detection."
                     + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                     Logger.EventCode.LaunchAppFailed);
             }

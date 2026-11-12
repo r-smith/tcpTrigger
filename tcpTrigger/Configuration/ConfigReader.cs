@@ -98,6 +98,14 @@ namespace tcpTrigger
                             Path = ReadString(node, "path"),
                         });
                         break;
+                    case ConfigNames.NotificationTypeCommand:
+                        Settings.Notifications.Add(new NotificationCommand
+                        {
+                            Name = ReadString(node, "name"),
+                            Path = ReadString(node, "path"),
+                            Arguments = ReadString(node, "arguments"),
+                        });
+                        break;
                     default:
                         break;
                 }
@@ -217,11 +225,17 @@ namespace tcpTrigger
         }
 
         // tcpTrigger/enabledActions/executeCommand + tcpTrigger/actionSettings
+        // Becomes a command notification if the legacy <executeCommand> element is true.
         private static void ReadLegacyExecuteCommandAction(XmlDocument xd)
         {
-            Settings.IsExternalAppEnabled = ReadBool(xd, ConfigNames.EnabledActionsExecuteCommand, false);
-            Settings.ExternalAppPath = ReadString(xd, ConfigNames.ActionSettingsCommandPath);
-            Settings.ExternalAppArguments = ReadString(xd, ConfigNames.ActionSettingsCommandArguments);
+            if (ReadBool(xd, ConfigNames.EnabledActionsExecuteCommand, false))
+            {
+                Settings.Notifications.Add(new NotificationCommand
+                {
+                    Path = ReadString(xd, ConfigNames.ActionSettingsCommandPath),
+                    Arguments = ReadString(xd, ConfigNames.ActionSettingsCommandArguments),
+                });
+            }
         }
 
         // tcpTrigger/enabledActions/emailNotification + tcpTrigger/email

@@ -8,6 +8,7 @@
 
         // Values of the `type` attribute on <notification> elements.
         public const string NotificationTypeLogFile = "logFile";
+        public const string NotificationTypeCommand = "command";
 
         public const string DetectionIcmp = "/tcpTrigger/detection/icmp";
         public const string DetectionTcp = "/tcpTrigger/detection/tcp";

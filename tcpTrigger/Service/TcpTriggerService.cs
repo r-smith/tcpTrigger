@@ -171,19 +171,6 @@ namespace tcpTrigger
             }
             Settings.Notifications = usableNotifications;
 
-            // Validate external app path.
-            if (Settings.IsExternalAppEnabled)
-            {
-                if (string.IsNullOrEmpty(Settings.ExternalAppPath))
-                {
-                    Settings.IsExternalAppEnabled = false;
-                    Logger.WriteWarning(
-                        "Launching an application has been disabled because no application path is set. "
-                        + "Update your tcpTrigger configuration with the application to launch.",
-                        Logger.EventCode.LaunchAppPathMissing);
-                }
-            }
-
             // Validate email settings.
             if (Settings.IsEmailNotificationEnabled)
             {
@@ -268,6 +255,16 @@ namespace tcpTrigger
                         Logger.WriteWarning(
                             $"{name} has been disabled because {reason}. Update your tcpTrigger configuration with a valid path.",
                             Logger.EventCode.LogPathInaccessible);
+                        return false;
+                    }
+                    return true;
+                case NotificationCommand command:
+                    if (string.IsNullOrEmpty(command.Path))
+                    {
+                        Logger.WriteWarning(
+                            $"{name} has been disabled because no command path is set. "
+                            + "Update your tcpTrigger configuration with the command to run.",
+                            Logger.EventCode.LaunchAppPathMissing);
                         return false;
                     }
                     return true;

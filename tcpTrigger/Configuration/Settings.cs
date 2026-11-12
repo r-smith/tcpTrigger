@@ -21,11 +21,8 @@ namespace tcpTrigger
         public static string UdpPortsToInclude { get; internal set; }
         public static string UdpPortsToExclude { get; internal set; }
         public static bool IsEmailNotificationEnabled { get; internal set; }
-        public static bool IsExternalAppEnabled { get; internal set; }
         public static int EmailRateLimitSeconds { get; internal set; }
         public static int EmailBufferSeconds { get; internal set; } = 30;
-        public static string ExternalAppPath { get; internal set; }
-        public static string ExternalAppArguments { get; internal set; }
         public static HashSet<string> ExcludedNetworkInterfaces { get; internal set; } = new HashSet<string>();
         public static List<Notification> Notifications { get; internal set; } = new List<Notification>();
         public static List<IgnoreRule> IgnoreRules { get; internal set; } = new List<IgnoreRule>();
@@ -95,15 +92,14 @@ namespace tcpTrigger
                         sb.AppendLine("  Type: Log file");
                         sb.AppendLine($"  Path: {logFile.Path}");
                         break;
+                    case NotificationCommand command:
+                        sb.AppendLine("  Type: Command");
+                        sb.AppendLine($"  Path: {command.Path}");
+                        sb.AppendLine($"  Arguments: {command.Arguments}");
+                        break;
                 }
             }
             sb.AppendLine("Email notifications: " + (IsEmailNotificationEnabled ? "Enabled" : "Disabled"));
-            sb.AppendLine("Launch external application: " + (IsExternalAppEnabled ? "Enabled" : "Disabled"));
-            if (IsExternalAppEnabled)
-            {
-                sb.AppendLine($"Launch app path: '{ExternalAppPath}'");
-                sb.AppendLine($"Launch app args: '{ExternalAppArguments}'");
-            }
 
             // Append email settings.
             if (IsEmailNotificationEnabled)
