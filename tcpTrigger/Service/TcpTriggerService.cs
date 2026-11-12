@@ -217,7 +217,31 @@ namespace tcpTrigger
                 }
             }
 
-            // Keep only the ignore rules that can be used.
+            // Validate ignore rules. Rules that can't be used are removed.
+            foreach (IgnoreRule rule in Settings.IgnoreRules)
+            {
+                string ruleName = string.IsNullOrEmpty(rule.Name) ? "An unnamed ignore rule" : $"The ignore rule '{rule.Name}'";
+                string invalidEntries = string.Join(", ", rule.InvalidEntries);
+
+                if (!rule.IsUsable)
+                {
+                    string message = $"{ruleName} has been disabled because it needs at least one valid source, destination, and service.";
+                    if (rule.InvalidEntries.Count > 0)
+                    {
+                        message += $" These entries aren't valid: {invalidEntries}.";
+                    }
+                    Logger.WriteWarning(
+                        message + " Update your tcpTrigger configuration to fix the rule.",
+                        Logger.EventCode.IgnoreRuleInvalid);
+                }
+                else if (rule.InvalidEntries.Count > 0)
+                {
+                    Logger.WriteWarning(
+                        $"{ruleName} has entries that aren't valid, so they were skipped: {invalidEntries}. "
+                        + "Update your tcpTrigger configuration to fix or remove them.",
+                        Logger.EventCode.IgnoreRuleInvalid);
+                }
+            }
             Settings.IgnoreRules = Settings.IgnoreRules.Where(rule => rule.IsUsable).ToList();
 
             // Write final applied configuration to event log.

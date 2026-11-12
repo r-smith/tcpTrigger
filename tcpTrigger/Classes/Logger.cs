@@ -29,6 +29,7 @@ namespace tcpTrigger
             LogPathInaccessible = 300,
             LaunchAppPathMissing = 301,
             EmailSettingsIncomplete = 302,
+            IgnoreRuleInvalid = 303,
             StartFailed = 400,
             ReloadFailed = 401,
             QueuedActionsDropped = 402,
