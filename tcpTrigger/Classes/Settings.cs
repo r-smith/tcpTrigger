@@ -69,7 +69,7 @@ namespace tcpTrigger
 
             // Append monitoring configuration.
             sb.AppendLine();
-            sb.AppendLine("# Rules");
+            sb.AppendLine("# Detect");
             sb.AppendLine("Detect incoming ICMP: " + (IsDetectIcmpEnabled ? "Enabled" : "Disabled"));
             sb.AppendLine("Detect incoming TCP: " + (IsDetectTcpEnabled ? "Enabled" : "Disabled"));
             if (IsDetectTcpEnabled)
@@ -84,23 +84,9 @@ namespace tcpTrigger
                 sb.AppendLine($"Excluding UDP port(s): {UdpPortsToExclude}");
             }
 
-            // Append ignore rules.
-            if (IgnoreRules.Count > 0)
-            {
-                sb.AppendLine();
-                sb.AppendLine("# Ignore");
-                foreach (IgnoreRule rule in IgnoreRules)
-                {
-                    sb.AppendLine(string.IsNullOrEmpty(rule.Name) ? "Unnamed rule" : rule.Name);
-                    sb.AppendLine($"  Sources: {ListEntries(rule.Sources)}");
-                    sb.AppendLine($"  Destinations: {ListEntries(rule.Destinations)}");
-                    sb.AppendLine($"  Services: {ListEntries(rule.Services)}");
-                }
-            }
-
             // Append enabled actions and settings.
             sb.AppendLine();
-            sb.AppendLine("# Actions");
+            sb.AppendLine("# Notify");
             sb.AppendLine("Write to text log: " + (IsLogEnabled ? "Enabled" : "Disabled"));
             if (IsLogEnabled)
             {
@@ -129,6 +115,20 @@ namespace tcpTrigger
                 sb.AppendLine($"Message subject: {EmailSubject}");
                 sb.AppendLine($"Rate limit: {EmailRateLimitSeconds} seconds");
                 sb.AppendLine($"Buffer: {EmailBufferSeconds} seconds");
+            }
+
+            // Append ignore rules.
+            if (IgnoreRules.Count > 0)
+            {
+                sb.AppendLine();
+                sb.AppendLine("# Ignore");
+                foreach (IgnoreRule rule in IgnoreRules)
+                {
+                    sb.AppendLine(string.IsNullOrEmpty(rule.Name) ? "Unnamed rule" : rule.Name);
+                    sb.AppendLine($"  Sources: {ListEntries(rule.Sources)}");
+                    sb.AppendLine($"  Destinations: {ListEntries(rule.Destinations)}");
+                    sb.AppendLine($"  Services: {ListEntries(rule.Services)}");
+                }
             }
 
             return sb.ToString();
