@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 
 namespace tcpTrigger
 {
@@ -33,7 +32,7 @@ namespace tcpTrigger
                 && (header.IcmpType == (int)IcmpTypeCode.Ping
                     || header.IcmpType == (int)IcmpTypeCode.Timestamp
                     || header.IcmpType == (int)IcmpTypeCode.Netmask)
-                && !IsIgnored(header.SourceIP, Settings.IgnoreIcmp);
+                && !IsIgnored(header);
         }
 
         private static bool DoesPacketMatchTcp(PacketHeader header, IPAddress ip)
@@ -43,7 +42,7 @@ namespace tcpTrigger
                 && header.DestinationIP.Equals(ip)
                 && Settings.TcpPortsToMonitor.Contains(header.DestinationPort)
                 && IsConnectionAttempt(header.TcpFlags)
-                && !IsIgnored(header.SourceIP, header.DestinationPort);
+                && !IsIgnored(header);
         }
 
         private static bool DoesPacketMatchUdp(PacketHeader header, IPAddress ip)
@@ -52,15 +51,20 @@ namespace tcpTrigger
                 && header.ProtocolType == Protocol.Udp
                 && header.DestinationIP.Equals(ip)
                 && Settings.UdpPortsToMonitor.Contains(header.DestinationPort)
-                && !IsIgnored(header.SourceIP, header.DestinationPort);
+                && !IsIgnored(header);
         }
 
-        // Returns true if the source IP is in the ignore list for all traffic, or for this port.
-        // For ICMP, port is Settings.IgnoreIcmp.
-        private static bool IsIgnored(IPAddress sourceIp, int port)
+        // Returns true if the packet matches an ignore rule.
+        private static bool IsIgnored(PacketHeader header)
         {
-            return Settings.IgnoredEndpoints.TryGetValue(sourceIp, out HashSet<int> ports)
-                && (ports.Contains(Settings.IgnoreAll) || ports.Contains(port));
+            foreach (IgnoreRule rule in Settings.IgnoreRules)
+            {
+                if (rule.Matches(header))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         // Returns true if the TCP flags indicate a connection attempt:

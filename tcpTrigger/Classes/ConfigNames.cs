@@ -9,6 +9,7 @@
         public const string DetectionRulesIcmp = "/tcpTrigger/detectionRules/icmp";
         public const string DetectionRulesTcp = "/tcpTrigger/detectionRules/tcp";
         public const string DetectionRulesUdp = "/tcpTrigger/detectionRules/udp";
+        public const string IgnoreRules = "/tcpTrigger/ignoreRules/rule";
 
         // ----- Legacy format -----
         // NetworkInterfaceExcludeListDeviceGuid is also used by the current format.

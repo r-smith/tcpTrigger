@@ -217,6 +217,9 @@ namespace tcpTrigger
                 }
             }
 
+            // Keep only the ignore rules that can be used.
+            Settings.IgnoreRules = Settings.IgnoreRules.Where(rule => rule.IsUsable).ToList();
+
             // Write final applied configuration to event log.
             Logger.Write(
                 "The tcpTrigger configuration has been applied."

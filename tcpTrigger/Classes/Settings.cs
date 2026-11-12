@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Net;
 using System.Text;
 
 namespace tcpTrigger
@@ -7,8 +6,6 @@ namespace tcpTrigger
     // The configuration settings, loaded from tcpTrigger.xml.
     internal static class Settings
     {
-        internal const int IgnoreAll = 0;
-        internal const int IgnoreIcmp = -1;
         internal const string TimestampFormat = "yyyy-MM-dd HH:mm:ss";
 
         // Full path of the configuration file that was loaded.
@@ -31,7 +28,7 @@ namespace tcpTrigger
         public static string ExternalAppPath { get; internal set; }
         public static string ExternalAppArguments { get; internal set; }
         public static HashSet<string> ExcludedNetworkInterfaces { get; internal set; } = new HashSet<string>();
-        public static Dictionary<IPAddress, HashSet<int>> IgnoredEndpoints { get; internal set; } = new Dictionary<IPAddress, HashSet<int>>();
+        public static List<IgnoreRule> IgnoreRules { get; internal set; } = new List<IgnoreRule>();
         public static string EmailSmtpServer { get; internal set; }
         public static int EmailPort { get; internal set; }
         public static bool IsEmailStartTlsEnabled { get; internal set; }
@@ -84,32 +81,6 @@ namespace tcpTrigger
             {
                 sb.AppendLine($"Including UDP port(s): {UdpPortsToInclude}");
                 sb.AppendLine($"Excluding UDP port(s): {UdpPortsToExclude}");
-            }
-
-            // Append endpoint ignore list.
-            if (IgnoredEndpoints.Count > 0)
-            {
-                sb.AppendLine();
-                sb.AppendLine("# Ignored endpoints");
-                foreach (KeyValuePair<IPAddress, HashSet<int>> pair in IgnoredEndpoints)
-                {
-                    foreach (int port in pair.Value)
-                    {
-                        sb.Append($"Ignore IP: {pair.Key}");
-                        if (port == IgnoreIcmp)
-                        {
-                            sb.AppendLine(":icmp");
-                        }
-                        else if (port == IgnoreAll)
-                        {
-                            sb.AppendLine();
-                        }
-                        else
-                        {
-                            sb.AppendLine($":{port}");
-                        }
-                    }
-                }
             }
 
             // Append enabled actions and settings.

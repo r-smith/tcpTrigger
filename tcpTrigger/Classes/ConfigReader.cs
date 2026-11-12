@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Xml;
 
 namespace tcpTrigger
@@ -41,6 +40,7 @@ namespace tcpTrigger
                     xd.Load(stream);
 
                     ReadDetectionRules(xd);
+                    ReadIgnoreRules(xd);
 
                     ReadExcludedInterfaces(xd);
 
@@ -73,6 +73,28 @@ namespace tcpTrigger
             Settings.IsDetectIcmpEnabled = ReadBool(xd, ConfigNames.DetectionRulesIcmp + "/enabled", false);
             Settings.IsDetectTcpEnabled = ReadBool(xd, ConfigNames.DetectionRulesTcp + "/enabled", false);
             Settings.IsDetectUdpEnabled = ReadBool(xd, ConfigNames.DetectionRulesUdp + "/enabled", false);
+        }
+
+        // tcpTrigger/ignoreRules
+        // Each rule has a source list (IP addresses), a destination list (IP addresses), and a
+        // service list (ports and protocols). Each list can be just "any".
+        private static void ReadIgnoreRules(XmlDocument xd)
+        {
+            Settings.IgnoreRules = new List<IgnoreRule>();
+            foreach (XmlNode node in SelectNodes(xd, ConfigNames.IgnoreRules))
+            {
+                // The service only uses enabled rules.
+                if (!ReadBool(node, "enabled", false))
+                {
+                    continue;
+                }
+
+                Settings.IgnoreRules.Add(new IgnoreRule(
+                    name: ReadString(node, "name"),
+                    sources: ReadList(node, "sourceList/source"),
+                    destinations: ReadList(node, "destinationList/destination"),
+                    services: ReadList(node, "serviceList/service")));
+            }
         }
 
         // tcpTrigger/networkInterfaceExcludeList
@@ -133,43 +155,23 @@ namespace tcpTrigger
         }
 
         // tcpTrigger/endpointIgnoreList
+        // Each entry becomes an ignore rule. The `port` attribute should be a single port number,
+        // the string "icmp", or missing. A missing `port` attribute means all traffic from that address.
         private static void ReadLegacyEndpointIgnoreList(XmlDocument xd)
         {
-            Dictionary<IPAddress, HashSet<int>> ignoredEndpoints = new Dictionary<IPAddress, HashSet<int>>();
             foreach (XmlNode node in SelectNodes(xd, ConfigNames.EndpointIgnoreListIpAddress))
             {
                 if (!string.IsNullOrEmpty(node.InnerText))
                 {
                     string portAttr = node.Attributes["port"]?.Value;
-                    int port = Settings.IgnoreAll;
 
-                    if (!string.IsNullOrEmpty(portAttr))
-                    {
-                        if (string.Equals(portAttr, "icmp", StringComparison.OrdinalIgnoreCase))
-                        {
-                            port = Settings.IgnoreIcmp;
-                        }
-                        else if (!int.TryParse(portAttr, out port) || port < 1 || port > 65535)
-                        {
-                            throw new FormatException(
-                                $"'{portAttr}' is not a valid port for ignored IP address '{node.InnerText}'. "
-                                + "Use a port number from 1 to 65535, or 'icmp'.");
-                        }
-                    }
-                    if (IPAddress.TryParse(node.InnerText, out IPAddress ip))
-                    {
-                        if (ignoredEndpoints.TryGetValue(ip, out HashSet<int> ports))
-                        {
-                            ports.Add(port);
-                        }
-                        else
-                        {
-                            ignoredEndpoints.Add(ip, new HashSet<int> { port });
-                        }
-                    }
+                    Settings.IgnoreRules.Add(new IgnoreRule(
+                        name: node.Attributes["comment"]?.Value,
+                        sources: new List<string> { node.InnerText },
+                        destinations: new List<string> { "any" },
+                        services: new List<string> { string.IsNullOrEmpty(portAttr) ? "any" : portAttr }));
                 }
             }
-            Settings.IgnoredEndpoints = ignoredEndpoints;
         }
 
         // tcpTrigger/enabledActions/log + tcpTrigger/actionSettings
