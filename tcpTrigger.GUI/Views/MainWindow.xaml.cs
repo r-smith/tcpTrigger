@@ -326,9 +326,11 @@ namespace tcpTrigger.GUI.Views
                 // Create tray icon.
                 _trayIcon = new WinForms.NotifyIcon
                 {
-                    Icon = new System.Drawing.Icon(Application.GetResourceStream(new Uri("pack://application:,,,/tcpTrigger.ico")).Stream),
-                    Text = "tcpTrigger",
-                    ContextMenuStrip = menuStrip
+                    Icon = new System.Drawing.Icon(
+                        Application.GetResourceStream(new Uri("pack://application:,,,/tcpTrigger.ico")).Stream,
+                        WinForms.SystemInformation.SmallIconSize),
+                        Text = "tcpTrigger",
+                        ContextMenuStrip = menuStrip
                 };
                 _trayIcon.MouseUp += (s, args) =>
                 {

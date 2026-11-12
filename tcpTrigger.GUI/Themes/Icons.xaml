@@ -3,53 +3,42 @@
     <!-- tcpTrigger logo -->
     <DrawingImage x:Key="icon.tcpTrigger">
         <DrawingImage.Drawing>
-            <DrawingGroup ClipGeometry="M0,0 V4.23328 H4.23328 V0 H0 Z">
+            <DrawingGroup ClipGeometry="M0,0 V24 H24 V0 H0 Z">
+                <GeometryDrawing Geometry="F1 M24,24z M0,0z M3.44,2A10,10,0,0,0,3.44,12 M20.56,2A10,10,0,0,1,20.56,12">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#FF5A5A5A" Thickness="2" StartLineCap="Round" EndLineCap="Round" LineJoin="Miter" MiterLimit="1" />
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFAF669" Geometry="F0 M24,24z M0,0z M5.58,7A6.42,6.42,0,1,0,18.42,7A6.42,6.42,0,1,0,5.58,7z M9.96,7A2.04,2.04,0,1,0,14.04,7A2.04,2.04,0,1,0,9.96,7z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#FF1F1F1F" Thickness="1.16" StartLineCap="Flat" EndLineCap="Flat" LineJoin="Miter" />
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
                 <DrawingGroup Opacity="1">
-                    <DrawingGroup Opacity="1">
-                        <GeometryDrawing Brush="#000000" Geometry="F1 M4.23328,4.23328z M0,0z M0,0L4.2332811,0 4.2332811,2.3812196 0,2.3812196z"/>
-                        <GeometryDrawing Brush="#505050">
-                            <GeometryDrawing.Geometry>
-                                <RectangleGeometry RadiusX="0" RadiusY="0" Rect="0.2646,0.2646,3.7041,1.8521"/>
-                            </GeometryDrawing.Geometry>
-                        </GeometryDrawing>
-                        <GeometryDrawing Geometry="F1 M4.23328,4.23328z M0,0z M0.26457972,1.19061L1.3229,1.19061 1.7197682,1.9843476 2.2489281,0.39686961 2.6457972,1.19061 2.910377,1.19061 3.9686961,1.19061">
-                            <GeometryDrawing.Pen>
-                                <Pen Brush="#FAF669" Thickness="0.26458" StartLineCap="Flat" EndLineCap="Flat" LineJoin="Round"/>
-                            </GeometryDrawing.Pen>
-                        </GeometryDrawing>
-                        <GeometryDrawing Brush="#000000">
-                            <GeometryDrawing.Geometry>
-                                <RectangleGeometry RadiusX="0" RadiusY="0" Rect="0.2646,2.6458,1.3229,1.3229"/>
-                            </GeometryDrawing.Geometry>
-                        </GeometryDrawing>
-                        <GeometryDrawing Brush="#59C0E6">
-                            <GeometryDrawing.Geometry>
-                                <RectangleGeometry RadiusX="0" RadiusY="0" Rect="0.5292,2.9104,0.7937,0.7937"/>
-                            </GeometryDrawing.Geometry>
-                        </GeometryDrawing>
-                        <GeometryDrawing Brush="#000000">
-                            <GeometryDrawing.Geometry>
-                                <RectangleGeometry RadiusX="0" RadiusY="0" Rect="2.6458,2.6458,1.3229,1.3229"/>
-                            </GeometryDrawing.Geometry>
-                        </GeometryDrawing>
-                        <GeometryDrawing Brush="#59C0E6">
-                            <GeometryDrawing.Geometry>
-                                <RectangleGeometry RadiusX="0" RadiusY="0" Rect="2.9104,2.9104,0.7937,0.7937"/>
-                            </GeometryDrawing.Geometry>
-                        </GeometryDrawing>
-                        <DrawingGroup Opacity="1" Transform="1,0,0,1,-5.6838989E-08,-0.79373991">
-                            <GeometryDrawing Brush="#000000">
-                                <GeometryDrawing.Geometry>
-                                    <RectangleGeometry RadiusX="0" RadiusY="0" Rect="1.3229,3.4395,1.5875,1.5875"/>
-                                </GeometryDrawing.Geometry>
-                            </GeometryDrawing>
-                            <GeometryDrawing Brush="#F06D6E">
-                                <GeometryDrawing.Geometry>
-                                    <RectangleGeometry RadiusX="0" RadiusY="0" Rect="1.5875,3.7041,1.0583,1.0583"/>
-                                </GeometryDrawing.Geometry>
-                            </GeometryDrawing>
-                        </DrawingGroup>
-                    </DrawingGroup>
+                    <GeometryDrawing Brush="#FF59C0E6">
+                        <GeometryDrawing.Pen>
+                            <Pen Brush="#FF1F1F1F" Thickness="1" StartLineCap="Flat" EndLineCap="Flat" LineJoin="Miter" />
+                        </GeometryDrawing.Pen>
+                        <GeometryDrawing.Geometry>
+                            <RectangleGeometry RadiusX="0" RadiusY="0" Rect="0.5,16.5,8,6" />
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="#FF59C0E6">
+                        <GeometryDrawing.Pen>
+                            <Pen Brush="#FF1F1F1F" Thickness="1" StartLineCap="Flat" EndLineCap="Flat" LineJoin="Miter" />
+                        </GeometryDrawing.Pen>
+                        <GeometryDrawing.Geometry>
+                            <RectangleGeometry RadiusX="0" RadiusY="0" Rect="15.5,16.5,8,6" />
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="#FFF06D6E">
+                        <GeometryDrawing.Pen>
+                            <Pen Brush="#FF1F1F1F" Thickness="1" StartLineCap="Flat" EndLineCap="Flat" LineJoin="Miter" />
+                        </GeometryDrawing.Pen>
+                        <GeometryDrawing.Geometry>
+                            <RectangleGeometry RadiusX="0" RadiusY="0" Rect="8.5,15.5,7,8" />
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
                 </DrawingGroup>
             </DrawingGroup>
         </DrawingImage.Drawing>
