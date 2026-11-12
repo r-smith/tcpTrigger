@@ -66,22 +66,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\ActionQueue.cs" />
-    <Compile Include="Classes\ActionRunner.cs" />
-    <Compile Include="Classes\ConfigNames.cs" />
-    <Compile Include="Classes\ConfigPaths.cs" />
-    <Compile Include="Classes\ConfigReader.cs" />
-    <Compile Include="Classes\EmailNotifier.cs" />
-    <Compile Include="Classes\IgnoreRule.cs" />
-    <Compile Include="Classes\JsonLogLine.cs" />
-    <Compile Include="Classes\Logger.cs" />
-    <Compile Include="Classes\PacketListener.cs" />
-    <Compile Include="Classes\PacketMatcher.cs" />
-    <Compile Include="Classes\Settings.cs" />
-    <Compile Include="Classes\StringCipher.cs" />
-    <Compile Include="Classes\TcpTriggerInterface.cs" />
-    <Compile Include="Classes\PacketHeader.cs" />
-    <Compile Include="Classes\UserVariableExpansion.cs" />
+    <Compile Include="Notifications\ActionQueue.cs" />
+    <Compile Include="Notifications\ActionRunner.cs" />
+    <Compile Include="Configuration\ConfigNames.cs" />
+    <Compile Include="Configuration\ConfigPaths.cs" />
+    <Compile Include="Configuration\ConfigReader.cs" />
+    <Compile Include="Notifications\EmailNotifier.cs" />
+    <Compile Include="Models\IgnoreRule.cs" />
+    <Compile Include="Notifications\JsonLogLine.cs" />
+    <Compile Include="Service\Logger.cs" />
+    <Compile Include="Network\PacketListener.cs" />
+    <Compile Include="Network\PacketMatcher.cs" />
+    <Compile Include="Configuration\Settings.cs" />
+    <Compile Include="Configuration\StringCipher.cs" />
+    <Compile Include="Network\TcpTriggerInterface.cs" />
+    <Compile Include="Network\PacketHeader.cs" />
+    <Compile Include="Notifications\UserVariableExpansion.cs" />
     <Compile Include="Service\TcpTriggerService.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -111,6 +111,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
