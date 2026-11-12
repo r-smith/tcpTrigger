@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace tcpTrigger
@@ -83,6 +84,20 @@ namespace tcpTrigger
                 sb.AppendLine($"Excluding UDP port(s): {UdpPortsToExclude}");
             }
 
+            // Append ignore rules.
+            if (IgnoreRules.Count > 0)
+            {
+                sb.AppendLine();
+                sb.AppendLine("# Ignore");
+                foreach (IgnoreRule rule in IgnoreRules)
+                {
+                    sb.AppendLine(string.IsNullOrEmpty(rule.Name) ? "Unnamed rule" : rule.Name);
+                    sb.AppendLine($"  Sources: {ListEntries(rule.Sources)}");
+                    sb.AppendLine($"  Destinations: {ListEntries(rule.Destinations)}");
+                    sb.AppendLine($"  Services: {ListEntries(rule.Services)}");
+                }
+            }
+
             // Append enabled actions and settings.
             sb.AppendLine();
             sb.AppendLine("# Actions");
@@ -117,6 +132,14 @@ namespace tcpTrigger
             }
 
             return sb.ToString();
+        }
+
+        // Lists the first 5 entries, then the number of entries not shown.
+        private static string ListEntries(List<string> entries)
+        {
+            const int MaxShown = 5;
+            string shown = string.Join(", ", entries.Take(MaxShown));
+            return entries.Count > MaxShown ? $"{shown} (+{entries.Count - MaxShown} more)" : shown;
         }
     }
 }

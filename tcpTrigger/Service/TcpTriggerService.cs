@@ -246,7 +246,7 @@ namespace tcpTrigger
 
             // Write final applied configuration to event log.
             Logger.Write(
-                "The tcpTrigger configuration has been applied."
+                "The tcpTrigger service applied the following configuration:"
                 + $"{Environment.NewLine}{Environment.NewLine}"
                 + Settings.DumpToString(),
                 Logger.EventCode.ConfigurationApplied);
