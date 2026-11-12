@@ -6,9 +6,9 @@
     {
         // ----- Current format -----
 
-        public const string DetectionRulesIcmp = "/tcpTrigger/detectionRules/icmp";
-        public const string DetectionRulesTcp = "/tcpTrigger/detectionRules/tcp";
-        public const string DetectionRulesUdp = "/tcpTrigger/detectionRules/udp";
+        public const string DetectionIcmp = "/tcpTrigger/detection/icmp";
+        public const string DetectionTcp = "/tcpTrigger/detection/tcp";
+        public const string DetectionUdp = "/tcpTrigger/detection/udp";
         public const string IgnoreRules = "/tcpTrigger/ignoreRules/rule";
 
         // ----- Legacy format -----

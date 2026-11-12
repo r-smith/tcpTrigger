@@ -39,7 +39,7 @@ namespace tcpTrigger
                     XmlDocument xd = new XmlDocument();
                     xd.Load(stream);
 
-                    ReadDetectionRules(xd);
+                    ReadDetection(xd);
                     ReadIgnoreRules(xd);
 
                     ReadExcludedInterfaces(xd);
@@ -67,12 +67,12 @@ namespace tcpTrigger
 
         // ----- Current format -----
 
-        // tcpTrigger/detectionRules
-        private static void ReadDetectionRules(XmlDocument xd)
+        // tcpTrigger/detection
+        private static void ReadDetection(XmlDocument xd)
         {
-            Settings.IsDetectIcmpEnabled = ReadBool(xd, ConfigNames.DetectionRulesIcmp + "/enabled", false);
-            Settings.IsDetectTcpEnabled = ReadBool(xd, ConfigNames.DetectionRulesTcp + "/enabled", false);
-            Settings.IsDetectUdpEnabled = ReadBool(xd, ConfigNames.DetectionRulesUdp + "/enabled", false);
+            Settings.IsDetectIcmpEnabled = ReadBool(xd, ConfigNames.DetectionIcmp + "/enabled", false);
+            Settings.IsDetectTcpEnabled = ReadBool(xd, ConfigNames.DetectionTcp + "/enabled", false);
+            Settings.IsDetectUdpEnabled = ReadBool(xd, ConfigNames.DetectionUdp + "/enabled", false);
         }
 
         // tcpTrigger/ignoreRules
