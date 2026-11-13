@@ -22,6 +22,8 @@ namespace tcpTrigger
         public const string IcmpType = "{ICMP_TYPE}";
         public const string Ttl = "{TTL}";
         public const string DetectionLog = "{DETECTION_LOG}";
+        public const string DetectionCount = "{DETECTION_COUNT}";
+        public const string DestinationServices = "{DESTINATION_SERVICES}";
 
         // Names used by version 1.3.5 and earlier. Still replaced so their configurations keep working.
         private const string OldConnectionLog = "{CONNECTION_LOG}";
@@ -71,6 +73,8 @@ namespace tcpTrigger
             message = message.Replace(DestinationIp, destinationIps);
             message = message.Replace(OldInterfaceIp, destinationIps);
             message = message.Replace(DestinationMac, destinationMacs);
+            message = message.Replace(DestinationServices, GetDestinationServices(detections));
+            message = message.Replace(DetectionCount, detections.Count.ToString());
 
             // The detection log goes in last, so nothing in it is taken for a variable.
             message = message.Replace(DetectionLog, detectionLog);
@@ -99,6 +103,29 @@ namespace tcpTrigger
                     break;
             }
             return $"{packetHeader.Timestamp.ToString(Settings.TimestampFormat)} [{packetHeader.DestinationIP}] {logText}";
+        }
+
+        // Returns the services in the detections, each listed once, in ignore rule syntax:
+        // TCP ports lowest first, then UDP ports, then icmp. For example, "tcp:22, tcp:443, udp:53, icmp".
+        private static string GetDestinationServices(List<PacketHeader> detections)
+        {
+            IEnumerable<string> tcp = detections
+                .Where(d => d.MatchType == PacketMatch.TcpConnect)
+                .Select(d => d.DestinationPort)
+                .Distinct()
+                .OrderBy(port => port)
+                .Select(port => $"tcp:{port}");
+            IEnumerable<string> udp = detections
+                .Where(d => d.MatchType == PacketMatch.UdpCommunication)
+                .Select(d => d.DestinationPort)
+                .Distinct()
+                .OrderBy(port => port)
+                .Select(port => $"udp:{port}");
+            IEnumerable<string> icmp = detections.Any(d => d.MatchType == PacketMatch.IcmpRequest)
+                ? new[] { "icmp" }
+                : Enumerable.Empty<string>();
+
+            return string.Join(", ", tcp.Concat(udp).Concat(icmp));
         }
 
         // Looks up the address's hostname in DNS. Returns an empty string if the lookup fails.
