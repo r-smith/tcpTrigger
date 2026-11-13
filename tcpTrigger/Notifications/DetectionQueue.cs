@@ -60,7 +60,7 @@ namespace tcpTrigger
             {
                 try
                 {
-                    ActionRunner.Run(detection.Header, detection.Interface);
+                    NotificationRunner.Run(detection.Header, detection.Interface);
                 }
                 catch (Exception ex)
                 {

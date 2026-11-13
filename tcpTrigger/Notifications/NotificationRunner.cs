@@ -4,13 +4,13 @@ using System.IO;
 
 namespace tcpTrigger
 {
-    // Performs the configured actions when a packet matches the detection rules.
-    internal static class ActionRunner
+    // Writes each detection to the event log and runs its notifications.
+    internal static class NotificationRunner
     {
         // Ensures only one thread at a time rotates or writes to the log file.
         private static readonly object s_logFileLock = new object();
 
-        // Runs each enabled action for a matched packet.
+        // Writes the detection to the event log, then runs each notification.
         public static void Run(PacketHeader packetHeader, TcpTriggerInterface ipInterface)
         {
             WriteEventLog(packetHeader);
@@ -32,7 +32,7 @@ namespace tcpTrigger
             }
         }
 
-        // Appends the match to a text log file, rotating if needed.
+        // Appends the detection to the notification's log file, rotating if needed.
         private static void WriteLog(PacketHeader packetHeader, NotificationLogFile logFile)
         {
             // Log files have a defined maximum file size and will rotate one time if reached.
@@ -96,7 +96,7 @@ namespace tcpTrigger
             }
         }
 
-        // Returns a one-line description of a matched packet. Used in email notifications.
+        // Returns a one-line description of a detection. Used in email notifications.
         private static string GetLogText(PacketHeader packetHeader)
         {
             string logText;
@@ -118,7 +118,7 @@ namespace tcpTrigger
             return $"{packetHeader.Timestamp.ToString(Settings.TimestampFormat)} [{packetHeader.DestinationIP}] {logText}";
         }
 
-        // Writes the matched packet's details to the event log.
+        // Writes the detection's details to the event log.
         private static void WriteEventLog(PacketHeader packetHeader)
         {
             switch (packetHeader.MatchType)
@@ -177,7 +177,7 @@ namespace tcpTrigger
             }
         }
 
-        // Adds the match to the interface's batch for this email notification, which sends it later.
+        // Adds the detection to the interface's batch for this email notification, which sends it later.
         private static void AddToEmailBatch(PacketHeader packetHeader, TcpTriggerInterface ipInterface, NotificationEmail email)
         {
             if (ipInterface.EmailBatches.TryGetValue(email, out EmailBatch batch))
