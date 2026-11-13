@@ -4,14 +4,9 @@ using System.Net;
 
 namespace tcpTrigger
 {
-    // Replaces {VARIABLE} placeholders in user-configured text with details of a match.
+    // Replaces {VARIABLE} placeholders in user-configured text with details of a detection.
     internal static class UserVariableExpansion
     {
-        public const string InterfaceIp = "{INTERFACE_IP}";
-        public const string InterfaceMac = "{INTERFACE_MAC}";
-        public const string InterfaceDescription = "{INTERFACE_DESCRIPTION}";
-        public const string ConnectionLog = "{CONNECTION_LOG}";
-
         public const string SourceIp = "{SOURCE_IP}";
         public const string SourcePort = "{SOURCE_PORT}";
         public const string SourceHostname = "{SOURCE_HOSTNAME}";
@@ -20,10 +15,15 @@ namespace tcpTrigger
         public const string DestinationHostname = "{DESTINATION_HOSTNAME}";
         public const string DestinationMac = "{DESTINATION_MAC}";
         public const string Timestamp = "{TIMESTAMP}";
-        public const string MatchType = "{MATCH_TYPE}";
+        public const string Protocol = "{PROTOCOL}";
         public const string TcpFlags = "{TCP_FLAGS}";
+        public const string DetectionLog = "{DETECTION_LOG}";
 
-        // Replaces the packet variables in the text, such as {SOURCE_IP}.
+        // Names used by version 1.3.5 and earlier. Still replaced so their configurations keep working.
+        private const string OldConnectionLog = "{CONNECTION_LOG}";
+        private const string OldInterfaceIp = "{INTERFACE_IP}";
+
+        // Replaces the variables for a command: the details of one detection.
         public static string GetExpandedString(string message, PacketHeader header)
         {
             message = message.Replace(SourceIp, header.SourceIP?.ToString());
@@ -33,7 +33,7 @@ namespace tcpTrigger
             message = message.Replace(DestinationMac, header.DestinationMacAsString);
             message = message.Replace(TcpFlags, header.TcpFlagNames);
             message = message.Replace(Timestamp, header.Timestamp.ToString(Settings.TimestampFormat));
-            message = message.Replace(MatchType, header.MatchTypeName);
+            message = message.Replace(Protocol, header.MatchTypeName);
 
             if (message.Contains(SourceHostname))
             {
@@ -47,19 +47,25 @@ namespace tcpTrigger
             return message;
         }
 
-        // Replaces the email variables in the text: {SOURCE_IP}, {SOURCE_HOSTNAME}, the interface variables,
-        // and {CONNECTION_LOG}. Each interface variable lists every interface, separated by commas.
-        public static string GetExpandedString(string message, IPAddress sourceIp, List<TcpTriggerInterface> interfaces, string connectionLog)
+        // Replaces the variables for an email. Each email is for one source IP.
+        // If that source IP hit more than one interface, {DESTINATION_IP} and {DESTINATION_MAC} list each, separated by commas.
+        public static string GetExpandedString(string message, IPAddress sourceIp, List<TcpTriggerInterface> interfaces, string detectionLog)
         {
+            string destinationIps = string.Join(", ", interfaces.Select(i => i.IP));
+            string destinationMacs = string.Join(", ", interfaces.Select(i => i.MacAddressAsString));
+
             message = message.Replace(SourceIp, sourceIp?.ToString());
             if (message.Contains(SourceHostname))
             {
                 message = message.Replace(SourceHostname, GetHostname(sourceIp));
             }
-            message = message.Replace(InterfaceIp, string.Join(", ", interfaces.Select(i => i.IP)));
-            message = message.Replace(InterfaceMac, string.Join(", ", interfaces.Select(i => i.MacAddressAsString)));
-            message = message.Replace(InterfaceDescription, string.Join(", ", interfaces.Select(i => i.Description)));
-            message = message.Replace(ConnectionLog, connectionLog);
+            message = message.Replace(DestinationIp, destinationIps);
+            message = message.Replace(OldInterfaceIp, destinationIps);
+            message = message.Replace(DestinationMac, destinationMacs);
+
+            // The detection log goes in last, so nothing in it is taken for a variable.
+            message = message.Replace(DetectionLog, detectionLog);
+            message = message.Replace(OldConnectionLog, detectionLog);
 
             return message;
         }

@@ -14,12 +14,12 @@ namespace tcpTrigger
         {
             try
             {
-                string connectionLog = string.Join(Environment.NewLine, detections);
+                string detectionLog = string.Join(Environment.NewLine, detections);
 
                 using (MailMessage message = new MailMessage())
                 {
-                    message.Subject = UserVariableExpansion.GetExpandedString(email.Subject, sourceIp, interfaces, connectionLog);
-                    message.Body = UserVariableExpansion.GetExpandedString(email.Body ?? string.Empty, sourceIp, interfaces, connectionLog);
+                    message.Subject = UserVariableExpansion.GetExpandedString(email.Subject, sourceIp, interfaces, detectionLog);
+                    message.Body = UserVariableExpansion.GetExpandedString(email.Body ?? string.Empty, sourceIp, interfaces, detectionLog);
                     message.From = string.IsNullOrWhiteSpace(email.FromDisplayName)
                         ? new MailAddress(email.FromAddress)
                         : new MailAddress(email.FromAddress, email.FromDisplayName);
