@@ -17,6 +17,7 @@ namespace tcpTrigger
         public const string DestinationHostname = "{DESTINATION_HOSTNAME}";
         public const string DestinationMac = "{DESTINATION_MAC}";
         public const string Timestamp = "{TIMESTAMP}";
+        public const string DetectionType = "{DETECTION_TYPE}";
         public const string Protocol = "{PROTOCOL}";
         public const string TcpFlags = "{TCP_FLAGS}";
         public const string IcmpType = "{ICMP_TYPE}";
@@ -24,6 +25,9 @@ namespace tcpTrigger
         public const string DetectionLog = "{DETECTION_LOG}";
         public const string DetectionCount = "{DETECTION_COUNT}";
         public const string DestinationServices = "{DESTINATION_SERVICES}";
+
+        // The {DETECTION_TYPE} of TCP, UDP, and ICMP detections.
+        private const string ConnectionDetectionType = "Connection";
 
         // Names used by version 1.3.5 and earlier. Still replaced so their configurations keep working.
         private const string OldConnectionLog = "{CONNECTION_LOG}";
@@ -42,6 +46,7 @@ namespace tcpTrigger
             message = message.Replace(IcmpType, header.MatchType == PacketMatch.IcmpRequest ? header.IcmpTypeName : string.Empty);
             message = message.Replace(Ttl, header.Ttl.ToString());
             message = message.Replace(Timestamp, header.Timestamp.ToString(Settings.TimestampFormat));
+            message = message.Replace(DetectionType, ConnectionDetectionType);
             message = message.Replace(Protocol, header.MatchTypeName);
 
             if (message.Contains(SourceHostname))
@@ -74,6 +79,7 @@ namespace tcpTrigger
             message = message.Replace(OldInterfaceIp, destinationIps);
             message = message.Replace(DestinationMac, destinationMacs);
             message = message.Replace(DestinationServices, GetDestinationServices(detections));
+            message = message.Replace(DetectionType, ConnectionDetectionType);
             message = message.Replace(DetectionCount, detections.Count.ToString());
 
             // The detection log goes in last, so nothing in it is taken for a variable.
