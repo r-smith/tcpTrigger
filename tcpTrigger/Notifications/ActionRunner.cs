@@ -25,11 +25,10 @@ namespace tcpTrigger
                     case NotificationCommand command:
                         RunCommand(packetHeader, command);
                         break;
+                    case NotificationEmail email:
+                        AddToEmailBatch(packetHeader, ipInterface, email);
+                        break;
                 }
-            }
-            if (Settings.IsEmailNotificationEnabled)
-            {
-                TriggerEmail(packetHeader, ipInterface);
             }
         }
 
@@ -178,10 +177,13 @@ namespace tcpTrigger
             }
         }
 
-        // Adds the match to the interface's email batch, which sends it later.
-        private static void TriggerEmail(PacketHeader packetHeader, TcpTriggerInterface ipInterface)
+        // Adds the match to the interface's batch for this email notification, which sends it later.
+        private static void AddToEmailBatch(PacketHeader packetHeader, TcpTriggerInterface ipInterface, NotificationEmail email)
         {
-            ipInterface.EmailBatch.Add(GetLogText(packetHeader));
+            if (ipInterface.EmailBatches.TryGetValue(email, out EmailBatch batch))
+            {
+                batch.Add(GetLogText(packetHeader));
+            }
         }
     }
 }

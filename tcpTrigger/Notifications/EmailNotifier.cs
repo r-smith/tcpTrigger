@@ -5,22 +5,22 @@ using System.Threading.Tasks;
 
 namespace tcpTrigger
 {
-    // Sends notification emails using the email settings.
+    // Sends the emails for email notifications.
     internal static class EmailNotifier
     {
-        // Sends a notification email for the interface. Errors are logged, not thrown.
-        public static async Task SendAsync(TcpTriggerInterface ipInterface, string connectionLog)
+        // Sends the notification's email for the interface. Errors are logged, not thrown.
+        public static async Task SendAsync(NotificationEmail email, TcpTriggerInterface ipInterface, string connectionLog)
         {
             try
             {
                 using (MailMessage message = new MailMessage())
                 {
-                    message.Subject = UserVariableExpansion.GetExpandedString(Settings.EmailSubject, ipInterface, connectionLog);
-                    message.Body = UserVariableExpansion.GetExpandedString(Settings.EmailBody ?? string.Empty, ipInterface, connectionLog);
-                    message.From = string.IsNullOrWhiteSpace(Settings.EmailFromDisplayName)
-                        ? new MailAddress(Settings.EmailFromAddress)
-                        : new MailAddress(Settings.EmailFromAddress, Settings.EmailFromDisplayName);
-                    foreach (string recipient in Settings.EmailRecipients)
+                    message.Subject = UserVariableExpansion.GetExpandedString(email.Subject, ipInterface, connectionLog);
+                    message.Body = UserVariableExpansion.GetExpandedString(email.Body ?? string.Empty, ipInterface, connectionLog);
+                    message.From = string.IsNullOrWhiteSpace(email.FromDisplayName)
+                        ? new MailAddress(email.FromAddress)
+                        : new MailAddress(email.FromAddress, email.FromDisplayName);
+                    foreach (string recipient in email.Recipients)
                     {
                         if (!string.IsNullOrWhiteSpace(recipient))
                         {
@@ -30,20 +30,21 @@ namespace tcpTrigger
 
                     using (SmtpClient smtpClient = new SmtpClient())
                     {
-                        smtpClient.Host = Settings.EmailSmtpServer;
-                        smtpClient.Port = Settings.EmailPort;
-                        smtpClient.EnableSsl = Settings.IsEmailStartTlsEnabled;
-                        if (!string.IsNullOrWhiteSpace(Settings.EmailUsername))
+                        smtpClient.Host = email.SmtpServer;
+                        smtpClient.Port = email.Port;
+                        smtpClient.EnableSsl = email.IsStartTlsEnabled;
+                        if (!string.IsNullOrWhiteSpace(email.Username))
                         {
-                            smtpClient.Credentials = new NetworkCredential(Settings.EmailUsername, Settings.EmailPassword);
+                            smtpClient.Credentials = new NetworkCredential(email.Username, email.Password);
                         }
                         await smtpClient.SendMailAsync(message);
                     }
 
                     int detectionCount = connectionLog.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).Length;
                     Logger.Write(
-                        $"An email notification was sent through {Settings.EmailSmtpServer}:{Settings.EmailPort}."
+                        $"An email notification was sent through {email.SmtpServer}:{email.Port}."
                         + $"{Environment.NewLine}{Environment.NewLine}"
+                        + $"Notification: {email.Name}{Environment.NewLine}"
                         + $"Recipients: {string.Join(", ", message.To)}{Environment.NewLine}"
                         + $"Detections: {detectionCount}",
                         Logger.EventCode.EmailSent);
@@ -52,7 +53,8 @@ namespace tcpTrigger
             catch (Exception ex)
             {
                 Logger.WriteError(
-                    $"tcpTrigger failed to send the email notification through {Settings.EmailSmtpServer}:{Settings.EmailPort}."
+                    $"tcpTrigger failed to send the email notification through {email.SmtpServer}:{email.Port}."
+                    + $"{Environment.NewLine}{Environment.NewLine}Notification: {email.Name}"
                     + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}"
                     + (ex.InnerException != null ? $"{Environment.NewLine}{ex.InnerException.Message}" : string.Empty),
                     Logger.EventCode.EmailSendFailed);

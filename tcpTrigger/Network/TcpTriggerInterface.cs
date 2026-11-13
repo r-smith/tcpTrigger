@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -20,7 +21,7 @@ namespace tcpTrigger
         }
     }
 
-    // A network interface address that tcpTrigger can monitor, and its email batch.
+    // A network interface address that tcpTrigger can monitor, and its email batches.
     // An adapter with several IPv4 addresses has one of these per address.
     internal class TcpTriggerInterface
     {
@@ -40,8 +41,8 @@ namespace tcpTrigger
         // The network adapter's description in Windows.
         public string Description { get; }
 
-        // Buffers this interface's detections for the notification email.
-        public EmailBatch EmailBatch { get; }
+        // One batch for each email notification. Each buffers this interface's detections for its email.
+        public Dictionary<NotificationEmail, EmailBatch> EmailBatches { get; }
 
         public TcpTriggerInterface(IPAddress address, string name, string description, PhysicalAddress macAddress, string guid)
         {
@@ -51,7 +52,9 @@ namespace tcpTrigger
             MacAddress = macAddress;
             Guid = guid;
 
-            EmailBatch = new EmailBatch(this);
+            EmailBatches = Settings.Notifications
+                .OfType<NotificationEmail>()
+                .ToDictionary(email => email, email => new EmailBatch(this, email));
         }
 
         // Returns an entry for each IPv4 address on adapters that are up, excluding loopback and

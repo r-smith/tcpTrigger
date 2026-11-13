@@ -171,37 +171,6 @@ namespace tcpTrigger
             }
             Settings.Notifications = usableNotifications;
 
-            // Validate email settings.
-            if (Settings.IsEmailNotificationEnabled)
-            {
-                List<string> missing = new List<string>();
-                if (Settings.EmailRecipients.Count == 0)
-                {
-                    missing.Add("recipient address");
-                }
-                if (string.IsNullOrWhiteSpace(Settings.EmailFromAddress))
-                {
-                    missing.Add("sender address");
-                }
-                if (string.IsNullOrWhiteSpace(Settings.EmailSmtpServer))
-                {
-                    missing.Add("mail server");
-                }
-                if (string.IsNullOrWhiteSpace(Settings.EmailSubject))
-                {
-                    missing.Add("message subject");
-                }
-
-                if (missing.Count > 0)
-                {
-                    Settings.IsEmailNotificationEnabled = false;
-                    Logger.WriteWarning(
-                        $"Email notifications have been disabled because these settings are missing: {string.Join(", ", missing)}. "
-                        + "Update your tcpTrigger configuration with the missing settings.",
-                        Logger.EventCode.EmailSettingsIncomplete);
-                }
-            }
-
             // Validate ignore rules. Rules that can't be used are removed.
             foreach (IgnoreRule rule in Settings.IgnoreRules)
             {
@@ -265,6 +234,34 @@ namespace tcpTrigger
                             $"{name} has been disabled because no command path is set. "
                             + "Update your tcpTrigger configuration with the command to run.",
                             Logger.EventCode.LaunchAppPathMissing);
+                        return false;
+                    }
+                    return true;
+                case NotificationEmail email:
+                    List<string> missing = new List<string>();
+                    if (email.Recipients.Count == 0)
+                    {
+                        missing.Add("recipient address");
+                    }
+                    if (string.IsNullOrWhiteSpace(email.FromAddress))
+                    {
+                        missing.Add("sender address");
+                    }
+                    if (string.IsNullOrWhiteSpace(email.SmtpServer))
+                    {
+                        missing.Add("mail server");
+                    }
+                    if (string.IsNullOrWhiteSpace(email.Subject))
+                    {
+                        missing.Add("message subject");
+                    }
+
+                    if (missing.Count > 0)
+                    {
+                        Logger.WriteWarning(
+                            $"{name} has been disabled because these settings are missing: {string.Join(", ", missing)}. "
+                            + "Update your tcpTrigger configuration with the missing settings.",
+                            Logger.EventCode.EmailSettingsIncomplete);
                         return false;
                     }
                     return true;

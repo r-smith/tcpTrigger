@@ -7,6 +7,7 @@
         // ----- Current format -----
 
         // Values of the `type` attribute on <notification> elements.
+        public const string NotificationTypeEmail = "email";
         public const string NotificationTypeLogFile = "logFile";
         public const string NotificationTypeCommand = "command";
 

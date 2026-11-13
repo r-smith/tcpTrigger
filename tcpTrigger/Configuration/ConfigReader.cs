@@ -91,6 +91,25 @@ namespace tcpTrigger
                 // Read the `type` attribute for each <notification> element and parse accordingly.
                 switch (node.Attributes["type"]?.Value)
                 {
+                    case ConfigNames.NotificationTypeEmail:
+                        Settings.Notifications.Add(new NotificationEmail
+                        {
+                            Name = ReadString(node, "name"),
+                            SmtpServer = ReadString(node, "server"),
+                            Port = ReadInt(node, "port", 25),
+                            IsStartTlsEnabled = ReadBool(node, "startTls", false),
+                            Username = ReadCredential(node, "username"),
+                            Password = ReadCredential(node, "password"),
+                            Recipients = ReadList(node, "recipientList/address"),
+                            FromAddress = ReadString(node, "fromAddress"),
+                            FromDisplayName = ReadString(node, "fromDisplayName"),
+                            Subject = ReadString(node, "subject"),
+                            Body = ReadString(node, "body"),
+                            // A value of 0 or less is treated as 1 second.
+                            RateLimitSeconds = Math.Max(1, ReadInt(node, "rateLimitSeconds", NotificationEmail.DefaultRateLimitSeconds)),
+                            WaitSeconds = Math.Max(1, ReadInt(node, "waitSeconds", NotificationEmail.DefaultWaitSeconds)),
+                        });
+                        break;
                     case ConfigNames.NotificationTypeLogFile:
                         Settings.Notifications.Add(new NotificationLogFile
                         {
@@ -239,23 +258,28 @@ namespace tcpTrigger
         }
 
         // tcpTrigger/enabledActions/emailNotification + tcpTrigger/email
+        // Becomes an email notification if the legacy <emailNotification> element is true.
         private static void ReadLegacyEmailAction(XmlDocument xd)
         {
-            Settings.IsEmailNotificationEnabled = ReadBool(xd, ConfigNames.EnabledActionsEmailNotification, false);
-            Settings.EmailSmtpServer = ReadString(xd, ConfigNames.EmailServer);
-            Settings.EmailPort = ReadInt(xd, ConfigNames.EmailPort, 25);
-            Settings.IsEmailStartTlsEnabled = ReadBool(xd, ConfigNames.EmailIsTlsEnabled, false);
-            Settings.EmailUsername = ReadCredential(xd, ConfigNames.EmailUsername);
-            Settings.EmailPassword = ReadCredential(xd, ConfigNames.EmailPassword);
-            Settings.EmailRecipients = ReadList(xd, ConfigNames.EmailRecipientListAddress);
-            Settings.EmailFromAddress = ReadString(xd, ConfigNames.EmailSenderAddress);
-            Settings.EmailFromDisplayName = ReadString(xd, ConfigNames.EmailSenderDisplayName);
-            Settings.EmailSubject = ReadString(xd, ConfigNames.EmailMessageSubject);
-            Settings.EmailBody = ReadString(xd, ConfigNames.EmailMessageBody);
-
-            // A value of 0 or less is treated as 1 second.
-            Settings.EmailRateLimitSeconds = Math.Max(1, ReadInt(xd, ConfigNames.EmailOptionsRateLimitSeconds, 300));
-            Settings.EmailBufferSeconds = Math.Max(1, ReadInt(xd, ConfigNames.EmailOptionsBufferSeconds, 30));
+            if (ReadBool(xd, ConfigNames.EnabledActionsEmailNotification, false))
+            {
+                Settings.Notifications.Add(new NotificationEmail
+                {
+                    SmtpServer = ReadString(xd, ConfigNames.EmailServer),
+                    Port = ReadInt(xd, ConfigNames.EmailPort, 25),
+                    IsStartTlsEnabled = ReadBool(xd, ConfigNames.EmailIsTlsEnabled, false),
+                    Username = ReadCredential(xd, ConfigNames.EmailUsername),
+                    Password = ReadCredential(xd, ConfigNames.EmailPassword),
+                    Recipients = ReadList(xd, ConfigNames.EmailRecipientListAddress),
+                    FromAddress = ReadString(xd, ConfigNames.EmailSenderAddress),
+                    FromDisplayName = ReadString(xd, ConfigNames.EmailSenderDisplayName),
+                    Subject = ReadString(xd, ConfigNames.EmailMessageSubject),
+                    Body = ReadString(xd, ConfigNames.EmailMessageBody),
+                    // A value of 0 or less is treated as 1 second.
+                    RateLimitSeconds = Math.Max(1, ReadInt(xd, ConfigNames.EmailOptionsRateLimitSeconds, NotificationEmail.DefaultRateLimitSeconds)),
+                    WaitSeconds = Math.Max(1, ReadInt(xd, ConfigNames.EmailOptionsBufferSeconds, NotificationEmail.DefaultWaitSeconds)),
+                });
+            }
         }
 
         // ----- Read helpers -----

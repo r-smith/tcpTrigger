@@ -20,22 +20,9 @@ namespace tcpTrigger
         public static HashSet<ushort> UdpPortsToMonitor { get; internal set; }
         public static string UdpPortsToInclude { get; internal set; }
         public static string UdpPortsToExclude { get; internal set; }
-        public static bool IsEmailNotificationEnabled { get; internal set; }
-        public static int EmailRateLimitSeconds { get; internal set; }
-        public static int EmailBufferSeconds { get; internal set; } = 30;
         public static HashSet<string> ExcludedNetworkInterfaces { get; internal set; } = new HashSet<string>();
         public static List<Notification> Notifications { get; internal set; } = new List<Notification>();
         public static List<IgnoreRule> IgnoreRules { get; internal set; } = new List<IgnoreRule>();
-        public static string EmailSmtpServer { get; internal set; }
-        public static int EmailPort { get; internal set; }
-        public static bool IsEmailStartTlsEnabled { get; internal set; }
-        public static string EmailUsername { get; internal set; }
-        public static string EmailPassword { get; internal set; }
-        public static List<string> EmailRecipients { get; internal set; } = new List<string>();
-        public static string EmailFromAddress { get; internal set; }
-        public static string EmailFromDisplayName { get; internal set; }
-        public static string EmailSubject { get; internal set; }
-        public static string EmailBody { get; internal set; }
 
         // Loads all settings from the configuration file. Throws if the file is missing or can't be parsed.
         public static void Load()
@@ -83,6 +70,10 @@ namespace tcpTrigger
             // Append notifications.
             sb.AppendLine();
             sb.AppendLine("# Notify");
+            if (Notifications.Count == 0)
+            {
+                sb.AppendLine("None");
+            }
             foreach (Notification notification in Notifications)
             {
                 sb.AppendLine(string.IsNullOrEmpty(notification.Name) ? "Unnamed notification" : notification.Name);
@@ -97,25 +88,19 @@ namespace tcpTrigger
                         sb.AppendLine($"  Path: {command.Path}");
                         sb.AppendLine($"  Arguments: {command.Arguments}");
                         break;
+                    case NotificationEmail email:
+                        sb.AppendLine("  Type: Email");
+                        sb.AppendLine($"  Server: {email.SmtpServer}:{email.Port}");
+                        sb.AppendLine($"  STARTTLS: {(email.IsStartTlsEnabled ? "Enabled" : "Disabled")}");
+                        sb.AppendLine("  Authentication: " + (string.IsNullOrWhiteSpace(email.Username) ? "Disabled" : "Enabled"));
+                        sb.AppendLine("  Recipients: " + string.Join(", ", email.Recipients));
+                        sb.AppendLine($"  From: {email.FromAddress}");
+                        sb.AppendLine($"  From display name: {email.FromDisplayName}");
+                        sb.AppendLine($"  Subject: {email.Subject}");
+                        sb.AppendLine($"  Rate limit: {email.RateLimitSeconds} seconds");
+                        sb.AppendLine($"  Wait: {email.WaitSeconds} seconds");
+                        break;
                 }
-            }
-            sb.AppendLine("Email notifications: " + (IsEmailNotificationEnabled ? "Enabled" : "Disabled"));
-
-            // Append email settings.
-            if (IsEmailNotificationEnabled)
-            {
-                sb.AppendLine();
-                sb.AppendLine("# Email");
-                sb.AppendLine($"Server: {EmailSmtpServer}");
-                sb.AppendLine($"Port: {EmailPort}");
-                sb.AppendLine($"STARTTLS: {(IsEmailStartTlsEnabled ? "Enabled" : "Disabled")}");
-                sb.AppendLine("Authentication: " + (string.IsNullOrWhiteSpace(EmailUsername) ? "Disabled" : "Enabled"));
-                sb.AppendLine("Recipient(s): " + string.Join(", ", EmailRecipients));
-                sb.AppendLine($"Sender address: {EmailFromAddress}");
-                sb.AppendLine($"Sender display name: {EmailFromDisplayName}");
-                sb.AppendLine($"Message subject: {EmailSubject}");
-                sb.AppendLine($"Rate limit: {EmailRateLimitSeconds} seconds");
-                sb.AppendLine($"Buffer: {EmailBufferSeconds} seconds");
             }
 
             // Append ignore rules.

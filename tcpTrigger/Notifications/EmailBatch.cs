@@ -2,11 +2,12 @@
 
 namespace tcpTrigger
 {
-    // Buffers detections on one interface and sends them together in one email,
-    // once the wait time has passed and the rate limit allows it.
+    // Buffers detections on one interface for one email notification, and sends them together
+    // in one email once the wait time has passed and the rate limit allows it.
     internal class EmailBatch
     {
         private readonly TcpTriggerInterface _ipInterface;
+        private readonly NotificationEmail _email;
 
         // Protects _buffer and _sendTimer, which the action thread and the timer both use.
         private readonly object _lock = new object();
@@ -19,13 +20,14 @@ namespace tcpTrigger
         // When the last email was sent, in UTC. Used to apply the rate limit.
         private DateTime _lastSent;
 
-        public EmailBatch(TcpTriggerInterface ipInterface)
+        public EmailBatch(TcpTriggerInterface ipInterface, NotificationEmail email)
         {
             _ipInterface = ipInterface;
+            _email = email;
 
             _sendTimer = new System.Timers.Timer
             {
-                Interval = TimeSpan.FromSeconds(Settings.EmailBufferSeconds).TotalMilliseconds
+                Interval = TimeSpan.FromSeconds(_email.WaitSeconds).TotalMilliseconds
             };
             _sendTimer.Elapsed += SendTimer_Elapsed;
             _sendTimer.Enabled = false;
@@ -44,17 +46,17 @@ namespace tcpTrigger
         // Sends the buffered detections, or delays the timer if an email was sent too recently.
         private void SendTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (_lastSent > DateTime.UtcNow.AddSeconds(-Settings.EmailRateLimitSeconds))
+            if (_lastSent > DateTime.UtcNow.AddSeconds(-_email.RateLimitSeconds))
             {
                 // Too soon to send another email. Apply rate limiting by changing the timer interval.
                 double secondsSinceLastEmail = (DateTime.UtcNow - _lastSent).TotalSeconds;
-                if (secondsSinceLastEmail > 0 && secondsSinceLastEmail < Settings.EmailRateLimitSeconds)
+                if (secondsSinceLastEmail > 0 && secondsSinceLastEmail < _email.RateLimitSeconds)
                 {
-                    _sendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailRateLimitSeconds - secondsSinceLastEmail).TotalMilliseconds;
+                    _sendTimer.Interval = TimeSpan.FromSeconds(_email.RateLimitSeconds - secondsSinceLastEmail).TotalMilliseconds;
                 }
                 else
                 {
-                    _sendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailRateLimitSeconds).TotalMilliseconds;
+                    _sendTimer.Interval = TimeSpan.FromSeconds(_email.RateLimitSeconds).TotalMilliseconds;
                 }
             }
             else
@@ -66,12 +68,12 @@ namespace tcpTrigger
                     connectionLog = _buffer;
                     _buffer = string.Empty;
                     _lastSent = DateTime.UtcNow;
-                    _sendTimer.Interval = TimeSpan.FromSeconds(Settings.EmailBufferSeconds).TotalMilliseconds;
+                    _sendTimer.Interval = TimeSpan.FromSeconds(_email.WaitSeconds).TotalMilliseconds;
                     _sendTimer.Enabled = false;
                 }
 
                 // Send the email. Not awaited. EmailNotifier.SendAsync catches and logs its own errors.
-                _ = EmailNotifier.SendAsync(_ipInterface, connectionLog);
+                _ = EmailNotifier.SendAsync(_email, _ipInterface, connectionLog);
             }
         }
     }
