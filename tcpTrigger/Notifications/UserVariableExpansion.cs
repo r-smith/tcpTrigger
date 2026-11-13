@@ -56,10 +56,11 @@ namespace tcpTrigger
 
         // Replaces the variables for an email. Each email is for one source IP.
         // If that source IP hit more than one interface, {DESTINATION_IP} and {DESTINATION_MAC} list each, separated by commas.
-        public static string GetExpandedString(string message, IPAddress sourceIp, List<TcpTriggerInterface> interfaces, string detectionLog)
+        public static string GetExpandedString(string message, IPAddress sourceIp, List<PacketHeader> detections)
         {
-            string destinationIps = string.Join(", ", interfaces.Select(i => i.IP));
-            string destinationMacs = string.Join(", ", interfaces.Select(i => i.MacAddressAsString));
+            string destinationIps = string.Join(", ", detections.Select(d => d.DestinationIP.ToString()).Distinct());
+            string destinationMacs = string.Join(", ", detections.Select(d => d.DestinationMacAsString).Distinct());
+            string detectionLog = string.Join(Environment.NewLine, detections.Select(GetDetectionLogLine));
 
             message = message.Replace(SensorName, Environment.MachineName);
             message = message.Replace(SourceIp, sourceIp?.ToString());
@@ -76,6 +77,28 @@ namespace tcpTrigger
             message = message.Replace(OldConnectionLog, detectionLog);
 
             return message;
+        }
+
+        // Returns a one-line description of a detection, for {DETECTION_LOG}.
+        private static string GetDetectionLogLine(PacketHeader packetHeader)
+        {
+            string logText;
+            switch (packetHeader.MatchType)
+            {
+                case PacketMatch.TcpConnect:
+                    logText = $"TCP connection to port {packetHeader.DestinationPort} from {packetHeader.SourceIP}";
+                    break;
+                case PacketMatch.UdpCommunication:
+                    logText = $"UDP communication to port {packetHeader.DestinationPort} from {packetHeader.SourceIP}";
+                    break;
+                case PacketMatch.IcmpRequest:
+                    logText = $"ICMP {packetHeader.IcmpTypeName} request from {packetHeader.SourceIP}";
+                    break;
+                default:
+                    logText = string.Empty;
+                    break;
+            }
+            return $"{packetHeader.Timestamp.ToString(Settings.TimestampFormat)} [{packetHeader.DestinationIP}] {logText}";
         }
 
         // Looks up the address's hostname in DNS. Returns an empty string if the lookup fails.

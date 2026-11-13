@@ -30,7 +30,7 @@ namespace tcpTrigger
                         RunCommand(packetHeader, command);
                         break;
                     case NotificationEmail email:
-                        AddToEmailBatch(packetHeader, ipInterface, email);
+                        AddToEmailBatch(packetHeader, email);
                         break;
                 }
             }
@@ -100,28 +100,6 @@ namespace tcpTrigger
             }
         }
 
-        // Returns a one-line description of a detection. Used in email notifications.
-        private static string GetLogText(PacketHeader packetHeader)
-        {
-            string logText;
-            switch (packetHeader.MatchType)
-            {
-                case PacketMatch.TcpConnect:
-                    logText = $"TCP connection to port {packetHeader.DestinationPort} from {packetHeader.SourceIP}";
-                    break;
-                case PacketMatch.UdpCommunication:
-                    logText = $"UDP communication to port {packetHeader.DestinationPort} from {packetHeader.SourceIP}";
-                    break;
-                case PacketMatch.IcmpRequest:
-                    logText = $"ICMP {packetHeader.IcmpTypeName} request from {packetHeader.SourceIP}";
-                    break;
-                default:
-                    logText = string.Empty;
-                    break;
-            }
-            return $"{packetHeader.Timestamp.ToString(Settings.TimestampFormat)} [{packetHeader.DestinationIP}] {logText}";
-        }
-
         // Writes the detection's details to the event log.
         private static void WriteEventLog(PacketHeader packetHeader)
         {
@@ -182,7 +160,7 @@ namespace tcpTrigger
         }
 
         // Adds the detection to the email notification's batch for its source IP. SendDueEmails sends it later.
-        private static void AddToEmailBatch(PacketHeader packetHeader, TcpTriggerInterface ipInterface, NotificationEmail email)
+        private static void AddToEmailBatch(PacketHeader packetHeader, NotificationEmail email)
         {
             if (!email.Batches.TryGetValue(packetHeader.SourceIP, out EmailBatch batch))
             {
@@ -194,11 +172,7 @@ namespace tcpTrigger
             {
                 batch.FirstDetection = DateTime.UtcNow;
             }
-            batch.Detections.Add(GetLogText(packetHeader));
-            if (!batch.Interfaces.Any(existing => existing.IP.Equals(ipInterface.IP)))
-            {
-                batch.Interfaces.Add(ipInterface);
-            }
+            batch.Detections.Add(packetHeader);
         }
 
         // True if any email notification still has emails to send or a rate limit to wait out.
@@ -253,15 +227,13 @@ namespace tcpTrigger
         // EmailNotifier.SendAsync logs its own errors.
         private static Task SendBatch(NotificationEmail email, IPAddress sourceIp, EmailBatch batch)
         {
-            // Copy the batch first, since it's emptied below while the email is still being sent.
-            List<TcpTriggerInterface> interfaces = batch.Interfaces.ToList();
-            List<string> detections = batch.Detections.ToList();
+            // Copy the detections first, since the batch is emptied below while the email is still being sent.
+            List<PacketHeader> detections = batch.Detections.ToList();
 
             // Send on a thread-pool thread, so a slow DNS lookup or mail server doesn't hold up the detection queue.
-            Task send = Task.Run(() => EmailNotifier.SendAsync(email, sourceIp, interfaces, detections));
+            Task send = Task.Run(() => EmailNotifier.SendAsync(email, sourceIp, detections));
 
             batch.Detections.Clear();
-            batch.Interfaces.Clear();
             batch.LastSent = DateTime.UtcNow;
             return send;
         }
