@@ -19,6 +19,8 @@ namespace tcpTrigger
         public const string Timestamp = "{TIMESTAMP}";
         public const string Protocol = "{PROTOCOL}";
         public const string TcpFlags = "{TCP_FLAGS}";
+        public const string IcmpType = "{ICMP_TYPE}";
+        public const string Ttl = "{TTL}";
         public const string DetectionLog = "{DETECTION_LOG}";
 
         // Names used by version 1.3.5 and earlier. Still replaced so their configurations keep working.
@@ -35,6 +37,8 @@ namespace tcpTrigger
             message = message.Replace(DestinationPort, header.DestinationPort.ToString());
             message = message.Replace(DestinationMac, header.DestinationMacAsString);
             message = message.Replace(TcpFlags, header.TcpFlagNames);
+            message = message.Replace(IcmpType, header.MatchType == PacketMatch.IcmpRequest ? header.IcmpTypeName : string.Empty);
+            message = message.Replace(Ttl, header.Ttl.ToString());
             message = message.Replace(Timestamp, header.Timestamp.ToString(Settings.TimestampFormat));
             message = message.Replace(Protocol, header.MatchTypeName);
 
