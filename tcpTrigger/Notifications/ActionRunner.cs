@@ -178,15 +178,10 @@ namespace tcpTrigger
             }
         }
 
-        // Adds the match to the interface's email buffer. The interface's email timer sends it later.
+        // Adds the match to the interface's email batch, which sends it later.
         private static void TriggerEmail(PacketHeader packetHeader, TcpTriggerInterface ipInterface)
         {
-            // Record matched connection to log buffer and enable timer, which handles sending the notification email.
-            lock (ipInterface.EmailLock)
-            {
-                ipInterface.EmailLogBuffer += GetLogText(packetHeader) + Environment.NewLine;
-                ipInterface.EmailSendTimer.Enabled = true;
-            }
+            ipInterface.EmailBatch.Add(GetLogText(packetHeader));
         }
     }
 }

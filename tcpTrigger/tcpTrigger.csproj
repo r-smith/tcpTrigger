@@ -75,6 +75,7 @@
     <Compile Include="Configuration\ConfigNames.cs" />
     <Compile Include="Configuration\ConfigPaths.cs" />
     <Compile Include="Configuration\ConfigReader.cs" />
+    <Compile Include="Notifications\EmailBatch.cs" />
     <Compile Include="Notifications\EmailNotifier.cs" />
     <Compile Include="Models\IgnoreRule.cs" />
     <Compile Include="Notifications\JsonLogLine.cs" />
