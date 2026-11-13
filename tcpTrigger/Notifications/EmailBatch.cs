@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 
 namespace tcpTrigger
 {
@@ -9,6 +10,7 @@ namespace tcpTrigger
     internal class EmailBatch : IDisposable
     {
         private readonly NotificationEmail _email;
+        private readonly IPAddress _sourceIp;
 
         // Protects _buffer, _interfaces, and _sendTimer, which the detection queue thread and the timer both use.
         private readonly object _lock = new object();
@@ -24,9 +26,10 @@ namespace tcpTrigger
         // When the last email was sent, in UTC. Used to apply the rate limit.
         private DateTime _lastSent;
 
-        public EmailBatch(NotificationEmail email)
+        public EmailBatch(NotificationEmail email, IPAddress sourceIp)
         {
             _email = email;
+            _sourceIp = sourceIp;
 
             _sendTimer = new System.Timers.Timer
             {
@@ -100,7 +103,7 @@ namespace tcpTrigger
                 }
 
                 // Send the email. Not awaited. EmailNotifier.SendAsync catches and logs its own errors.
-                _ = EmailNotifier.SendAsync(_email, interfaces, connectionLog);
+                _ = EmailNotifier.SendAsync(_email, _sourceIp, interfaces, connectionLog);
             }
         }
     }

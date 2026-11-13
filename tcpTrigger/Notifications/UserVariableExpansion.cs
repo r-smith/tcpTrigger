@@ -37,45 +37,44 @@ namespace tcpTrigger
 
             if (message.Contains(SourceHostname))
             {
-                string hostname = string.Empty;
-                try
-                {
-                    hostname = Dns.GetHostEntry(header.SourceIP).HostName;
-                }
-                catch
-                {
-                    // Leave the hostname empty if the lookup fails.
-                }
-                message = message.Replace(SourceHostname, hostname);
+                message = message.Replace(SourceHostname, GetHostname(header.SourceIP));
             }
-
             if (message.Contains(DestinationHostname))
             {
-                string hostname = string.Empty;
-                try
-                {
-                    hostname = Dns.GetHostEntry(header.DestinationIP).HostName;
-                }
-                catch
-                {
-                    // Leave the hostname empty if the lookup fails.
-                }
-                message = message.Replace(DestinationHostname, hostname);
+                message = message.Replace(DestinationHostname, GetHostname(header.DestinationIP));
             }
 
             return message;
         }
 
-        // Replaces the interface variables and {CONNECTION_LOG} in the text.
-        // Each interface variable lists every interface, separated by commas.
-        public static string GetExpandedString(string message, List<TcpTriggerInterface> interfaces, string connectionLog)
+        // Replaces the email variables in the text: {SOURCE_IP}, {SOURCE_HOSTNAME}, the interface variables,
+        // and {CONNECTION_LOG}. Each interface variable lists every interface, separated by commas.
+        public static string GetExpandedString(string message, IPAddress sourceIp, List<TcpTriggerInterface> interfaces, string connectionLog)
         {
+            message = message.Replace(SourceIp, sourceIp?.ToString());
+            if (message.Contains(SourceHostname))
+            {
+                message = message.Replace(SourceHostname, GetHostname(sourceIp));
+            }
             message = message.Replace(InterfaceIp, string.Join(", ", interfaces.Select(i => i.IP)));
             message = message.Replace(InterfaceMac, string.Join(", ", interfaces.Select(i => i.MacAddressAsString)));
             message = message.Replace(InterfaceDescription, string.Join(", ", interfaces.Select(i => i.Description)));
             message = message.Replace(ConnectionLog, connectionLog);
 
             return message;
+        }
+
+        // Looks up the address's hostname in DNS. Returns an empty string if the lookup fails.
+        private static string GetHostname(IPAddress address)
+        {
+            try
+            {
+                return Dns.GetHostEntry(address).HostName;
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
     }
 }

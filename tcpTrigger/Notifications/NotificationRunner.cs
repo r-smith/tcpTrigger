@@ -186,7 +186,7 @@ namespace tcpTrigger
             if (!email.Batches.TryGetValue(packetHeader.SourceIP, out EmailBatch batch))
             {
                 RemoveIdleBatches(email);
-                batch = new EmailBatch(email);
+                batch = new EmailBatch(email, packetHeader.SourceIP);
                 email.Batches.Add(packetHeader.SourceIP, batch);
             }
             batch.Add(GetLogText(packetHeader), ipInterface);
