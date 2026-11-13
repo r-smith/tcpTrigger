@@ -269,12 +269,20 @@ namespace tcpTrigger.GUI.Configuration
                 Recipients = ReadList(xd, ConfigNames.EmailRecipientListAddress),
                 FromAddress = ReadString(xd, ConfigNames.EmailSenderAddress),
                 FromDisplayName = ReadString(xd, ConfigNames.EmailSenderDisplayName),
-                Subject = ReadString(xd, ConfigNames.EmailMessageSubject),
-                Body = ReadString(xd, ConfigNames.EmailMessageBody),
+                Subject = RenameLegacyVariables(ReadString(xd, ConfigNames.EmailMessageSubject)),
+                Body = RenameLegacyVariables(ReadString(xd, ConfigNames.EmailMessageBody)),
                 // A value of 0 or less is treated as 1 second.
                 RateLimitSeconds = Math.Max(1, ReadInt(xd, ConfigNames.EmailOptionsRateLimitSeconds, NotificationEmail.DefaultRateLimitSeconds)),
                 WaitSeconds = Math.Max(1, ReadInt(xd, ConfigNames.EmailOptionsBufferSeconds, NotificationEmail.DefaultWaitSeconds)),
             });
+        }
+
+        // Replaces variable names used by version 1.3.5 and earlier with their current names.
+        private static string RenameLegacyVariables(string text)
+        {
+            return text?
+                .Replace("{CONNECTION_LOG}", "{DETECTION_LOG}")
+                .Replace("{INTERFACE_IP}", "{DESTINATION_IP}");
         }
 
         // ----- Read helpers -----
