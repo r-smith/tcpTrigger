@@ -125,7 +125,7 @@
                     </TextBox>
                     <TextBlock Grid.Row="1"
                                Grid.Column="1"
-                               Text="Can include {SOURCE_IP}, {SOURCE_PORT}, {SOURCE_HOSTNAME}, {DESTINATION_IP}, {DESTINATION_PORT}, {DESTINATION_HOSTNAME}, {DESTINATION_MAC}, {TIMESTAMP}, {MATCH_TYPE}, and {TCP_FLAGS}, which are replaced with details of the detection."
+                               Text="Can include {SENSOR_NAME}, {SOURCE_IP}, {SOURCE_PORT}, {SOURCE_HOSTNAME}, {SOURCE_OS_GUESS}, {DESTINATION_IP}, {DESTINATION_PORT}, {DESTINATION_HOSTNAME}, {DESTINATION_MAC}, {DETECTION_TYPE}, {PROTOCOL}, {TCP_FLAGS}, {ICMP_TYPE}, {TTL}, and {TIMESTAMP}, which are replaced with details of the detection."
                                Style="{StaticResource HintText}"/>
                 </Grid>
             </StackPanel>

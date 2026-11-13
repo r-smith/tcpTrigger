@@ -228,7 +228,7 @@
                     </TextBox>
                     <TextBlock Grid.Row="1"
                                Grid.Column="1"
-                               Text="The subject and body can include {SOURCE_IP}, {SOURCE_HOSTNAME}, {CONNECTION_LOG} (the detections being reported), {INTERFACE_IP}, {INTERFACE_MAC}, and {INTERFACE_DESCRIPTION}."
+                               Text="The subject and body can include {SENSOR_NAME}, {SOURCE_IP}, {SOURCE_HOSTNAME}, {SOURCE_OS_GUESS}, {DESTINATION_IP}, {DESTINATION_MAC}, {DESTINATION_SERVICES}, {DETECTION_TYPE}, {DETECTION_COUNT}, and {DETECTION_LOG} (the detections being reported)."
                                Style="{StaticResource HintText}"/>
                 </Grid>
             </StackPanel>

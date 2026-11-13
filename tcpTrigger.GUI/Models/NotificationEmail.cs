@@ -10,9 +10,15 @@ namespace tcpTrigger.GUI.Models
         // Filled in for each new email notification.
         public const string DefaultSubject = "Alert: Suspicious network activity from {SOURCE_IP}";
         public const string DefaultBody =
-            "The following activity from {SOURCE_IP} was detected:\r\n"
+            "tcpTrigger on {SENSOR_NAME} detected activity from {SOURCE_IP}.\r\n"
             + "\r\n"
-            + "{CONNECTION_LOG}";
+            + "Suspicious IP: {SOURCE_IP}\r\n"
+            + "Hostname: {SOURCE_HOSTNAME}\r\n"
+            + "Likely OS: {SOURCE_OS_GUESS}\r\n"
+            + "Probed services: {DESTINATION_SERVICES}\r\n"
+            + "\r\n"
+            + "Activity detected:\r\n"
+            + "{DETECTION_LOG}";
 
         public NotificationEmail()
         {
