@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 
 namespace tcpTrigger
 {
@@ -28,5 +29,8 @@ namespace tcpTrigger
         public string Body { get; set; }
         public int RateLimitSeconds { get; set; }
         public int WaitSeconds { get; set; }
+
+        // Detections waiting to be emailed, one batch per source IP. Only used on the detection queue thread.
+        public Dictionary<IPAddress, EmailBatch> Batches { get; } = new Dictionary<IPAddress, EmailBatch>();
     }
 }

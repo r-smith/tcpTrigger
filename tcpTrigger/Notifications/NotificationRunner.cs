@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Net;
 
 namespace tcpTrigger
 {
@@ -177,12 +180,30 @@ namespace tcpTrigger
             }
         }
 
-        // Adds the detection to the interface's batch for this email notification, which sends it later.
+        // Adds the detection to the email notification's batch for its source IP, which sends it later.
         private static void AddToEmailBatch(PacketHeader packetHeader, TcpTriggerInterface ipInterface, NotificationEmail email)
         {
-            if (ipInterface.EmailBatches.TryGetValue(email, out EmailBatch batch))
+            if (!email.Batches.TryGetValue(packetHeader.SourceIP, out EmailBatch batch))
             {
-                batch.Add(GetLogText(packetHeader));
+                RemoveIdleBatches(email);
+                batch = new EmailBatch(email);
+                email.Batches.Add(packetHeader.SourceIP, batch);
+            }
+            batch.Add(GetLogText(packetHeader), ipInterface);
+        }
+
+        // Removes batches with nothing waiting whose rate limit has passed, so old sources don't build up.
+        private static void RemoveIdleBatches(NotificationEmail email)
+        {
+            List<IPAddress> idleSources = email.Batches
+                .Where(pair => pair.Value.IsIdle)
+                .Select(pair => pair.Key)
+                .ToList();
+
+            foreach (IPAddress source in idleSources)
+            {
+                email.Batches[source].Dispose();
+                email.Batches.Remove(source);
             }
         }
     }

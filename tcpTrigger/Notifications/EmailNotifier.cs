@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
@@ -8,15 +9,15 @@ namespace tcpTrigger
     // Sends the emails for email notifications.
     internal static class EmailNotifier
     {
-        // Sends the notification's email for the interface. Errors are logged, not thrown.
-        public static async Task SendAsync(NotificationEmail email, TcpTriggerInterface ipInterface, string connectionLog)
+        // Sends the notification's email for a batch of detections. Errors are logged, not thrown.
+        public static async Task SendAsync(NotificationEmail email, List<TcpTriggerInterface> interfaces, string connectionLog)
         {
             try
             {
                 using (MailMessage message = new MailMessage())
                 {
-                    message.Subject = UserVariableExpansion.GetExpandedString(email.Subject, ipInterface, connectionLog);
-                    message.Body = UserVariableExpansion.GetExpandedString(email.Body ?? string.Empty, ipInterface, connectionLog);
+                    message.Subject = UserVariableExpansion.GetExpandedString(email.Subject, interfaces, connectionLog);
+                    message.Body = UserVariableExpansion.GetExpandedString(email.Body ?? string.Empty, interfaces, connectionLog);
                     message.From = string.IsNullOrWhiteSpace(email.FromDisplayName)
                         ? new MailAddress(email.FromAddress)
                         : new MailAddress(email.FromAddress, email.FromDisplayName);

@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 
 namespace tcpTrigger
 {
@@ -65,11 +67,12 @@ namespace tcpTrigger
         }
 
         // Replaces the interface variables and {CONNECTION_LOG} in the text.
-        public static string GetExpandedString(string message, TcpTriggerInterface ipInterface, string connectionLog)
+        // Each interface variable lists every interface, separated by commas.
+        public static string GetExpandedString(string message, List<TcpTriggerInterface> interfaces, string connectionLog)
         {
-            message = message.Replace(InterfaceIp, ipInterface.IP?.ToString());
-            message = message.Replace(InterfaceMac, ipInterface.MacAddressAsString);
-            message = message.Replace(InterfaceDescription, ipInterface.Description);
+            message = message.Replace(InterfaceIp, string.Join(", ", interfaces.Select(i => i.IP)));
+            message = message.Replace(InterfaceMac, string.Join(", ", interfaces.Select(i => i.MacAddressAsString)));
+            message = message.Replace(InterfaceDescription, string.Join(", ", interfaces.Select(i => i.Description)));
             message = message.Replace(ConnectionLog, connectionLog);
 
             return message;
