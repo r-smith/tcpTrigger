@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace tcpTrigger
 {
@@ -10,6 +11,12 @@ namespace tcpTrigger
     {
         // Maximum time Stop waits for queued detections to finish.
         private static readonly TimeSpan s_stopTimeout = TimeSpan.FromSeconds(10);
+
+        // How often the thread checks for emails that are due.
+        private static readonly TimeSpan s_emailCheckInterval = TimeSpan.FromSeconds(1);
+
+        // Maximum time to wait for the last emails to send when stopping. Less than s_stopTimeout.
+        private static readonly TimeSpan s_lastEmailsTimeout = TimeSpan.FromSeconds(5);
 
         // Detections waiting for their notifications to run, with the interface each was captured on.
         private readonly BlockingCollection<(PacketHeader Header, TcpTriggerInterface Interface)> _detections =
@@ -53,14 +60,20 @@ namespace tcpTrigger
         }
 
         // Runs the notifications for each detection (on the background thread) in the order they were queued.
+        // Also sends the emails that are due, checking at least once a second.
         private void RunNotifications()
         {
-            // Take each detection as it's queued. The loop ends once Stop is called and the queue is empty.
-            foreach (var detection in _detections.GetConsumingEnumerable())
+            // The loop ends once Stop is called and the queue is empty.
+            while (!_detections.IsCompleted)
             {
                 try
                 {
-                    NotificationRunner.Run(detection.Header, detection.Interface);
+                    // Wait up to a second for the next detection.
+                    if (_detections.TryTake(out var detection, s_emailCheckInterval))
+                    {
+                        NotificationRunner.Run(detection.Header, detection.Interface);
+                    }
+                    NotificationRunner.SendDueEmails();
                 }
                 catch (Exception ex)
                 {
@@ -70,6 +83,9 @@ namespace tcpTrigger
                         Logger.EventCode.NotificationFailed);
                 }
             }
+
+            // Send the emails still waiting, so stopping or reloading doesn't lose them.
+            Task.WaitAll(NotificationRunner.SendAllEmails(), s_lastEmailsTimeout);
         }
     }
 }

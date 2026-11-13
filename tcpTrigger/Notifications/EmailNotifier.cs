@@ -10,10 +10,12 @@ namespace tcpTrigger
     internal static class EmailNotifier
     {
         // Sends the notification's email for a batch of detections. Errors are logged, not thrown.
-        public static async Task SendAsync(NotificationEmail email, IPAddress sourceIp, List<TcpTriggerInterface> interfaces, string connectionLog)
+        public static async Task SendAsync(NotificationEmail email, IPAddress sourceIp, List<TcpTriggerInterface> interfaces, List<string> detections)
         {
             try
             {
+                string connectionLog = string.Join(Environment.NewLine, detections);
+
                 using (MailMessage message = new MailMessage())
                 {
                     message.Subject = UserVariableExpansion.GetExpandedString(email.Subject, sourceIp, interfaces, connectionLog);
@@ -41,14 +43,13 @@ namespace tcpTrigger
                         await smtpClient.SendMailAsync(message);
                     }
 
-                    int detectionCount = connectionLog.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).Length;
                     Logger.Write(
                         $"An email notification was sent through {email.SmtpServer}:{email.Port}."
                         + $"{Environment.NewLine}{Environment.NewLine}"
                         + $"Notification: {email.Name}{Environment.NewLine}"
                         + $"Source: {sourceIp}{Environment.NewLine}"
                         + $"Recipients: {string.Join(", ", message.To)}{Environment.NewLine}"
-                        + $"Detections: {detectionCount}",
+                        + $"Detections: {detections.Count}",
                         Logger.EventCode.EmailSent);
                 }
             }

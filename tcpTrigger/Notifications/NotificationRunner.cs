@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace tcpTrigger
 {
@@ -180,31 +181,85 @@ namespace tcpTrigger
             }
         }
 
-        // Adds the detection to the email notification's batch for its source IP, which sends it later.
+        // Adds the detection to the email notification's batch for its source IP. SendDueEmails sends it later.
         private static void AddToEmailBatch(PacketHeader packetHeader, TcpTriggerInterface ipInterface, NotificationEmail email)
         {
             if (!email.Batches.TryGetValue(packetHeader.SourceIP, out EmailBatch batch))
             {
-                RemoveIdleBatches(email);
-                batch = new EmailBatch(email, packetHeader.SourceIP);
+                batch = new EmailBatch();
                 email.Batches.Add(packetHeader.SourceIP, batch);
             }
-            batch.Add(GetLogText(packetHeader), ipInterface);
+
+            if (batch.Detections.Count == 0)
+            {
+                batch.FirstDetection = DateTime.UtcNow;
+            }
+            batch.Detections.Add(GetLogText(packetHeader));
+            if (!batch.Interfaces.Any(existing => existing.IP.Equals(ipInterface.IP)))
+            {
+                batch.Interfaces.Add(ipInterface);
+            }
         }
 
-        // Removes batches with nothing waiting whose rate limit has passed, so old sources don't build up.
-        private static void RemoveIdleBatches(NotificationEmail email)
+        // Sends each email that's due, and removes sources that have nothing left to send.
+        // A source's email is due once the wait time has passed since its first detection
+        // and the rate limit has passed since its last email.
+        public static void SendDueEmails()
         {
-            List<IPAddress> idleSources = email.Batches
-                .Where(pair => pair.Value.IsIdle)
-                .Select(pair => pair.Key)
-                .ToList();
-
-            foreach (IPAddress source in idleSources)
+            DateTime now = DateTime.UtcNow;
+            foreach (NotificationEmail email in Settings.Notifications.OfType<NotificationEmail>())
             {
-                email.Batches[source].Dispose();
-                email.Batches.Remove(source);
+                foreach (KeyValuePair<IPAddress, EmailBatch> pair in email.Batches.ToList())
+                {
+                    EmailBatch batch = pair.Value;
+                    bool isWaitOver = now >= batch.FirstDetection.AddSeconds(email.WaitSeconds);
+                    bool isRateLimitOver = now >= batch.LastSent.AddSeconds(email.RateLimitSeconds);
+
+                    if (batch.Detections.Count > 0 && isWaitOver && isRateLimitOver)
+                    {
+                        SendBatch(email, pair.Key, batch);
+                    }
+                    else if (batch.Detections.Count == 0 && isRateLimitOver)
+                    {
+                        email.Batches.Remove(pair.Key);
+                    }
+                }
             }
+        }
+
+        // Sends every email that's waiting, due or not, so stopping or reloading doesn't lose them.
+        // Returns the sends, so the caller can wait for them.
+        public static Task[] SendAllEmails()
+        {
+            List<Task> sends = new List<Task>();
+            foreach (NotificationEmail email in Settings.Notifications.OfType<NotificationEmail>())
+            {
+                foreach (KeyValuePair<IPAddress, EmailBatch> pair in email.Batches)
+                {
+                    if (pair.Value.Detections.Count > 0)
+                    {
+                        sends.Add(SendBatch(email, pair.Key, pair.Value));
+                    }
+                }
+            }
+            return sends.ToArray();
+        }
+
+        // Starts sending the batch's email on another thread, then empties the batch.
+        // EmailNotifier.SendAsync logs its own errors.
+        private static Task SendBatch(NotificationEmail email, IPAddress sourceIp, EmailBatch batch)
+        {
+            // Copy the batch first, since it's emptied below while the email is still being sent.
+            List<TcpTriggerInterface> interfaces = batch.Interfaces.ToList();
+            List<string> detections = batch.Detections.ToList();
+
+            // Send on a thread-pool thread, so a slow DNS lookup or mail server doesn't hold up the detection queue.
+            Task send = Task.Run(() => EmailNotifier.SendAsync(email, sourceIp, interfaces, detections));
+
+            batch.Detections.Clear();
+            batch.Interfaces.Clear();
+            batch.LastSent = DateTime.UtcNow;
+            return send;
         }
     }
 }
