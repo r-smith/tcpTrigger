@@ -4,14 +4,14 @@ using System.Net.Sockets;
 
 namespace tcpTrigger
 {
-    // Captures incoming packets on a network interface and runs the configured actions for any that match.
+    // Captures incoming packets on a network interface and queues any detections for their notifications.
     internal class PacketListener
     {
         // The raw socket capturing packets. Created by Start and closed by Stop.
         private Socket _socket;
 
-        // Matched packets are queued here for their actions to run.
-        private readonly ActionQueue _actionQueue;
+        // Detections are queued here for their notifications to run.
+        private readonly DetectionQueue _detectionQueue;
 
         // The network interface this listener captures packets on.
         public TcpTriggerInterface Interface { get; }
@@ -20,10 +20,10 @@ namespace tcpTrigger
         private volatile bool _hasFailed;
         public bool HasFailed => _hasFailed;
 
-        public PacketListener(TcpTriggerInterface ipInterface, ActionQueue actionQueue)
+        public PacketListener(TcpTriggerInterface ipInterface, DetectionQueue detectionQueue)
         {
             Interface = ipInterface;
-            _actionQueue = actionQueue;
+            _detectionQueue = detectionQueue;
         }
 
         // Starts capturing packets on the interface. Throws a SocketException if the listener can't start.
@@ -97,18 +97,18 @@ namespace tcpTrigger
             _socket?.Close();
         }
 
-        // Reads the packet header and queues the packet for its actions if it matches a detection rule.
+        // Reads the packet header and queues the packet as a detection if it matches a detection rule.
         private void ProcessPacket(byte[] buffer)
         {
             PacketHeader packetHeader = new PacketHeader(buffer);
 
             packetHeader.MatchType = PacketMatcher.GetMatchType(packetHeader, Interface.IP);
 
-            // Queue matches for the action thread.
+            // Queue detections for the detection queue thread.
             if (packetHeader.MatchType != PacketMatch.None)
             {
                 packetHeader.DestinationMac = Interface.MacAddress;
-                _actionQueue.Add(packetHeader, Interface);
+                _detectionQueue.Add(packetHeader, Interface);
             }
         }
     }

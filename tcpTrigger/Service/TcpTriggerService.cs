@@ -24,8 +24,8 @@ namespace tcpTrigger
         // Timer that checks for network changes and restarts listeners when one is found.
         private System.Timers.Timer _networkCheckTimer;
 
-        // Runs the actions for matched packets on a background thread.
-        private ActionQueue _actionQueue;
+        // Runs the notifications for detections on a background thread.
+        private DetectionQueue _detectionQueue;
 
         // Held while starting monitoring, stopping monitoring, or checking for network changes
         // so they never run at the same time.
@@ -270,16 +270,16 @@ namespace tcpTrigger
             }
         }
 
-        // Starts the action queue thread, the network listeners, and the network change detection.
+        // Starts the detection queue thread, the network listeners, and the network change detection.
         private void StartMonitoring()
         {
             lock (_monitoringLock)
             {
                 _isMonitoring = true;
 
-                // Start the action queue thread.
-                _actionQueue = new ActionQueue();
-                _actionQueue.Start();
+                // Start the detection queue thread.
+                _detectionQueue = new DetectionQueue();
+                _detectionQueue.Start();
 
                 // Start the listeners now, then check every minute for network changes
                 // and restart the listeners when the interfaces change.
@@ -293,7 +293,7 @@ namespace tcpTrigger
             }
         }
 
-        // Stops the network change detection, the network listeners, and the action queue thread.
+        // Stops the network change detection, the network listeners, and the detection queue thread.
         private void StopMonitoring()
         {
             lock (_monitoringLock)
@@ -315,8 +315,8 @@ namespace tcpTrigger
                     listener.Stop();
                 }
 
-                // Let actions already queued finish before stopping.
-                _actionQueue.Stop();
+                // Let detections already queued finish before stopping.
+                _detectionQueue.Stop();
 
                 // Forget the detected interfaces, so the next start begins with a fresh network check.
                 _detectedInterfaces = null;
@@ -448,7 +448,7 @@ namespace tcpTrigger
         // Starts a listener on the interface. Returns null and logs an error if it can't start.
         private PacketListener TryStartListener(TcpTriggerInterface ipInterface)
         {
-            PacketListener listener = new PacketListener(ipInterface, _actionQueue);
+            PacketListener listener = new PacketListener(ipInterface, _detectionQueue);
             try
             {
                 listener.Start();

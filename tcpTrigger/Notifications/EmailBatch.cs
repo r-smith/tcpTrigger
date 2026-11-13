@@ -9,7 +9,7 @@ namespace tcpTrigger
         private readonly TcpTriggerInterface _ipInterface;
         private readonly NotificationEmail _email;
 
-        // Protects _buffer and _sendTimer, which the action thread and the timer both use.
+        // Protects _buffer and _sendTimer, which the detection queue thread and the timer both use.
         private readonly object _lock = new object();
 
         // Detections waiting to be sent in the next email.

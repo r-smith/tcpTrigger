@@ -70,7 +70,7 @@
     <Compile Include="Models\NotificationCommand.cs" />
     <Compile Include="Models\NotificationEmail.cs" />
     <Compile Include="Models\NotificationLogFile.cs" />
-    <Compile Include="Notifications\ActionQueue.cs" />
+    <Compile Include="Notifications\DetectionQueue.cs" />
     <Compile Include="Notifications\ActionRunner.cs" />
     <Compile Include="Configuration\ConfigNames.cs" />
     <Compile Include="Configuration\ConfigPaths.cs" />
