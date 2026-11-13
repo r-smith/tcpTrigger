@@ -201,6 +201,10 @@ namespace tcpTrigger
             }
         }
 
+        // True if any email notification still has emails to send or a rate limit to wait out.
+        public static bool HasEmailBatches =>
+            Settings.Notifications.OfType<NotificationEmail>().Any(email => email.Batches.Count > 0);
+
         // Sends each email that's due, and removes sources that have nothing left to send.
         // A source's email is due once the wait time has passed since its first detection
         // and the rate limit has passed since its last email.

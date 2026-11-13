@@ -12,7 +12,7 @@ namespace tcpTrigger
         // Maximum time Stop waits for queued detections to finish.
         private static readonly TimeSpan s_stopTimeout = TimeSpan.FromSeconds(10);
 
-        // How often the thread checks for emails that are due.
+        // How often the thread checks for emails that are due, while any batches are waiting.
         private static readonly TimeSpan s_emailCheckInterval = TimeSpan.FromSeconds(1);
 
         // Maximum time to wait for the last emails to send when stopping. Less than s_stopTimeout.
@@ -60,7 +60,7 @@ namespace tcpTrigger
         }
 
         // Runs the notifications for each detection (on the background thread) in the order they were queued.
-        // Also sends the emails that are due, checking at least once a second.
+        // Also sends the emails that are due, checking once a second while any batches are waiting.
         private void RunNotifications()
         {
             // The loop ends once Stop is called and the queue is empty.
@@ -68,8 +68,9 @@ namespace tcpTrigger
             {
                 try
                 {
-                    // Wait up to a second for the next detection.
-                    if (_detections.TryTake(out var detection, s_emailCheckInterval))
+                    // Wait for the next detection. If email batches are waiting, wake at least once a second so emails go out on time.
+                    TimeSpan timeout = NotificationRunner.HasEmailBatches ? s_emailCheckInterval : Timeout.InfiniteTimeSpan;
+                    if (_detections.TryTake(out var detection, timeout))
                     {
                         NotificationRunner.Run(detection.Header, detection.Interface);
                     }
