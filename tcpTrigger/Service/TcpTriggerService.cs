@@ -39,9 +39,6 @@ namespace tcpTrigger
             InitializeComponent();
 
             EventLog.Log = "tcpTrigger";
-
-            // Call OnShutdown when the system shuts down.
-            CanShutdown = true;
         }
 
         // Runs the service in a console window for debugging.
@@ -105,13 +102,6 @@ namespace tcpTrigger
             {
                 Logger.Write("The tcpTrigger service stopped successfully.", Logger.EventCode.ServiceStopped);
             }
-        }
-
-        // Called by Windows when the system is shutting down or restarting.
-        protected override void OnShutdown()
-        {
-            Logger.Write("The tcpTrigger service is stopping because Windows is shutting down.", Logger.EventCode.ServiceShuttingDown);
-            OnStop();
         }
 
         // Called by Windows when a custom command is sent to the tcpTrigger service.

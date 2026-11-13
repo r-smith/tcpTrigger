@@ -15,7 +15,6 @@ namespace tcpTrigger
             ServiceStarting = 90,
             ServiceStopped = 91,
             ServiceStoppedOnError = 92,
-            ServiceShuttingDown = 93,
             ConfigurationApplied = 100,
             NetworkChangeDetected = 101,
             NetworkInterfaces = 102,
