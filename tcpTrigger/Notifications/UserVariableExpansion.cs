@@ -12,6 +12,7 @@ namespace tcpTrigger
         public const string SourceIp = "{SOURCE_IP}";
         public const string SourcePort = "{SOURCE_PORT}";
         public const string SourceHostname = "{SOURCE_HOSTNAME}";
+        public const string SourceOsGuess = "{SOURCE_OS_GUESS}";
         public const string DestinationIp = "{DESTINATION_IP}";
         public const string DestinationPort = "{DESTINATION_PORT}";
         public const string DestinationHostname = "{DESTINATION_HOSTNAME}";
@@ -45,6 +46,7 @@ namespace tcpTrigger
             message = message.Replace(TcpFlags, header.TcpFlagNames);
             message = message.Replace(IcmpType, header.MatchType == PacketMatch.IcmpRequest ? header.IcmpTypeName : string.Empty);
             message = message.Replace(Ttl, header.Ttl.ToString());
+            message = message.Replace(SourceOsGuess, GetSourceOsGuess(header.Ttl));
             message = message.Replace(Timestamp, header.Timestamp.ToString(Settings.TimestampFormat));
             message = message.Replace(DetectionType, ConnectionDetectionType);
             message = message.Replace(Protocol, header.MatchTypeName);
@@ -75,6 +77,7 @@ namespace tcpTrigger
             {
                 message = message.Replace(SourceHostname, GetHostname(sourceIp));
             }
+            message = message.Replace(SourceOsGuess, string.Join(", ", detections.Select(d => GetSourceOsGuess(d.Ttl)).Distinct()));
             message = message.Replace(DestinationIp, destinationIps);
             message = message.Replace(OldInterfaceIp, destinationIps);
             message = message.Replace(DestinationMac, destinationMacs);
@@ -132,6 +135,20 @@ namespace tcpTrigger
                 : Enumerable.Empty<string>();
 
             return string.Join(", ", tcp.Concat(udp).Concat(icmp));
+        }
+
+        // Guesses the source's OS from the packet's TTL. Each OS starts packets at a fixed TTL.
+        private static string GetSourceOsGuess(byte ttl)
+        {
+            if (ttl <= 64)
+            {
+                return "Linux/macOS/Unix";
+            }
+            if (ttl <= 128)
+            {
+                return "Windows";
+            }
+            return "Network device";
         }
 
         // Looks up the address's hostname in DNS. Returns an empty string if the lookup fails.
