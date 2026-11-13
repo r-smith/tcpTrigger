@@ -13,10 +13,9 @@ namespace tcpTrigger.GUI
         [STAThread]
         public static void Main()
         {
-            // Arguments starting with "--" are administrator tasks. The GUI launches an
-            // elevated copy of itself to run one, and that copy exits without showing a window.
+            // If this is an elevated copy launched for an administrator task, run the task and exit.
             string[] args = Environment.GetCommandLineArgs();
-            if (args.Length > 1 && args[1].StartsWith("--"))
+            if (args.Length > 1 && IsAdministratorTask(args[1]))
             {
                 Environment.Exit(RunAdministratorTask(args));
             }
@@ -39,7 +38,15 @@ namespace tcpTrigger.GUI
             }
         }
 
-        // Returns one of the CommandLineArgs exit codes.
+        // True if the argument is one of the tasks that RunAdministratorTask runs.
+        private static bool IsAdministratorTask(string arg)
+        {
+            return arg == CommandLineArgs.StartService
+                || arg == CommandLineArgs.StopService
+                || arg == CommandLineArgs.SaveConfig;
+        }
+
+        // Runs the administrator task in args[1]. Returns an exit code, which the GUI checks.
         private static int RunAdministratorTask(string[] args)
         {
             if (!IsElevated())
