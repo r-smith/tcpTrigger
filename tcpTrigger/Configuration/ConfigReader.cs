@@ -45,7 +45,7 @@ namespace tcpTrigger
 
                     ReadExcludedInterfaces(xd);
 
-                    // Legacy values, if present, override the values above.
+                    // Values from version 1.3.5 and earlier, if present, override the values above.
                     ReadLegacyEnabledComponents(xd);
                     ReadLegacyMonitoredPorts(xd);
                     ReadLegacyEndpointIgnoreList(xd);
@@ -160,7 +160,7 @@ namespace tcpTrigger
             Settings.ExcludedNetworkInterfaces = new HashSet<string>(ReadList(xd, ConfigNames.NetworkInterfaceExcludeListDeviceGuid));
         }
 
-        // ----- Legacy format -----
+        // ----- Legacy format: version 1.3.5 and earlier -----
         // Missing values keep what was read from the current format.
 
         // tcpTrigger/enabledComponents

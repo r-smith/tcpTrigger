@@ -14,12 +14,15 @@ namespace tcpTrigger
         public static bool IsDetectTcpEnabled { get; internal set; }
         public static bool IsDetectUdpEnabled { get; internal set; }
         public static bool IsDetectIcmpEnabled { get; internal set; }
+
+        // Legacy <monitoredPorts>, version 1.3.5 and earlier.
         public static HashSet<ushort> TcpPortsToMonitor { get; internal set; }
         public static string TcpPortsToInclude { get; internal set; }
         public static string TcpPortsToExclude { get; internal set; }
         public static HashSet<ushort> UdpPortsToMonitor { get; internal set; }
         public static string UdpPortsToInclude { get; internal set; }
         public static string UdpPortsToExclude { get; internal set; }
+
         public static HashSet<string> ExcludedNetworkInterfaces { get; internal set; } = new HashSet<string>();
         public static List<Notification> Notifications { get; internal set; } = new List<Notification>();
         public static List<IgnoreRule> IgnoreRules { get; internal set; } = new List<IgnoreRule>();

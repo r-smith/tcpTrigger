@@ -17,7 +17,7 @@
         public const string Notifications = "/tcpTrigger/notifications/notification";
         public const string IgnoreRules = "/tcpTrigger/ignoreRules/rule";
 
-        // ----- Legacy format -----
+        // ----- Legacy format: version 1.3.5 and earlier -----
         // NetworkInterfaceExcludeListDeviceGuid is also used by the current format.
 
         public const string EnabledComponentsTcp = "/tcpTrigger/enabledComponents/tcp";
