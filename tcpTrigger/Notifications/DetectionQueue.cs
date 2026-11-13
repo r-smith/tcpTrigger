@@ -18,9 +18,8 @@ namespace tcpTrigger
         // Maximum time to wait for the last emails to send when stopping. Less than s_stopTimeout.
         private static readonly TimeSpan s_lastEmailsTimeout = TimeSpan.FromSeconds(5);
 
-        // Detections waiting for their notifications to run, with the interface each was captured on.
-        private readonly BlockingCollection<(PacketHeader Header, TcpTriggerInterface Interface)> _detections =
-            new BlockingCollection<(PacketHeader Header, TcpTriggerInterface Interface)>();
+        // Detections waiting for their notifications to run.
+        private readonly BlockingCollection<PacketHeader> _detections = new BlockingCollection<PacketHeader>();
         private Thread _worker;
 
         // Starts the background thread that runs notifications.
@@ -35,11 +34,11 @@ namespace tcpTrigger
         }
 
         // Queues a detection. Called by the packet listeners.
-        public void Add(PacketHeader header, TcpTriggerInterface ipInterface)
+        public void Add(PacketHeader header)
         {
             try
             {
-                _detections.Add((header, ipInterface));
+                _detections.Add(header);
             }
             catch (InvalidOperationException)
             {
@@ -70,9 +69,9 @@ namespace tcpTrigger
                 {
                     // Wait for the next detection. If email batches are waiting, wake at least once a second so emails go out on time.
                     TimeSpan timeout = NotificationRunner.HasEmailBatches ? s_emailCheckInterval : Timeout.InfiniteTimeSpan;
-                    if (_detections.TryTake(out var detection, timeout))
+                    if (_detections.TryTake(out PacketHeader detection, timeout))
                     {
-                        NotificationRunner.Run(detection.Header, detection.Interface);
+                        NotificationRunner.Run(detection);
                     }
                     NotificationRunner.SendDueEmails();
                 }

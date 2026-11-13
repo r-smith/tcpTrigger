@@ -108,7 +108,7 @@ namespace tcpTrigger
             if (packetHeader.MatchType != PacketMatch.None)
             {
                 packetHeader.DestinationMac = Interface.MacAddress;
-                _detectionQueue.Add(packetHeader, Interface);
+                _detectionQueue.Add(packetHeader);
             }
         }
     }

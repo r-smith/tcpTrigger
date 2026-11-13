@@ -15,7 +15,7 @@ namespace tcpTrigger
         private static readonly object s_logFileLock = new object();
 
         // Writes the detection to the event log, then runs each notification.
-        public static void Run(PacketHeader packetHeader, TcpTriggerInterface ipInterface)
+        public static void Run(PacketHeader packetHeader)
         {
             WriteEventLog(packetHeader);
 
