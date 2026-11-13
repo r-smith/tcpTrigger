@@ -8,9 +8,9 @@ namespace tcpTrigger.GUI.Models
         public const int DefaultWaitSeconds = 30;
 
         // Filled in for each new email notification.
-        public const string DefaultSubject = "Alert: Suspicious network activity";
+        public const string DefaultSubject = "Alert: Suspicious network activity from {SOURCE_IP}";
         public const string DefaultBody =
-            "Network connections to {INTERFACE_IP} are being monitored. The following activity was detected:\r\n"
+            "The following activity from {SOURCE_IP} was detected:\r\n"
             + "\r\n"
             + "{CONNECTION_LOG}";
 
