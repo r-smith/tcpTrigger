@@ -68,6 +68,7 @@
   <ItemGroup>
     <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\NotificationCommand.cs" />
+    <Compile Include="Models\NotificationEmail.cs" />
     <Compile Include="Models\NotificationLogFile.cs" />
     <Compile Include="Notifications\ActionQueue.cs" />
     <Compile Include="Notifications\ActionRunner.cs" />
