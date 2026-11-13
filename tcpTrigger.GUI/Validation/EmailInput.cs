@@ -8,11 +8,11 @@ namespace tcpTrigger.GUI.Validation
     // Parsing and validation for email notification fields.
     internal static class EmailInput
     {
-        // Rate limiting and buffering can't be turned off, so the minimum is 1 second.
+        // Rate limiting and waiting can't be turned off, so the minimum is 1 second.
         public const int MinRateLimitSeconds = 1;
         public const int MaxRateLimitSeconds = 86400; // 24 hours
-        public const int MinBufferSeconds = 1;
-        public const int MaxBufferSeconds = 600; // 10 minutes
+        public const int MinWaitSeconds = 1;
+        public const int MaxWaitSeconds = 600; // 10 minutes
 
         // Recipients are separated by commas or semicolons.
         public static List<string> ParseRecipients(string recipients)
@@ -63,9 +63,9 @@ namespace tcpTrigger.GUI.Validation
             return int.TryParse(rateLimit, out int seconds) && seconds >= MinRateLimitSeconds && seconds <= MaxRateLimitSeconds;
         }
 
-        public static bool IsValidBufferSeconds(string buffer)
+        public static bool IsValidWaitSeconds(string value)
         {
-            return int.TryParse(buffer, out int seconds) && seconds >= MinBufferSeconds && seconds <= MaxBufferSeconds;
+            return int.TryParse(value, out int seconds) && seconds >= MinWaitSeconds && seconds <= MaxWaitSeconds;
         }
     }
 }

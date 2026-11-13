@@ -143,7 +143,7 @@ namespace tcpTrigger.GUI.Configuration
             writer.WriteElementString("subject", email.Subject);
             writer.WriteElementString("body", email.Body);
             writer.WriteElementString("rateLimitSeconds", XmlConvert.ToString(email.RateLimitSeconds));
-            writer.WriteElementString("bufferSeconds", XmlConvert.ToString(email.BufferSeconds));
+            writer.WriteElementString("waitSeconds", XmlConvert.ToString(email.WaitSeconds));
             writer.WriteEndElement(); // End: notification
         }
 

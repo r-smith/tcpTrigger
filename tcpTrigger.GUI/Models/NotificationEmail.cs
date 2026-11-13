@@ -5,7 +5,7 @@ namespace tcpTrigger.GUI.Models
     public class NotificationEmail : Notification
     {
         public const int DefaultRateLimitSeconds = 300;
-        public const int DefaultBufferSeconds = 30;
+        public const int DefaultWaitSeconds = 30;
 
         // Filled in for each new email notification.
         public const string DefaultSubject = "Alert: Suspicious network activity";
@@ -19,7 +19,7 @@ namespace tcpTrigger.GUI.Models
             Type = NotificationType.Email;
             Name = "Send email";
             RateLimitSeconds = DefaultRateLimitSeconds;
-            BufferSeconds = DefaultBufferSeconds;
+            WaitSeconds = DefaultWaitSeconds;
         }
 
         public string SmtpServer { get; set; }
@@ -33,6 +33,6 @@ namespace tcpTrigger.GUI.Models
         public string Subject { get; set; }
         public string Body { get; set; }
         public int RateLimitSeconds { get; set; }
-        public int BufferSeconds { get; set; }
+        public int WaitSeconds { get; set; }
     }
 }

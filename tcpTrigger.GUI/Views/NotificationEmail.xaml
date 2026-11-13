@@ -233,7 +233,7 @@
                 </Grid>
             </StackPanel>
 
-            <!-- Sending: rate limit and buffer -->
+            <!-- Sending: rate limit and wait seconds -->
             <TextBlock Text="Sending"
                        Style="{StaticResource SectionHeading}"
                        Margin="0,40,0,1"/>
@@ -250,13 +250,13 @@
                     <TextBlock Text="seconds"
                                Padding="11,0,0,0"/>
                 </StackPanel>
-                <!-- Buffer -->
+                <!-- Wait -->
                 <StackPanel Orientation="Horizontal"
                             Margin="0,12,0,0">
                     <TextBlock Text="Wait"/>
                     <TextBox Width="65"
-                             x:Name="BufferSeconds"
-                             Text="{Binding BufferSeconds, Mode=OneWay}"
+                             x:Name="WaitSeconds"
+                             Text="{Binding WaitSeconds, Mode=OneWay}"
                              Padding="5,7"
                              MaxLength="5"/>
                     <TextBlock Text="seconds to collect detections before sending"

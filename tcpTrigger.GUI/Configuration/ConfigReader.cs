@@ -111,7 +111,7 @@ namespace tcpTrigger.GUI.Configuration
                             Body = ReadString(node, "body"),
                             // A value of 0 or less is treated as 1 second.
                             RateLimitSeconds = Math.Max(1, ReadInt(node, "rateLimitSeconds", NotificationEmail.DefaultRateLimitSeconds)),
-                            BufferSeconds = Math.Max(1, ReadInt(node, "bufferSeconds", NotificationEmail.DefaultBufferSeconds)),
+                            WaitSeconds = Math.Max(1, ReadInt(node, "waitSeconds", NotificationEmail.DefaultWaitSeconds)),
                         });
                         break;
                     default:
@@ -273,7 +273,7 @@ namespace tcpTrigger.GUI.Configuration
                 Body = ReadString(xd, ConfigNames.EmailMessageBody),
                 // A value of 0 or less is treated as 1 second.
                 RateLimitSeconds = Math.Max(1, ReadInt(xd, ConfigNames.EmailOptionsRateLimitSeconds, NotificationEmail.DefaultRateLimitSeconds)),
-                BufferSeconds = Math.Max(1, ReadInt(xd, ConfigNames.EmailOptionsBufferSeconds, NotificationEmail.DefaultBufferSeconds)),
+                WaitSeconds = Math.Max(1, ReadInt(xd, ConfigNames.EmailOptionsBufferSeconds, NotificationEmail.DefaultWaitSeconds)),
             });
         }
 

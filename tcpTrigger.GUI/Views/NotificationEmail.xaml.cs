@@ -67,9 +67,9 @@ namespace tcpTrigger.GUI.Views
                 {
                     notification.RateLimitSeconds = rateLimit;
                 }
-                if (int.TryParse(BufferSeconds.Text, out int buffer))
+                if (int.TryParse(WaitSeconds.Text, out int seconds))
                 {
-                    notification.BufferSeconds = buffer;
+                    notification.WaitSeconds = seconds;
                 }
             }
 
@@ -136,12 +136,12 @@ namespace tcpTrigger.GUI.Views
                     RateLimitSeconds);
             }
 
-            if (!EmailInput.IsValidBufferSeconds(BufferSeconds.Text))
+            if (!EmailInput.IsValidWaitSeconds(WaitSeconds.Text))
             {
                 return ValidationOutcome.Invalid(
-                    $"Please enter how long to collect detections before sending, between {EmailInput.MinBufferSeconds} and {EmailInput.MaxBufferSeconds} seconds.{Environment.NewLine}{Environment.NewLine}"
-                    + $"The default is {Models.NotificationEmail.DefaultBufferSeconds} seconds.",
-                    BufferSeconds);
+                    $"Please enter how long to collect detections before sending, between {EmailInput.MinWaitSeconds} and {EmailInput.MaxWaitSeconds} seconds.{Environment.NewLine}{Environment.NewLine}"
+                    + $"The default is {Models.NotificationEmail.DefaultWaitSeconds} seconds.",
+                    WaitSeconds);
             }
 
             return ValidationOutcome.ValidResult;
