@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
@@ -7,6 +8,7 @@ namespace tcpTrigger
     // Replaces {VARIABLE} placeholders in user-configured text with details of a detection.
     internal static class UserVariableExpansion
     {
+        public const string SensorName = "{SENSOR_NAME}";
         public const string SourceIp = "{SOURCE_IP}";
         public const string SourcePort = "{SOURCE_PORT}";
         public const string SourceHostname = "{SOURCE_HOSTNAME}";
@@ -26,6 +28,7 @@ namespace tcpTrigger
         // Replaces the variables for a command: the details of one detection.
         public static string GetExpandedString(string message, PacketHeader header)
         {
+            message = message.Replace(SensorName, Environment.MachineName);
             message = message.Replace(SourceIp, header.SourceIP?.ToString());
             message = message.Replace(SourcePort, header.SourcePort.ToString());
             message = message.Replace(DestinationIp, header.DestinationIP?.ToString());
@@ -54,6 +57,7 @@ namespace tcpTrigger
             string destinationIps = string.Join(", ", interfaces.Select(i => i.IP));
             string destinationMacs = string.Join(", ", interfaces.Select(i => i.MacAddressAsString));
 
+            message = message.Replace(SensorName, Environment.MachineName);
             message = message.Replace(SourceIp, sourceIp?.ToString());
             if (message.Contains(SourceHostname))
             {
