@@ -48,7 +48,7 @@ namespace tcpTrigger
             {
                 Logger.WriteError(
                     $"tcpTrigger stopped before all queued detections finished. Notifications for detections still queued after {s_stopTimeout.TotalSeconds} seconds were not run.",
-                    Logger.EventCode.QueuedActionsDropped);
+                    Logger.EventCode.QueuedDetectionsDropped);
             }
         }
 
@@ -67,7 +67,7 @@ namespace tcpTrigger
                     Logger.WriteError(
                         "tcpTrigger failed to run the notifications for a detection."
                         + $"{Environment.NewLine}{Environment.NewLine}{ex.GetType().Name}: {ex.Message}",
-                        Logger.EventCode.ActionFailed);
+                        Logger.EventCode.NotificationFailed);
                 }
             }
         }

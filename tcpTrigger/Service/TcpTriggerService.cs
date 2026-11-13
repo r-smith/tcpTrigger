@@ -233,7 +233,7 @@ namespace tcpTrigger
                         Logger.WriteWarning(
                             $"{name} has been disabled because no command path is set. "
                             + "Update your tcpTrigger configuration with the command to run.",
-                            Logger.EventCode.LaunchAppPathMissing);
+                            Logger.EventCode.CommandPathMissing);
                         return false;
                     }
                     return true;

@@ -23,16 +23,16 @@ namespace tcpTrigger
             LogRotated = 104,
             InterfaceMonitoringResumed = 105,
             EmailSent = 110,
-            MatchedIcmp = 200,
-            MatchedTcp = 201,
-            MatchedUdp = 202,
+            DetectedIcmp = 200,
+            DetectedTcp = 201,
+            DetectedUdp = 202,
             LogPathInaccessible = 300,
-            LaunchAppPathMissing = 301,
+            CommandPathMissing = 301,
             EmailSettingsIncomplete = 302,
             IgnoreRuleInvalid = 303,
             StartFailed = 400,
             ReloadFailed = 401,
-            QueuedActionsDropped = 402,
+            QueuedDetectionsDropped = 402,
             InterfaceBindFailed = 410,
             InterfaceMonitoringStopped = 411,
             NoInterfacesMonitored = 412,
@@ -40,9 +40,9 @@ namespace tcpTrigger
             LogWriteFailed = 420,
             LogRotationFailed = 421,
             EmailSendFailed = 430,
-            LaunchAppFailed = 440,
+            CommandFailed = 440,
             PacketProcessingFailed = 450,
-            ActionFailed = 451,
+            NotificationFailed = 451,
         }
 
         // The event log rejects messages longer than 31,839 bytes. Leave room for the message.
@@ -53,9 +53,9 @@ namespace tcpTrigger
         {
             EventCode.LogWriteFailed,
             EventCode.EmailSendFailed,
-            EventCode.LaunchAppFailed,
+            EventCode.CommandFailed,
             EventCode.PacketProcessingFailed,
-            EventCode.ActionFailed,
+            EventCode.NotificationFailed,
         };
 
         private static readonly TimeSpan s_repeatWindow = TimeSpan.FromMinutes(5);

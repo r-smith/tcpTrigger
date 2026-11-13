@@ -131,7 +131,7 @@ namespace tcpTrigger
                         + $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}{Environment.NewLine}"
                         + $"TTL: {packetHeader.Ttl}{Environment.NewLine}"
                         + $"ICMP type: {packetHeader.IcmpTypeName}",
-                        Logger.EventCode.MatchedIcmp);
+                        Logger.EventCode.DetectedIcmp);
                     break;
                 case PacketMatch.TcpConnect:
                     Logger.Write(
@@ -143,7 +143,7 @@ namespace tcpTrigger
                         + $"Destination port: {packetHeader.DestinationPort}{Environment.NewLine}{Environment.NewLine}"
                         + $"TTL: {packetHeader.Ttl}{Environment.NewLine}"
                         + $"TCP flags: {packetHeader.TcpFlagNames}",
-                        Logger.EventCode.MatchedTcp);
+                        Logger.EventCode.DetectedTcp);
                     break;
                 case PacketMatch.UdpCommunication:
                     Logger.Write(
@@ -154,7 +154,7 @@ namespace tcpTrigger
                         + $"Destination IP: {packetHeader.DestinationIP}{Environment.NewLine}"
                         + $"Destination port: {packetHeader.DestinationPort}{Environment.NewLine}{Environment.NewLine}"
                         + $"TTL: {packetHeader.Ttl}",
-                        Logger.EventCode.MatchedUdp);
+                        Logger.EventCode.DetectedUdp);
                     break;
             }
         }
@@ -173,7 +173,7 @@ namespace tcpTrigger
                 Logger.WriteError(
                     $"tcpTrigger failed to run the command '{command.Path}' for a detection."
                     + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                    Logger.EventCode.LaunchAppFailed);
+                    Logger.EventCode.CommandFailed);
             }
         }
 
