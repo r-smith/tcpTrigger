@@ -110,7 +110,7 @@ namespace tcpTrigger.GUI.Views
             }
             else
             {
-                _selectedIgnoreRule.Services = IgnoreRuleInput.ParseLines(ServiceList.Text);
+                _selectedIgnoreRule.Services = IgnoreRuleInput.SortServices(IgnoreRuleInput.ParseLines(ServiceList.Text));
             }
         }
 

@@ -95,6 +95,7 @@
     <Compile Include="Validation\IgnoreRuleInput.cs" />
     <Compile Include="Validation\PathInput.cs" />
     <Compile Include="Validation\PortList.cs" />
+    <Compile Include="Validation\ServiceComparer.cs" />
     <Compile Include="Views\Dialogs\DialogMessage.xaml.cs">
       <DependentUpon>DialogMessage.xaml</DependentUpon>
     </Compile>

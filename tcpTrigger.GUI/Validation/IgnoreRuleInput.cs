@@ -26,6 +26,12 @@ namespace tcpTrigger.GUI.Validation
             return addresses;
         }
 
+        public static List<string> SortServices(List<string> services)
+        {
+            services.Sort(new ServiceComparer());
+            return services;
+        }
+
         // Returns the first entry that isn't a valid IP address, or null if every entry is valid.
         public static string GetFirstInvalidAddress(string text)
         {
