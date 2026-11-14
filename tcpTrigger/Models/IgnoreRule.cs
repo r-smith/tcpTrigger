@@ -137,7 +137,7 @@ namespace tcpTrigger
         }
 
         // Parses "any", a protocol (tcp, udp, icmp), a port (443), a port range (8000-9000),
-        // or either of those with "tcp:" or "udp:" in front. A port without a protocol is for TCP and UDP.
+        // or either of those with "tcp:" or "udp:" in front. A port without a protocol is a TCP port.
         // Returns null if the entry isn't valid.
         private static ServiceRange ParseService(string entry)
         {
@@ -153,17 +153,15 @@ namespace tcpTrigger
                     return new ServiceRange(isTcp: false, isUdp: false, isIcmp: true, ushort.MinValue, ushort.MaxValue);
             }
 
-            bool isTcp = true;
-            bool isUdp = true;
+            bool isUdp = false;
             string ports = entry;
             if (entry.StartsWith("tcp:", StringComparison.Ordinal))
             {
-                isUdp = false;
                 ports = entry.Substring("tcp:".Length);
             }
             else if (entry.StartsWith("udp:", StringComparison.Ordinal))
             {
-                isTcp = false;
+                isUdp = true;
                 ports = entry.Substring("udp:".Length);
             }
 
@@ -175,7 +173,7 @@ namespace tcpTrigger
             {
                 return null;
             }
-            return new ServiceRange(isTcp, isUdp, isIcmp: false, start, end);
+            return new ServiceRange(isTcp: !isUdp, isUdp, isIcmp: false, start, end);
         }
 
         // Converts an IPv4 address to a number. Returns false if it isn't valid.
