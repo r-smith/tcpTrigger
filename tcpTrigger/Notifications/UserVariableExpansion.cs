@@ -99,19 +99,19 @@ namespace tcpTrigger
             switch (packetHeader.MatchType)
             {
                 case PacketMatch.TcpConnect:
-                    logText = $"TCP connection to port {packetHeader.DestinationPort} from {packetHeader.SourceIP}";
+                    logText = $"Tried connecting to TCP port {packetHeader.DestinationPort} on {packetHeader.DestinationIP}";
                     break;
                 case PacketMatch.UdpCommunication:
-                    logText = $"UDP communication to port {packetHeader.DestinationPort} from {packetHeader.SourceIP}";
+                    logText = $"Sent a UDP packet to port {packetHeader.DestinationPort} on {packetHeader.DestinationIP}";
                     break;
                 case PacketMatch.IcmpRequest:
-                    logText = $"ICMP {packetHeader.IcmpTypeName} request from {packetHeader.SourceIP}";
+                    logText = $"Sent an ICMP {packetHeader.IcmpTypeName} request to {packetHeader.DestinationIP}";
                     break;
                 default:
                     logText = string.Empty;
                     break;
             }
-            return $"{packetHeader.Timestamp.ToString(Settings.TimestampFormat)} [{packetHeader.DestinationIP}] {logText}";
+            return $"{packetHeader.Timestamp.ToString(Settings.TimestampFormat)}  {logText}";
         }
 
         // Returns the services in the detections, each listed once, in ignore rule syntax:
