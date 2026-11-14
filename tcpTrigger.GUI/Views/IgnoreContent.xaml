@@ -215,7 +215,7 @@
                          AutomationProperties.Name="Ports and protocols"
                          Style="{StaticResource ListInput}"/>
                 <TextBlock Grid.Row="2"
-                           Text="One per line, such as 443, icmp, 8000-9000, udp:53, or tcp:20-80"
+                           Text="One per line, such as 443, 8000-9000, icmp, or udp:53. Ports are TCP unless they start with udp:"
                            Style="{StaticResource HintText}"/>
             </Grid>
         </UniformGrid>

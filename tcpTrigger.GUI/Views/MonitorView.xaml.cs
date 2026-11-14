@@ -439,7 +439,7 @@ namespace tcpTrigger.GUI.Views
             switch (detection.Type)
             {
                 case MatchType.TCP:
-                    return $"tcp:{detection.DestinationPort}";
+                    return detection.DestinationPort.ToString();
                 case MatchType.UDP:
                     return $"udp:{detection.DestinationPort}";
                 case MatchType.ICMP:

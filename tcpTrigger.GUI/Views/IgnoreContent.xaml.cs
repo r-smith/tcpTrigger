@@ -177,10 +177,9 @@ namespace tcpTrigger.GUI.Views
         private static readonly string s_serviceFormatHelp =
             "Enter one per line, as:" + Environment.NewLine
             + "- A protocol: icmp, tcp, or udp" + Environment.NewLine
-            + "- A port, such as 443" + Environment.NewLine
-            + "- A port range, such as 8000-9000" + Environment.NewLine
-            + "- A protocol and port, such as udp:53" + Environment.NewLine
-            + "- A protocol and port range, such as tcp:20-80";
+            + "- A TCP port, such as 443" + Environment.NewLine
+            + "- A TCP port range, such as 8000-9000" + Environment.NewLine
+            + "- A UDP port or port range, such as udp:53 or udp:5000-6000";
 
         // Each choice set to "specific" shows its list box. The boxes sit side by side, one column
         // each, but there are always at least two columns, so a single box stays the same width.

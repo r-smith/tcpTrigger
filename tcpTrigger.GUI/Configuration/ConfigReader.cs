@@ -210,10 +210,24 @@ namespace tcpTrigger.GUI.Configuration
                         IsEnabled = true,
                         Name = node.Attributes["comment"]?.Value,
                         Sources = new List<string> { node.InnerText },
-                        Services = new List<string> { string.IsNullOrEmpty(portAttr) ? "any" : portAttr },
+                        Services = GetLegacyServices(portAttr),
                     });
                 }
             }
+        }
+
+        // Version 1.3.5 and earlier applied a port to both TCP and UDP.
+        private static List<string> GetLegacyServices(string port)
+        {
+            if (string.IsNullOrEmpty(port))
+            {
+                return new List<string> { "any" };
+            }
+            if (port.Equals("icmp", StringComparison.OrdinalIgnoreCase))
+            {
+                return new List<string> { "icmp" };
+            }
+            return new List<string> { "tcp:" + port, "udp:" + port };
         }
 
         // tcpTrigger/enabledActions/log + tcpTrigger/actionSettings

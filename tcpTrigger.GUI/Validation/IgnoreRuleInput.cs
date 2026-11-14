@@ -117,7 +117,7 @@ namespace tcpTrigger.GUI.Validation
         {
             // Valid service formats include:
             // - Protocol name (tcp, udp, icmp).
-            // - Single port number (443).
+            // - Single port number (443). A port without a protocol is a TCP port.
             // - Port range (8000-9000).
             // - Protocol and single port (udp:53).
             // - Protocol and port range (tcp:8000-9000).

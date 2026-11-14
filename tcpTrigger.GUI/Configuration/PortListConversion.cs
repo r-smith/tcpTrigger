@@ -37,13 +37,16 @@ namespace tcpTrigger.GUI.Configuration
                 return null;
             }
 
+            // TCP ports are written without a protocol prefix.
+            string prefix = protocol == "udp" ? "udp:" : string.Empty;
+
             DateTime now = DateTime.Now;
             return new IgnoreRule
             {
                 IsEnabled = true,
                 Name = GetName(protocol.ToUpperInvariant(), isAllPorts, exclude, watched),
                 Sources = new List<string> { "any" },
-                Services = ignoredRanges.Select(range => $"{protocol}:{range}").ToList(),
+                Services = ignoredRanges.Select(range => prefix + range).ToList(),
                 Created = now,
                 Modified = now
             };
