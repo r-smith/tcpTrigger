@@ -30,6 +30,9 @@ namespace tcpTrigger
         // The {DETECTION_TYPE} of TCP, UDP, and ICMP detections.
         private const string ConnectionDetectionType = "Connection";
 
+        // More services than this are given as a count for each protocol, such as "1,000 TCP ports".
+        private const int MaxListedServices = 15;
+
         // Names used by version 1.3.5 and earlier. Still replaced so their configurations keep working.
         private const string OldConnectionLog = "{CONNECTION_LOG}";
         private const string OldInterfaceIp = "{INTERFACE_IP}";
@@ -116,25 +119,53 @@ namespace tcpTrigger
 
         // Returns the services in the detections, each listed once, in ignore rule syntax:
         // TCP ports lowest first, then UDP ports, then icmp. For example, "tcp:22, tcp:443, udp:53, icmp".
+        // If there are more than MaxListedServices, the ports are counted instead, such as "1,000 TCP ports, icmp".
         private static string GetDestinationServices(List<PacketHeader> detections)
         {
-            IEnumerable<string> tcp = detections
-                .Where(d => d.MatchType == PacketMatch.TcpConnect)
-                .Select(d => d.DestinationPort)
-                .Distinct()
-                .OrderBy(port => port)
-                .Select(port => $"tcp:{port}");
-            IEnumerable<string> udp = detections
-                .Where(d => d.MatchType == PacketMatch.UdpCommunication)
-                .Select(d => d.DestinationPort)
-                .Distinct()
-                .OrderBy(port => port)
-                .Select(port => $"udp:{port}");
-            IEnumerable<string> icmp = detections.Any(d => d.MatchType == PacketMatch.IcmpRequest)
-                ? new[] { "icmp" }
-                : Enumerable.Empty<string>();
+            List<ushort> tcpPorts = GetDistinctPorts(detections, PacketMatch.TcpConnect);
+            List<ushort> udpPorts = GetDistinctPorts(detections, PacketMatch.UdpCommunication);
+            bool hasIcmp = detections.Any(d => d.MatchType == PacketMatch.IcmpRequest);
 
-            return string.Join(", ", tcp.Concat(udp).Concat(icmp));
+            List<string> services = new List<string>();
+            if (tcpPorts.Count + udpPorts.Count + (hasIcmp ? 1 : 0) <= MaxListedServices)
+            {
+                services.AddRange(tcpPorts.Select(port => $"tcp:{port}"));
+                services.AddRange(udpPorts.Select(port => $"udp:{port}"));
+            }
+            else
+            {
+                if (tcpPorts.Count > 0)
+                {
+                    services.Add(GetPortCount(tcpPorts.Count, "TCP"));
+                }
+                if (udpPorts.Count > 0)
+                {
+                    services.Add(GetPortCount(udpPorts.Count, "UDP"));
+                }
+            }
+            if (hasIcmp)
+            {
+                services.Add("icmp");
+            }
+
+            return string.Join(", ", services);
+        }
+
+        // Returns the destination ports of one type of detection, each listed once.
+        private static List<ushort> GetDistinctPorts(List<PacketHeader> detections, PacketMatch matchType)
+        {
+            return detections
+                .Where(d => d.MatchType == matchType)
+                .Select(d => d.DestinationPort)
+                .Distinct()
+                .OrderBy(port => port)
+                .ToList();
+        }
+
+        // Returns a count of ports, such as "1 UDP port" or "1,000 TCP ports".
+        private static string GetPortCount(int count, string protocol)
+        {
+            return count == 1 ? $"1 {protocol} port" : $"{count:N0} {protocol} ports";
         }
 
         // Guesses the source's OS from the packet's TTL. Each OS starts packets at a fixed TTL.
