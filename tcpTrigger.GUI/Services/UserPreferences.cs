@@ -53,8 +53,16 @@ namespace tcpTrigger.GUI.Services
                 EventLogFromDate = string.Empty;
             }
 
-            // Not stored in the registry. The shortcut in the Startup folder is the setting.
-            LaunchAtLogon = StartupShortcut.Exists();
+            // Launch at sign-in is stored in the Run registry key, so it's read separately.
+            StartupEntry.ReplaceOldShortcut();
+            try
+            {
+                LaunchAtLogon = StartupEntry.Exists();
+            }
+            catch
+            {
+                // The Run key couldn't be read. Launch at sign-in shows as off.
+            }
         }
 
         public static void SetExitToTray(bool value)

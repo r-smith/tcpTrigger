@@ -73,7 +73,6 @@
     <Compile Include="Configuration\PortListConversion.cs" />
     <Compile Include="Configuration\ServiceConfig.cs" />
     <Compile Include="Interop\NativeMethods.cs" />
-    <Compile Include="Interop\ShellLink.cs" />
     <Compile Include="Interop\WindowInterop.cs" />
     <Compile Include="Models\DetectionEvent.cs" />
     <Compile Include="Models\IgnoreRule.cs" />
@@ -89,7 +88,7 @@
     <Compile Include="Services\ElevatedCommand.cs" />
     <Compile Include="Services\ElevatedServiceControl.cs" />
     <Compile Include="Services\LocalAddresses.cs" />
-    <Compile Include="Services\StartupShortcut.cs" />
+    <Compile Include="Services\StartupEntry.cs" />
     <Compile Include="Services\TcpTriggerService.cs" />
     <Compile Include="Services\UserPreferences.cs" />
     <Compile Include="Validation\EmailInput.cs" />

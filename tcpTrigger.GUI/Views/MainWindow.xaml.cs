@@ -329,8 +329,8 @@ namespace tcpTrigger.GUI.Views
                     Icon = new System.Drawing.Icon(
                         Application.GetResourceStream(new Uri("pack://application:,,,/tcpTrigger.ico")).Stream,
                         WinForms.SystemInformation.SmallIconSize),
-                        Text = "tcpTrigger",
-                        ContextMenuStrip = menuStrip
+                    Text = "tcpTrigger",
+                    ContextMenuStrip = menuStrip
                 };
                 _trayIcon.MouseUp += (s, args) =>
                 {
@@ -486,17 +486,17 @@ namespace tcpTrigger.GUI.Views
             {
                 if (launchAtLogon)
                 {
-                    StartupShortcut.Create();
+                    StartupEntry.Create();
                 }
                 else
                 {
-                    StartupShortcut.Delete();
+                    StartupEntry.Delete();
                 }
                 UserPreferences.LaunchAtLogon = launchAtLogon;
             }
             catch (Exception ex)
             {
-                // Failed to create or delete the shortcut in the user's Startup folder.
+                // Failed to change the Run value in the registry.
                 UserPreferences.LaunchAtLogon = !launchAtLogon;
                 LaunchAtLogonOption.IsChecked = !launchAtLogon;
                 await ShowMessageAsync("Unable to change the sign-in setting", ex.Message);
