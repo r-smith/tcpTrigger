@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading;
 using tcpTrigger.GUI.Models;
 
 namespace tcpTrigger.GUI.Services
@@ -16,7 +17,17 @@ namespace tcpTrigger.GUI.Services
         private const int DetectTcpEventId = 201;
         private const int DetectUdpEventId = 202;
 
+        // How long to wait before watching again after watching stops working.
+        private static readonly TimeSpan s_retryInterval = TimeSpan.FromSeconds(30);
+
+        private readonly object _lock = new object();
+        private string _queryText;
         private EventLogWatcher _watcher;
+        private Timer _retryTimer;
+        private bool _isDisposed;
+
+        // The newest detection read, so watching can start again right after it.
+        private EventBookmark _newestBookmark;
 
         public event Action<DetectionEvent> DetectionReceived;
 
@@ -26,33 +37,77 @@ namespace tcpTrigger.GUI.Services
         // Otherwise, if fromDate (ISO 8601) is set, only events from that date onward are read.
         public List<DetectionEvent> Start(int maxExisting, int maxDays, string fromDate)
         {
-            string queryText = BuildQuery(maxDays, fromDate);
+            _queryText = BuildQuery(maxDays, fromDate);
 
             // Read newest first, so reading can stop once maxExisting events are found
             // instead of going through the whole log.
-            EventLogQuery recentQuery = new EventLogQuery(LogName, PathType.LogName, queryText)
+            EventLogQuery recentQuery = new EventLogQuery(LogName, PathType.LogName, _queryText)
             {
                 ReverseDirection = true
             };
-            List<DetectionEvent> existing = ReadRecent(recentQuery, maxExisting, out EventBookmark newestBookmark);
+            List<DetectionEvent> existing = ReadRecent(recentQuery, maxExisting, out _newestBookmark);
 
-            // Watch for events written after the newest one read above, including any written
-            // while reading. If the log had no events, watch for new events only.
-            EventLogQuery watchQuery = new EventLogQuery(LogName, PathType.LogName, queryText);
-            _watcher = new EventLogWatcher(watchQuery, newestBookmark, readExistingEvents: newestBookmark != null);
-            _watcher.EventRecordWritten += Watcher_EventRecordWritten;
-            _watcher.Enabled = true;
+            lock (_lock)
+            {
+                _retryTimer = new Timer(Retry);
+                StartWatcher();
+            }
 
             return existing;
         }
 
         public void Dispose()
         {
+            lock (_lock)
+            {
+                _isDisposed = true;
+                StopWatcher();
+                _retryTimer?.Dispose();
+                _retryTimer = null;
+            }
+        }
+
+        // Watches for events written after the newest one read, including any written while
+        // reading or while watching wasn't working. If the log had no events, watches for new events only.
+        private void StartWatcher()
+        {
+            EventLogQuery watchQuery = new EventLogQuery(LogName, PathType.LogName, _queryText);
+            _watcher = new EventLogWatcher(watchQuery, _newestBookmark, readExistingEvents: _newestBookmark != null);
+            _watcher.EventRecordWritten += Watcher_EventRecordWritten;
+            _watcher.Enabled = true;
+        }
+
+        private void StopWatcher()
+        {
             if (_watcher != null)
             {
                 _watcher.Enabled = false;
                 _watcher.Dispose();
                 _watcher = null;
+            }
+        }
+
+        // Runs on the timer. Replaces the watcher that stopped working with a new one.
+        private void Retry(object state)
+        {
+            lock (_lock)
+            {
+                if (_isDisposed)
+                {
+                    return;
+                }
+
+                StopWatcher();
+                try
+                {
+                    StartWatcher();
+                }
+                catch
+                {
+                    // The event log still can't be watched. Try again later.
+                    StopWatcher();
+                    _retryTimer.Change(s_retryInterval, Timeout.InfiniteTimeSpan);
+                }
             }
         }
 
@@ -112,12 +167,22 @@ namespace tcpTrigger.GUI.Services
 
         private void Watcher_EventRecordWritten(object sender, EventRecordWrittenEventArgs e)
         {
+            if (e.EventException != null)
+            {
+                // Watching stopped working. Stop listening to this watcher and try again later.
+                ((EventLogWatcher)sender).EventRecordWritten -= Watcher_EventRecordWritten;
+                _retryTimer.Change(s_retryInterval, Timeout.InfiniteTimeSpan);
+                return;
+            }
+
             using (EventRecord record = e.EventRecord)
             {
                 if (record == null)
                 {
                     return;
                 }
+
+                _newestBookmark = record.Bookmark;
 
                 DetectionEvent detection = Parse(record);
                 if (detection != null)
