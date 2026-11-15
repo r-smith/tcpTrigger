@@ -89,6 +89,7 @@ namespace tcpTrigger.GUI.Views
 
         private void Window_Closed(object sender, EventArgs e)
         {
+            _monitorView.StopWatching();
             _trayIcon?.Dispose();
             _trayIcon = null;
         }

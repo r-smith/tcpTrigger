@@ -66,10 +66,13 @@ namespace tcpTrigger.GUI.Views
                 ApplyFilter();
             };
 
-            // Stop watching the event log when the main window closes.
-            Unloaded += (sender, e) => _logWatcher.Dispose();
-
             LoadDetectionEvents();
+        }
+
+        // Stops watching the event log. Called when the main window closes.
+        public void StopWatching()
+        {
+            _logWatcher.Dispose();
         }
 
         private async void LoadDetectionEvents()
