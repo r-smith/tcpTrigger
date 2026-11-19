@@ -41,14 +41,21 @@ namespace tcpTrigger
             void OnReceive(IAsyncResult ar)
             {
                 // Complete the receive, as required for every BeginReceive.
-                // Errors and the number of bytes received are ignored.
+                SocketError error;
                 try
                 {
-                    _socket.EndReceive(ar, out SocketError _);
+                    _socket.EndReceive(ar, out error);
                 }
                 catch (ObjectDisposedException)
                 {
                     // The listener was stopped. Stop receiving.
+                    return;
+                }
+
+                // Stop on any error except MessageSize, which only means the packet was larger than the buffer.
+                if (error != SocketError.Success && error != SocketError.MessageSize)
+                {
+                    SetFailed(new SocketException((int)error).Message);
                     return;
                 }
 
@@ -78,12 +85,7 @@ namespace tcpTrigger
                 }
                 catch (SocketException ex)
                 {
-                    _hasFailed = true;
-                    Logger.WriteError(
-                        $"tcpTrigger stopped monitoring network interface {Interface.Name} ({Interface.IP}) because of an error. "
-                        + "Monitoring will be retried in one minute."
-                        + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                        Logger.EventCode.InterfaceMonitoringStopped);
+                    SetFailed(ex.Message);
                 }
             }
 
@@ -95,6 +97,17 @@ namespace tcpTrigger
         public void Stop()
         {
             _socket?.Close();
+        }
+
+        // Marks the listener as failed, so the network check restarts it, and logs the error.
+        private void SetFailed(string errorMessage)
+        {
+            _hasFailed = true;
+            Logger.WriteError(
+                $"tcpTrigger stopped monitoring network interface {Interface.Name} ({Interface.IP}) because of an error. "
+                + "Monitoring will be retried in one minute."
+                + $"{Environment.NewLine}{Environment.NewLine}{errorMessage}",
+                Logger.EventCode.InterfaceMonitoringStopped);
         }
 
         // Reads the packet header and queues the packet as a detection if it matches a detection rule.
