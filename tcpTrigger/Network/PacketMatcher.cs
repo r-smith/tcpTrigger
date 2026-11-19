@@ -67,16 +67,14 @@ namespace tcpTrigger
             return false;
         }
 
-        // Returns true if the TCP flags indicate a connection attempt:
-        // SYN is set, and ACK, RST, FIN are not.
+        // Returns true if the TCP flags indicate a connection attempt or probe: ACK and RST are not set.
+        // Every packet after the first SYN has ACK set, including the FIN that closes a connection.
         private static bool IsConnectionAttempt(byte tcpFlags)
         {
-            const byte FIN = 0x01;
-            const byte SYN = 0x02;
             const byte RST = 0x04;
             const byte ACK = 0x10;
 
-            return (tcpFlags & (SYN | ACK | RST | FIN)) == SYN;
+            return (tcpFlags & (ACK | RST)) == 0;
         }
     }
 
