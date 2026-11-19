@@ -47,8 +47,9 @@
     <!-- External link -->
     <DrawingImage x:Key="icon.external-link">
         <DrawingImage.Drawing>
-            <DrawingGroup ClipGeometry="M0,0 V512 H576 V0 H0 Z">
-                <GeometryDrawing Brush="#83CE7F" Geometry="F1 M576,512z M0,0z M576,24L576,151.984C576,173.445,550.04,183.964,535.029,168.955L499.322,133.246 255.799,376.769C246.426,386.142,231.231,386.142,221.858,376.769L199.231,354.142C189.858,344.769,189.858,329.573,199.231,320.201L442.756,76.676 407.053,40.971C391.982,25.9,402.656,0,424.024,0L552,0C565.255,0,576,10.745,576,24z M407.029,270.794L391.029,286.794A23.999,23.999,0,0,0,384,303.765L384,448 64,448 64,128 328,128A24.003,24.003,0,0,0,344.97,120.971L360.97,104.971C376.089,89.851,365.381,64,344,64L48,64C21.49,64,0,85.49,0,112L0,464C0,490.51,21.49,512,48,512L400,512C426.51,512,448,490.51,448,464L448,287.764C448,266.382,422.148,255.674,407.029,270.794z"/>
+            <DrawingGroup ClipGeometry="M0,0 V24 H24 V0 H0 Z">
+                <GeometryDrawing Brush="#FF000000" Geometry="F1 M24,24z M0,0z M15.6396,7.02527L12.0181,7.02527 12.0181,5.02527 19.0181,5.02527 19.0181,12.0253 17.0181,12.0253 17.0181,8.47528 12.1042,13.3892 10.6899,11.975 15.6396,7.02527z"/>
+                <GeometryDrawing Brush="#FF000000" Geometry="F1 M24,24z M0,0z M10.9819,6.97473L4.98193,6.97473 4.98193,18.9747 16.9819,18.9747 16.9819,12.9747 14.9819,12.9747 14.9819,16.9747 6.98193,16.9747 6.98193,8.97473 10.9819,8.97473 10.9819,6.97473z"/>
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
@@ -310,6 +311,19 @@
         </DrawingImage.Drawing>
     </DrawingImage>
 
+    <!-- UAC shield, for actions that need administrator rights -->
+    <DrawingImage x:Key="icon.shield">
+        <DrawingImage.Drawing>
+            <DrawingGroup ClipGeometry="M0,0 V24 H24 V0 H0 Z">
+                <GeometryDrawing Geometry="F1 M24,24z M0,0z M12,2.3999C9.30325,4.6927,7.61285,4.7999,4.80005,4.7999L4.80005,14.0279C4.80005,17.7103 7.36245,18.6711 12,21.5999 16.6376,18.6711 19.2001,17.7103 19.2001,14.0279 19.2001,10.3455 19.2001,4.7999 19.2001,4.7999 16.3872,4.7999 14.6968,4.6927 12,2.3999z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#000000" Thickness="2" StartLineCap="Flat" EndLineCap="Flat" LineJoin="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
 
     <!-- ================== -->
     <!-- Notification types -->
@@ -523,35 +537,12 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
-    <DrawingImage x:Key="icon.shield-check">
-        <DrawingImage.Drawing>
-            <DrawingGroup ClipGeometry="M0,0 V24 H24 V0 H0 Z">
-                <DrawingGroup Opacity="1">
-                    <DrawingGroup.ClipGeometry>
-                        <RectangleGeometry RadiusX="0" RadiusY="0" Rect="0,0,24,24"/>
-                    </DrawingGroup.ClipGeometry>
-                    <GeometryDrawing Brush="#E1E4E8" Geometry="F1 M24,24z M0,0z M19.9442,2.64258L12.0002,0.00958252 4.05615,2.64258C3.45763,2.841 2.93684,3.22296 2.56775,3.73422 2.19867,4.24547 2.00007,4.86002 2.00015,5.49058L2.00015,12.0006C2.00015,19.5246,11.2002,23.6796,11.5942,23.8526L11.9482,24.0096 12.3162,23.8876C12.7122,23.7556,22.0002,20.5776,22.0002,12.0006L22.0002,5.49058C22.0002,4.86002 21.8016,4.24547 21.4326,3.73422 21.0635,3.22296 20.5427,2.841 19.9442,2.64258z M12.4442,13.9896C12.2693,14.1656 12.0613,14.3051 11.8321,14.4 11.603,14.4949 11.3572,14.5434 11.1092,14.5426L11.0762,14.5426C10.823,14.5387 10.5733,14.4835 10.3422,14.3804 10.111,14.2773 9.90313,14.1283 9.73115,13.9426L7.42515,11.5426 8.86815,10.1606 11.1122,12.5006 16.2932,7.31958 17.7072,8.73358 12.4442,13.9896z"/>
-                </DrawingGroup>
-            </DrawingGroup>
-        </DrawingImage.Drawing>
-    </DrawingImage>
     <DrawingImage x:Key="icon.activity">
         <DrawingImage.Drawing>
             <DrawingGroup ClipGeometry="M0,0 V24 H24 V0 H0 Z">
                 <GeometryDrawing Geometry="F1 M24,24z M0,0z M4,11.6661L8,11.6661 10.0404,5 14.4382,19 15.9903,11.6661 20,11.6661">
                     <GeometryDrawing.Pen>
                         <Pen Brush="#E1E4E8" Thickness="2" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" MiterLimit="1"/>
-                    </GeometryDrawing.Pen>
-                </GeometryDrawing>
-            </DrawingGroup>
-        </DrawingImage.Drawing>
-    </DrawingImage>
-    <DrawingImage x:Key="icon.shield">
-        <DrawingImage.Drawing>
-            <DrawingGroup ClipGeometry="M0,0 V24 H24 V0 H0 Z">
-                <GeometryDrawing Geometry="F1 M24,24z M0,0z M12,2.3999C9.30325,4.6927,7.61285,4.7999,4.80005,4.7999L4.80005,14.0279C4.80005,17.7103 7.36245,18.6711 12,21.5999 16.6376,18.6711 19.2001,17.7103 19.2001,14.0279 19.2001,10.3455 19.2001,4.7999 19.2001,4.7999 16.3872,4.7999 14.6968,4.6927 12,2.3999z">
-                    <GeometryDrawing.Pen>
-                        <Pen Brush="#E1E4E8" Thickness="2" StartLineCap="Flat" EndLineCap="Flat" LineJoin="Round"/>
                     </GeometryDrawing.Pen>
                 </GeometryDrawing>
             </DrawingGroup>

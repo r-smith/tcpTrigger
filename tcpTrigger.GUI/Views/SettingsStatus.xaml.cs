@@ -113,6 +113,7 @@ namespace tcpTrigger.GUI.Views
         {
             _isBusy = true;
             ServiceControl.IsEnabled = false;
+            ShieldIcon.Visibility = Visibility.Collapsed;
             Spinner.Visibility = Visibility.Visible;
 
             string action;
@@ -132,6 +133,7 @@ namespace tcpTrigger.GUI.Views
 
             _isBusy = false;
             Spinner.Visibility = Visibility.Collapsed;
+            ShieldIcon.Visibility = Visibility.Visible;
             ServiceControl.IsEnabled = true;
             CheckServiceStatus();
 
