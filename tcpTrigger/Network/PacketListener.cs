@@ -105,7 +105,7 @@ namespace tcpTrigger
             _hasFailed = true;
             Logger.WriteError(
                 $"tcpTrigger stopped monitoring network interface {Interface.Name} ({Interface.IP}) because of an error. "
-                + "Monitoring will be retried in one minute."
+                + "Monitoring will be retried shortly."
                 + $"{Environment.NewLine}{Environment.NewLine}{errorMessage}",
                 Logger.EventCode.InterfaceMonitoringStopped);
         }

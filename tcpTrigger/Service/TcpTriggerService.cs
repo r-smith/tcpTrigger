@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Reflection;
 using System.ServiceProcess;
 using System.Text;
@@ -23,6 +24,14 @@ namespace tcpTrigger
 
         // Timer that checks for network changes and restarts listeners when one is found.
         private System.Timers.Timer _networkCheckTimer;
+
+        // How often the network check runs, and how long after Windows reports an IP address change.
+        private static readonly TimeSpan s_networkCheckInterval = TimeSpan.FromMinutes(1);
+        private static readonly TimeSpan s_addressChangeDelay = TimeSpan.FromSeconds(5);
+
+        // Set when Windows reports an IP address change, so the next network check restarts the listeners
+        // even if the interfaces look the same.
+        private bool _hasAddressChanged;
 
         // Runs the notifications for detections on a background thread.
         private DetectionQueue _detectionQueue;
@@ -275,10 +284,11 @@ namespace tcpTrigger
                 // and restart the listeners when the interfaces change.
                 _networkCheckTimer = new System.Timers.Timer
                 {
-                    Interval = TimeSpan.FromMinutes(1).TotalMilliseconds
+                    Interval = s_networkCheckInterval.TotalMilliseconds
                 };
                 _networkCheckTimer.Elapsed += NetworkCheckTimer_Elapsed;
                 _networkCheckTimer.Enabled = true;
+                NetworkChange.NetworkAddressChanged += NetworkChange_NetworkAddressChanged;
                 CheckNetworkInterfaces();
             }
         }
@@ -296,6 +306,7 @@ namespace tcpTrigger
 
                 _isMonitoring = false;
 
+                NetworkChange.NetworkAddressChanged -= NetworkChange_NetworkAddressChanged;
                 _networkCheckTimer.Stop();
                 _networkCheckTimer.Dispose();
 
@@ -319,8 +330,24 @@ namespace tcpTrigger
             CheckNetworkInterfaces();
         }
 
-        // Runs on startup and every minute. Starts listeners on startup, and restarts them when the
-        // network interfaces on the system have changed.
+        // Runs the network check a few seconds after Windows reports an IP address change.
+        // Each new report restarts the wait, so the check runs once the changes have settled.
+        private void NetworkChange_NetworkAddressChanged(object sender, EventArgs e)
+        {
+            lock (_monitoringLock)
+            {
+                if (!_isMonitoring)
+                {
+                    return;
+                }
+
+                _hasAddressChanged = true;
+                _networkCheckTimer.Interval = s_addressChangeDelay.TotalMilliseconds;
+            }
+        }
+
+        // Runs on startup, every minute, and a few seconds after an IP address change. Restarts all listeners
+        // when the network interfaces have changed, an IP address has changed, or a listener has failed.
         private void CheckNetworkInterfaces()
         {
             lock (_monitoringLock)
@@ -330,24 +357,31 @@ namespace tcpTrigger
                     return;
                 }
 
+                // Go back to checking every minute, in case an IP address change made this check run early.
+                _networkCheckTimer.Interval = s_networkCheckInterval.TotalMilliseconds;
+
                 try
                 {
                     // Get network interfaces that support listening.
                     List<TcpTriggerInterface> networkInterfaces = TcpTriggerInterface.GetInterfaces();
 
-                    // Check if tcpTrigger service is already running (_detectedInterfaces won't be null).
-                    if (_detectedInterfaces != null)
-                    {
-                        // Compare list of network interfaces to previously stored list of network interfaces.
-                        TcpTriggerInterfaceComparer comparer = new TcpTriggerInterfaceComparer();
-                        if (networkInterfaces.SequenceEqual(_detectedInterfaces, comparer))
-                        {
-                            // No network change. Restart any listeners that stopped because of an error.
-                            RestartFailedListeners();
-                            return;
-                        }
+                    // On startup there are no detected interfaces yet, which counts as a change.
+                    TcpTriggerInterfaceComparer comparer = new TcpTriggerInterfaceComparer();
+                    bool hasInterfacesChanged = _detectedInterfaces == null
+                        || !networkInterfaces.SequenceEqual(_detectedInterfaces, comparer);
+                    bool hasListenerFailed = _listeners.Exists(listener => listener.HasFailed);
 
-                        // Network interfaces have changed. Record to event log that a change was detected.
+                    // An IP address change also restarts the listeners, even if the interfaces look the same.
+                    // When an adapter is disabled and enabled again, its listener can stop receiving without an error.
+                    if (!hasInterfacesChanged && !hasListenerFailed && !_hasAddressChanged)
+                    {
+                        return;
+                    }
+                    _hasAddressChanged = false;
+
+                    // Record the change to the event log, except on startup.
+                    if (hasInterfacesChanged && _detectedInterfaces != null)
+                    {
                         List<TcpTriggerInterface> added = networkInterfaces.Except(_detectedInterfaces, comparer).ToList();
                         List<TcpTriggerInterface> removed = _detectedInterfaces.Except(networkInterfaces, comparer).ToList();
                         Logger.Write(
@@ -360,30 +394,28 @@ namespace tcpTrigger
                             + $"# Removed{Environment.NewLine}"
                             + (removed.Count > 0 ? NetworkInterfacesToString(removed) : "None"),
                             Logger.EventCode.NetworkChangeDetected);
-
-                        // Stop all existing listeners.
-                        foreach (PacketListener listener in _listeners)
-                        {
-                            listener.Stop();
-                        }
                     }
 
-                    // Store the retrieved list of network interfaces and start listening on them.
+                    // Restart all listeners. If only an IP address changed, the interfaces being monitored aren't logged again.
+                    foreach (PacketListener listener in _listeners)
+                    {
+                        listener.Stop();
+                    }
                     _detectedInterfaces = networkInterfaces;
-                    StartListeners(networkInterfaces);
+                    StartListeners(networkInterfaces, logInterfaces: hasInterfacesChanged || hasListenerFailed);
                 }
                 catch (Exception ex)
                 {
                     Logger.WriteError(
-                        "tcpTrigger failed to check the network configuration. The check will be retried in one minute."
+                        "tcpTrigger failed to check the network configuration. The check will be retried shortly."
                         + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                         Logger.EventCode.NetworkCheckFailed);
                 }
             }
         }
 
-        // Starts a listener on each network interface and logs which interfaces are being monitored.
-        private void StartListeners(List<TcpTriggerInterface> interfaces)
+        // Starts a listener on each network interface. If logInterfaces is true, logs which interfaces are being monitored.
+        private void StartListeners(List<TcpTriggerInterface> interfaces, bool logInterfaces)
         {
             // Start a listener on each interface. Keep only the listeners that started successfully.
             List<PacketListener> listeners = new List<PacketListener>();
@@ -400,7 +432,7 @@ namespace tcpTrigger
             // Listeners have started. Network monitoring is now active.
             // Record which adapters are being monitored to event log.
             // Record an error if no adapters are monitored.
-            if (_listeners.Count > 0)
+            if (_listeners.Count > 0 && logInterfaces)
             {
                 Logger.Write(
                     "The tcpTrigger service is monitoring the following network interfaces:"
@@ -408,30 +440,11 @@ namespace tcpTrigger
                     + NetworkInterfacesToString(_listeners.ConvertAll(listener => listener.Interface)),
                     Logger.EventCode.NetworkInterfaces);
             }
-            else
+            else if (_listeners.Count == 0)
             {
                 Logger.WriteError(
                     "The tcpTrigger service is running, but it isn't monitoring any network interfaces, so nothing will be detected.",
                     Logger.EventCode.NoInterfacesMonitored);
-            }
-        }
-
-        // Replaces each listener that stopped because of an error with a new one on the same interface.
-        private void RestartFailedListeners()
-        {
-            foreach (PacketListener failed in _listeners.FindAll(listener => listener.HasFailed))
-            {
-                failed.Stop();
-                _listeners.Remove(failed);
-
-                PacketListener listener = TryStartListener(failed.Interface);
-                if (listener != null)
-                {
-                    _listeners.Add(listener);
-                    Logger.Write(
-                        $"tcpTrigger resumed monitoring network interface {listener.Interface.Name} ({listener.Interface.IP}).",
-                        Logger.EventCode.InterfaceMonitoringResumed);
-                }
             }
         }
 
