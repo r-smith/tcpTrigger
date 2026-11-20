@@ -60,14 +60,14 @@
     <SolidColorBrush x:Key="CheckBox.Pressed.Border" Color="#AA9184EE"/>
 
     <!-- ComboBox -->
-    <SolidColorBrush x:Key="ComboBox.Static.Background" Color="#141414"/>
+    <SolidColorBrush x:Key="ComboBox.Static.Background" Color="#1A1A1A"/>
     <SolidColorBrush x:Key="ComboBox.Static.Border" Color="#72809D"/>
     <SolidColorBrush x:Key="ComboBox.Static.Foreground" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="ComboBox.Static.Glyph" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="ComboBox.MouseOver.Background" Color="#282828"/>
     <SolidColorBrush x:Key="ComboBox.MouseOver.Border" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="ComboBox.MouseOver.Glyph" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="ComboBox.Pressed.Background" Color="#141414"/>
+    <SolidColorBrush x:Key="ComboBox.Pressed.Background" Color="#1A1A1A"/>
     <SolidColorBrush x:Key="ComboBox.Pressed.Border" Color="#AAAAAA"/>
     <SolidColorBrush x:Key="ComboBox.Pressed.Glyph" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="ComboBox.DropDown.Background" Color="#040404"/>
@@ -122,18 +122,18 @@
     <SolidColorBrush x:Key="TabItemVert.Static.Border" Color="#454D66"/>
     <SolidColorBrush x:Key="TabItemVert.Static.Foreground" Color="#959DA5"/>
     <SolidColorBrush x:Key="TabItemVert.MouseOver.Background" Color="#24292E"/>
-    <SolidColorBrush x:Key="TabItemVert.Selected.Background" Color="#000000"/>
+    <SolidColorBrush x:Key="TabItemVert.Selected.Background" Color="#0A0A0A"/>
     <SolidColorBrush x:Key="TabItemVert.Selected.Border" Color="#214462"/>
     <SolidColorBrush x:Key="TabItemVert.Selected.Foreground" Color="#EA4A5A"/>
-    <SolidColorBrush x:Key="TabItemVert.SelectedMouseOver.Background" Color="#141414"/>
-    <SolidColorBrush x:Key="TabControlVert.Content.Background" Color="#000000"/>
-    <SolidColorBrush x:Key="TabControlVert.Content.Border" Color="#000000"/>
+    <SolidColorBrush x:Key="TabItemVert.SelectedMouseOver.Background" Color="#161616"/>
+    <SolidColorBrush x:Key="TabControlVert.Content.Background" Color="#0A0A0A"/>
+    <SolidColorBrush x:Key="TabControlVert.Content.Border" Color="#0A0A0A"/>
 
     <!-- TextBox and PasswordBox -->
-    <SolidColorBrush x:Key="TextBox.Static.Background" Color="#020305"/>
+    <SolidColorBrush x:Key="TextBox.Static.Background" Color="#000000"/>
     <SolidColorBrush x:Key="TextBox.Static.Border" Color="#2F363D"/>
     <SolidColorBrush x:Key="TextBox.Static.Foreground" Color="#FFD43B"/>
-    <SolidColorBrush x:Key="TextBox.MouseOver.Background" Color="#020305"/>
+    <SolidColorBrush x:Key="TextBox.MouseOver.Background" Color="#000000"/>
     <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="TextBox.Focus.Background" Color="#000000"/>
     <SolidColorBrush x:Key="TextBox.Selection.Active" Color="#FFFFFF"/>
@@ -209,11 +209,11 @@
     <!-- ==== Settings window and editors ==== -->
 
     <!-- Window background, and the border of the rule and notification editors -->
-    <SolidColorBrush x:Key="Window.Background" Color="#000000"/>
+    <SolidColorBrush x:Key="Window.Background" Color="#0A0A0A"/>
     <SolidColorBrush x:Key="EditorWindow.Border" Color="#707070"/>
 
     <!-- Button bar at the bottom of the window -->
-    <SolidColorBrush x:Key="ButtonBar.Background" Color="#141517"/>
+    <SolidColorBrush x:Key="ButtonBar.Background" Color="#141414"/>
     <SolidColorBrush x:Key="ButtonBar.Border" Color="#303030"/>
 
     <!-- Text: labels, the editor title, captions above list inputs, warnings -->
@@ -234,8 +234,8 @@
     <SolidColorBrush x:Key="SaveStatus.Warning" Color="#FFD43B"/>
 
     <!-- Notification and ignore rule lists -->
-    <SolidColorBrush x:Key="SettingsList.Item.Static.Background" Color="#000000"/>
-    <SolidColorBrush x:Key="SettingsList.Item.MouseOver.Background" Color="#111111"/>
+    <SolidColorBrush x:Key="SettingsList.Item.Static.Background" Color="#0A0A0A"/>
+    <SolidColorBrush x:Key="SettingsList.Item.MouseOver.Background" Color="#161616"/>
     <SolidColorBrush x:Key="SettingsList.Item.MouseOver.Border" Color="#444455"/>
     <SolidColorBrush x:Key="SettingsList.Item.Focused.Background" Color="#222233"/>
     <SolidColorBrush x:Key="SettingsList.Name.Foreground" Color="#EEEEFF"/>
@@ -252,7 +252,7 @@
 
     <!-- ==== Dialogs ==== -->
     <SolidColorBrush x:Key="Dialog.Overlay" Color="#88000000"/>
-    <SolidColorBrush x:Key="Dialog.Background" Color="#181818"/>
+    <SolidColorBrush x:Key="Dialog.Background" Color="#1C1C1C"/>
     <SolidColorBrush x:Key="Dialog.Foreground" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="Dialog.Border" Color="#9184EE"/>
     <SolidColorBrush x:Key="Dialog.Warning.Border" Color="#FFD43B"/>
