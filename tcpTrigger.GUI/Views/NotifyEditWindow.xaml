@@ -13,16 +13,9 @@
                     MouseDown="Window_MouseDown"
                     ShowInTaskbar="False"
                     Background="{StaticResource Window.Background}"
-                    WindowStyle="None"
                     WindowStartupLocation="CenterOwner"
                     FontSize="14">
 
-    <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="40"
-                      ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}"
-                      GlassFrameThickness="0"
-                      CornerRadius="0"/>
-    </WindowChrome.WindowChrome>
     <Window.Resources>
         <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
             <Setter Property="FontFamily" Value="Segoe UI"/>
@@ -31,122 +24,77 @@
         </Style>
     </Window.Resources>
 
-    <Border Style="{StaticResource WindowMainPanelStyle}" BorderBrush="{StaticResource EditorWindow.Border}" BorderThickness="1">
-        <Grid>
+    <Grid>
+        <!-- Window content -->
+        <Grid IsEnabled="{Binding Visibility, ElementName=DialogOverlay, Converter={StaticResource VisibleToDisabled}}">
             <Grid.RowDefinitions>
-                <RowDefinition Height="40"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Window title bar -->
-            <Grid Grid.Row="0" Background="{StaticResource Window.Background}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Grid.Style>
-                    <!-- Dim title bar elements when window loses focus -->
-                    <Style TargetType="{x:Type Grid}">
-                        <Setter Property="Opacity" Value="1"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="False">
-                                <Setter Property="Opacity" Value="0.6"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Grid.Style>
-
-                <!-- Icon -->
-                <Image Grid.Column="0"
-                       Width="28"
+            <!-- Title -->
+            <StackPanel Orientation="Horizontal" Margin="25,12,25,0">
+                <Image Width="28"
                        Height="28"
-                       Margin="25,12,0,0"
-                       Source="{StaticResource icon.megaphone}"
-                       HorizontalAlignment="Left"/>
-
-                <!-- Title -->
-                <TextBlock Grid.Column="1"
-                           Margin="15,12,0,0"
+                       Source="{StaticResource icon.megaphone}"/>
+                <TextBlock Margin="15,0,0,0"
                            VerticalAlignment="Center"
                            FontSize="23"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource EditorTitle.Foreground}"
-                           HorizontalAlignment="Left"
                            Text="{Binding Title, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+            </StackPanel>
 
-                <!-- Close button -->
-                <Button Grid.Column="2"
-                        Click="Close_Click"
-                        Style="{StaticResource TitleBarCloseButtonStyle}"
-                        ToolTip="Close">
-                    <Path Width="46"
-                          Height="31"
-                          Data="M 18,11 27,20 M 18,20 27,11"
-                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
-                          StrokeThickness="1"/>
-                </Button>
-            </Grid>
+            <StackPanel Grid.Row="1" Margin="60,25,25,0" Orientation="Horizontal">
+                <TextBlock Text="Notification type:"
+                           FontSize="15"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource NotificationType.Label.Foreground}"
+                           Margin="0,15,0,1"/>
+                <TextBlock x:Name="NotificationTypeText"
+                           d:Text="Email"
+                           FontSize="15"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource NotificationType.Foreground}"
+                           Margin="6,15,0,1"/>
+            </StackPanel>
 
-            <!-- Window content -->
-            <Grid Grid.Row="1"
-                  IsEnabled="{Binding Visibility, ElementName=DialogOverlay, Converter={StaticResource VisibleToDisabled}}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
+            <!-- Notification content. Changes based on selected notification type. -->
+            <Border Grid.Row="2"
+                    Background="{StaticResource Window.Background}"
+                    Margin="0,25,0,0">
+                <ContentControl x:Name="NotificationEntryControl"
+                                Focusable="False"/>
+            </Border>
 
-                <StackPanel Margin="60,25,25,0" Orientation="Horizontal">
-                    <TextBlock Text="Notification type:"
-                               FontSize="15"
-                               FontWeight="Bold"
-                               Foreground="{StaticResource NotificationType.Label.Foreground}"
-                               Margin="0,15,0,1"/>
-                    <TextBlock x:Name="NotificationTypeText"
-                               d:Text="Email"
-                               FontSize="15"
-                               FontWeight="Bold"
-                               Foreground="{StaticResource NotificationType.Foreground}"
-                               Margin="6,15,0,1"/>
-                </StackPanel>
-
-                <!-- Notification content. Changes based on selected notification type. -->
-                <Border Grid.Row="1"
-                        Background="{StaticResource Window.Background}"
-                        Margin="0,25,0,0">
-                    <ContentControl x:Name="NotificationEntryControl"
-                                    Focusable="False"/>
-                </Border>
-
-                <!-- Button section -->
-                <Border Grid.Row="2" Background="{StaticResource ButtonBar.Background}" BorderBrush="{StaticResource ButtonBar.Border}" BorderThickness="0,1,0,0">
-                    <Grid Margin="25,20,25,20">
-                        <Button x:Name="DeleteButton"
-                                Style="{StaticResource DeleteButton}"
-                                HorizontalAlignment="Left"
-                                Click="Delete_Click"
-                                Tag="{Binding}"/>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Button Content="_OK"
-                                    Click="OK_Click"
-                                    HorizontalAlignment="Right"
-                                    Width="110"
-                                    Margin="0,0,10,0"/>
-                            <Button Content="Cancel"
-                                    Click="Cancel_Click"
-                                    IsCancel="True"
-                                    Style="{StaticResource SecondaryButton}"
-                                    Width="110"/>
-                        </StackPanel>
-                    </Grid>
-                </Border>
-            </Grid>
-
-            <!-- Dialog overlay -->
-            <UserControl x:Name="DialogOverlay"
-                         Grid.RowSpan="2"
-                         Visibility="Collapsed"/>
+            <!-- Button section -->
+            <Border Grid.Row="3" Background="{StaticResource ButtonBar.Background}" BorderBrush="{StaticResource ButtonBar.Border}" BorderThickness="0,1,0,0">
+                <Grid Margin="25,20,25,20">
+                    <Button x:Name="DeleteButton"
+                            Style="{StaticResource DeleteButton}"
+                            HorizontalAlignment="Left"
+                            Click="Delete_Click"
+                            Tag="{Binding}"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="_OK"
+                                Click="OK_Click"
+                                HorizontalAlignment="Right"
+                                Width="110"
+                                Margin="0,0,10,0"/>
+                        <Button Content="Cancel"
+                                Click="Cancel_Click"
+                                IsCancel="True"
+                                Style="{StaticResource SecondaryButton}"
+                                Width="110"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
         </Grid>
-    </Border>
+
+        <!-- Dialog overlay -->
+        <UserControl x:Name="DialogOverlay"
+                     Visibility="Collapsed"/>
+    </Grid>
 </local:EditorWindow>

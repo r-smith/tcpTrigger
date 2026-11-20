@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using tcpTrigger.GUI.Configuration;
+using tcpTrigger.GUI.Interop;
 using tcpTrigger.GUI.Models;
 using tcpTrigger.GUI.Services;
 using tcpTrigger.GUI.Views.Dialogs;
@@ -86,6 +88,14 @@ namespace tcpTrigger.GUI.Views
             Instance = this;
         }
 
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            WindowInterop.UseDarkTitleBar(new WindowInteropHelper(this).Handle,
+                ((SolidColorBrush)FindResource("Window.Background")).Color,
+                ((SolidColorBrush)FindResource("Window.Static.Border")).Color);
+        }
+
         private void Settings_Changed(object sender, EventArgs e)
         {
             MarkUnsavedChanges();
@@ -106,16 +116,6 @@ namespace tcpTrigger.GUI.Views
             {
                 DragMove();
             }
-        }
-
-        private void Minimize_Click(object sender, RoutedEventArgs e)
-        {
-            WindowState = WindowState.Minimized;
-        }
-
-        private void MaximizeRestore_Click(object sender, RoutedEventArgs e)
-        {
-            WindowState = (WindowState == WindowState.Normal) ? WindowState.Maximized : WindowState.Normal;
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)

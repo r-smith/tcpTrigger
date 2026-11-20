@@ -24,6 +24,31 @@ namespace tcpTrigger.GUI.Interop
             SetWindowLong(hwnd, GWL_STYLE, GetWindowLong(hwnd, GWL_STYLE) & ~WS_MAXIMIZEBOX & ~WS_MINIMIZEBOX);
         }
 
+        // Gives a window with the standard Windows title bar a dark title bar. On Windows 11, the
+        // title bar and window border also get the given colors. Windows versions that don't
+        // support a setting ignore it.
+        public static void UseDarkTitleBar(IntPtr hwnd, Color captionColor, Color borderColor)
+        {
+            int darkMode = 1;
+            if (DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref darkMode, sizeof(int)) != 0)
+            {
+                // Windows 10 before version 20H1 uses an older attribute number.
+                DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1, ref darkMode, sizeof(int));
+            }
+
+            int caption = ToColorRef(captionColor);
+            DwmSetWindowAttribute(hwnd, DWMWA_CAPTION_COLOR, ref caption, sizeof(int));
+
+            int border = ToColorRef(borderColor);
+            DwmSetWindowAttribute(hwnd, DWMWA_BORDER_COLOR, ref border, sizeof(int));
+        }
+
+        // Win32 colors are stored as 0x00BBGGRR.
+        private static int ToColorRef(Color color)
+        {
+            return color.R | (color.G << 8) | (color.B << 16);
+        }
+
         // Call when a borderless window receives WM_GETMINMAXINFO. Without this, a maximized
         // borderless window covers the whole screen, including the taskbar. This limits it
         // to the work area of the monitor the window is on.

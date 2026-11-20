@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
 using tcpTrigger.GUI.Interop;
 using tcpTrigger.GUI.Views.Dialogs;
 
@@ -10,7 +11,7 @@ namespace tcpTrigger.GUI.Views
 {
     // Base class for the rule create/edit windows. Show these windows with ShowDialog().
     //
-    // Provides the shared title bar behavior (drag to move, close button, no minimize
+    // Provides the shared title bar behavior (dark title bar, drag to move, no minimize
     // or maximize) and the in-window overlay used for validation errors and delete
     // confirmation. Derived windows must contain a UserControl named "DialogOverlay".
     public class EditorWindow : Window
@@ -23,7 +24,11 @@ namespace tcpTrigger.GUI.Views
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
-            WindowInterop.RemoveMinimizeMaximize(new WindowInteropHelper(this).Handle);
+            IntPtr hwnd = new WindowInteropHelper(this).Handle;
+            WindowInterop.RemoveMinimizeMaximize(hwnd);
+            WindowInterop.UseDarkTitleBar(hwnd,
+                ((SolidColorBrush)FindResource("Window.Background")).Color,
+                ((SolidColorBrush)FindResource("EditorWindow.Border")).Color);
         }
 
         protected void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -32,11 +37,6 @@ namespace tcpTrigger.GUI.Views
             {
                 DragMove();
             }
-        }
-
-        protected void Close_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
         }
 
         protected void Cancel_Click(object sender, RoutedEventArgs e)

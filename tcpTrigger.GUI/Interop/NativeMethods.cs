@@ -12,6 +12,10 @@ namespace tcpTrigger.GUI.Interop
         public const int WS_MAXIMIZEBOX = 0x10000;
         public const int WS_MINIMIZEBOX = 0x20000;
         public const uint MONITOR_DEFAULTTONEAREST = 0x00000002;
+        public const int DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1 = 19;
+        public const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
+        public const int DWMWA_BORDER_COLOR = 34;
+        public const int DWMWA_CAPTION_COLOR = 35;
 
         [DllImport("user32")]
         public static extern bool PostMessage(IntPtr hwnd, int msg, IntPtr wparam, IntPtr lparam);
@@ -30,6 +34,9 @@ namespace tcpTrigger.GUI.Interop
 
         [DllImport("user32.dll")]
         public static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO lpmi);
+
+        [DllImport("dwmapi.dll")]
+        public static extern int DwmSetWindowAttribute(IntPtr hwnd, int attribute, ref int value, int size);
 
         [StructLayout(LayoutKind.Sequential)]
         public struct RECT
