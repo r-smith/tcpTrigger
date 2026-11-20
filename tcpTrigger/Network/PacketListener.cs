@@ -121,12 +121,14 @@ namespace tcpTrigger
         {
             PacketHeader packetHeader = new PacketHeader(buffer, length);
 
-            packetHeader.MatchType = PacketMatcher.GetMatchType(packetHeader, Interface.IP);
+            packetHeader.MatchType = PacketMatcher.GetMatchType(packetHeader, Interface.Address);
 
             // Queue detections for the detection queue thread.
             if (packetHeader.MatchType != PacketMatch.None)
             {
                 packetHeader.Timestamp = DateTime.Now;
+                packetHeader.SourceIP = IPv4Address.ToIPAddress(packetHeader.SourceAddress);
+                packetHeader.DestinationIP = Interface.IP;
                 packetHeader.DestinationMac = Interface.MacAddress;
                 _detectionQueue.Add(packetHeader);
             }

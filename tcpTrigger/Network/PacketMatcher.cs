@@ -1,55 +1,53 @@
-﻿using System.Net;
-
-namespace tcpTrigger
+﻿namespace tcpTrigger
 {
     // Decides whether a captured packet matches the configured detection rules.
     internal static class PacketMatcher
     {
-        // Returns the type of match for a packet sent to the given interface IP,
+        // Returns the type of match for a packet sent to the given interface address,
         // or PacketMatch.None if the packet doesn't match any rule.
-        public static PacketMatch GetMatchType(PacketHeader header, IPAddress ip)
+        public static PacketMatch GetMatchType(PacketHeader header, uint interfaceAddress)
         {
-            if (DoesPacketMatchIcmp(header, ip))
+            if (DoesPacketMatchIcmp(header, interfaceAddress))
             {
                 return PacketMatch.IcmpRequest;
             }
-            if (DoesPacketMatchTcp(header, ip))
+            if (DoesPacketMatchTcp(header, interfaceAddress))
             {
                 return PacketMatch.TcpConnect;
             }
-            if (DoesPacketMatchUdp(header, ip))
+            if (DoesPacketMatchUdp(header, interfaceAddress))
             {
                 return PacketMatch.UdpCommunication;
             }
             return PacketMatch.None;
         }
 
-        private static bool DoesPacketMatchIcmp(PacketHeader header, IPAddress ip)
+        private static bool DoesPacketMatchIcmp(PacketHeader header, uint interfaceAddress)
         {
             return Settings.IsDetectIcmpEnabled
                 && header.ProtocolType == Protocol.Icmp
-                && header.DestinationIP.Equals(ip)
+                && header.DestinationAddress == interfaceAddress
                 && (header.IcmpType == (int)IcmpTypeCode.Ping
                     || header.IcmpType == (int)IcmpTypeCode.Timestamp
                     || header.IcmpType == (int)IcmpTypeCode.Netmask)
                 && !IsIgnored(header);
         }
 
-        private static bool DoesPacketMatchTcp(PacketHeader header, IPAddress ip)
+        private static bool DoesPacketMatchTcp(PacketHeader header, uint interfaceAddress)
         {
             return Settings.IsDetectTcpEnabled
                 && header.ProtocolType == Protocol.Tcp
-                && header.DestinationIP.Equals(ip)
+                && header.DestinationAddress == interfaceAddress
                 && Settings.TcpPortsToMonitor.Contains(header.DestinationPort)
                 && IsConnectionAttempt(header.TcpFlags)
                 && !IsIgnored(header);
         }
 
-        private static bool DoesPacketMatchUdp(PacketHeader header, IPAddress ip)
+        private static bool DoesPacketMatchUdp(PacketHeader header, uint interfaceAddress)
         {
             return Settings.IsDetectUdpEnabled
                 && header.ProtocolType == Protocol.Udp
-                && header.DestinationIP.Equals(ip)
+                && header.DestinationAddress == interfaceAddress
                 && Settings.UdpPortsToMonitor.Contains(header.DestinationPort)
                 && !IsIgnored(header);
         }

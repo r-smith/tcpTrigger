@@ -29,6 +29,9 @@ namespace tcpTrigger
         // The network adapter's IP address.
         public IPAddress IP { get; }
 
+        // The IP address as a number, for comparing with packets.
+        public uint Address { get; }
+
         // The network adapter's physical (MAC) address.
         public PhysicalAddress MacAddress { get; }
 
@@ -41,6 +44,7 @@ namespace tcpTrigger
         public TcpTriggerInterface(IPAddress address, string name, string description, PhysicalAddress macAddress, string guid)
         {
             IP = address;
+            Address = IPv4Address.ToNumber(address);
             Name = name;
             Description = description;
             MacAddress = macAddress;

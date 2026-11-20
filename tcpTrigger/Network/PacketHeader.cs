@@ -34,8 +34,14 @@ namespace tcpTrigger
     // The fields tcpTrigger reads from a captured packet's IP/TCP/UDP/ICMP headers.
     internal class PacketHeader
     {
+        // The packet's addresses, read as numbers.
+        public uint SourceAddress { get; set; }
+        public uint DestinationAddress { get; set; }
+
+        // Set only when the packet is queued as a detection.
         public IPAddress SourceIP { get; set; }
         public IPAddress DestinationIP { get; set; }
+
         public ushort SourcePort { get; set; }
         public ushort DestinationPort { get; set; }
         public PhysicalAddress DestinationMac { get; set; }
@@ -123,11 +129,11 @@ namespace tcpTrigger
             // Read the time to live - byte 8 (8 bits).
             Ttl = buffer[8];
 
-            // Read the source IP address - starting at byte 12 (32 bits).
-            SourceIP = new IPAddress(BitConverter.ToUInt32(buffer, 12));
+            // Read the source IP address - bytes 12 to 15 (32 bits).
+            SourceAddress = ((uint)buffer[12] << 24) | ((uint)buffer[13] << 16) | ((uint)buffer[14] << 8) | buffer[15];
 
-            // Read the destination IP address - starting at byte 16 (32 bits).
-            DestinationIP = new IPAddress(BitConverter.ToUInt32(buffer, 16));
+            // Read the destination IP address - bytes 16 to 19 (32 bits).
+            DestinationAddress = ((uint)buffer[16] << 24) | ((uint)buffer[17] << 16) | ((uint)buffer[18] << 8) | buffer[19];
 
             switch (ProtocolType)
             {

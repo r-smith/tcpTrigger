@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 
 namespace tcpTrigger
 {
@@ -49,12 +48,35 @@ namespace tcpTrigger
         // Returns true if the packet matches this rule.
         public bool Matches(PacketHeader header)
         {
-            uint source = ToNumber(header.SourceIP);
-            uint destination = ToNumber(header.DestinationIP);
+            return ContainsAddress(_sourceRanges, header.SourceAddress)
+                && ContainsAddress(_destinationRanges, header.DestinationAddress)
+                && MatchesService(header.ProtocolType, header.DestinationPort);
+        }
 
-            return _sourceRanges.Any(range => range.Contains(source))
-                && _destinationRanges.Any(range => range.Contains(destination))
-                && _serviceRanges.Any(service => service.Matches(header.ProtocolType, header.DestinationPort));
+        // Returns true if any of the ranges contains the address.
+        private static bool ContainsAddress(List<AddressRange> ranges, uint address)
+        {
+            foreach (AddressRange range in ranges)
+            {
+                if (range.Contains(address))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Returns true if any of the rule's services matches the protocol and port.
+        private bool MatchesService(Protocol protocol, ushort port)
+        {
+            foreach (ServiceRange service in _serviceRanges)
+            {
+                if (service.Matches(protocol, port))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private List<AddressRange> ParseAddresses(List<string> entries)
@@ -200,13 +222,6 @@ namespace tcpTrigger
         private static bool TryParsePort(string text, out ushort port)
         {
             return ushort.TryParse(text, out port) && port > 0;
-        }
-
-        // Returns the IPv4 address as a number, so it can be compared with a range.
-        private static uint ToNumber(IPAddress ip)
-        {
-            byte[] bytes = ip.GetAddressBytes();
-            return ((uint)bytes[0] << 24) | ((uint)bytes[1] << 16) | ((uint)bytes[2] << 8) | bytes[3];
         }
 
         // A range of IPv4 addresses, stored as numbers.
