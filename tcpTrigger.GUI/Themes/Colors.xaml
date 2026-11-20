@@ -210,9 +210,8 @@
     <SolidColorBrush x:Key="ButtonBar.Background" Color="#141414"/>
     <SolidColorBrush x:Key="ButtonBar.Border" Color="#303030"/>
 
-    <!-- Text: labels, the editor title, captions above list inputs, warnings -->
+    <!-- Text: labels, captions above list inputs, warnings -->
     <SolidColorBrush x:Key="Text.Primary" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="EditorTitle.Foreground" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="FieldCaption.Foreground" Color="#AAAAAA"/>
     <SolidColorBrush x:Key="WarningText.Foreground" Color="#FFD43B"/>
 

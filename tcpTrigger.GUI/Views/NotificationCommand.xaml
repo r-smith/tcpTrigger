@@ -27,7 +27,7 @@
     </UserControl.Resources>
 
     <ScrollViewer Style="{StaticResource TabScrollViewer}">
-        <StackPanel x:Name="MainPanel" Margin="60,0,60,5">
+        <StackPanel x:Name="MainPanel" Margin="25,0,25,5">
             <!-- Name and enabled state, on one row -->
             <Grid Margin="0,23,0,0">
                 <Grid.ColumnDefinitions>
@@ -48,10 +48,7 @@
             </Grid>
 
             <!-- Command settings -->
-            <TextBlock Text="Command"
-                       Style="{StaticResource SectionHeading}"
-                       Margin="0,40,0,1"/>
-            <StackPanel Grid.IsSharedSizeScope="True" Margin="0,12,0,0">
+            <StackPanel Grid.IsSharedSizeScope="True" Margin="0,40,0,0">
                 <!-- How the service runs this notification -->
                 <ContentControl Style="{StaticResource InfoBox}"
                                 Margin="0,0,0,14"

@@ -38,7 +38,7 @@
         <Setter Property="Background" Value="{StaticResource TabItemVert.Static.Background}"/>
         <Setter Property="BorderBrush" Value="{StaticResource TabItemVert.Static.Border}"/>
         <Setter Property="Margin" Value="0"/>
-        <Setter Property="Padding" Value="10,14,40,14"/>
+        <Setter Property="Padding" Value="10,11,40,11"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Stretch"/>
         <Setter Property="HeaderTemplate" Value="{StaticResource TabVertHeader}"/>

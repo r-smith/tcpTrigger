@@ -25,35 +25,20 @@
         <!-- Window content -->
         <Grid IsEnabled="{Binding Visibility, ElementName=DialogOverlay, Converter={StaticResource VisibleToDisabled}}">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Title -->
-            <StackPanel Orientation="Horizontal" Margin="25,12,25,0">
-                <Image Width="24"
-                       Height="24"
-                       Source="{StaticResource icon.closedeye}"/>
-                <TextBlock Margin="15,0,0,0"
-                           VerticalAlignment="Center"
-                           FontSize="20"
-                           FontWeight="SemiBold"
-                           Foreground="{StaticResource EditorTitle.Foreground}"
-                           Text="{Binding Title, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
-            </StackPanel>
-
             <!-- Ignore rule content -->
-            <Border Grid.Row="1"
-                    Background="{StaticResource Window.Background}"
-                    Margin="0,25,0,0">
+            <Border Background="{StaticResource Window.Background}"
+                    Margin="0,20,0,0">
                 <ContentControl x:Name="IgnoreRuleContent"
                                 Focusable="False"/>
             </Border>
 
             <!-- Button section -->
-            <Border Grid.Row="2" Background="{StaticResource ButtonBar.Background}" BorderBrush="{StaticResource ButtonBar.Border}" BorderThickness="0,1,0,0">
-                <DockPanel Margin="0,20,25,20" HorizontalAlignment="Right">
+            <Border Grid.Row="1" Background="{StaticResource ButtonBar.Background}" BorderBrush="{StaticResource ButtonBar.Border}" BorderThickness="0,1,0,0">
+                <DockPanel Margin="0,14,25,14" HorizontalAlignment="Right">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Content="_Add"
                                 Click="Add_Click"

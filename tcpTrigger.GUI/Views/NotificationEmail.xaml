@@ -30,7 +30,7 @@
     </UserControl.Resources>
 
     <ScrollViewer Style="{StaticResource TabScrollViewer}">
-        <StackPanel x:Name="MainPanel" Margin="60,0,60,5" Grid.IsSharedSizeScope="True">
+        <StackPanel x:Name="MainPanel" Margin="25,0,25,5" Grid.IsSharedSizeScope="True">
             <!-- Name and enabled state, on one row -->
             <Grid Margin="0,23,0,0">
                 <Grid.ColumnDefinitions>

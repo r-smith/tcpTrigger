@@ -73,7 +73,7 @@
                                 Cursor="Hand"
                                 CornerRadius="2"
                                 Margin="0,0"
-                                Padding="10,17,0,17"
+                                Padding="10,12,0,12"
                                 FocusVisualStyle="{StaticResource ListFocusVisual}"
                                 SnapsToDevicePixels="True">
                             <Border.Style>

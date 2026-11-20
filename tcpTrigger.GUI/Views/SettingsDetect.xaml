@@ -41,13 +41,13 @@
                 <CheckBox Content="Detect incoming TCP connections"
                           x:Name="DetectTcp"
                           Click="Input_Changed"
-                          Margin="0,32,0,0"/>
+                          Margin="0,24,0,0"/>
                 <TextBlock Text="A connection attempt from another computer, on any TCP port."
                            Style="{StaticResource HintText}"
                            Margin="27,5,0,0"/>
 
                 <!-- UDP -->
-                <StackPanel Orientation="Horizontal" Margin="0,32,0,0">
+                <StackPanel Orientation="Horizontal" Margin="0,24,0,0">
                     <CheckBox Content="Detect incoming UDP traffic"
                               x:Name="DetectUdp"
                               Click="DetectUdp_Click"/>

@@ -48,7 +48,7 @@
                                     BorderThickness="1"
                                     Cursor="Hand"
                                     CornerRadius="2"
-                                    Padding="8,20,0,20"
+                                    Padding="8,12,0,12"
                                     FocusVisualStyle="{StaticResource ListFocusVisual}"
                                     SnapsToDevicePixels="True">
                                 <Border.Style>

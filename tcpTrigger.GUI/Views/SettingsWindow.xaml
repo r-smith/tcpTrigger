@@ -43,7 +43,7 @@
 
             <!-- Button section -->
             <Border Grid.Row="1" Background="{StaticResource ButtonBar.Background}" BorderBrush="{StaticResource ButtonBar.Border}" BorderThickness="0,1,0,0">
-                <DockPanel Margin="25">
+                <DockPanel Margin="25,16">
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                         <Button x:Name="SaveButton"
                                 Content="Save"
