@@ -58,12 +58,12 @@
             <Setter.Value>
                 <ControlTemplate>
                     <Grid>
-                        <Rectangle Margin="-3"
+                        <Rectangle Margin="-4"
                                    SnapsToDevicePixels="true"
                                    Stroke="{StaticResource FocusVisual.Border}"
                                    StrokeThickness="2"
-                                   RadiusX="6"
-                                   RadiusY="6"/>
+                                   RadiusX="7"
+                                   RadiusY="7"/>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

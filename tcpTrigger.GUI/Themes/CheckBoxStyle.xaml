@@ -6,7 +6,7 @@
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Rectangle Margin="-4,-3,-3,-3"
+                    <Rectangle Margin="-6,-5,-3,-5"
                                SnapsToDevicePixels="true"
                                Stroke="{StaticResource FocusVisual.Border}"
                                StrokeThickness="2"
