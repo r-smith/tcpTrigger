@@ -38,15 +38,11 @@
     <SolidColorBrush x:Key="Button.Danger.MouseOver.Background" Color="#F06B78"/>
     <SolidColorBrush x:Key="Button.Danger.Pressed.Background" Color="#C93A49"/>
 
-    <!-- Browse button. The delete button uses its hover and pressed backgrounds. -->
-    <SolidColorBrush x:Key="Button.Browse.Static.Background" Color="#000000"/>
-    <SolidColorBrush x:Key="Button.Browse.Static.Border" Color="#246BFD"/>
-    <SolidColorBrush x:Key="Button.Browse.Static.Foreground" Color="#0BFFDB"/>
-    <SolidColorBrush x:Key="Button.Browse.MouseOver.Background" Color="#1A1A1A"/>
-    <SolidColorBrush x:Key="Button.Browse.Pressed.Background" Color="#000000"/>
-
-    <!-- Delete button text -->
-    <SolidColorBrush x:Key="Button.Delete.Foreground" Color="#EEEEFF"/>
+    <!-- Delete button in the editor button bar -->
+    <SolidColorBrush x:Key="Button.Delete.Foreground" Color="#C8C8C8"/>
+    <SolidColorBrush x:Key="Button.Delete.MouseOver.Foreground" Color="#FF6B7A"/>
+    <SolidColorBrush x:Key="Button.Delete.MouseOver.Background" Color="#2A1518"/>
+    <SolidColorBrush x:Key="Button.Delete.Pressed.Background" Color="#200F12"/>
 
     <!-- CheckBox -->
     <SolidColorBrush x:Key="CheckBox.Unchecked.Foreground" Color="#FFFFFF"/>
