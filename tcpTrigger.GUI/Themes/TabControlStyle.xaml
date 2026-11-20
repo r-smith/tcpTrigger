@@ -21,14 +21,14 @@
     <!-- Vertical tab header -->
     <DataTemplate x:Key="TabVertHeader">
         <TextBlock Text="{Binding}"
-                   FontSize="20"
-                   FontFamily="Corbel"
+                   FontSize="15"
+                   FontFamily="Segoe UI"
                    Foreground="{StaticResource TabItemVert.Static.Foreground}"/>
     </DataTemplate>
     <DataTemplate x:Key="TabVertSelectedHeader">
         <TextBlock Text="{Binding}"
-                   FontSize="20"
-                   FontFamily="Corbel"
+                   FontSize="15"
+                   FontFamily="Segoe UI"
                    Foreground="{StaticResource TabItemVert.Selected.Foreground}"/>
     </DataTemplate>
 

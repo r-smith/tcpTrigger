@@ -141,8 +141,8 @@
 
     <!-- Text styles: hint under an input, settings page heading, editor section heading -->
     <SolidColorBrush x:Key="HintText.Foreground" Color="#909090"/>
-    <SolidColorBrush x:Key="PageHeading.Foreground" Color="#00FA9A"/>
-    <SolidColorBrush x:Key="SectionHeading.Foreground" Color="#61B8FF"/>
+    <SolidColorBrush x:Key="PageHeading.Foreground" Color="#7FD6A6"/>
+    <SolidColorBrush x:Key="SectionHeading.Foreground" Color="#8CC4FF"/>
 
     <!-- InfoBox -->
     <SolidColorBrush x:Key="InfoBox.Background" Color="#0D1724"/>
@@ -223,7 +223,7 @@
     <SolidColorBrush x:Key="WarningText.Foreground" Color="#FFD43B"/>
 
     <!-- Line under page and section headings -->
-    <SolidColorBrush x:Key="Heading.Separator" Color="#9184EE"/>
+    <SolidColorBrush x:Key="Heading.Separator" Color="#3A3A3A"/>
 
     <!-- "Notification type: Email" in the notification editor -->
     <SolidColorBrush x:Key="NotificationType.Label.Foreground" Color="#666666"/>

@@ -23,8 +23,8 @@
 
     <!-- Heading at the top of each settings tab -->
     <Style x:Key="PageHeading" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-        <Setter Property="FontFamily" Value="Corbel"/>
-        <Setter Property="FontSize" Value="21"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="18"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="{StaticResource PageHeading.Foreground}"/>
         <Setter Property="Margin" Value="0,4,0,1"/>
@@ -34,7 +34,7 @@
     <Style x:Key="SectionHeading" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
         <Setter Property="FontFamily" Value="Segoe UI"/>
         <Setter Property="FontSize" Value="15"/>
-        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="{StaticResource SectionHeading.Foreground}"/>
         <Setter Property="Margin" Value="0,0,0,1"/>
     </Style>

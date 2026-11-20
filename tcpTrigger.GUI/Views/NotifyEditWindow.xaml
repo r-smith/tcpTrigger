@@ -36,12 +36,12 @@
 
             <!-- Title -->
             <StackPanel Orientation="Horizontal" Margin="25,12,25,0">
-                <Image Width="28"
-                       Height="28"
+                <Image Width="24"
+                       Height="24"
                        Source="{StaticResource icon.megaphone}"/>
                 <TextBlock Margin="15,0,0,0"
                            VerticalAlignment="Center"
-                           FontSize="23"
+                           FontSize="20"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource EditorTitle.Foreground}"
                            Text="{Binding Title, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
