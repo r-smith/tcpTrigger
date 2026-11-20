@@ -38,7 +38,7 @@ namespace tcpTrigger.GUI.Views
 
             if (rule.Destinations.Count > 0 && rule.Destinations[0] != "any")
             {
-                MatchSpecificDestinations.IsSelected = true;
+                LimitDestinations.IsChecked = true;
                 DestinationList.Text = string.Join(Environment.NewLine, rule.Destinations);
             }
 
@@ -95,13 +95,13 @@ namespace tcpTrigger.GUI.Views
                 _selectedIgnoreRule.Sources = IgnoreRuleInput.SortAddresses(IgnoreRuleInput.ParseLines(SourceList.Text));
             }
 
-            if (MatchAnyDestination.IsSelected)
+            if (LimitDestinations.IsChecked == true)
             {
-                _selectedIgnoreRule.Destinations = new List<string> { "any" };
+                _selectedIgnoreRule.Destinations = IgnoreRuleInput.SortAddresses(IgnoreRuleInput.ParseLines(DestinationList.Text));
             }
             else
             {
-                _selectedIgnoreRule.Destinations = IgnoreRuleInput.SortAddresses(IgnoreRuleInput.ParseLines(DestinationList.Text));
+                _selectedIgnoreRule.Destinations = new List<string> { "any" };
             }
 
             if (MatchAnyService.IsSelected)
@@ -135,17 +135,17 @@ namespace tcpTrigger.GUI.Views
                 }
             }
 
-            if (MatchSpecificDestinations.IsSelected)
+            if (LimitDestinations.IsChecked == true)
             {
                 if (string.IsNullOrWhiteSpace(DestinationList.Text))
                 {
-                    return ValidationOutcome.Invalid("Please enter at least one destination IP address." + s_paragraph + s_addressFormatHelp, DestinationList);
+                    return ValidationOutcome.Invalid("Please enter at least one local IP address." + s_paragraph + s_addressFormatHelp, DestinationList);
                 }
 
                 string invalidDestination = IgnoreRuleInput.GetFirstInvalidAddress(DestinationList.Text);
                 if (invalidDestination != null)
                 {
-                    return ValidationOutcome.Invalid($"'{invalidDestination}' is not a valid destination IP address." + s_paragraph + s_addressFormatHelp, DestinationList);
+                    return ValidationOutcome.Invalid($"'{invalidDestination}' is not a valid local IP address." + s_paragraph + s_addressFormatHelp, DestinationList);
                 }
             }
 
@@ -181,25 +181,8 @@ namespace tcpTrigger.GUI.Views
             + "- A TCP port range, such as 8000-9000" + Environment.NewLine
             + "- A UDP port or port range, such as udp:53 or udp:5000-6000";
 
-        // Each choice set to "specific" shows its list box. The boxes sit side by side, one column
-        // each, but there are always at least two columns, so a single box stays the same width.
-        // The choices change while the page loads, before ListsGrid exists, so check for that.
-        private void UpdateListColumns()
-        {
-            if (ListsGrid == null)
-            {
-                return;
-            }
-
-            int shown = (MatchSpecificSources.IsSelected ? 1 : 0)
-                + (MatchSpecificDestinations.IsSelected ? 1 : 0)
-                + (MatchSpecificServices.IsSelected ? 1 : 0);
-            ListsGrid.Columns = Math.Max(2, shown);
-        }
-
         private void SourceMatch_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            UpdateListColumns();
             if (MatchAnySource?.IsSelected == true && MatchAnyService?.IsSelected == true && MatchSpecificServices != null)
             {
                 MatchSpecificServices.IsSelected = true;
@@ -215,18 +198,13 @@ namespace tcpTrigger.GUI.Views
             }
         }
 
-        private void DestinationMatch_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void LimitDestinations_Checked(object sender, RoutedEventArgs e)
         {
-            UpdateListColumns();
-            if (MatchSpecificDestinations?.IsSelected == true)
-            {
-                DestinationList?.Focus();
-            }
+            DestinationList?.Focus();
         }
 
         private void ServiceMatch_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            UpdateListColumns();
             if (MatchAnyService?.IsSelected == true && MatchAnySource?.IsSelected == true && MatchSpecificSources != null)
             {
                 MatchSpecificSources.IsSelected = true;

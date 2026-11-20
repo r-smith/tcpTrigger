@@ -41,7 +41,7 @@
                 </Style>
             </Style.Resources>
         </Style>
-        <!-- A "match on" dropdown: From, To, or On -->
+        <!-- A "match on" dropdown: From or On -->
         <Style x:Key="MatchChoice" TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
             <Setter Property="Width" Value="300"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
@@ -56,6 +56,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Name and enabled state, on one row -->
@@ -78,7 +79,7 @@
                       Margin="18,0,0,0"/>
         </Grid>
 
-        <!-- What the rule matches: ignore traffic from... to... on... -->
+        <!-- What the rule matches: ignore traffic from... on... -->
         <TextBlock Grid.Row="1"
                    Text="Ignore traffic"
                    Style="{StaticResource SectionHeading}"
@@ -89,7 +90,6 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -103,19 +103,8 @@
                 <ComboBoxItem x:Name="MatchSpecificSources" Content="specific IP addresses" IsSelected="True"/>
             </ComboBox>
 
-            <TextBlock Grid.Row="1" Text="To" Margin="0,8,0,0"/>
+            <TextBlock Grid.Row="1" Text="On" Margin="0,8,0,0"/>
             <ComboBox Grid.Row="1"
-                      Grid.Column="1"
-                      AutomationProperties.Name="To"
-                      Style="{StaticResource MatchChoice}"
-                      Margin="0,8,0,0"
-                      SelectionChanged="DestinationMatch_SelectionChanged">
-                <ComboBoxItem x:Name="MatchAnyDestination" Content="any address on this computer" IsSelected="True"/>
-                <ComboBoxItem x:Name="MatchSpecificDestinations" Content="specific addresses"/>
-            </ComboBox>
-
-            <TextBlock Grid.Row="2" Text="On" Margin="0,8,0,0"/>
-            <ComboBox Grid.Row="2"
                       Grid.Column="1"
                       AutomationProperties.Name="On"
                       Style="{StaticResource MatchChoice}"
@@ -126,13 +115,11 @@
             </ComboBox>
         </Grid>
 
-        <!-- A list box for each choice set to "specific", side by side. UpdateListColumns sets the
-             number of columns. The negative right margin cancels the last box's gap. -->
-        <UniformGrid x:Name="ListsGrid"
-                     Grid.Row="3"
+        <!-- Source and port lists, side by side. The negative margin cancels the last column's gap. -->
+        <UniformGrid Grid.Row="3"
                      Rows="1"
                      Columns="2"
-                     Margin="0,22,-20,22">
+                     Margin="0,22,-20,0">
             <!-- Sources. Hidden when matching any. -->
             <Grid Margin="0,0,20,0">
                 <Grid.RowDefinitions>
@@ -158,35 +145,6 @@
                          Style="{StaticResource ListInput}"/>
                 <TextBlock Grid.Row="2"
                            Text="One per line, such as 192.168.0.1, 192.168.0.1-100, or 192.168.0.0/24"
-                           Style="{StaticResource HintText}"/>
-            </Grid>
-
-            <!-- Destinations. Hidden when matching any. -->
-            <Grid Margin="0,0,20,0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Grid.Style>
-                    <Style TargetType="{x:Type Grid}">
-                        <Setter Property="IsEnabled" Value="True"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsSelected, ElementName=MatchAnyDestination}" Value="True">
-                                <Setter Property="IsEnabled" Value="False"/>
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Grid.Style>
-                <TextBlock Text="Destination IP addresses" Style="{StaticResource FieldCaption}"/>
-                <TextBox x:Name="DestinationList"
-                         Grid.Row="1"
-                         AutomationProperties.Name="Destination IP addresses"
-                         Style="{StaticResource ListInput}"/>
-                <!-- Lists this computer's addresses. Set in code. -->
-                <TextBlock x:Name="DestinationHint"
-                           Grid.Row="2"
                            Style="{StaticResource HintText}"/>
             </Grid>
 
@@ -218,5 +176,26 @@
                            Style="{StaticResource HintText}"/>
             </Grid>
         </UniformGrid>
+
+        <!-- Local addresses, behind a link -->
+        <StackPanel Grid.Row="4" Margin="0,14,0,22">
+            <ToggleButton x:Name="LimitDestinations"
+                          Content="Limit to specific local addresses"
+                          Style="{StaticResource LinkToggleButton}"
+                          HorizontalAlignment="Left"
+                          Margin="-4,0,0,0"
+                          Checked="LimitDestinations_Checked"/>
+            <StackPanel Visibility="{Binding IsChecked, ElementName=LimitDestinations, Converter={StaticResource TrueToVisible}}">
+                <TextBlock Text="Only needed when this computer has more than one IP address."
+                           Style="{StaticResource HintText}"
+                           Margin="0,6,0,6"/>
+                <TextBox x:Name="DestinationList"
+                         Height="72"
+                         AutomationProperties.Name="Local IP addresses"
+                         Style="{StaticResource ListInput}"/>
+                <!-- Lists this computer's addresses. Set in code. -->
+                <TextBlock x:Name="DestinationHint" Style="{StaticResource HintText}"/>
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </UserControl>
