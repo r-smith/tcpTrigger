@@ -27,10 +27,14 @@ namespace tcpTrigger.GUI.Services
 
         public static void Load()
         {
+            // Stays false if the registry can't be read, so launch at sign-in is never turned back on by mistake.
+            bool isFirstRun = false;
             try
             {
                 using (RegistryKey key = Registry.CurrentUser.OpenSubKey(KeyPath))
                 {
+                    isFirstRun = key == null || !ReadFlag(key, "FirstRunDone", false);
+
                     // The key doesn't exist until a preference is saved for the first time.
                     if (key != null)
                     {
@@ -54,9 +58,15 @@ namespace tcpTrigger.GUI.Services
             }
 
             // Launch at sign-in is stored in the Run registry key, so it's read separately.
+            // It's turned on the first time the GUI runs for this user. After that, only the user changes it.
             StartupEntry.ReplaceOldShortcut();
             try
             {
+                if (isFirstRun)
+                {
+                    StartupEntry.Create();
+                    WriteFlag("FirstRunDone", true);
+                }
                 LaunchAtLogon = StartupEntry.Exists();
             }
             catch
