@@ -23,17 +23,9 @@
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\tcpTrigger.Manager\tcpTrigger.Manager.csproj">
-      <Name>tcpTrigger.Manager</Name>
-      <Project>{386264b5-9107-4595-abbc-44959747bdee}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
-    <ProjectReference Include="..\tcpTrigger.Monitor\tcpTrigger.Monitor.csproj">
-      <Name>tcpTrigger.Monitor</Name>
-      <Project>{c52cbee5-774e-4d74-893b-357cb9061ca6}</Project>
+    <ProjectReference Include="..\tcpTrigger.GUI\tcpTrigger.GUI.csproj">
+      <Name>tcpTrigger.GUI</Name>
+      <Project>{c5f8706e-cc2f-48aa-9ba4-24c984f21964}</Project>
       <Private>True</Private>
       <DoNotHarvest>True</DoNotHarvest>
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
