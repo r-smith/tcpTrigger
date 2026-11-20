@@ -49,13 +49,11 @@
                                 Content="Save"
                                 IsEnabled="False"
                                 Click="Save_Click"
-                                Width="110"
                                 Margin="0,0,10,0"/>
                         <Button Content="Close"
                                 Click="Close_Click"
                                 Style="{StaticResource SecondaryButton}"
-                                IsCancel="True"
-                                Width="110"/>
+                                IsCancel="True"/>
                     </StackPanel>
                     <!-- Unsaved changes, or the result of the last save -->
                     <TextBlock x:Name="SaveStatus"

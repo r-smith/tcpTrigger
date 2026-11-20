@@ -28,7 +28,6 @@
                            Foreground="{StaticResource Dialog.Foreground}"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,45,0,0">
                     <Button Click="Stop_Click"
-                            Width="150"
                             Margin="0,0,10,0">
                         <StackPanel Orientation="Horizontal">
                             <!-- Shield icon -->
@@ -44,8 +43,7 @@
                             Content="Cancel"
                             Style="{StaticResource SecondaryButton}"
                             Click="Cancel_Click"
-                            IsCancel="True"
-                            Width="130"/>
+                            IsCancel="True"/>
                 </StackPanel>
             </StackPanel>
         </Border>

@@ -102,6 +102,7 @@
                 <!-- Close filter button -->
                 <Button DockPanel.Dock="Right"
                         Width="26"
+                        MinWidth="0"
                         Height="26"
                         Click="CloseFilter_Click"
                         ToolTip="Close (Esc)"

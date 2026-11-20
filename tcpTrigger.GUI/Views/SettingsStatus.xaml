@@ -73,7 +73,6 @@
                         </Button>
                         <Button Click="OpenServices_Click"
                                 Style="{StaticResource SecondaryButton}"
-                                Width="210"
                                 Margin="12,0,0,0">
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="{StaticResource icon.external-link}"

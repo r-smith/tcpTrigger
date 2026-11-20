@@ -48,13 +48,11 @@
                         <Button Content="_OK"
                                 Click="OK_Click"
                                 HorizontalAlignment="Right"
-                                Width="110"
                                 Margin="0,0,10,0"/>
                         <Button Content="Cancel"
                                 Click="Cancel_Click"
                                 IsCancel="True"
-                                Style="{StaticResource SecondaryButton}"
-                                Width="110"/>
+                                Style="{StaticResource SecondaryButton}"/>
                     </StackPanel>
                 </Grid>
             </Border>

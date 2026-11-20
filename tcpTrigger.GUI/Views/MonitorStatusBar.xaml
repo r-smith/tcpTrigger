@@ -14,6 +14,7 @@
               Margin="25,0"
               Visibility="Collapsed">
             <Button x:Name="ServiceStatusButton"
+                    MinWidth="0"
                     Click="ServiceStatus_Click"
                     AutomationProperties.Name="Service options"
                     FocusVisualStyle="{StaticResource SmallButtonFocusVisual}"
@@ -86,6 +87,7 @@
 
                 <!-- Start service button -->
                 <Button x:Name="StartButton"
+                        MinWidth="0"
                         DockPanel.Dock="Right"
                         Click="Start_Click"
                         Padding="12,4"
@@ -112,6 +114,7 @@
 
                 <!-- Open settings button. Shown instead of start service when there's no settings file yet. -->
                 <Button x:Name="SettingsButton"
+                        MinWidth="0"
                         DockPanel.Dock="Right"
                         Content="Open Settings"
                         Click="Settings_Click"

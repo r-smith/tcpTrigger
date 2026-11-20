@@ -36,15 +36,13 @@
                             Content="_Copy"
                             Style="{StaticResource SecondaryButton}"
                             Click="Copy_Click"
-                            Width="130"
                             Margin="0,0,10,0"
                             Visibility="Collapsed"/>
                     <Button x:Name="OkButton"
                             Content="OK"
                             Click="OK_Click"
                             IsCancel="True"
-                            IsDefault="True"
-                            Width="130"/>
+                            IsDefault="True"/>
                 </StackPanel>
             </StackPanel>
         </Border>

@@ -37,14 +37,12 @@
                     <Button Content="_Delete"
                             Style="{StaticResource DangerButton}"
                             Click="Delete_Click"
-                            Width="130"
                             Margin="0,0,10,0"/>
                     <Button x:Name="CancelButton"
                             Content="Cancel"
                             Style="{StaticResource SecondaryButton}"
                             Click="Cancel_Click"
-                            IsCancel="True"
-                            Width="130"/>
+                            IsCancel="True"/>
                 </StackPanel>
             </StackPanel>
         </Border>

@@ -189,6 +189,7 @@
 
                     <!-- Magnifier button that opens the filter -->
                     <Button Height="18"
+                            MinWidth="0"
                             Click="Filter_Click"
                             ToolTip="Filter (Ctrl+F)"
                             AutomationProperties.Name="Filter"

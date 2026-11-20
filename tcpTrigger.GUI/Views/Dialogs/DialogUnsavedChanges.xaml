@@ -30,18 +30,15 @@
                     <Button x:Name="SaveButton"
                             Content="_Save"
                             Click="Save_Click"
-                            Width="130"
                             Margin="0,0,10,0"/>
                     <Button Content="Do_n't save"
                             Style="{StaticResource SecondaryButton}"
                             Click="DontSave_Click"
-                            Width="130"
                             Margin="0,0,10,0"/>
                     <Button Content="Cancel"
                             Style="{StaticResource SecondaryButton}"
                             Click="Cancel_Click"
-                            IsCancel="True"
-                            Width="130"/>
+                            IsCancel="True"/>
                 </StackPanel>
             </StackPanel>
         </Border>
