@@ -126,6 +126,7 @@ namespace tcpTrigger
             // Queue detections for the detection queue thread.
             if (packetHeader.MatchType != PacketMatch.None)
             {
+                packetHeader.Timestamp = DateTime.Now;
                 packetHeader.DestinationMac = Interface.MacAddress;
                 _detectionQueue.Add(packetHeader);
             }

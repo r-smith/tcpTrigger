@@ -46,8 +46,8 @@ namespace tcpTrigger
         public Protocol ProtocolType { get; set; }
         public PacketMatch MatchType { get; set; }
 
-        // The time the packet was captured.
-        public DateTime Timestamp { get; } = DateTime.Now;
+        // The time the packet was captured. Set only when the packet is queued as a detection.
+        public DateTime Timestamp { get; set; }
 
         // The names of the TCP flags that are set, such as "SYN,ECE".
         public string TcpFlagNames
