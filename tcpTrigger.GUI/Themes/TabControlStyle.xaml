@@ -59,6 +59,15 @@
                                     Margin="0,3,5,3"
                                     CornerRadius="3"/>
                         </Border>
+                        <!-- Selected tab marker -->
+                        <Border x:Name="selectedIndicator"
+                                Width="3"
+                                Height="18"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                CornerRadius="1.5"
+                                Background="{StaticResource TabItemVert.Selected.Indicator}"
+                                Visibility="Collapsed"/>
                         <StackPanel Orientation="Horizontal" Margin="{TemplateBinding Padding}">
                             <Image x:Name="Icon"
                                    Source="{x:Null}"
@@ -107,6 +116,7 @@
                             <Setter Property="BorderThickness" TargetName="innerBorder" Value="0,0,0,0"/>
                             <Setter Property="HeaderTemplate" Value="{StaticResource TabVertSelectedHeader}"/>
                             <Setter Property="Opacity" TargetName="Icon" Value="1"/>
+                            <Setter Property="Visibility" TargetName="selectedIndicator" Value="Visible"/>
                         </DataTrigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>

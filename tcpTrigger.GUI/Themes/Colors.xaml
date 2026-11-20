@@ -121,11 +121,12 @@
     <SolidColorBrush x:Key="TabItemVert.Static.Background" Color="Transparent"/>
     <SolidColorBrush x:Key="TabItemVert.Static.Border" Color="#454D66"/>
     <SolidColorBrush x:Key="TabItemVert.Static.Foreground" Color="#959DA5"/>
-    <SolidColorBrush x:Key="TabItemVert.MouseOver.Background" Color="#24292E"/>
-    <SolidColorBrush x:Key="TabItemVert.Selected.Background" Color="#0A0A0A"/>
+    <SolidColorBrush x:Key="TabItemVert.MouseOver.Background" Color="#161616"/>
+    <SolidColorBrush x:Key="TabItemVert.Selected.Background" Color="#1E1B2E"/>
     <SolidColorBrush x:Key="TabItemVert.Selected.Border" Color="#214462"/>
-    <SolidColorBrush x:Key="TabItemVert.Selected.Foreground" Color="#EA4A5A"/>
-    <SolidColorBrush x:Key="TabItemVert.SelectedMouseOver.Background" Color="#161616"/>
+    <SolidColorBrush x:Key="TabItemVert.Selected.Foreground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="TabItemVert.Selected.Indicator" Color="#9184EE"/>
+    <SolidColorBrush x:Key="TabItemVert.SelectedMouseOver.Background" Color="#24203A"/>
     <SolidColorBrush x:Key="TabControlVert.Content.Background" Color="#0A0A0A"/>
     <SolidColorBrush x:Key="TabControlVert.Content.Border" Color="#0A0A0A"/>
 
