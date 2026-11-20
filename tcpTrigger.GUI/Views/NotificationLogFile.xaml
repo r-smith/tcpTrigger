@@ -51,7 +51,6 @@
             <TextBlock Text="Log"
                        Style="{StaticResource SectionHeading}"
                        Margin="0,40,0,1"/>
-            <Separator Background="{StaticResource Heading.Separator}"/>
             <StackPanel Grid.IsSharedSizeScope="True" Margin="0,12,0,0">
                 <!-- How the service runs this notification -->
                 <ContentControl Style="{StaticResource InfoBox}"

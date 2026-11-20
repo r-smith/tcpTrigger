@@ -222,8 +222,8 @@
     <SolidColorBrush x:Key="FieldCaption.Foreground" Color="#AAAAAA"/>
     <SolidColorBrush x:Key="WarningText.Foreground" Color="#FFD43B"/>
 
-    <!-- Line under page and section headings -->
-    <SolidColorBrush x:Key="Heading.Separator" Color="#3A3A3A"/>
+    <!-- Line under page headings -->
+    <SolidColorBrush x:Key="PageHeading.Separator" Color="#3A3A3A"/>
 
     <!-- "Notification type: Email" in the notification editor -->
     <SolidColorBrush x:Key="NotificationType.Label.Foreground" Color="#666666"/>

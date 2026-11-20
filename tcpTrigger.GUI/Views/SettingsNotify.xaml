@@ -22,7 +22,7 @@
             <StackPanel>
                 <TextBlock Text="Notifications"
                            Style="{StaticResource PageHeading}"/>
-                <Separator Background="{StaticResource Heading.Separator}"/>
+                <Separator Background="{StaticResource PageHeading.Separator}"/>
 
                 <!-- New notification button -->
                 <Button Content="_New notification"

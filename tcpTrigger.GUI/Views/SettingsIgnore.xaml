@@ -25,7 +25,7 @@
             <StackPanel>
                 <TextBlock Text="Ignore rules"
                            Style="{StaticResource PageHeading}"/>
-                <Separator Background="{StaticResource Heading.Separator}"/>
+                <Separator Background="{StaticResource PageHeading.Separator}"/>
 
                 <!-- New rule button -->
                 <Button Content="_New rule"

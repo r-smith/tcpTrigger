@@ -17,7 +17,7 @@
             <StackPanel>
                 <TextBlock Text="Service status"
                            Style="{StaticResource PageHeading}"/>
-                <Separator Background="{StaticResource Heading.Separator}"/>
+                <Separator Background="{StaticResource PageHeading.Separator}"/>
             </StackPanel>
 
             <!-- Content -->
