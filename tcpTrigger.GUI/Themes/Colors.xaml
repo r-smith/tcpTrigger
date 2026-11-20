@@ -48,12 +48,7 @@
     <SolidColorBrush x:Key="CheckBox.Unchecked.Foreground" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="CheckBox.Unchecked.Background" Color="#000000"/>
     <SolidColorBrush x:Key="CheckBox.Unchecked.Border" Color="#605F76"/>
-    <SolidColorBrush x:Key="CheckBox.Checked.Foreground" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="CheckBox.MouseOver.Foreground" Color="#FFFFAA"/>
-    <SolidColorBrush x:Key="CheckBox.MouseOver.Background" Color="#121212"/>
-    <SolidColorBrush x:Key="CheckBox.MouseOver.Border" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="CheckBox.Pressed.Background" Color="#AA9184EE"/>
-    <SolidColorBrush x:Key="CheckBox.Pressed.Border" Color="#AA9184EE"/>
+    <SolidColorBrush x:Key="CheckBox.MouseOver.Background" Color="#1A1A1A"/>
 
     <!-- ComboBox -->
     <SolidColorBrush x:Key="ComboBox.Static.Background" Color="#1A1A1A"/>

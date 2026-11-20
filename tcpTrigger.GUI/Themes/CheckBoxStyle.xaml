@@ -6,7 +6,7 @@
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Rectangle Margin="-8,-7,-2,-7"
+                    <Rectangle Margin="-4,-3,-3,-3"
                                SnapsToDevicePixels="true"
                                Stroke="{StaticResource FocusVisual.Border}"
                                StrokeThickness="2"
@@ -37,14 +37,23 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
+                        <!-- Hover background behind the check box and content. The negative margin
+                             extends it past the control without changing the layout. -->
+                        <Border x:Name="hoverBackground"
+                                Grid.ColumnSpan="2"
+                                Margin="-6,-4,0,-4"
+                                CornerRadius="4"
+                                Background="Transparent"/>
                         <!-- Check box -->
                         <Border x:Name="checkBoxBorder"
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
+                                Width="18"
+                                Height="18"
                                 HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                CornerRadius="1"
+                                CornerRadius="3"
                                 Padding="1"
                                 Margin="0,0,5,0">
                             <Grid x:Name="markGrid">
@@ -52,7 +61,8 @@
                                 <Path x:Name="optionMark"
                                       Data="F1 M 9.97498,1.22334L 4.6983,9.09834L 4.52164,9.09834L 0,5.19331L 1.27664,3.52165L 4.255,6.08833L 8.33331,1.52588e-005L 9.97498,1.22334 Z "
                                       Fill="{StaticResource Accent.Static.Foreground}"
-                                      Margin="1"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"
                                       Opacity="0"
                                       Stretch="None"/>
                                 <Rectangle x:Name="indeterminateMark"
@@ -77,20 +87,14 @@
                             <Setter Property="Padding" Value="6,-1,6,0"/>
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="true">
-                            <Setter Property="Foreground" Value="{StaticResource CheckBox.MouseOver.Foreground}"/>
-                            <Setter Property="Background" TargetName="checkBoxBorder" Value="{StaticResource CheckBox.MouseOver.Background}"/>
-                            <Setter Property="BorderBrush" TargetName="checkBoxBorder" Value="{StaticResource CheckBox.MouseOver.Border}"/>
-                            <Setter Property="Fill" TargetName="optionMark" Value="{StaticResource Accent.Static.Foreground}"/>
-                            <Setter Property="Fill" TargetName="indeterminateMark" Value="{StaticResource Accent.Static.Foreground}"/>
+                            <Setter Property="Background" TargetName="hoverBackground" Value="{StaticResource CheckBox.MouseOver.Background}"/>
+                            <Setter Property="BorderBrush" TargetName="checkBoxBorder" Value="{StaticResource Accent.Static.Background}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="true">
-                            <Setter Property="Background" TargetName="checkBoxBorder" Value="{StaticResource CheckBox.Pressed.Background}"/>
-                            <Setter Property="BorderBrush" TargetName="checkBoxBorder" Value="{StaticResource CheckBox.Pressed.Border}"/>
-                            <Setter Property="Fill" TargetName="optionMark" Value="{StaticResource Accent.Static.Background}"/>
-                            <Setter Property="Fill" TargetName="indeterminateMark" Value="{StaticResource Accent.Static.Background}"/>
+                            <Setter Property="Background" TargetName="checkBoxBorder" Value="{StaticResource Accent.Pressed.Background}"/>
+                            <Setter Property="BorderBrush" TargetName="checkBoxBorder" Value="{StaticResource Accent.Pressed.Background}"/>
                         </Trigger>
                         <Trigger Property="IsChecked" Value="true">
-                            <Setter Property="Foreground" Value="{StaticResource CheckBox.Checked.Foreground}"/>
                             <Setter Property="Background" TargetName="checkBoxBorder" Value="{StaticResource Accent.Static.Background}"/>
                             <Setter Property="BorderBrush" TargetName="checkBoxBorder" Value="{StaticResource Accent.Static.Background}"/>
                             <Setter Property="Opacity" TargetName="optionMark" Value="1"/>
@@ -100,15 +104,17 @@
                             <Setter Property="Opacity" TargetName="optionMark" Value="0"/>
                             <Setter Property="Opacity" TargetName="indeterminateMark" Value="1"/>
                         </Trigger>
+                        <!-- Checked and pressed -->
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
-                                <Condition Property="IsMouseOver" Value="True"/>
+                                <Condition Property="IsPressed" Value="True"/>
                                 <Condition Property="IsChecked" Value="True"/>
                             </MultiTrigger.Conditions>
-                            <Setter Property="Foreground" Value="{StaticResource CheckBox.MouseOver.Foreground}"/>
+                            <Setter Property="Background" TargetName="checkBoxBorder" Value="{StaticResource Accent.Pressed.Background}"/>
+                            <Setter Property="BorderBrush" TargetName="checkBoxBorder" Value="{StaticResource Accent.Pressed.Background}"/>
                         </MultiTrigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" TargetName="checkBoxBorder" Value="0.1"/>
+                            <Setter Property="Opacity" Value="0.4"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
