@@ -29,7 +29,7 @@ namespace tcpTrigger
         // Starts capturing packets on the interface. Throws a SocketException if the listener can't start.
         public void Start()
         {
-            // Buffer for incoming data.
+            // Buffer for incoming data, reused for every packet.
             byte[] buffer = new byte[512];
 
             // Bind socket to IP endpoint.
@@ -42,9 +42,10 @@ namespace tcpTrigger
             {
                 // Complete the receive, as required for every BeginReceive.
                 SocketError error;
+                int bytesReceived;
                 try
                 {
-                    _socket.EndReceive(ar, out error);
+                    bytesReceived = _socket.EndReceive(ar, out error);
                 }
                 catch (ObjectDisposedException)
                 {
@@ -59,10 +60,16 @@ namespace tcpTrigger
                     return;
                 }
 
+                // A packet larger than the buffer fills all of it.
+                if (error == SocketError.MessageSize)
+                {
+                    bytesReceived = buffer.Length;
+                }
+
                 // Process the packet. Log any error and keep listening.
                 try
                 {
-                    ProcessPacket(buffer);
+                    ProcessPacket(buffer, bytesReceived);
                 }
                 catch (Exception ex)
                 {
@@ -73,8 +80,7 @@ namespace tcpTrigger
                         Logger.EventCode.PacketProcessingFailed);
                 }
 
-                // Reset buffer and continue listening for new data.
-                buffer = new byte[512];
+                // Continue listening for new data.
                 try
                 {
                     _socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, OnReceive, null);
@@ -111,9 +117,9 @@ namespace tcpTrigger
         }
 
         // Reads the packet header and queues the packet as a detection if it matches a detection rule.
-        private void ProcessPacket(byte[] buffer)
+        private void ProcessPacket(byte[] buffer, int length)
         {
-            PacketHeader packetHeader = new PacketHeader(buffer);
+            PacketHeader packetHeader = new PacketHeader(buffer, length);
 
             packetHeader.MatchType = PacketMatcher.GetMatchType(packetHeader, Interface.IP);
 

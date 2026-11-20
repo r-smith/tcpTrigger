@@ -91,8 +91,9 @@ namespace tcpTrigger
         // The name of the ICMP type, such as "ping", or its type code if it has no name.
         public string IcmpTypeName => Enum.GetName(typeof(IcmpTypeCode), IcmpType)?.ToLowerInvariant() ?? IcmpType.ToString();
 
-        // Reads the header fields from a captured packet. The buffer starts with the IP header.
-        public PacketHeader(byte[] buffer)
+        // Reads the header fields from a captured packet. The buffer starts with the IP header,
+        // and length is the number of bytes received.
+        public PacketHeader(byte[] buffer, int length)
         {
             MatchType = PacketMatch.None;
 
@@ -108,6 +109,16 @@ namespace tcpTrigger
             // Read the IP header length from the low 4 bits of byte 0 (the high 4 bits are the IP version).
             // The value is a count of 32-bit words, so multiply by 4 for the length in bytes (at most 60).
             int headerLength = (buffer[0] & 0x0F) * 4;
+
+            // Bytes read after the IP header: the TCP ports and flags, the UDP ports, or the ICMP type.
+            int transportLength = ProtocolType == Protocol.Tcp ? 14 : ProtocolType == Protocol.Udp ? 4 : 1;
+
+            // A packet too short for these fields is treated as unknown, so it's never matched.
+            if (headerLength < 20 || length < headerLength + transportLength)
+            {
+                ProtocolType = Protocol.Unknown;
+                return;
+            }
 
             // Read the time to live - byte 8 (8 bits).
             Ttl = buffer[8];
