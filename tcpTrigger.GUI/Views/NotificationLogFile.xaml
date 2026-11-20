@@ -48,12 +48,7 @@
             </Grid>
 
             <!-- Log settings -->
-            <StackPanel Grid.IsSharedSizeScope="True" Margin="0,40,0,0">
-                <!-- How the service runs this notification -->
-                <ContentControl Style="{StaticResource InfoBox}"
-                                Margin="0,0,0,14"
-                                Content="The tcpTrigger service writes this file under its own account. Choose a folder it can write to, such as C:\ProgramData\tcpTrigger. Folders in your user profile, like Desktop or Documents, won't work."/>
-
+            <StackPanel Grid.IsSharedSizeScope="True" Margin="0,24,0,0">
                 <!-- Path -->
                 <Grid Margin="0">
                     <Grid.ColumnDefinitions>
@@ -91,6 +86,11 @@
                             Margin="0,6,0,0"
                             Padding="15,4"/>
                 </Grid>
+
+                <!-- How the service runs this notification -->
+                <ContentControl Style="{StaticResource InfoBox}"
+                                Margin="0,20,0,0"
+                                Content="The tcpTrigger service writes this file, not your user account. Use a folder like C:\ProgramData\tcpTrigger. Folders in your user profile, like Desktop or Documents, won't work."/>
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

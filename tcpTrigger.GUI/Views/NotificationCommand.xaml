@@ -48,12 +48,7 @@
             </Grid>
 
             <!-- Command settings -->
-            <StackPanel Grid.IsSharedSizeScope="True" Margin="0,40,0,0">
-                <!-- How the service runs this notification -->
-                <ContentControl Style="{StaticResource InfoBox}"
-                                Margin="0,0,0,14"
-                                Content="The tcpTrigger service starts this program in the background, under its own account. A script or command-line tool works best."/>
-
+            <StackPanel Grid.IsSharedSizeScope="True" Margin="0,24,0,0">
                 <!-- Path -->
                 <Grid Margin="0">
                     <Grid.ColumnDefinitions>
@@ -125,6 +120,11 @@
                                Text="Can include {SENSOR_NAME}, {SOURCE_IP}, {SOURCE_PORT}, {SOURCE_HOSTNAME}, {SOURCE_OS_GUESS}, {DESTINATION_IP}, {DESTINATION_PORT}, {DESTINATION_HOSTNAME}, {DESTINATION_MAC}, {DETECTION_TYPE}, {PROTOCOL}, {TCP_FLAGS}, {ICMP_TYPE}, {TTL}, and {TIMESTAMP}, which are replaced with details of the detection."
                                Style="{StaticResource HintText}"/>
                 </Grid>
+
+                <!-- How the service runs this notification -->
+                <ContentControl Style="{StaticResource InfoBox}"
+                                Margin="0,20,0,0"
+                                Content="The tcpTrigger service starts this program in the background, under its own account. A script or command-line tool works best."/>
             </StackPanel>
         </StackPanel>
     </ScrollViewer>
