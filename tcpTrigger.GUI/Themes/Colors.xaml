@@ -94,6 +94,7 @@
     <SolidColorBrush x:Key="MenuItem.Highlight.Border" Color="Transparent"/>
     <SolidColorBrush x:Key="MenuItem.Highlight.Disabled.Background" Color="#0A000000"/>
     <SolidColorBrush x:Key="MenuItem.Highlight.Disabled.Border" Color="#21000000"/>
+    <SolidColorBrush x:Key="MenuItem.Separator" Color="#333333"/>
 
     <!-- ScrollBar -->
     <SolidColorBrush x:Key="ScrollBar.Track.Background" Color="#2E2E2E"/>
