@@ -1,17 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- Colors -->
-    <SolidColorBrush x:Key="TextBox.Static.Background" Color="#020305"/>
-    <SolidColorBrush x:Key="TextBox.Static.Border" Color="#2F363D"/>
-    <SolidColorBrush x:Key="TextBox.Static.Foreground" Color="#FFD43B"/>
-    <SolidColorBrush x:Key="TextBox.MouseOver.Background" Color="#020305"/>
-    <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="TextBox.Focus.Background" Color="#000000"/>
-    <SolidColorBrush x:Key="TextBox.Focus.Border" Color="#48E3FF"/>
-    <SolidColorBrush x:Key="TextBox.Selection.Active" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="TextBox.Selection.Inactive" Color="#A9A9A9"/>
-
     <!-- TextBox style -->
     <Style TargetType="{x:Type TextBox}">
         <Setter Property="Background" Value="{StaticResource TextBox.Static.Background}"/>
@@ -60,8 +49,8 @@
                             <Setter Property="Background" TargetName="border" Value="{StaticResource TextBox.MouseOver.Background}"/>
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="true">
-                            <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource TextBox.Focus.Border}"/>
-                            <Setter Property="Stroke" TargetName="outerBorder" Value="{StaticResource TextBox.Focus.Border}"/>
+                            <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource InputFocus.Border}"/>
+                            <Setter Property="Stroke" TargetName="outerBorder" Value="{StaticResource InputFocus.Border}"/>
                             <Setter Property="Background" TargetName="border" Value="{StaticResource TextBox.Focus.Background}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -128,8 +117,8 @@
                             <Setter Property="Background" TargetName="border" Value="{StaticResource TextBox.MouseOver.Background}"/>
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="true">
-                            <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource TextBox.Focus.Border}"/>
-                            <Setter Property="Stroke" TargetName="outerBorder" Value="{StaticResource TextBox.Focus.Border}"/>
+                            <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource InputFocus.Border}"/>
+                            <Setter Property="Stroke" TargetName="outerBorder" Value="{StaticResource InputFocus.Border}"/>
                             <Setter Property="Background" TargetName="border" Value="{StaticResource TextBox.Focus.Background}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>

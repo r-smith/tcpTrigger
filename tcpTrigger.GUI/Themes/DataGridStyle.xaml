@@ -2,18 +2,6 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero">
 
-    <!-- Brushes -->
-    <SolidColorBrush x:Key="{x:Static DataGrid.FocusBorderBrushKey}" Color="#000000"/>
-    <SolidColorBrush x:Key="DG.Header.Static.Background" Color="#000000"/>
-    <SolidColorBrush x:Key="DG.Header.Static.Foreground" Color="#7FD6A6"/>
-    <SolidColorBrush x:Key="DG.Header.Static.Border" Color="#000000"/>
-    <SolidColorBrush x:Key="DG.Row.Static.Background" Color="#000000"/>
-    <SolidColorBrush x:Key="DG.Row.Static.Foreground" Color="#E8E8E8"/>
-    <SolidColorBrush x:Key="DG.Row.Selected.Background" Color="#101820"/>
-    <SolidColorBrush x:Key="DG.Row.MouseOver.Background" Color="#1A1A1A"/>
-    <SolidColorBrush x:Key="DG.Row.MouseOver.Border" Color="#50303030"/>
-    <SolidColorBrush x:Key="DG.Gridlines.Border" Color="#303030"/>
-
     <!-- Row style -->
     <Style x:Key="DataGridRowStyle" TargetType="{x:Type DataGridRow}">
         <Setter Property="BorderThickness" Value="0"/>
@@ -131,7 +119,7 @@
         <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
         <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
         <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
-        <Setter Property="Background" Value="#000000"/>
+        <Setter Property="Background" Value="{StaticResource DG.Static.Background}"/>
         <Setter Property="Foreground" Value="{StaticResource DG.Row.Static.Foreground}"/>
         <Setter Property="RowBackground" Value="{StaticResource DG.Row.Static.Background}"/>
         <Setter Property="BorderThickness" Value="0"/>

@@ -9,7 +9,7 @@
                 <ControlTemplate>
                     <Rectangle Margin="-1"
                                SnapsToDevicePixels="true"
-                               Stroke="#48E3FF"
+                               Stroke="{StaticResource InputFocus.Border}"
                                StrokeThickness="3"
                                RadiusX="2"
                                RadiusY="2"/>
@@ -23,7 +23,7 @@
                 <ControlTemplate>
                     <Rectangle Margin="4"
                                SnapsToDevicePixels="true"
-                               Stroke="#48E3FF"
+                               Stroke="{StaticResource InputFocus.Border}"
                                StrokeThickness="2"
                                RadiusX="4"
                                RadiusY="4"/>
@@ -31,24 +31,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-
-    <!-- Colors -->
-    <SolidColorBrush x:Key="ComboBox.Static.Background" Color="#141414"/>
-    <SolidColorBrush x:Key="ComboBox.Static.Border" Color="#72809D"/>
-    <SolidColorBrush x:Key="ComboBox.Static.Foreground" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="ComboBox.Static.Glyph" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="ComboBox.MouseOver.Background" Color="#282828"/>
-    <SolidColorBrush x:Key="ComboBox.MouseOver.Border" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="ComboBox.MouseOver.Glyph" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="ComboBox.Pressed.Background" Color="#141414"/>
-    <SolidColorBrush x:Key="ComboBox.Pressed.Border" Color="#AAAAAA"/>
-    <SolidColorBrush x:Key="ComboBox.Pressed.Glyph" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="ComboBox.DropDown.Background" Color="#040404"/>
-    <SolidColorBrush x:Key="ComboBox.DropDown.Border" Color="#5F8CFF"/>
-    <SolidColorBrush x:Key="ComboBoxItem.Static.Foreground" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="ComboBoxItem.ItemsviewHover.Background" Color="#282828"/>
-    <SolidColorBrush x:Key="ComboBoxItem.ItemsviewHover.Border" Color="Transparent"/>
-    <SolidColorBrush x:Key="ComboBoxItem.ItemsviewSelected.Glyph" Color="#88B0FF"/>
 
     <!-- ComboBox item container style -->
     <Style TargetType="{x:Type ComboBoxItem}">
@@ -222,7 +204,7 @@
         <ControlTemplate.Triggers>
             <Trigger Property="HasDropShadow" SourceName="PART_Popup" Value="true">
                 <Setter Property="Margin" TargetName="shadow" Value="0,0,5,5"/>
-                <Setter Property="Color" TargetName="shadow" Value="#A1000000"/>
+                <Setter Property="Color" TargetName="shadow" Value="{StaticResource ComboBox.DropDown.Shadow}"/>
             </Trigger>
             <Trigger Property="HasItems" Value="false">
                 <Setter Property="Height" TargetName="dropDownBorder" Value="95"/>

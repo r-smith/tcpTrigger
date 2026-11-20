@@ -26,17 +26,17 @@
          Use: <ContentControl Style="{StaticResource DisabledBadge}"/> -->
     <Style x:Key="DisabledBadge" TargetType="{x:Type ContentControl}" BasedOn="{StaticResource Badge}">
         <Setter Property="Content" Value="Disabled"/>
-        <Setter Property="Background" Value="#1AFFD43B"/>
-        <Setter Property="BorderBrush" Value="#8CFFD43B"/>
-        <Setter Property="Foreground" Value="#FFD43B"/>
+        <Setter Property="Background" Value="{StaticResource DisabledBadge.Background}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource DisabledBadge.Border}"/>
+        <Setter Property="Foreground" Value="{StaticResource DisabledBadge.Foreground}"/>
     </Style>
 
     <!-- Marks a setting for experienced users, such as UDP detection.
          Use: <ContentControl Style="{StaticResource AdvancedBadge}"/> -->
     <Style x:Key="AdvancedBadge" TargetType="{x:Type ContentControl}" BasedOn="{StaticResource Badge}">
         <Setter Property="Content" Value="Advanced"/>
-        <Setter Property="Background" Value="#268E6EFF"/>
-        <Setter Property="BorderBrush" Value="#8C8E6EFF"/>
-        <Setter Property="Foreground" Value="#B7A6FF"/>
+        <Setter Property="Background" Value="{StaticResource AdvancedBadge.Background}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource AdvancedBadge.Border}"/>
+        <Setter Property="Foreground" Value="{StaticResource AdvancedBadge.Foreground}"/>
     </Style>
 </ResourceDictionary>

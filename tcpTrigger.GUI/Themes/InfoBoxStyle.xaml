@@ -8,8 +8,8 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ContentControl}">
-                    <Border Background="#0D1724"
-                            BorderBrush="#2A4A6B"
+                    <Border Background="{StaticResource InfoBox.Background}"
+                            BorderBrush="{StaticResource InfoBox.Border}"
                             BorderThickness="1"
                             CornerRadius="3"
                             Padding="12,9">
@@ -25,10 +25,10 @@
                                              Canvas.Top="3"
                                              Width="18"
                                              Height="18"
-                                             Stroke="#61B8FF"
+                                             Stroke="{StaticResource InfoBox.Icon}"
                                              StrokeThickness="1.8"/>
                                     <Path Data="M12,11 L12,17 M12,7.5 L12,8"
-                                          Stroke="#61B8FF"
+                                          Stroke="{StaticResource InfoBox.Icon}"
                                           StrokeThickness="1.8"
                                           StrokeStartLineCap="Round"
                                           StrokeEndLineCap="Round"/>
@@ -38,7 +38,7 @@
                                        TextWrapping="Wrap"
                                        FontFamily="Segoe UI"
                                        FontSize="14"
-                                       Foreground="#E0E0E0"
+                                       Foreground="{StaticResource InfoBox.Foreground}"
                                        VerticalAlignment="Top"/>
                         </DockPanel>
                     </Border>

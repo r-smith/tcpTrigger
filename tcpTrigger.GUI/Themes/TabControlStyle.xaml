@@ -1,24 +1,13 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- Colors -->
-    <SolidColorBrush x:Key="TabItemVert.Selected.Background" Color="#000000"/>
-    <SolidColorBrush x:Key="TabItemVert.Selected.Border" Color="#214462"/>
-    <SolidColorBrush x:Key="TabItemVert.Selected.Foreground" Color="#EA4A5A"/>
-    <SolidColorBrush x:Key="TabItemVert.Static.Background" Color="Transparent"/>
-    <SolidColorBrush x:Key="TabItemVert.Static.Border" Color="#454D66"/>
-    <SolidColorBrush x:Key="TabItemVert.Static.Foreground" Color="#959DA5"/>
-    <SolidColorBrush x:Key="TabItemVert.MouseOver.Background" Color="#24292E"/>
-    <SolidColorBrush x:Key="TabControlVert.Content.Background" Color="#000000"/>
-    <SolidColorBrush x:Key="TabControlVert.Content.Border" Color="#000000"/>
-
     <!-- Vertical focus visual -->
     <Style x:Key="TabVertFocusVisual">
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
                     <Grid>
-                        <Rectangle Stroke="#E8E8E8"
+                        <Rectangle Stroke="{StaticResource FocusVisual.Border}"
                                    RadiusX="4"
                                    RadiusY="4"
                                    SnapsToDevicePixels="true"
@@ -124,7 +113,7 @@
                                 <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Mode=Self}}" Value="true"/>
                                 <Condition Binding="{Binding IsMouseOver, ElementName=templateRoot}" Value="true"/>
                             </MultiDataTrigger.Conditions>
-                            <Setter Property="Background" TargetName="innerBorder" Value="#141414"/>
+                            <Setter Property="Background" TargetName="innerBorder" Value="{StaticResource TabItemVert.SelectedMouseOver.Background}"/>
                         </MultiDataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
