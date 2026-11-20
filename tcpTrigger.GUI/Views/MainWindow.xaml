@@ -15,7 +15,7 @@
         Background="{StaticResource Monitor.Window.Background}"
         WindowStyle="None">
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="40"
+        <WindowChrome CaptionHeight="36"
                       ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}"
                       GlassFrameThickness="0"
                       CornerRadius="0"/>
@@ -24,7 +24,7 @@
     <Border Style="{StaticResource WindowMainPanelStyle}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="40"/>
+                <RowDefinition Height="36"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -53,8 +53,8 @@
                 </Grid.Style>
                 <!-- Icon -->
                 <Image Grid.Column="0"
-                       Width="20"
-                       Height="20"
+                       Width="16"
+                       Height="16"
                        Margin="8,0,4,0"
                        Source="{StaticResource icon.tcpTrigger}"/>
 
@@ -62,7 +62,7 @@
                 <TextBlock Grid.Column="1"
                            Margin="4,0,0,0"
                            VerticalAlignment="Center"
-                           FontSize="14"
+                           FontSize="12"
                            Foreground="{StaticResource TitleBar.Static.Foreground}"
                            Text="{Binding Title, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
 
@@ -78,7 +78,7 @@
                       Background="Transparent"
                       BorderThickness="0"
                       FontSize="14"
-                      Height="40">
+                      Height="36">
                     <MenuItem Header="Preferences">
                         <MenuItem.Icon>
                             <Image Source="{StaticResource icon.preferences}"/>
@@ -110,16 +110,10 @@
 
                 <!-- Minimize button -->
                 <Button Grid.Column="5"
+                        Content="&#xE921;"
                         Click="Minimize_Click"
-                        RenderOptions.EdgeMode="Aliased"
                         Style="{StaticResource TitleBarButtonStyle}"
-                        ToolTip="Minimize">
-                    <Path Width="46"
-                          Height="29"
-                          Data="M 18,15 H 28"
-                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
-                          StrokeThickness="1"/>
-                </Button>
+                        ToolTip="Minimize"/>
 
                 <!-- Maximize button -->
                 <Grid Grid.Column="6">
@@ -134,15 +128,10 @@
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    <Button Click="MaximizeRestore_Click"
+                    <Button Content="&#xE922;"
+                            Click="MaximizeRestore_Click"
                             Style="{StaticResource TitleBarButtonStyle}"
-                            ToolTip="Maximize">
-                        <Path Width="46"
-                              Height="31"
-                              Data="M 18.5,10.5 H 27.5 V 19.5 H 18.5 Z"
-                              Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
-                              StrokeThickness="1"/>
-                    </Button>
+                            ToolTip="Maximize"/>
                 </Grid>
 
                 <!-- Restore button -->
@@ -158,32 +147,22 @@
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    <Button Click="MaximizeRestore_Click"
+                    <Button Content="&#xE923;"
+                            Click="MaximizeRestore_Click"
                             Style="{StaticResource TitleBarButtonStyle}"
-                            ToolTip="Restore">
-                        <Path Width="46"
-                              Height="31"
-                              Data="M 18.5,12.5 H 25.5 V 19.5 H 18.5 Z M 20.5,12.5 V 10.5 H 27.5 V 17.5 H 25.5"
-                              Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
-                              StrokeThickness="1"/>
-                    </Button>
+                            ToolTip="Restore"/>
                 </Grid>
 
                 <!-- Close button -->
                 <Button Grid.Column="7"
+                        Content="&#xE8BB;"
                         Click="Close_Click"
                         Style="{StaticResource TitleBarCloseButtonStyle}"
-                        ToolTip="Close">
-                    <Path Width="46"
-                          Height="31"
-                          Data="M 18,11 27,20 M 18,20 27,11"
-                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
-                          StrokeThickness="1"/>
-                </Button>
+                        ToolTip="Close"/>
             </Grid>
 
             <!-- Window content -->
-            <Grid Grid.Row="1" Margin="25,10,25,0">
+            <Grid Grid.Row="1" Margin="25,13,25,0">
                 <Border Background="{StaticResource Monitor.List.Background}" BorderBrush="{StaticResource Monitor.List.Border}" BorderThickness="1"
                         CornerRadius="3" Padding="10,10">
                     <ContentControl x:Name="MonitorContent" Focusable="False"/>

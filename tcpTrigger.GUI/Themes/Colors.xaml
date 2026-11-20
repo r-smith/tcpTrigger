@@ -8,11 +8,11 @@
 
     <!-- Title bar text and caption buttons -->
     <SolidColorBrush x:Key="TitleBar.Static.Foreground" Color="#F1F1F1"/>
-    <SolidColorBrush x:Key="TitleBarButton.MouseOver.Background" Color="#292929"/>
-    <SolidColorBrush x:Key="TitleBarButton.Pressed.Background" Color="#202020"/>
-    <SolidColorBrush x:Key="TitleBarCloseButton.MouseOver.Background" Color="#AB0A15"/>
+    <SolidColorBrush x:Key="TitleBarButton.MouseOver.Background" Color="#17FFFFFF"/>
+    <SolidColorBrush x:Key="TitleBarButton.Pressed.Background" Color="#0FFFFFFF"/>
+    <SolidColorBrush x:Key="TitleBarCloseButton.MouseOver.Background" Color="#C42B1C"/>
     <SolidColorBrush x:Key="TitleBarCloseButton.MouseOver.Foreground" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="TitleBarCloseButton.Pressed.Background" Color="#780D13"/>
+    <SolidColorBrush x:Key="TitleBarCloseButton.Pressed.Background" Color="#B42A1C"/>
 
     <!-- Accent: primary buttons, the add button, and checked checkboxes -->
     <SolidColorBrush x:Key="Accent.Static.Background" Color="#9184EE"/>
