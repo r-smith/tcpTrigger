@@ -275,4 +275,93 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <!-- Variable button: one clickable variable in a VariablePicker. It isn't focusable, so the text
+         box being edited keeps the focus. -->
+    <Style x:Key="VariableButton" TargetType="{x:Type Button}">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Background" Value="{StaticResource VariableButton.Static.Background}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource VariableButton.Static.Border}"/>
+        <Setter Property="Foreground" Value="{StaticResource VariableButton.Static.Foreground}"/>
+        <Setter Property="Margin" Value="0,0,4,4"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="3"
+                            Padding="6,1"
+                            SnapsToDevicePixels="True">
+                        <!-- A TextBlock rather than a ContentPresenter, so underscores in the
+                             variable names aren't read as access keys -->
+                        <TextBlock Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}"
+                                   FontFamily="Consolas"
+                                   FontSize="12"
+                                   Padding="0"
+                                   Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource VariableButton.MouseOver.Background}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource VariableButton.MouseOver.Border}"/>
+                <Setter Property="Foreground" Value="{StaticResource VariableButton.MouseOver.Foreground}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{StaticResource VariableButton.Pressed.Background}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Link that shows or hides more content, with an arrow that turns when it's open -->
+    <Style x:Key="LinkToggleButton" TargetType="{x:Type ToggleButton}">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource ButtonFocusVisual}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Foreground" Value="{StaticResource LinkToggle.Static.Foreground}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ToggleButton}">
+                    <Border Background="Transparent" Padding="4,3">
+                        <StackPanel Orientation="Horizontal">
+                            <!-- Arrow -->
+                            <Path x:Name="arrow"
+                                  Data="M 0,0 L 4,4 L 0,8"
+                                  Stroke="{TemplateBinding Foreground}"
+                                  StrokeThickness="1.5"
+                                  StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round"
+                                  StrokeLineJoin="Round"
+                                  VerticalAlignment="Center"
+                                  RenderTransformOrigin="0.5,0.5"/>
+                            <!-- Text -->
+                            <TextBlock Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}"
+                                       FontFamily="Segoe UI"
+                                       FontSize="13"
+                                       Padding="0"
+                                       Margin="7,0,0,0"
+                                       Foreground="{TemplateBinding Foreground}"/>
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="RenderTransform" TargetName="arrow">
+                                <Setter.Value>
+                                    <RotateTransform Angle="90"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource LinkToggle.MouseOver.Foreground}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>

@@ -3,21 +3,38 @@ using System.Windows.Controls;
 using Microsoft.Win32;
 using tcpTrigger.GUI.Models;
 using tcpTrigger.GUI.Validation;
+using tcpTrigger.GUI.Views.Controls;
 
 namespace tcpTrigger.GUI.Views
 {
     public partial class NotificationCommand : UserControl, INotificationHandler
     {
+        // Variables that can go in the arguments.
+        private static readonly string[] s_variables =
+        {
+            "{SENSOR_NAME}", "{SOURCE_IP}", "{SOURCE_PORT}", "{SOURCE_HOSTNAME}", "{SOURCE_OS_GUESS}",
+            "{DESTINATION_IP}", "{DESTINATION_PORT}", "{DESTINATION_HOSTNAME}", "{DESTINATION_MAC}",
+            "{DETECTION_TYPE}", "{PROTOCOL}", "{TCP_FLAGS}", "{ICMP_TYPE}", "{TTL}", "{TIMESTAMP}"
+        };
+
         public NotificationCommand()
         {
             InitializeComponent();
             DataContext = new Models.NotificationCommand { IsEnabled = true };
+            SetUpVariables();
         }
 
         public NotificationCommand(Models.NotificationCommand notification)
         {
             InitializeComponent();
             DataContext = notification;
+            SetUpVariables();
+        }
+
+        private void SetUpVariables()
+        {
+            VariableList.Variables = s_variables;
+            VariableList.VariableClicked += (sender, variable) => VariablePicker.InsertInto(Arguments, variable);
         }
 
         // Start with the name textbox selected.

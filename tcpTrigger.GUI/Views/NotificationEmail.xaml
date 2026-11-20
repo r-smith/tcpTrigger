@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:models="clr-namespace:tcpTrigger.GUI.Models"
+             xmlns:controls="clr-namespace:tcpTrigger.GUI.Views.Controls"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=models:NotificationEmail}"
              d:DesignHeight="450" d:DesignWidth="800"
@@ -195,6 +196,7 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Email subject"/>
                     <TextBox x:Name="Subject"
+                             GotKeyboardFocus="VariableTarget_GotKeyboardFocus"
                              Text="{Binding Subject, UpdateSourceTrigger=Explicit}"
                              Grid.Column="1"/>
                 </Grid>
@@ -213,11 +215,12 @@
                                VerticalAlignment="Top"
                                Margin="0,12,0,0"/>
                     <TextBox x:Name="Body"
+                             GotKeyboardFocus="VariableTarget_GotKeyboardFocus"
                              Text="{Binding Body, UpdateSourceTrigger=Explicit}"
                              Grid.Column="1"
                              Padding="0,8,2,8"
                              AcceptsReturn="True"
-                             Height="140"
+                             Height="205"
                              TextWrapping="Wrap"
                              VerticalContentAlignment="Top"
                              VerticalScrollBarVisibility="Auto">
@@ -227,10 +230,12 @@
                             </Style>
                         </TextBox.Resources>
                     </TextBox>
-                    <TextBlock Grid.Row="1"
-                               Grid.Column="1"
-                               Text="The subject and body can include {SENSOR_NAME}, {SOURCE_IP}, {SOURCE_HOSTNAME}, {SOURCE_OS_GUESS}, {DESTINATION_IP}, {DESTINATION_MAC}, {DESTINATION_SERVICES}, {DETECTION_TYPE}, {DETECTION_COUNT}, and {DETECTION_LOG} (the detections being reported)."
-                               Style="{StaticResource HintText}"/>
+                    <!-- Variables that can go in the subject and body -->
+                    <controls:VariablePicker x:Name="VariableList"
+                                             Grid.Row="1"
+                                             Grid.Column="1"
+                                             Margin="0,8,0,0"
+                                             Hint="Click a variable to insert it into the subject or body, whichever you used last."/>
                 </Grid>
             </StackPanel>
 

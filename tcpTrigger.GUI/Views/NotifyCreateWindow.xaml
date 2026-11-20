@@ -4,7 +4,7 @@
                     xmlns:local="clr-namespace:tcpTrigger.GUI.Views"
                     Title="New notification"
                     Height="630"
-                    Width="600"
+                    Width="605"
                     MinHeight="300"
                     MinWidth="500"
                     Loaded="Window_Loaded"

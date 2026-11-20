@@ -116,6 +116,9 @@
     <Compile Include="Views\Controls\Spinner.xaml.cs">
       <DependentUpon>Spinner.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Controls\VariablePicker.xaml.cs">
+      <DependentUpon>VariablePicker.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Validation\IpAddressComparer.cs" />
     <Compile Include="Views\INotificationHandler.cs" />
     <Compile Include="Configuration\StringCipher.cs" />
@@ -183,6 +186,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Controls\Spinner.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Controls\VariablePicker.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

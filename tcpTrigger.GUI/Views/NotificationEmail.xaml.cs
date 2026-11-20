@@ -1,13 +1,26 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using tcpTrigger.GUI.Models;
 using tcpTrigger.GUI.Validation;
+using tcpTrigger.GUI.Views.Controls;
 
 namespace tcpTrigger.GUI.Views
 {
     public partial class NotificationEmail : UserControl, INotificationHandler
     {
+        // Variables that can go in the subject and body.
+        private static readonly string[] s_variables =
+        {
+            "{SENSOR_NAME}", "{SOURCE_IP}", "{SOURCE_HOSTNAME}", "{SOURCE_OS_GUESS}", "{DESTINATION_IP}",
+            "{DESTINATION_MAC}", "{DESTINATION_SERVICES}", "{DETECTION_TYPE}", "{DETECTION_COUNT}", "{DETECTION_LOG}"
+        };
+
+        // The text box a clicked variable goes into: the subject or the body, whichever had the
+        // focus last.
+        private TextBox _variableTarget;
+
         // Placeholder text for the password box, from its Tag in XAML.
         private readonly string _passwordPlaceholder;
 
@@ -15,6 +28,7 @@ namespace tcpTrigger.GUI.Views
         {
             InitializeComponent();
             _passwordPlaceholder = (string)Password.Tag;
+            SetUpVariables();
             DataContext = new Models.NotificationEmail
             {
                 IsEnabled = true,
@@ -27,6 +41,7 @@ namespace tcpTrigger.GUI.Views
         {
             InitializeComponent();
             _passwordPlaceholder = (string)Password.Tag;
+            SetUpVariables();
             DataContext = notification;
 
             Recipients.Text = string.Join(",", notification.Recipients);
@@ -40,6 +55,18 @@ namespace tcpTrigger.GUI.Views
             {
                 EncryptionNone.IsSelected = true;
             }
+        }
+
+        private void SetUpVariables()
+        {
+            _variableTarget = Body;
+            VariableList.Variables = s_variables;
+            VariableList.VariableClicked += (sender, variable) => VariablePicker.InsertInto(_variableTarget, variable);
+        }
+
+        private void VariableTarget_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            _variableTarget = (TextBox)sender;
         }
 
         // Shows the password placeholder only while the password box is empty.

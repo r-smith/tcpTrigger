@@ -7,7 +7,7 @@
                     mc:Ignorable="d"
                     Title="Edit notification"
                     Height="630"
-                    Width="600"
+                    Width="605"
                     MinHeight="300"
                     MinWidth="500"
                     MouseDown="Window_MouseDown"

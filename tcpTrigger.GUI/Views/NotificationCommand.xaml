@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:models="clr-namespace:tcpTrigger.GUI.Models"
+             xmlns:controls="clr-namespace:tcpTrigger.GUI.Views.Controls"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=models:NotificationCommand}"
              d:DesignHeight="450" d:DesignWidth="800"
@@ -116,10 +117,12 @@
                             </Style>
                         </TextBox.Resources>
                     </TextBox>
-                    <TextBlock Grid.Row="1"
-                               Grid.Column="1"
-                               Text="Can include {SENSOR_NAME}, {SOURCE_IP}, {SOURCE_PORT}, {SOURCE_HOSTNAME}, {SOURCE_OS_GUESS}, {DESTINATION_IP}, {DESTINATION_PORT}, {DESTINATION_HOSTNAME}, {DESTINATION_MAC}, {DETECTION_TYPE}, {PROTOCOL}, {TCP_FLAGS}, {ICMP_TYPE}, {TTL}, and {TIMESTAMP}, which are replaced with details of the detection."
-                               Style="{StaticResource HintText}"/>
+                    <!-- Variables that can go in the arguments -->
+                    <controls:VariablePicker x:Name="VariableList"
+                                             Grid.Row="1"
+                                             Grid.Column="1"
+                                             Margin="0,8,0,0"
+                                             Hint="Click a variable to insert it. Each one is replaced with details of the detection."/>
                 </Grid>
 
                 <!-- How the service runs this notification -->

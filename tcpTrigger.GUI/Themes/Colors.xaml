@@ -241,6 +241,17 @@
     <SolidColorBrush x:Key="SettingsList.More.Foreground" Color="#8A8A8A"/>
     <SolidColorBrush x:Key="SettingsList.Empty.Foreground" Color="#9A9A9A"/>
 
+    <!-- Variable picker: the show/hide link and the variable buttons -->
+    <SolidColorBrush x:Key="LinkToggle.Static.Foreground" Color="#A59AF1"/>
+    <SolidColorBrush x:Key="LinkToggle.MouseOver.Foreground" Color="#C2B5FF"/>
+    <SolidColorBrush x:Key="VariableButton.Static.Background" Color="#1C1C1C"/>
+    <SolidColorBrush x:Key="VariableButton.Static.Border" Color="#333333"/>
+    <SolidColorBrush x:Key="VariableButton.Static.Foreground" Color="#C8C8C8"/>
+    <SolidColorBrush x:Key="VariableButton.MouseOver.Background" Color="#2A2A2A"/>
+    <SolidColorBrush x:Key="VariableButton.MouseOver.Border" Color="#4A4A4A"/>
+    <SolidColorBrush x:Key="VariableButton.MouseOver.Foreground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="VariableButton.Pressed.Background" Color="#161616"/>
+
     <!-- Ignore rule sources, destination addresses, and ports and protocols -->
     <SolidColorBrush x:Key="Rule.Source.Foreground" Color="#44CCDD"/>
     <SolidColorBrush x:Key="Rule.Destination.Foreground" Color="#B7A6FF"/>
