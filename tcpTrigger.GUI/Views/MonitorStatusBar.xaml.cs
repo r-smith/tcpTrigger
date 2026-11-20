@@ -201,17 +201,15 @@ namespace tcpTrigger.GUI.Views
             _isStarting = true;
             _startError = null;
             StartButton.IsEnabled = false;
-            ShieldIcon.Visibility = Visibility.Collapsed;
-            StartingSpinner.Visibility = Visibility.Visible;
-            StartButtonText.Text = "Starting...";
+            StartContent.Visibility = Visibility.Hidden;
+            StartingContent.Visibility = Visibility.Visible;
 
             _startError = await ElevatedServiceControl.StartAsync();
 
             _isStarting = false;
             StartButton.IsEnabled = true;
-            StartingSpinner.Visibility = Visibility.Collapsed;
-            ShieldIcon.Visibility = Visibility.Visible;
-            StartButtonText.Text = "Start service";
+            StartingContent.Visibility = Visibility.Hidden;
+            StartContent.Visibility = Visibility.Visible;
             CheckServiceStatus();
         }
     }

@@ -93,23 +93,32 @@
                         Padding="12,4"
                         Margin="12,0,0,0"
                         VerticalAlignment="Center">
-                    <StackPanel Orientation="Horizontal">
-                        <!-- Spinner animation: shown while starting -->
-                        <controls:Spinner x:Name="StartingSpinner"
-                                          Width="14"
-                                          Height="14"
-                                          Margin="0,0,6,0"
-                                          VerticalAlignment="Center"
-                                          Visibility="Collapsed"/>
-                        <!-- Shield icon -->
-                        <Image x:Name="ShieldIcon"
-                               Source="{StaticResource icon.shield}"
-                               Width="14"
-                               Height="14"
-                               Margin="0,0,6,0"
-                               VerticalAlignment="Center"/>
-                        <TextBlock x:Name="StartButtonText" Text="Start service"/>
-                    </StackPanel>
+                    <!-- Both contents share one cell, and the hidden one still takes up space, so
+                         the button keeps the same width while the service starts -->
+                    <Grid>
+                        <!-- Shield icon and "Start service" -->
+                        <StackPanel x:Name="StartContent"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Center">
+                            <Image Source="{StaticResource icon.shield}"
+                                   Width="14"
+                                   Height="14"
+                                   Margin="0,0,6,0"
+                                   VerticalAlignment="Center"/>
+                            <TextBlock Text="Start service"/>
+                        </StackPanel>
+                        <!-- Spinner animation and "Starting...", shown while starting -->
+                        <StackPanel x:Name="StartingContent"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    Visibility="Hidden">
+                            <controls:Spinner Width="14"
+                                              Height="14"
+                                              Margin="0,0,6,0"
+                                              VerticalAlignment="Center"/>
+                            <TextBlock Text="Starting..."/>
+                        </StackPanel>
+                    </Grid>
                 </Button>
 
                 <!-- Open settings button. Shown instead of start service when there's no settings file yet. -->
