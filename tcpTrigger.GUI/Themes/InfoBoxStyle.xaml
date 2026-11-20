@@ -1,35 +1,37 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- A note that explains how something works, shown above the inputs it's about.
-         Use: <ContentControl Style="{StaticResource InfoBox}" Content="Text to show"/> -->
-    <Style x:Key="InfoBox" TargetType="{x:Type ContentControl}">
+    <!-- Callout icons, drawn on a 24 by 24 canvas -->
+    <GeometryGroup x:Key="InfoIcon">
+        <EllipseGeometry Center="12,12" RadiusX="9" RadiusY="9"/>
+        <PathGeometry Figures="M12,11 L12,17 M12,7.5 L12,8"/>
+    </GeometryGroup>
+    <PathGeometry x:Key="WarningIcon" Figures="M12,3 L22,21 L2,21 Z M12,10 L12,15 M12,18 L12,18.5"/>
+
+    <!-- A boxed note with an icon. The styles below set the colors and the icon, which goes in Tag.
+         The icon uses Foreground; the text color is the same for every callout. -->
+    <Style x:Key="Callout" TargetType="{x:Type ContentControl}">
         <Setter Property="Focusable" Value="False"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ContentControl}">
-                    <Border Background="{StaticResource InfoBox.Background}"
-                            BorderBrush="{StaticResource InfoBox.Border}"
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="1"
-                            CornerRadius="3"
+                            CornerRadius="4"
                             Padding="12,9">
                         <DockPanel>
-                            <!-- "i" icon -->
+                            <!-- Icon -->
                             <Viewbox DockPanel.Dock="Left"
                                      Width="18"
                                      Height="18"
                                      Margin="0,1,10,0"
                                      VerticalAlignment="Top">
                                 <Canvas Width="24" Height="24">
-                                    <Ellipse Canvas.Left="3"
-                                             Canvas.Top="3"
-                                             Width="18"
-                                             Height="18"
-                                             Stroke="{StaticResource InfoBox.Icon}"
-                                             StrokeThickness="1.8"/>
-                                    <Path Data="M12,11 L12,17 M12,7.5 L12,8"
-                                          Stroke="{StaticResource InfoBox.Icon}"
+                                    <Path Data="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Stroke="{TemplateBinding Foreground}"
                                           StrokeThickness="1.8"
+                                          StrokeLineJoin="Round"
                                           StrokeStartLineCap="Round"
                                           StrokeEndLineCap="Round"/>
                                 </Canvas>
@@ -38,12 +40,30 @@
                                        TextWrapping="Wrap"
                                        FontFamily="Segoe UI"
                                        FontSize="14"
-                                       Foreground="{StaticResource InfoBox.Foreground}"
+                                       Foreground="{StaticResource Callout.Foreground}"
                                        VerticalAlignment="Top"/>
                         </DockPanel>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!-- A note that explains how something works, shown above the inputs it's about.
+         Use: <ContentControl Style="{StaticResource InfoBox}" Content="Text to show"/> -->
+    <Style x:Key="InfoBox" TargetType="{x:Type ContentControl}" BasedOn="{StaticResource Callout}">
+        <Setter Property="Tag" Value="{StaticResource InfoIcon}"/>
+        <Setter Property="Background" Value="{StaticResource InfoBox.Background}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource InfoBox.Border}"/>
+        <Setter Property="Foreground" Value="{StaticResource InfoBox.Icon}"/>
+    </Style>
+
+    <!-- A warning about a setting, such as every detection type being off.
+         Use: <ContentControl Style="{StaticResource WarningBox}" Content="Text to show"/> -->
+    <Style x:Key="WarningBox" TargetType="{x:Type ContentControl}" BasedOn="{StaticResource Callout}">
+        <Setter Property="Tag" Value="{StaticResource WarningIcon}"/>
+        <Setter Property="Background" Value="{StaticResource WarningBox.Background}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource WarningBox.Border}"/>
+        <Setter Property="Foreground" Value="{StaticResource WarningBox.Icon}"/>
     </Style>
 </ResourceDictionary>

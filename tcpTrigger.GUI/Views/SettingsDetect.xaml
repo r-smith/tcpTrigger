@@ -64,12 +64,10 @@
                                 Visibility="Collapsed"/>
 
                 <!-- Warning when every detection type is off -->
-                <TextBlock Text="All detection types are off, so tcpTrigger won't detect anything."
-                           Foreground="{StaticResource WarningText.Foreground}"
-                           TextWrapping="Wrap"
-                           Margin="0,25,0,0">
-                    <TextBlock.Style>
-                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                <ContentControl Content="All detection types are off, so tcpTrigger won't detect anything."
+                                Margin="0,25,0,0">
+                    <ContentControl.Style>
+                        <Style TargetType="{x:Type ContentControl}" BasedOn="{StaticResource WarningBox}">
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
                                 <MultiDataTrigger>
@@ -82,8 +80,8 @@
                                 </MultiDataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </TextBlock.Style>
-                </TextBlock>
+                    </ContentControl.Style>
+                </ContentControl>
             </StackPanel>
         </Grid>
     </ScrollViewer>
