@@ -87,6 +87,7 @@
                             Style="{StaticResource SecondaryButton}"
                             Click="Browse_Click"
                             HorizontalAlignment="Left"
+                            MinWidth="0"
                             Margin="0,6,0,0"
                             Padding="15,4"/>
                 </Grid>
