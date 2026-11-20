@@ -12,7 +12,7 @@
         KeyDown="Window_KeyDown"
         Closing="Window_Closing"
         Closed="Window_Closed"
-        Background="#101010"
+        Background="{StaticResource Monitor.Window.Background}"
         WindowStyle="None">
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="40"
@@ -29,7 +29,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <!-- Window title bar -->
-            <Grid Grid.Row="0" Background="#101010">
+            <Grid Grid.Row="0" Background="{StaticResource Monitor.Window.Background}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -184,7 +184,7 @@
 
             <!-- Window content -->
             <Grid Grid.Row="1" Margin="25,10,25,0">
-                <Border Background="#000000" BorderBrush="#454D66" BorderThickness="1"
+                <Border Background="{StaticResource Monitor.List.Background}" BorderBrush="{StaticResource Monitor.List.Border}" BorderThickness="1"
                         CornerRadius="3" Padding="10,10">
                     <ContentControl x:Name="MonitorContent" Focusable="False"/>
                 </Border>
@@ -198,13 +198,13 @@
                             VerticalAlignment="Top">
                     <StackPanel.Background>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                            <GradientStop Color="#101010" Offset="0.5"/>
-                            <GradientStop Color="#000000" Offset="0.5"/>
+                            <GradientStop Color="{StaticResource Monitor.Window.BackgroundColor}" Offset="0.5"/>
+                            <GradientStop Color="{StaticResource Monitor.List.BackgroundColor}" Offset="0.5"/>
                         </LinearGradientBrush>
                     </StackPanel.Background>
                     <TextBlock Text="Connections to this computer"
                                FontSize="13"
-                               Foreground="#7A8099"
+                               Foreground="{StaticResource Monitor.ListHeading.Foreground}"
                                Padding="6,0"
                                VerticalAlignment="Center"/>
 
@@ -219,7 +219,7 @@
                             <ControlTemplate TargetType="{x:Type Button}">
                                 <Border Padding="6,0" Background="Transparent">
                                     <Path x:Name="Icon"
-                                          Stroke="#7A8099"
+                                          Stroke="{StaticResource Monitor.ListHeading.Foreground}"
                                           StrokeThickness="1.6"
                                           VerticalAlignment="Center">
                                         <Path.Data>
@@ -232,7 +232,7 @@
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="Icon" Property="Stroke" Value="#C8C8C8"/>
+                                        <Setter TargetName="Icon" Property="Stroke" Value="{StaticResource Monitor.ListHeading.MouseOver.Foreground}"/>
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>

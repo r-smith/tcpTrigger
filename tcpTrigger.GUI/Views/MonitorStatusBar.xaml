@@ -31,7 +31,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="HoverBackground" Property="Background" Value="#202020"/>
+                                <Setter TargetName="HoverBackground" Property="Background" Value="{StaticResource Monitor.SmallButton.MouseOver.Background}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -46,13 +46,13 @@
                 <StackPanel Orientation="Horizontal">
                     <Ellipse Width="8"
                              Height="8"
-                             Fill="#00FA9A"
+                             Fill="{StaticResource Monitor.Status.Running}"
                              Margin="0,0,8,0"
                              VerticalAlignment="Center"/>
                     <TextBlock x:Name="MonitoringText"
                                Text="Monitoring"
                                FontSize="13"
-                               Foreground="#C8C8C8"
+                               Foreground="{StaticResource Monitor.Status.Foreground}"
                                Margin="0,0,0,2"/>
                 </StackPanel>
             </Button>
@@ -62,8 +62,8 @@
         <Border x:Name="NotMonitoringBanner"
                 Margin="25,10,25,16"
                 Padding="12,8"
-                Background="#1E1A0B"
-                BorderBrush="#6B5A1A"
+                Background="{StaticResource Monitor.StoppedBanner.Background}"
+                BorderBrush="{StaticResource Monitor.StoppedBanner.Border}"
                 BorderThickness="1"
                 CornerRadius="3"
                 Visibility="Collapsed">
@@ -76,7 +76,7 @@
                          VerticalAlignment="Center">
                     <Canvas Width="24" Height="24">
                         <Path Data="M12,3 L22,21 L2,21 Z M12,10 L12,15 M12,18 L12,18.5"
-                              Stroke="#FFD43B"
+                              Stroke="{StaticResource Monitor.StoppedBanner.Icon}"
                               StrokeThickness="1.8"
                               StrokeLineJoin="Round"
                               StrokeStartLineCap="Round"
@@ -123,7 +123,7 @@
                            d:Text="Not monitoring. The tcpTrigger service is stopped."
                            TextWrapping="Wrap"
                            FontSize="14"
-                           Foreground="#F1F1F1"
+                           Foreground="{StaticResource Monitor.StoppedBanner.Foreground}"
                            VerticalAlignment="Center"/>
             </DockPanel>
         </Border>

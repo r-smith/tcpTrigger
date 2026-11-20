@@ -1,8 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- Every color used by the control styles in Themes. Merged first in App.xaml, so the other
-         dictionaries can use these brushes. -->
+    <!-- Colors used by the app's styles and views  -->
 
     <!-- Window border -->
     <SolidColorBrush x:Key="Window.Static.Border" Color="#454D66"/>
@@ -158,4 +157,53 @@
     <SolidColorBrush x:Key="AdvancedBadge.Background" Color="#268E6EFF"/>
     <SolidColorBrush x:Key="AdvancedBadge.Border" Color="#8C8E6EFF"/>
     <SolidColorBrush x:Key="AdvancedBadge.Foreground" Color="#B7A6FF"/>
+
+    <!-- ==== Monitor window ====
+         Colors used only by the monitor window. Settings and the editors don't use these. -->
+
+    <!-- Window background, and the detection list box. The Color versions are for the gradient
+         behind the list heading, which must match both backgrounds. -->
+    <Color x:Key="Monitor.Window.BackgroundColor">#101010</Color>
+    <Color x:Key="Monitor.List.BackgroundColor">#000000</Color>
+    <SolidColorBrush x:Key="Monitor.Window.Background" Color="{StaticResource Monitor.Window.BackgroundColor}"/>
+    <SolidColorBrush x:Key="Monitor.List.Background" Color="{StaticResource Monitor.List.BackgroundColor}"/>
+    <SolidColorBrush x:Key="Monitor.List.Border" Color="#454D66"/>
+
+    <!-- List heading on the border line, and its filter button -->
+    <SolidColorBrush x:Key="Monitor.ListHeading.Foreground" Color="#7A8099"/>
+    <SolidColorBrush x:Key="Monitor.ListHeading.MouseOver.Foreground" Color="#C8C8C8"/>
+
+    <!-- Filter bar -->
+    <SolidColorBrush x:Key="Monitor.FilterBar.Border" Color="#262B3A"/>
+    <SolidColorBrush x:Key="Monitor.FilterBar.Foreground" Color="#959AAE"/>
+    <SolidColorBrush x:Key="Monitor.FilterBar.Placeholder" Color="#707070"/>
+    <SolidColorBrush x:Key="Monitor.FilterBar.CloseGlyph" Color="#A0A0A0"/>
+
+    <!-- Small icon buttons: close filter, service status -->
+    <SolidColorBrush x:Key="Monitor.SmallButton.MouseOver.Background" Color="#202020"/>
+
+    <!-- Detection rows, in both the compact and detailed views -->
+    <SolidColorBrush x:Key="Monitor.Date.Foreground" Color="#A0A0A0"/>
+    <SolidColorBrush x:Key="Monitor.Time.Foreground" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="Monitor.SourceIP.Foreground" Color="#FFD43B"/>
+    <SolidColorBrush x:Key="Monitor.DestinationIP.Foreground" Color="#999999"/>
+    <SolidColorBrush x:Key="Monitor.Description.Foreground" Color="#707070"/>
+    <SolidColorBrush x:Key="Monitor.Port.Foreground" Color="#61B8FF"/>
+    <SolidColorBrush x:Key="Monitor.PortName.Foreground" Color="#B84DB8"/>
+    <SolidColorBrush x:Key="Monitor.Protocol.Foreground" Color="#A0A0A0"/>
+    <SolidColorBrush x:Key="Monitor.Endpoints.Foreground" Color="#2EDCDC"/>
+
+    <!-- Empty list and loading overlays -->
+    <SolidColorBrush x:Key="Monitor.EmptyTitle.Foreground" Color="#FFD43B"/>
+    <SolidColorBrush x:Key="Monitor.EmptyMessage.Foreground" Color="#E8E8E8"/>
+    <SolidColorBrush x:Key="Monitor.Loading.Spinner" Color="#61B8FF"/>
+    <SolidColorBrush x:Key="Monitor.Loading.Foreground" Color="#CCCCCC"/>
+
+    <!-- Status bar: monitoring, and the banner shown when the service is stopped -->
+    <SolidColorBrush x:Key="Monitor.Status.Running" Color="#00FA9A"/>
+    <SolidColorBrush x:Key="Monitor.Status.Foreground" Color="#C8C8C8"/>
+    <SolidColorBrush x:Key="Monitor.StoppedBanner.Background" Color="#1E1A0B"/>
+    <SolidColorBrush x:Key="Monitor.StoppedBanner.Border" Color="#6B5A1A"/>
+    <SolidColorBrush x:Key="Monitor.StoppedBanner.Icon" Color="#FFD43B"/>
+    <SolidColorBrush x:Key="Monitor.StoppedBanner.Foreground" Color="#F1F1F1"/>
 </ResourceDictionary>

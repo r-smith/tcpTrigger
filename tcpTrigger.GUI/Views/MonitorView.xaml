@@ -43,7 +43,7 @@
         <!-- Filter bar. Opened with Ctrl+F or the search button -->
         <Border x:Name="FilterBar"
                 Visibility="Collapsed"
-                BorderBrush="#262B3A"
+                BorderBrush="{StaticResource Monitor.FilterBar.Border}"
                 BorderThickness="0,0,0,1"
                 Padding="5,0,0,8"
                 Margin="0,0,0,6">
@@ -57,7 +57,7 @@
                              PreviewKeyDown="FilterBox_PreviewKeyDown"
                              AutomationProperties.Name="Filter detections"/>
                     <!-- Magnifier icon -->
-                    <Path Stroke="#959AAE"
+                    <Path Stroke="{StaticResource Monitor.FilterBar.Foreground}"
                           StrokeThickness="1.6"
                           Margin="8,0,0,0"
                           HorizontalAlignment="Left"
@@ -74,7 +74,7 @@
                     <TextBlock Text="Filter"
                                FontFamily="Consolas"
                                FontSize="14"
-                               Foreground="#707070"
+                               Foreground="{StaticResource Monitor.FilterBar.Placeholder}"
                                Margin="28,0,0,0"
                                VerticalAlignment="Center"
                                IsHitTestVisible="False">
@@ -94,7 +94,7 @@
                 <!-- How many detections matched the filter. Empty while there's no filter. -->
                 <TextBlock x:Name="FilterCount"
                            FontSize="13"
-                           Foreground="#959AAE"
+                           Foreground="{StaticResource Monitor.FilterBar.Foreground}"
                            Margin="12,0,0,0"
                            VerticalAlignment="Center"/>
 
@@ -111,14 +111,14 @@
                         <ControlTemplate TargetType="{x:Type Button}">
                             <Border x:Name="HoverBackground" Background="Transparent" CornerRadius="3">
                                 <Path Data="M 0,0 L 9,9 M 0,9 L 9,0"
-                                      Stroke="#A0A0A0"
+                                      Stroke="{StaticResource Monitor.FilterBar.CloseGlyph}"
                                       StrokeThickness="1.5"
                                       HorizontalAlignment="Center"
                                       VerticalAlignment="Center"/>
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="HoverBackground" Property="Background" Value="#202020"/>
+                                    <Setter TargetName="HoverBackground" Property="Background" Value="{StaticResource Monitor.SmallButton.MouseOver.Background}"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -161,7 +161,7 @@
                                    Text="{Binding Endpoints}"
                                    FontFamily="Consolas"
                                    FontSize="14"
-                                   Foreground="#2EDCDC"
+                                   Foreground="{StaticResource Monitor.Endpoints.Foreground}"
                                    Padding="20,6,0,6"/>
                     </Grid>
                 </DataTemplate>
@@ -186,11 +186,11 @@
                                     <ControlTemplate TargetType="{x:Type DataGridCell}">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="{Binding Timestamp, StringFormat=d}"
-                                                       Foreground="#A0A0A0"
+                                                       Foreground="{StaticResource Monitor.Date.Foreground}"
                                                        Padding="5,4,0,4"/>
                                             <TextBlock Text=" "/>
                                             <TextBlock Text="{Binding Timestamp, StringFormat=T}"
-                                                       Foreground="#E0E0E0"
+                                                       Foreground="{StaticResource Monitor.Time.Foreground}"
                                                        Padding="0,4,5,4"/>
                                         </StackPanel>
                                     </ControlTemplate>
@@ -211,7 +211,7 @@
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="{Binding SourceIP}"
                                                        FontFamily="Consolas"
-                                                       Foreground="#FFD43B"
+                                                       Foreground="{StaticResource Monitor.SourceIP.Foreground}"
                                                        FontSize="18"
                                                        Padding="20,4,10,4"/>
                                         </StackPanel>
@@ -231,7 +231,7 @@
                                 <Setter.Value>
                                     <ControlTemplate TargetType="{x:Type DataGridCell}">
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Foreground="#707070"
+                                            <TextBlock Foreground="{StaticResource Monitor.Description.Foreground}"
                                                        Padding="5,4,4,4">
                                                 <TextBlock.Style>
                                                     <Style TargetType="{x:Type TextBlock}">
@@ -248,7 +248,7 @@
                                                 </TextBlock.Style>
                                             </TextBlock>
                                             <TextBlock Text="{Binding DestinationPort}"
-                                                       Foreground="#61B8FF"
+                                                       Foreground="{StaticResource Monitor.Port.Foreground}"
                                                        FontFamily="Consolas"
                                                        FontSize="18"
                                                        Padding="6,4,0,4">
@@ -264,7 +264,7 @@
                                             </TextBlock>
                                             <!-- The port's name, if it's a well-known port -->
                                             <TextBlock Text="{Binding PortName}"
-                                                       Foreground="#B84DB8"
+                                                       Foreground="{StaticResource Monitor.PortName.Foreground}"
                                                        FontFamily="Consolas"
                                                        FontSize="14"
                                                        Padding="12,5,0,4"/>
@@ -283,7 +283,7 @@
                                     Width="Auto"
                                     Visibility="Collapsed"
                                     FontFamily="Consolas"
-                                    Foreground="#FFD43B"
+                                    Foreground="{StaticResource Monitor.SourceIP.Foreground}"
                                     CellStyle="{StaticResource DetailedCell}"
                                     ElementStyle="{StaticResource DetailedText}"/>
                 <DataGridTextColumn x:Name="DetailedDestinationIPColumn"
@@ -292,7 +292,7 @@
                                     Width="Auto"
                                     Visibility="Collapsed"
                                     FontFamily="Consolas"
-                                    Foreground="#999999"
+                                    Foreground="{StaticResource Monitor.DestinationIP.Foreground}"
                                     CellStyle="{StaticResource DetailedCell}"
                                     ElementStyle="{StaticResource DetailedText}"/>
                 <DataGridTextColumn x:Name="DetailedDestinationPortColumn"
@@ -301,7 +301,7 @@
                                     Width="144"
                                     Visibility="Collapsed"
                                     FontFamily="Consolas"
-                                    Foreground="#61B8FF"
+                                    Foreground="{StaticResource Monitor.Port.Foreground}"
                                     CellStyle="{StaticResource DetailedCell}"
                                     ElementStyle="{StaticResource DetailedPort}"/>
                 <DataGridTextColumn x:Name="DetailedServiceColumn"
@@ -310,7 +310,7 @@
                                     Width="Auto"
                                     Visibility="Collapsed"
                                     FontFamily="Consolas"
-                                    Foreground="#B84DB8"
+                                    Foreground="{StaticResource Monitor.PortName.Foreground}"
                                     CellStyle="{StaticResource DetailedCell}"
                                     ElementStyle="{StaticResource DetailedText}"/>
                 <DataGridTextColumn x:Name="DetailedProtocolColumn"
@@ -318,14 +318,14 @@
                                     Binding="{Binding Type}"
                                     Width="Auto"
                                     Visibility="Collapsed"
-                                    Foreground="#A0A0A0"
+                                    Foreground="{StaticResource Monitor.Protocol.Foreground}"
                                     CellStyle="{StaticResource DetailedCell}"
                                     ElementStyle="{StaticResource DetailedText}"/>
             </DataGrid.Columns>
         </DataGrid>
 
         <!-- Overlay when the list is empty: no detections, or nothing matches the filter -->
-        <Border Grid.Row="1" Background="#000000">
+        <Border Grid.Row="1" Background="{StaticResource Monitor.List.Background}">
             <Border.Style>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -339,14 +339,14 @@
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock x:Name="EmptyTitle"
                            Text="No events"
-                           Foreground="#FFD43B"
+                           Foreground="{StaticResource Monitor.EmptyTitle.Foreground}"
                            FontWeight="SemiBold"
                            HorizontalAlignment="Center"
                            Margin="0,0,0,24"
                            FontSize="36"/>
                 <TextBlock x:Name="EmptyMessage"
                            Text="When another device tries to reach this computer, it shows up here."
-                           Foreground="#E8E8E8"
+                           Foreground="{StaticResource Monitor.EmptyMessage.Foreground}"
                            FontSize="16"
                            TextWrapping="Wrap"
                            TextAlignment="Center"/>
@@ -354,16 +354,16 @@
         </Border>
 
         <!-- Overlay when initial event loading is in progress -->
-        <Border x:Name="LoadingOverlay" Grid.Row="1" Background="#000000">
+        <Border x:Name="LoadingOverlay" Grid.Row="1" Background="{StaticResource Monitor.List.Background}">
             <Grid HorizontalAlignment="Center"
                   VerticalAlignment="Center">
                 <DockPanel>
-                    <controls:Spinner Foreground="#61B8FF"
+                    <controls:Spinner Foreground="{StaticResource Monitor.Loading.Spinner}"
                                       DockPanel.Dock="Top"
                                       HorizontalAlignment="Center"/>
                     <TextBlock Text="Loading tcpTrigger detection history..."
                                DockPanel.Dock="Top"
-                               Foreground="#CCCCCC"
+                               Foreground="{StaticResource Monitor.Loading.Foreground}"
                                Margin="0,15,0,0"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
