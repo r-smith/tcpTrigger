@@ -20,9 +20,10 @@
     <SolidColorBrush x:Key="Accent.MouseOver.Background" Color="#A59AF1"/>
     <SolidColorBrush x:Key="Accent.Pressed.Background" Color="#7969EA"/>
 
-    <!-- Focus outlines. Inputs (text boxes and combo boxes) use their own color. -->
+    <!-- Focus outlines. Inputs (text boxes and combo boxes) use their own color, which also marks
+         the selected item in a combo box dropdown. -->
     <SolidColorBrush x:Key="FocusVisual.Border" Color="#E8E8E8"/>
-    <SolidColorBrush x:Key="InputFocus.Border" Color="#48E3FF"/>
+    <SolidColorBrush x:Key="InputFocus.Border" Color="#9184EE"/>
 
     <!-- Secondary button -->
     <SolidColorBrush x:Key="Button.Secondary.Static.Border" Color="#4A4A4A"/>
@@ -52,22 +53,21 @@
 
     <!-- ComboBox -->
     <SolidColorBrush x:Key="ComboBox.Static.Background" Color="#1A1A1A"/>
-    <SolidColorBrush x:Key="ComboBox.Static.Border" Color="#72809D"/>
+    <SolidColorBrush x:Key="ComboBox.Static.Border" Color="#444444"/>
     <SolidColorBrush x:Key="ComboBox.Static.Foreground" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="ComboBox.Static.Glyph" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="ComboBox.MouseOver.Background" Color="#282828"/>
-    <SolidColorBrush x:Key="ComboBox.MouseOver.Border" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="ComboBox.MouseOver.Background" Color="#222222"/>
+    <SolidColorBrush x:Key="ComboBox.MouseOver.Border" Color="#707070"/>
     <SolidColorBrush x:Key="ComboBox.MouseOver.Glyph" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="ComboBox.Pressed.Background" Color="#1A1A1A"/>
     <SolidColorBrush x:Key="ComboBox.Pressed.Border" Color="#AAAAAA"/>
     <SolidColorBrush x:Key="ComboBox.Pressed.Glyph" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="ComboBox.DropDown.Background" Color="#040404"/>
-    <SolidColorBrush x:Key="ComboBox.DropDown.Border" Color="#5F8CFF"/>
+    <SolidColorBrush x:Key="ComboBox.DropDown.Background" Color="#1C1C1C"/>
+    <SolidColorBrush x:Key="ComboBox.DropDown.Border" Color="#454545"/>
     <Color x:Key="ComboBox.DropDown.Shadow">#A1000000</Color>
     <SolidColorBrush x:Key="ComboBoxItem.Static.Foreground" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="ComboBoxItem.ItemsviewHover.Background" Color="#282828"/>
+    <SolidColorBrush x:Key="ComboBoxItem.ItemsviewHover.Background" Color="#2A2A2A"/>
     <SolidColorBrush x:Key="ComboBoxItem.ItemsviewHover.Border" Color="Transparent"/>
-    <SolidColorBrush x:Key="ComboBoxItem.ItemsviewSelected.Glyph" Color="#88B0FF"/>
 
     <!-- DataGrid -->
     <SolidColorBrush x:Key="{x:Static DataGrid.FocusBorderBrushKey}" Color="#000000"/>
@@ -123,12 +123,12 @@
 
     <!-- TextBox and PasswordBox -->
     <SolidColorBrush x:Key="TextBox.Static.Background" Color="#000000"/>
-    <SolidColorBrush x:Key="TextBox.Static.Border" Color="#2F363D"/>
-    <SolidColorBrush x:Key="TextBox.Static.Foreground" Color="#FFD43B"/>
+    <SolidColorBrush x:Key="TextBox.Static.Border" Color="#444444"/>
+    <SolidColorBrush x:Key="TextBox.Static.Foreground" Color="#F1F1F1"/>
     <SolidColorBrush x:Key="TextBox.MouseOver.Background" Color="#000000"/>
-    <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#707070"/>
     <SolidColorBrush x:Key="TextBox.Focus.Background" Color="#000000"/>
-    <SolidColorBrush x:Key="TextBox.Selection.Active" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="TextBox.Selection.Active" Color="#9184EE"/>
     <SolidColorBrush x:Key="TextBox.Selection.Inactive" Color="#A9A9A9"/>
 
     <!-- Text styles: hint under an input, settings page heading, editor section heading -->
@@ -168,6 +168,7 @@
     <SolidColorBrush x:Key="Monitor.FilterBar.Border" Color="#262B3A"/>
     <SolidColorBrush x:Key="Monitor.FilterBar.Foreground" Color="#959AAE"/>
     <SolidColorBrush x:Key="Monitor.FilterBar.Placeholder" Color="#707070"/>
+    <SolidColorBrush x:Key="Monitor.FilterBox.Foreground" Color="#FFD43B"/>
     <SolidColorBrush x:Key="Monitor.FilterBar.CloseGlyph" Color="#A0A0A0"/>
 
     <!-- Small icon buttons: close filter, service status -->

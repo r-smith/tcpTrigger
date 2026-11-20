@@ -10,9 +10,9 @@
                     <Rectangle Margin="-1"
                                SnapsToDevicePixels="true"
                                Stroke="{StaticResource InputFocus.Border}"
-                               StrokeThickness="3"
-                               RadiusX="2"
-                               RadiusY="2"/>
+                               StrokeThickness="2"
+                               RadiusX="5"
+                               RadiusY="5"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -35,7 +35,7 @@
     <!-- ComboBox item container style -->
     <Style TargetType="{x:Type ComboBoxItem}">
         <Setter Property="SnapsToDevicePixels" Value="True"/>
-        <Setter Property="Padding" Value="10,15,40,15"/>
+        <Setter Property="Padding" Value="10,8,36,8"/>
         <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
         <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
         <Setter Property="Background" Value="Transparent"/>
@@ -53,7 +53,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="2"
+                                CornerRadius="3"
                                 Padding="{TemplateBinding Padding}"
                                 SnapsToDevicePixels="true">
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -63,7 +63,7 @@
                         <!-- Check mark drawing -->
                         <Path x:Name="optionMark"
                               Data="F1 M 12.97147,1.59034L 6.10779,11.82784L 5.87713,11.82784L 0,6.751295L 1.660652,4.577145L 5.5315,7.915829L 10.833403,1.967644e-005L 12.97147,1.59034 Z"
-                              Fill="{StaticResource ComboBoxItem.ItemsviewSelected.Glyph}"
+                              Fill="{StaticResource InputFocus.Border}"
                               Margin="0,0,12,0"
                               Opacity="0"
                               Stretch="None"
@@ -100,18 +100,23 @@
                             Background="{StaticResource ComboBox.Static.Background}"
                             BorderBrush="{StaticResource ComboBox.Static.Border}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="2"
+                            CornerRadius="4"
                             SnapsToDevicePixels="true">
+                        <!-- Drop-down arrow -->
                         <Path x:Name="arrow"
-                              Data="M 0 0 L 5 5 L 10 0 Z"
-                              Fill="{StaticResource ComboBox.Static.Glyph}"
+                              Data="M 0,0 L 4,4 L 8,0"
+                              Stroke="{StaticResource ComboBox.Static.Glyph}"
+                              StrokeThickness="1.5"
+                              StrokeStartLineCap="Round"
+                              StrokeEndLineCap="Round"
+                              StrokeLineJoin="Round"
                               HorizontalAlignment="Right"
-                              Margin="0,0,6,0"
+                              Margin="0,0,11,0"
                               VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Fill" TargetName="arrow" Value="{StaticResource ComboBox.MouseOver.Glyph}"/>
+                            <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource ComboBox.MouseOver.Glyph}"/>
                         </Trigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
@@ -122,7 +127,7 @@
                             <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource ComboBox.MouseOver.Border}"/>
                         </MultiDataTrigger>
                         <Trigger Property="IsPressed" Value="true">
-                            <Setter Property="Fill" TargetName="arrow" Value="{StaticResource ComboBox.Pressed.Glyph}"/>
+                            <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource ComboBox.Pressed.Glyph}"/>
                         </Trigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
@@ -161,8 +166,8 @@
                             BorderBrush="{StaticResource ComboBox.DropDown.Border}"
                             CornerRadius="4"
                             Margin="0,5,0,0"
-                            BorderThickness="2">
-                        <ScrollViewer x:Name="DropDownScrollViewer" Margin="5">
+                            BorderThickness="1">
+                        <ScrollViewer x:Name="DropDownScrollViewer" Margin="4">
                             <Grid x:Name="grid"
                                   RenderOptions.ClearTypeHint="Enabled">
                                 <Canvas x:Name="canvas"
@@ -239,7 +244,7 @@
         <Setter Property="Template" Value="{StaticResource ComboBoxTemplate}"/>
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Opacity" Value="0.22"/>
+                <Setter Property="Opacity" Value="0.4"/>
             </Trigger>
         </Style.Triggers>
     </Style>

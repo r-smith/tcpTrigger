@@ -50,6 +50,7 @@
             <DockPanel LastChildFill="False">
                 <Grid DockPanel.Dock="Left" Width="240">
                     <TextBox x:Name="FilterBox"
+                             Foreground="{StaticResource Monitor.FilterBox.Foreground}"
                              FontFamily="Consolas"
                              FontSize="14"
                              Padding="24,2,3,2"

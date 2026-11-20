@@ -25,20 +25,21 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="2"
+                                CornerRadius="4"
                                 SnapsToDevicePixels="True">
                             <ScrollViewer x:Name="PART_ContentHost"
                                           Focusable="false"
                                           HorizontalScrollBarVisibility="Hidden"
                                           VerticalScrollBarVisibility="Hidden"/>
                         </Border>
+                        <!-- Focus ring just outside the border -->
                         <Rectangle x:Name="outerBorder"
                                    Margin="-1"
                                    SnapsToDevicePixels="true"
                                    Stroke="Transparent"
-                                   StrokeThickness="3"
-                                   RadiusX="2"
-                                   RadiusY="2"/>
+                                   StrokeThickness="1"
+                                   RadiusX="5"
+                                   RadiusY="5"/>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsEnabled" Value="false">
@@ -93,20 +94,21 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="2"
+                                CornerRadius="4"
                                 SnapsToDevicePixels="True">
                             <ScrollViewer x:Name="PART_ContentHost"
                                           Focusable="false"
                                           HorizontalScrollBarVisibility="Hidden"
                                           VerticalScrollBarVisibility="Hidden"/>
                         </Border>
+                        <!-- Focus ring just outside the border -->
                         <Rectangle x:Name="outerBorder"
                                    Margin="-1"
                                    SnapsToDevicePixels="true"
                                    Stroke="Transparent"
-                                   StrokeThickness="3"
-                                   RadiusX="2"
-                                   RadiusY="2"/>
+                                   StrokeThickness="1"
+                                   RadiusX="5"
+                                   RadiusY="5"/>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsEnabled" Value="false">
