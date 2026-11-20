@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- TextBox style -->
+    <!-- TextBox style. Set Tag to show dim placeholder text while the box is empty. -->
     <Style TargetType="{x:Type TextBox}">
         <Setter Property="Background" Value="{StaticResource TextBox.Static.Background}"/>
         <Setter Property="BorderBrush" Value="{StaticResource TextBox.Static.Border}"/>
@@ -27,10 +27,23 @@
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="4"
                                 SnapsToDevicePixels="True">
-                            <ScrollViewer x:Name="PART_ContentHost"
-                                          Focusable="false"
-                                          HorizontalScrollBarVisibility="Hidden"
-                                          VerticalScrollBarVisibility="Hidden"/>
+                            <Grid>
+                                <ScrollViewer x:Name="PART_ContentHost"
+                                              Focusable="false"
+                                              HorizontalScrollBarVisibility="Hidden"
+                                              VerticalScrollBarVisibility="Hidden"/>
+                                <!-- Placeholder: dim text from Tag, lined up with typed text -->
+                                <Border x:Name="placeholder"
+                                        Margin="{Binding Margin, ElementName=PART_ContentHost}"
+                                        Padding="{TemplateBinding Padding}"
+                                        IsHitTestVisible="False"
+                                        Visibility="Collapsed">
+                                    <TextBlock Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
+                                               Foreground="{StaticResource TextBox.Placeholder.Foreground}"
+                                               Margin="2,0,0,0"
+                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                </Border>
+                            </Grid>
                         </Border>
                         <!-- Focus ring just outside the border -->
                         <Rectangle x:Name="outerBorder"
@@ -42,6 +55,9 @@
                                    RadiusY="5"/>
                     </Grid>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="Text" Value="">
+                            <Setter Property="Visibility" TargetName="placeholder" Value="Visible"/>
+                        </Trigger>
                         <Trigger Property="IsEnabled" Value="false">
                             <Setter Property="Opacity" TargetName="border" Value="0.35"/>
                         </Trigger>
@@ -69,7 +85,8 @@
         </Style.Triggers>
     </Style>
 
-    <!-- PasswordBox style -->
+    <!-- PasswordBox style. Tag shows as dim placeholder text. A password box can't check from XAML
+         whether it's empty, so its window clears Tag in code once a password is entered. -->
     <Style TargetType="{x:Type PasswordBox}">
         <Setter Property="PasswordChar" Value="●"/>
         <Setter Property="Background" Value="{StaticResource TextBox.Static.Background}"/>
@@ -96,10 +113,23 @@
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="4"
                                 SnapsToDevicePixels="True">
-                            <ScrollViewer x:Name="PART_ContentHost"
-                                          Focusable="false"
-                                          HorizontalScrollBarVisibility="Hidden"
-                                          VerticalScrollBarVisibility="Hidden"/>
+                            <Grid>
+                                <ScrollViewer x:Name="PART_ContentHost"
+                                              Focusable="false"
+                                              HorizontalScrollBarVisibility="Hidden"
+                                              VerticalScrollBarVisibility="Hidden"/>
+                                <!-- Placeholder: dim text from Tag, lined up with typed text -->
+                                <Border x:Name="placeholder"
+                                        Margin="{Binding Margin, ElementName=PART_ContentHost}"
+                                        Padding="{TemplateBinding Padding}"
+                                        IsHitTestVisible="False"
+                                        Visibility="Visible">
+                                    <TextBlock Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
+                                               Foreground="{StaticResource TextBox.Placeholder.Foreground}"
+                                               Margin="2,0,0,0"
+                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                </Border>
+                            </Grid>
                         </Border>
                         <!-- Focus ring just outside the border -->
                         <Rectangle x:Name="outerBorder"

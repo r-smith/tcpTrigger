@@ -97,10 +97,11 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Text="Arguments (optional)"
+                    <TextBlock Text="Arguments"
                                VerticalAlignment="Top"
                                Margin="0,12,0,0"/>
                     <TextBox x:Name="Arguments"
+                             Tag="(optional)"
                              Text="{Binding Arguments, UpdateSourceTrigger=Explicit}"
                              Grid.Column="1"
                              Padding="0,8,2,8"

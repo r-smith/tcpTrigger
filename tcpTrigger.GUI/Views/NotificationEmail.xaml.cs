@@ -8,9 +8,13 @@ namespace tcpTrigger.GUI.Views
 {
     public partial class NotificationEmail : UserControl, INotificationHandler
     {
+        // Placeholder text for the password box, from its Tag in XAML.
+        private readonly string _passwordPlaceholder;
+
         public NotificationEmail()
         {
             InitializeComponent();
+            _passwordPlaceholder = (string)Password.Tag;
             DataContext = new Models.NotificationEmail
             {
                 IsEnabled = true,
@@ -22,6 +26,7 @@ namespace tcpTrigger.GUI.Views
         public NotificationEmail(Models.NotificationEmail notification)
         {
             InitializeComponent();
+            _passwordPlaceholder = (string)Password.Tag;
             DataContext = notification;
 
             Recipients.Text = string.Join(",", notification.Recipients);
@@ -35,6 +40,12 @@ namespace tcpTrigger.GUI.Views
             {
                 EncryptionNone.IsSelected = true;
             }
+        }
+
+        // Shows the password placeholder only while the password box is empty.
+        private void Password_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            Password.Tag = Password.Password.Length == 0 ? _passwordPlaceholder : null;
         }
 
         // Start with the name textbox selected.

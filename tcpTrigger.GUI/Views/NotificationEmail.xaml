@@ -111,8 +111,9 @@
                         <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Username (optional)"/>
+                    <TextBlock Text="Username"/>
                     <TextBox x:Name="Username"
+                             Tag="(optional)"
                              Text="{Binding Username, UpdateSourceTrigger=Explicit}"
                              Grid.Column="1"/>
                 </Grid>
@@ -123,9 +124,11 @@
                         <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Password (optional)"/>
+                    <TextBlock Text="Password"/>
                     <PasswordBox x:Name="Password"
-                                 Grid.Column="1"/>
+                                 Grid.Column="1"
+                                 Tag="(optional)"
+                                 PasswordChanged="Password_PasswordChanged"/>
                 </Grid>
             </StackPanel>
 
@@ -171,8 +174,9 @@
                         <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="From display name (optional)"/>
+                    <TextBlock Text="From display name"/>
                     <TextBox x:Name="FromDisplayName"
+                             Tag="(optional)"
                              Text="{Binding FromDisplayName, UpdateSourceTrigger=Explicit}"
                              Grid.Column="1"/>
                 </Grid>

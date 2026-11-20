@@ -131,6 +131,7 @@
     <SolidColorBrush x:Key="TextBox.Focus.Background" Color="#000000"/>
     <SolidColorBrush x:Key="TextBox.Selection.Active" Color="#9184EE"/>
     <SolidColorBrush x:Key="TextBox.Selection.Inactive" Color="#A9A9A9"/>
+    <SolidColorBrush x:Key="TextBox.Placeholder.Foreground" Color="#707070"/>
 
     <!-- Text styles: hint under an input, settings page heading, editor section heading -->
     <SolidColorBrush x:Key="HintText.Foreground" Color="#909090"/>
