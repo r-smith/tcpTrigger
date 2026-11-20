@@ -10,13 +10,8 @@
         Closed="Window_Closed"
         MouseDown="Window_MouseDown"
         ShowInTaskbar="True"
-        Background="#000000"
+        Background="{StaticResource Window.Background}"
         WindowStyle="None">
-
-    <Window.Resources>
-        <SolidColorBrush x:Key="SaveStatus.Normal" Color="#AAAAAA"/>
-        <SolidColorBrush x:Key="SaveStatus.Warning" Color="#FFD43B"/>
-    </Window.Resources>
 
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="40"
@@ -32,7 +27,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <!-- Window title bar -->
-            <Grid Grid.Row="0" Background="#000000">
+            <Grid Grid.Row="0" Background="{StaticResource Window.Background}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -169,7 +164,7 @@
                 </TabControl>
 
                 <!-- Button section -->
-                <Border Grid.Row="1" Background="#141517" BorderBrush="#303030" BorderThickness="0,1,0,0">
+                <Border Grid.Row="1" Background="{StaticResource ButtonBar.Background}" BorderBrush="{StaticResource ButtonBar.Border}" BorderThickness="0,1,0,0">
                     <DockPanel Margin="25">
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                             <Button x:Name="SaveButton"

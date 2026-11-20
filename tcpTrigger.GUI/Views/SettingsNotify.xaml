@@ -22,7 +22,7 @@
             <StackPanel>
                 <TextBlock Text="Notifications"
                            Style="{StaticResource PageHeading}"/>
-                <Separator Background="#9184EE"/>
+                <Separator Background="{StaticResource Heading.Separator}"/>
 
                 <!-- New notification button -->
                 <Button Content="_New notification"
@@ -36,8 +36,7 @@
             <Border Grid.Row="1"
                     Margin="0,10,0,5"
                     CornerRadius="2"
-                    Background="#000000"
-                    BorderBrush="#1B1F23"
+                    Background="{StaticResource Window.Background}"
                     BorderThickness="0">
                 <ItemsControl x:Name="NotificationsControl" Focusable="False">
                     <ItemsControl.ItemTemplate>
@@ -54,15 +53,15 @@
                                     SnapsToDevicePixels="True">
                                 <Border.Style>
                                     <Style TargetType="{x:Type Border}">
-                                        <Setter Property="Background" Value="#000000"/>
+                                        <Setter Property="Background" Value="{StaticResource SettingsList.Item.Static.Background}"/>
                                         <Setter Property="BorderBrush" Value="Transparent"/>
                                         <Style.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="#111111"/>
-                                                <Setter Property="BorderBrush" Value="#444455"/>
+                                                <Setter Property="Background" Value="{StaticResource SettingsList.Item.MouseOver.Background}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource SettingsList.Item.MouseOver.Border}"/>
                                             </Trigger>
                                             <Trigger Property="IsFocused" Value="True">
-                                                <Setter Property="Background" Value="#222233"/>
+                                                <Setter Property="Background" Value="{StaticResource SettingsList.Item.Focused.Background}"/>
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
@@ -110,7 +109,7 @@
                                                    Style="{StaticResource OpacityToggle}"
                                                    FontSize="17"
                                                    FontWeight="Regular"
-                                                   Foreground="#EEEEFF"
+                                                   Foreground="{StaticResource SettingsList.Name.Foreground}"
                                                    TextTrimming="CharacterEllipsis"
                                                    VerticalAlignment="Center"/>
                                         <!-- Disabled badge -->
@@ -124,7 +123,7 @@
                                                Text="&#x203A;"
                                                FontSize="17"
                                                Padding="0,0,16,0"
-                                               Foreground="#707070"/>
+                                               Foreground="{StaticResource SettingsList.Chevron.Foreground}"/>
                                 </Grid>
                             </Border>
                         </DataTemplate>
@@ -136,7 +135,7 @@
             <TextBlock Grid.Row="1"
                        Text="No notifications yet. Detections appear in the tcpTrigger window. Add a notification to also send an email, run a program, or write to a log file."
                        FontSize="16"
-                       Foreground="#9A9A9A"
+                       Foreground="{StaticResource SettingsList.Empty.Foreground}"
                        TextWrapping="Wrap"
                        VerticalAlignment="Top"
                        Margin="0,14,0,0">

@@ -25,7 +25,7 @@
             <StackPanel>
                 <TextBlock Text="Ignore rules"
                            Style="{StaticResource PageHeading}"/>
-                <Separator Background="#9184EE"/>
+                <Separator Background="{StaticResource Heading.Separator}"/>
 
                 <!-- New rule button -->
                 <Button Content="_New rule"
@@ -39,7 +39,7 @@
             <Border Grid.Row="1"
                     Margin="0,14,0,0"
                     Padding="11,0,1,6"
-                    BorderBrush="#262A33"
+                    BorderBrush="{StaticResource SettingsList.Header.Border}"
                     BorderThickness="0,0,0,1">
                 <Border.Style>
                     <Style TargetType="{x:Type Border}">
@@ -55,8 +55,8 @@
                         <ColumnDefinition Width="1.6*" MaxWidth="250"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Sources" FontSize="12" Foreground="#8A8A8A"/>
-                    <TextBlock Text="Destinations" Grid.Column="1" FontSize="12" Foreground="#8A8A8A"/>
+                    <TextBlock Text="Sources" FontSize="12" Foreground="{StaticResource SettingsList.Header.Foreground}"/>
+                    <TextBlock Text="Destinations" Grid.Column="1" FontSize="12" Foreground="{StaticResource SettingsList.Header.Foreground}"/>
                 </Grid>
             </Border>
 
@@ -78,15 +78,15 @@
                                 SnapsToDevicePixels="True">
                             <Border.Style>
                                 <Style TargetType="{x:Type Border}">
-                                    <Setter Property="Background" Value="#000000"/>
+                                    <Setter Property="Background" Value="{StaticResource SettingsList.Item.Static.Background}"/>
                                     <Setter Property="BorderBrush" Value="Transparent"/>
                                     <Style.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="#111111"/>
-                                            <Setter Property="BorderBrush" Value="#444455"/>
+                                            <Setter Property="Background" Value="{StaticResource SettingsList.Item.MouseOver.Background}"/>
+                                            <Setter Property="BorderBrush" Value="{StaticResource SettingsList.Item.MouseOver.Border}"/>
                                         </Trigger>
                                         <Trigger Property="IsFocused" Value="True">
-                                            <Setter Property="Background" Value="#222233"/>
+                                            <Setter Property="Background" Value="{StaticResource SettingsList.Item.Focused.Background}"/>
                                         </Trigger>
                                     </Style.Triggers>
                                 </Style>
@@ -115,7 +115,7 @@
                                     <Style x:Key="MoreLine" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource OpacityToggle}">
                                         <Setter Property="FontFamily" Value="Segoe UI"/>
                                         <Setter Property="FontSize" Value="13"/>
-                                        <Setter Property="Foreground" Value="#8A8A8A"/>
+                                        <Setter Property="Foreground" Value="{StaticResource SettingsList.More.Foreground}"/>
                                         <Style.Triggers>
                                             <Trigger Property="Text" Value="">
                                                 <Setter Property="Visibility" Value="Collapsed"/>
@@ -130,7 +130,7 @@
                                                Style="{StaticResource OpacityToggle}"
                                                FontSize="17"
                                                FontWeight="Regular"
-                                               Foreground="#EEEEFF"
+                                               Foreground="{StaticResource SettingsList.Name.Foreground}"
                                                TextTrimming="CharacterEllipsis"
                                                Margin="0,0,0,4"/>
                                     <!-- Disabled badge -->
@@ -147,7 +147,7 @@
                                             <DataTemplate>
                                                 <TextBlock Text="{Binding}"
                                                            Style="{StaticResource OpacityToggle}"
-                                                           Foreground="#44CCDD"
+                                                           Foreground="{StaticResource Rule.Source.Foreground}"
                                                            FontFamily="Consolas"
                                                            FontSize="14"
                                                            TextTrimming="CharacterEllipsis"/>
@@ -165,7 +165,7 @@
                                             <DataTemplate>
                                                 <TextBlock Text="{Binding}"
                                                            Style="{StaticResource OpacityToggle}"
-                                                           Foreground="#B7A6FF"
+                                                           Foreground="{StaticResource Rule.Destination.Foreground}"
                                                            FontFamily="Consolas"
                                                            FontSize="14"
                                                            TextTrimming="CharacterEllipsis"/>
@@ -185,7 +185,7 @@
                                             <DataTemplate>
                                                 <TextBlock Text="{Binding}"
                                                            Style="{StaticResource OpacityToggle}"
-                                                           Foreground="#DD66DD"
+                                                           Foreground="{StaticResource Rule.Service.Foreground}"
                                                            FontFamily="Consolas"
                                                            FontSize="14"
                                                            TextTrimming="CharacterEllipsis"/>
@@ -201,7 +201,7 @@
                                            Text="&#x203A;"
                                            FontSize="17"
                                            Padding="0,0,16,0"
-                                           Foreground="#707070"
+                                           Foreground="{StaticResource SettingsList.Chevron.Foreground}"
                                            HorizontalAlignment="Right"
                                            VerticalAlignment="Center"/>
                             </Grid>
@@ -214,7 +214,7 @@
             <TextBlock Grid.Row="2"
                        Text="No ignore rules yet. Add rules to stop detections from sources you expect, such as a monitoring server or a vulnerability scanner."
                        FontSize="16"
-                       Foreground="#9A9A9A"
+                       Foreground="{StaticResource SettingsList.Empty.Foreground}"
                        TextWrapping="Wrap"
                        VerticalAlignment="Top"
                        Margin="0,14,0,0">

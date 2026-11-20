@@ -7,14 +7,14 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=models:IgnoreRule}"
              d:DesignHeight="450" d:DesignWidth="800"
-             Foreground="#FFFFFF"
+             Foreground="{StaticResource Text.Primary}"
              Loaded="UserControl_Loaded">
 
     <UserControl.Resources>
         <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="Foreground" Value="{StaticResource Text.Primary}"/>
             <Setter Property="Padding" Value="0,0,12,0"/>
         </Style>
         <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
@@ -24,7 +24,7 @@
         <!-- Small title above a list box, such as "Ports and protocols" -->
         <Style x:Key="FieldCaption" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
             <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Foreground" Value="#AAAAAA"/>
+            <Setter Property="Foreground" Value="{StaticResource FieldCaption.Foreground}"/>
             <Setter Property="Margin" Value="0,0,0,4"/>
         </Style>
         <!-- A multi-line box for one of the rule's lists, entered one entry per line -->
@@ -82,7 +82,7 @@
         <StackPanel Grid.Row="1" Margin="0,32,0,0">
             <TextBlock Text="Ignore traffic"
                        Style="{StaticResource SectionHeading}"/>
-            <Separator Background="#9184EE"/>
+            <Separator Background="{StaticResource Heading.Separator}"/>
         </StackPanel>
         <Grid Grid.Row="2" Margin="0,12,0,0">
             <Grid.ColumnDefinitions>

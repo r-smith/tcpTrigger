@@ -17,7 +17,7 @@
             <StackPanel>
                 <TextBlock Text="Service status"
                            Style="{StaticResource PageHeading}"/>
-                <Separator Background="#9184EE"/>
+                <Separator Background="{StaticResource Heading.Separator}"/>
             </StackPanel>
 
             <!-- Content -->
@@ -40,11 +40,11 @@
                            Margin="0,0,24,0"/>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
                         <TextBlock Text="The tcpTrigger service is currently "
-                                   Foreground="#FFFFFF"
+                                   Foreground="{StaticResource Text.Primary}"
                                    FontSize="14"/>
                         <TextBlock x:Name="ServiceStatus"
                                    d:Text="running"
-                                   Foreground="#FFFFFF"
+                                   Foreground="{StaticResource Text.Primary}"
                                    FontSize="14"
                                    FontWeight="Bold"/>
                     </StackPanel>

@@ -6,11 +6,11 @@
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
              UseLayoutRounding="True">
-    <Grid Background="#88000000">
-        <Border Background="#181818"
+    <Grid Background="{StaticResource Dialog.Overlay}">
+        <Border Background="{StaticResource Dialog.Background}"
                 CornerRadius="4"
                 Padding="25"
-                BorderBrush="#9184EE"
+                BorderBrush="{StaticResource Dialog.Border}"
                 BorderThickness="2"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center">
@@ -20,7 +20,7 @@
                            FontSize="19"
                            FontFamily="Segoe UI"
                            FontWeight="Regular"
-                           Foreground="#FFFFFF"/>
+                           Foreground="{StaticResource Dialog.Foreground}"/>
                 <TextBlock x:Name="Message"
                            d:Text="A message goes here."
                            TextWrapping="Wrap"
@@ -29,7 +29,7 @@
                            MaxWidth="420"
                            FontSize="14"
                            HorizontalAlignment="Left"
-                           Foreground="#FFFFFF"/>
+                           Foreground="{StaticResource Dialog.Foreground}"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,45,0,0">
                     <!-- Shown when the dialog is given text to copy -->
                     <Button x:Name="CopyButton"

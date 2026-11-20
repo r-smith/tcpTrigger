@@ -13,7 +13,7 @@
         <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="Foreground" Value="{StaticResource Text.Primary}"/>
             <Setter Property="Padding" Value="0,0,12,0"/>
         </Style>
         <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
@@ -54,7 +54,7 @@
             <TextBlock Text="SMTP server"
                        Style="{StaticResource SectionHeading}"
                        Margin="0,40,0,1"/>
-            <Separator Background="#9184EE"/>
+            <Separator Background="{StaticResource Heading.Separator}"/>
             <StackPanel Grid.IsSharedSizeScope="True" Margin="0,12,0,0">
                 <!-- Server address -->
                 <Grid Margin="0">
@@ -134,7 +134,7 @@
             <TextBlock Text="Addresses"
                        Style="{StaticResource SectionHeading}"
                        Margin="0,40,0,1"/>
-            <Separator Background="#9184EE"/>
+            <Separator Background="{StaticResource Heading.Separator}"/>
             <StackPanel Grid.IsSharedSizeScope="True" Margin="0,12,0,0">
                 <!-- Recipients -->
                 <Grid Margin="0">
@@ -184,7 +184,7 @@
             <TextBlock Text="Message customization"
                        Style="{StaticResource SectionHeading}"
                        Margin="0,40,0,1"/>
-            <Separator Background="#9184EE"/>
+            <Separator Background="{StaticResource Heading.Separator}"/>
             <StackPanel Grid.IsSharedSizeScope="True" Margin="0,12,0,0">
                 <!-- Subject -->
                 <Grid Margin="0">
@@ -237,7 +237,7 @@
             <TextBlock Text="Sending"
                        Style="{StaticResource SectionHeading}"
                        Margin="0,40,0,1"/>
-            <Separator Background="#9184EE"/>
+            <Separator Background="{StaticResource Heading.Separator}"/>
             <StackPanel Margin="0,15,0,15">
                 <!-- Rate limit -->
                 <StackPanel Orientation="Horizontal">

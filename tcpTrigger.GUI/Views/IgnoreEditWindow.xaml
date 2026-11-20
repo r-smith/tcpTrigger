@@ -9,7 +9,7 @@
                     MinWidth="500"
                     MouseDown="Window_MouseDown"
                     ShowInTaskbar="False"
-                    Background="#000000"
+                    Background="{StaticResource Window.Background}"
                     WindowStyle="None"
                     WindowStartupLocation="CenterOwner"
                     FontSize="14">
@@ -24,11 +24,11 @@
         <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="Foreground" Value="{StaticResource Text.Primary}"/>
         </Style>
     </Window.Resources>
 
-    <Border Style="{StaticResource WindowMainPanelStyle}" BorderBrush="#707070" BorderThickness="1">
+    <Border Style="{StaticResource WindowMainPanelStyle}" BorderBrush="{StaticResource EditorWindow.Border}" BorderThickness="1">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="40"/>
@@ -36,7 +36,7 @@
             </Grid.RowDefinitions>
 
             <!-- Window title bar -->
-            <Grid Grid.Row="0" Background="#000000">
+            <Grid Grid.Row="0" Background="{StaticResource Window.Background}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -68,7 +68,7 @@
                            VerticalAlignment="Center"
                            FontSize="23"
                            FontWeight="SemiBold"
-                           Foreground="#FFFFFF"
+                           Foreground="{StaticResource EditorTitle.Foreground}"
                            HorizontalAlignment="Left"
                            Text="{Binding Title, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
 
@@ -94,14 +94,14 @@
                 </Grid.RowDefinitions>
 
                 <!-- Ignore rule content -->
-                <Border Background="#000000"
+                <Border Background="{StaticResource Window.Background}"
                         Margin="0,25,0,0">
                     <ContentControl x:Name="IgnoreRuleContent"
                                     Focusable="False"/>
                 </Border>
 
                 <!-- Button section -->
-                <Border Grid.Row="1" Background="#141517" BorderBrush="#303030" BorderThickness="0,1,0,0">
+                <Border Grid.Row="1" Background="{StaticResource ButtonBar.Background}" BorderBrush="{StaticResource ButtonBar.Border}" BorderThickness="0,1,0,0">
                     <Grid Margin="25,20,25,20">
                         <Button x:Name="DeleteButton"
                                 Style="{StaticResource DeleteButton}"

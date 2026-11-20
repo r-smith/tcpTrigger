@@ -6,11 +6,11 @@
              mc:Ignorable="d"
              d:Width="600" d:Height="500"
              UseLayoutRounding="True">
-    <Grid Background="#88000000">
-        <Border Background="#181818"
+    <Grid Background="{StaticResource Dialog.Overlay}">
+        <Border Background="{StaticResource Dialog.Background}"
                 CornerRadius="4"
                 Padding="25"
-                BorderBrush="#FFD43B"
+                BorderBrush="{StaticResource Dialog.Warning.Border}"
                 BorderThickness="2"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center">
@@ -19,13 +19,13 @@
                            FontSize="19"
                            FontFamily="Segoe UI"
                            FontWeight="Regular"
-                           Foreground="#FFFFFF"/>
+                           Foreground="{StaticResource Dialog.Foreground}"/>
                 <TextBlock Text="tcpTrigger won't detect anything until the service is started again."
                            TextWrapping="Wrap"
                            Margin="0,12,0,0"
                            FontSize="14"
                            HorizontalAlignment="Left"
-                           Foreground="#FFFFFF"/>
+                           Foreground="{StaticResource Dialog.Foreground}"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,45,0,0">
                     <Button Click="Stop_Click"
                             Width="150"
