@@ -156,11 +156,13 @@
                            Style="{StaticResource HintText}"
                            Margin="0,6,0,6"/>
                 <TextBox x:Name="DestinationList"
-                         Height="72"
+                         Height="60"
                          AutomationProperties.Name="Destination IP addresses"
                          Style="{StaticResource ListInput}"/>
-                <!-- Lists this computer's addresses. Set in code. -->
-                <TextBlock x:Name="DestinationHint" Style="{StaticResource HintText}"/>
+                <!-- This computer's addresses. Clicking one adds it to the box. Filled in by code. -->
+                <WrapPanel x:Name="LocalAddressButtons" Margin="0,8,0,0">
+                    <TextBlock Text="This computer:" Style="{StaticResource HintText}" Margin="0,0,8,4"/>
+                </WrapPanel>
             </StackPanel>
         </StackPanel>
     </Grid>

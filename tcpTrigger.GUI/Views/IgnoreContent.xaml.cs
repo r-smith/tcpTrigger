@@ -70,13 +70,42 @@ namespace tcpTrigger.GUI.Views
             AutomationProperties.SetHelpText(ServiceList, s_serviceFormatHelp);
         }
 
-        // Lists this computer's addresses under the destination box, so they don't have to be looked up.
+        // Shows this computer's addresses under the destination box. Hidden if none are found.
         private void ShowLocalAddresses()
         {
             List<string> addresses = LocalAddresses.GetIPv4();
-            DestinationHint.Text = addresses.Count > 0
-                ? "One per line. This computer: " + string.Join(", ", addresses)
-                : "One per line, such as 192.168.0.1, 192.168.0.1-100, or 192.168.0.0/24";
+            foreach (string address in addresses)
+            {
+                Button button = new Button
+                {
+                    Content = address,
+                    Style = (Style)FindResource("VariableButton")
+                };
+                button.Click += (sender, e) => AddDestination(address);
+                LocalAddressButtons.Children.Add(button);
+            }
+
+            if (addresses.Count == 0)
+            {
+                LocalAddressButtons.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        // Adds an address to the end of the destination box on its own line, unless it's
+        // already listed.
+        private void AddDestination(string address)
+        {
+            DestinationList.Focus();
+            if (IgnoreRuleInput.ParseLines(DestinationList.Text).Contains(address))
+            {
+                return;
+            }
+
+            string text = DestinationList.Text;
+            bool needsNewLine = text.Length > 0 && text[text.Length - 1] != '\n';
+            DestinationList.CaretIndex = text.Length;
+            DestinationList.SelectedText = (needsNewLine ? Environment.NewLine : "") + address;
+            DestinationList.CaretIndex = DestinationList.Text.Length;
         }
 
         // Start with the name textbox selected.
