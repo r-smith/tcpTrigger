@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using tcpTrigger.GUI.Models;
 using tcpTrigger.GUI.Services;
 using tcpTrigger.GUI.Validation;
@@ -211,9 +212,17 @@ namespace tcpTrigger.GUI.Views
             }
         }
 
+        // Puts the cursor in the destination box when the link opens it. The box isn't laid out
+        // yet when this runs, so wait for that. Skip it while the page loads, so the name box
+        // keeps the focus when editing a rule that has destinations.
         private void LimitDestinations_Checked(object sender, RoutedEventArgs e)
         {
-            DestinationList?.Focus();
+            if (!IsLoaded)
+            {
+                return;
+            }
+
+            Dispatcher.BeginInvoke(new Action(() => DestinationList.Focus()), DispatcherPriority.Loaded);
         }
 
         private void ServiceMatch_SelectionChanged(object sender, SelectionChangedEventArgs e)
