@@ -66,4 +66,57 @@
         <Setter Property="BorderBrush" Value="{StaticResource WarningBox.Border}"/>
         <Setter Property="Foreground" Value="{StaticResource WarningBox.Icon}"/>
     </Style>
+
+    <!-- A small info icon that shows help in a tooltip. Give it a ToolTip with the HelpToolTip style. -->
+    <Style x:Key="HelpIcon" TargetType="{x:Type Control}">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Foreground" Value="{StaticResource HelpIcon.Static.Foreground}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="ToolTipService.InitialShowDelay" Value="100"/>
+        <Setter Property="ToolTipService.ShowDuration" Value="60000"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Control}">
+                    <Border Background="Transparent" Padding="2">
+                        <Viewbox Width="15" Height="15">
+                            <Canvas Width="24" Height="24">
+                                <Path Data="{StaticResource InfoIcon}"
+                                      Stroke="{TemplateBinding Foreground}"
+                                      StrokeThickness="2"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"/>
+                            </Canvas>
+                        </Viewbox>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource HelpIcon.MouseOver.Foreground}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- The tooltip a help icon shows -->
+    <Style x:Key="HelpToolTip" TargetType="{x:Type ToolTip}">
+        <Setter Property="Background" Value="{StaticResource HelpToolTip.Background}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource HelpToolTip.Border}"/>
+        <Setter Property="Foreground" Value="{StaticResource HelpToolTip.Foreground}"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ToolTip}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="16,14">
+                        <ContentPresenter/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

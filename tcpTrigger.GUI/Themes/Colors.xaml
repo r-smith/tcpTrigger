@@ -147,6 +147,13 @@
     <SolidColorBrush x:Key="WarningBox.Border" Color="#6B5A1A"/>
     <SolidColorBrush x:Key="WarningBox.Icon" Color="#FFD43B"/>
 
+    <!-- Help icon: a small info icon, and the tooltip it shows -->
+    <SolidColorBrush x:Key="HelpIcon.Static.Foreground" Color="#909090"/>
+    <SolidColorBrush x:Key="HelpIcon.MouseOver.Foreground" Color="#61B8FF"/>
+    <SolidColorBrush x:Key="HelpToolTip.Background" Color="#0D1724"/>
+    <SolidColorBrush x:Key="HelpToolTip.Border" Color="#2A4A6B"/>
+    <SolidColorBrush x:Key="HelpToolTip.Foreground" Color="#E0E0E0"/>
+
     <!-- Badges -->
     <SolidColorBrush x:Key="DisabledBadge.Background" Color="#1C1C1C"/>
     <SolidColorBrush x:Key="DisabledBadge.Border" Color="#4A4A4A"/>

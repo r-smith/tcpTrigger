@@ -94,9 +94,11 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="From" Margin="0,0,0,6"/>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                    <TextBlock Text="From" Padding="0"/>
+                    <Control x:Name="SourceFormatHelp" Style="{StaticResource HelpIcon}" Margin="5,0,0,0"/>
+                </StackPanel>
                 <ComboBox Grid.Row="1"
                           AutomationProperties.Name="From"
                           Style="{StaticResource MatchChoice}"
@@ -109,10 +111,8 @@
                          Margin="0,8,0,0"
                          IsEnabled="{Binding IsSelected, ElementName=MatchSpecificSources}"
                          AutomationProperties.Name="Source IP addresses"
+                         Tag="One IP address, range, or CIDR per line"
                          Style="{StaticResource ListInput}"/>
-                <TextBlock Grid.Row="3"
-                           Text="One per line, such as 192.168.0.1, 192.168.0.1-100, or 192.168.0.0/24"
-                           Style="{StaticResource HintText}"/>
             </Grid>
 
             <!-- Ports and protocols -->
@@ -121,9 +121,11 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="Port" Margin="0,0,0,6"/>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                    <TextBlock Text="Port" Padding="0"/>
+                    <Control x:Name="ServiceFormatHelp" Style="{StaticResource HelpIcon}" Margin="5,0,0,0"/>
+                </StackPanel>
                 <ComboBox Grid.Row="1"
                           AutomationProperties.Name="Port"
                           Style="{StaticResource MatchChoice}"
@@ -136,10 +138,8 @@
                          Margin="0,8,0,0"
                          IsEnabled="{Binding IsSelected, ElementName=MatchSpecificServices}"
                          AutomationProperties.Name="Ports and protocols"
+                         Tag="One port or protocol per line"
                          Style="{StaticResource ListInput}"/>
-                <TextBlock Grid.Row="3"
-                           Text="One per line, such as 443, 8000-9000, icmp, or udp:53. Ports are TCP unless they start with udp:"
-                           Style="{StaticResource HintText}"/>
             </Grid>
         </UniformGrid>
 

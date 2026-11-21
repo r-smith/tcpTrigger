@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
 using tcpTrigger.GUI.Models;
 using tcpTrigger.GUI.Services;
@@ -19,6 +20,7 @@ namespace tcpTrigger.GUI.Views
 
             _selectedIgnoreRule = new IgnoreRule { IsEnabled = true };
             DataContext = _selectedIgnoreRule;
+            ShowFormatHelp();
             ShowLocalAddresses();
         }
 
@@ -53,7 +55,18 @@ namespace tcpTrigger.GUI.Views
 
             _selectedIgnoreRule = rule;
             DataContext = _selectedIgnoreRule;
+            ShowFormatHelp();
             ShowLocalAddresses();
+        }
+
+        // The info icons show the same format help as the error messages. Screen readers get it from the boxes.
+        private void ShowFormatHelp()
+        {
+            Style toolTipStyle = (Style)FindResource("HelpToolTip");
+            SourceFormatHelp.ToolTip = new ToolTip { Content = s_addressFormatHelp, Style = toolTipStyle };
+            ServiceFormatHelp.ToolTip = new ToolTip { Content = s_serviceFormatHelp, Style = toolTipStyle };
+            AutomationProperties.SetHelpText(SourceList, s_addressFormatHelp);
+            AutomationProperties.SetHelpText(ServiceList, s_serviceFormatHelp);
         }
 
         // Lists this computer's addresses under the destination box, so they don't have to be looked up.

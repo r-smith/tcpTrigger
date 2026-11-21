@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- TextBox style. Set Tag to show dim placeholder text while the box is empty. -->
+    <!-- TextBox style. Set Tag to show dim placeholder text while the box is empty and enabled. -->
     <Style TargetType="{x:Type TextBox}">
         <Setter Property="Background" Value="{StaticResource TextBox.Static.Background}"/>
         <Setter Property="BorderBrush" Value="{StaticResource TextBox.Static.Border}"/>
@@ -41,6 +41,7 @@
                                     <TextBlock Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
                                                Foreground="{StaticResource TextBox.Placeholder.Foreground}"
                                                Margin="2,0,0,0"
+                                               TextWrapping="{TemplateBinding TextWrapping}"
                                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                                 </Border>
                             </Grid>
@@ -60,6 +61,7 @@
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="false">
                             <Setter Property="Opacity" TargetName="border" Value="0.35"/>
+                            <Setter Property="Visibility" TargetName="placeholder" Value="Collapsed"/>
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="true">
                             <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource TextBox.MouseOver.Border}"/>
