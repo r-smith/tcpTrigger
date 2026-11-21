@@ -21,12 +21,6 @@
             <Setter Property="Padding" Value="6,8"/>
             <Setter Property="FontFamily" Value="Consolas"/>
         </Style>
-        <!-- Small title above a list box, such as "Ports and protocols" -->
-        <Style x:Key="FieldCaption" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Foreground" Value="{StaticResource FieldCaption.Foreground}"/>
-            <Setter Property="Margin" Value="0,0,0,4"/>
-        </Style>
         <!-- A multi-line box for one of the rule's lists, entered one entry per line -->
         <Style x:Key="ListInput" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
             <Setter Property="FontSize" Value="16"/>
@@ -40,11 +34,16 @@
                     <Setter Property="Margin" Value="6,4,4,4"/>
                 </Style>
             </Style.Resources>
+            <!-- Disabled while its dropdown is set to "any". The text is ignored on save, so hide it. -->
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="Transparent"/>
+                    <Setter Property="VerticalScrollBarVisibility" Value="Hidden"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
-        <!-- A "match on" dropdown: From or On -->
+        <!-- A "match on" dropdown above a list box: From or Port -->
         <Style x:Key="MatchChoice" TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
-            <Setter Property="Width" Value="300"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="Padding" Value="10,8.5"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
@@ -52,7 +51,6 @@
 
     <Grid Margin="25,0,25,0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -79,108 +77,76 @@
                       Margin="18,0,0,0"/>
         </Grid>
 
-        <!-- What the rule matches: ignore traffic from... on... -->
+        <!-- What the rule matches: ignore traffic from... on port... -->
         <TextBlock Grid.Row="1"
                    Text="Ignore traffic"
                    Style="{StaticResource SectionHeading}"
                    Margin="0,32,0,0"/>
-        <Grid Grid.Row="2" Margin="0,12,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
 
-            <TextBlock Text="From"/>
-            <ComboBox Grid.Column="1"
-                      AutomationProperties.Name="From"
-                      Style="{StaticResource MatchChoice}"
-                      SelectionChanged="SourceMatch_SelectionChanged">
-                <ComboBoxItem x:Name="MatchAnySource" Content="any IP address"/>
-                <ComboBoxItem x:Name="MatchSpecificSources" Content="specific IP addresses" IsSelected="True"/>
-            </ComboBox>
-
-            <TextBlock Grid.Row="1" Text="On" Margin="0,8,0,0"/>
-            <ComboBox Grid.Row="1"
-                      Grid.Column="1"
-                      AutomationProperties.Name="On"
-                      Style="{StaticResource MatchChoice}"
-                      Margin="0,8,0,0"
-                      SelectionChanged="ServiceMatch_SelectionChanged">
-                <ComboBoxItem x:Name="MatchAnyService" Content="any port"/>
-                <ComboBoxItem x:Name="MatchSpecificServices" Content="specific ports" IsSelected="True"/>
-            </ComboBox>
-        </Grid>
-
-        <!-- Source and port lists, side by side. The negative margin cancels the last column's gap. -->
-        <UniformGrid Grid.Row="3"
+        <!-- From and Port, side by side. The negative margin cancels the last column's gap. -->
+        <UniformGrid Grid.Row="2"
                      Rows="1"
                      Columns="2"
-                     Margin="0,22,-20,0">
-            <!-- Sources. Hidden when matching any. -->
+                     Margin="0,12,-20,0">
+            <!-- Sources -->
             <Grid Margin="0,0,20,0">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <Grid.Style>
-                    <Style TargetType="{x:Type Grid}">
-                        <Setter Property="IsEnabled" Value="True"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsSelected, ElementName=MatchAnySource}" Value="True">
-                                <Setter Property="IsEnabled" Value="False"/>
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Grid.Style>
-                <TextBlock Text="Source IP addresses" Style="{StaticResource FieldCaption}"/>
+                <TextBlock Text="From" Margin="0,0,0,6"/>
+                <ComboBox Grid.Row="1"
+                          AutomationProperties.Name="From"
+                          Style="{StaticResource MatchChoice}"
+                          SelectionChanged="SourceMatch_SelectionChanged">
+                    <ComboBoxItem x:Name="MatchAnySource" Content="any IP address"/>
+                    <ComboBoxItem x:Name="MatchSpecificSources" Content="specific IP addresses" IsSelected="True"/>
+                </ComboBox>
                 <TextBox x:Name="SourceList"
-                         Grid.Row="1"
+                         Grid.Row="2"
+                         Margin="0,8,0,0"
+                         IsEnabled="{Binding IsSelected, ElementName=MatchSpecificSources}"
                          AutomationProperties.Name="Source IP addresses"
                          Style="{StaticResource ListInput}"/>
-                <TextBlock Grid.Row="2"
+                <TextBlock Grid.Row="3"
                            Text="One per line, such as 192.168.0.1, 192.168.0.1-100, or 192.168.0.0/24"
                            Style="{StaticResource HintText}"/>
             </Grid>
 
-            <!-- Ports and protocols. Hidden when matching any. -->
+            <!-- Ports and protocols -->
             <Grid Margin="0,0,20,0">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <Grid.Style>
-                    <Style TargetType="{x:Type Grid}">
-                        <Setter Property="IsEnabled" Value="True"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsSelected, ElementName=MatchAnyService}" Value="True">
-                                <Setter Property="IsEnabled" Value="False"/>
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Grid.Style>
-                <TextBlock Text="Ports and protocols" Style="{StaticResource FieldCaption}"/>
+                <TextBlock Text="Port" Margin="0,0,0,6"/>
+                <ComboBox Grid.Row="1"
+                          AutomationProperties.Name="Port"
+                          Style="{StaticResource MatchChoice}"
+                          SelectionChanged="ServiceMatch_SelectionChanged">
+                    <ComboBoxItem x:Name="MatchAnyService" Content="any port"/>
+                    <ComboBoxItem x:Name="MatchSpecificServices" Content="specific ports" IsSelected="True"/>
+                </ComboBox>
                 <TextBox x:Name="ServiceList"
-                         Grid.Row="1"
+                         Grid.Row="2"
+                         Margin="0,8,0,0"
+                         IsEnabled="{Binding IsSelected, ElementName=MatchSpecificServices}"
                          AutomationProperties.Name="Ports and protocols"
                          Style="{StaticResource ListInput}"/>
-                <TextBlock Grid.Row="2"
+                <TextBlock Grid.Row="3"
                            Text="One per line, such as 443, 8000-9000, icmp, or udp:53. Ports are TCP unless they start with udp:"
                            Style="{StaticResource HintText}"/>
             </Grid>
         </UniformGrid>
 
-        <!-- Local addresses, behind a link -->
-        <StackPanel Grid.Row="4" Margin="0,14,0,22">
+        <!-- Destination addresses, behind a link -->
+        <StackPanel Grid.Row="3" Margin="0,14,0,22">
             <ToggleButton x:Name="LimitDestinations"
-                          Content="Limit to specific local addresses"
+                          Content="Limit to specific destination IP addresses"
                           Style="{StaticResource LinkToggleButton}"
                           HorizontalAlignment="Left"
                           Margin="-4,0,0,0"
@@ -191,7 +157,7 @@
                            Margin="0,6,0,6"/>
                 <TextBox x:Name="DestinationList"
                          Height="72"
-                         AutomationProperties.Name="Local IP addresses"
+                         AutomationProperties.Name="Destination IP addresses"
                          Style="{StaticResource ListInput}"/>
                 <!-- Lists this computer's addresses. Set in code. -->
                 <TextBlock x:Name="DestinationHint" Style="{StaticResource HintText}"/>

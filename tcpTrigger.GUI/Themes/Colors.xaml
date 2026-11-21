@@ -214,9 +214,8 @@
     <SolidColorBrush x:Key="ButtonBar.Background" Color="#141414"/>
     <SolidColorBrush x:Key="ButtonBar.Border" Color="#303030"/>
 
-    <!-- Text: labels and captions above list inputs -->
+    <!-- Text: labels -->
     <SolidColorBrush x:Key="Text.Primary" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="FieldCaption.Foreground" Color="#AAAAAA"/>
 
     <!-- Line under page headings -->
     <SolidColorBrush x:Key="PageHeading.Separator" Color="#3A3A3A"/>

@@ -139,13 +139,13 @@ namespace tcpTrigger.GUI.Views
             {
                 if (string.IsNullOrWhiteSpace(DestinationList.Text))
                 {
-                    return ValidationOutcome.Invalid("Please enter at least one local IP address." + s_paragraph + s_addressFormatHelp, DestinationList);
+                    return ValidationOutcome.Invalid("Please enter at least one destination IP address." + s_paragraph + s_addressFormatHelp, DestinationList);
                 }
 
                 string invalidDestination = IgnoreRuleInput.GetFirstInvalidAddress(DestinationList.Text);
                 if (invalidDestination != null)
                 {
-                    return ValidationOutcome.Invalid($"'{invalidDestination}' is not a valid local IP address." + s_paragraph + s_addressFormatHelp, DestinationList);
+                    return ValidationOutcome.Invalid($"'{invalidDestination}' is not a valid destination IP address." + s_paragraph + s_addressFormatHelp, DestinationList);
                 }
             }
 
