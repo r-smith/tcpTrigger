@@ -9,6 +9,11 @@ Project("{B7DD6F7E-DEF8-4E67-B5B7-07EF123DB6F0}") = "tcpTrigger.Setup", "tcpTrig
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tcpTrigger.GUI", "tcpTrigger.GUI\tcpTrigger.GUI.csproj", "{C5F8706E-CC2F-48AA-9BA4-24C984F21964}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8251C5E7-50D1-4FA7-BCA4-C67256DEAD7D}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

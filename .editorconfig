@@ -1,0 +1,74 @@
+# Editor settings for tcpTrigger.
+root = true
+
+# All files
+[*]
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Code and XAML
+[*.{cs,xaml}]
+charset = utf-8-bom
+indent_style = space
+indent_size = 4
+tab_width = 4
+
+# Project files
+[*.{csproj,wixproj}]
+indent_style = space
+indent_size = 2
+
+# WiX installer source
+[*.wxs]
+indent_style = tab
+indent_size = 4
+
+# Markdown: two trailing spaces are a line break, so keep them.
+[*.md]
+trim_trailing_whitespace = false
+
+# C# code style
+[*.cs]
+# Using directives: System first, no blank lines between groups.
+dotnet_separate_import_directive_groups = false
+dotnet_sort_system_directives_first = true
+
+# Explicit types instead of var.
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = false:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+# Braces on if statements and loops.
+csharp_prefer_braces = true:suggestion
+
+# Naming: constants are PascalCase, private static fields s_camelCase, other private fields _camelCase.
+dotnet_naming_rule.constants_pascal.symbols = constant_fields
+dotnet_naming_rule.constants_pascal.style = pascal_case
+dotnet_naming_rule.constants_pascal.severity = suggestion
+
+dotnet_naming_rule.private_static_fields_s.symbols = private_static_fields
+dotnet_naming_rule.private_static_fields_s.style = s_camel_case
+dotnet_naming_rule.private_static_fields_s.severity = suggestion
+
+dotnet_naming_rule.private_fields_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_underscore.style = underscore_camel_case
+dotnet_naming_rule.private_fields_underscore.severity = suggestion
+
+dotnet_naming_symbols.constant_fields.applicable_kinds = field
+dotnet_naming_symbols.constant_fields.required_modifiers = const
+
+dotnet_naming_symbols.private_static_fields.applicable_kinds = field
+dotnet_naming_symbols.private_static_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_static_fields.required_modifiers = static
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+dotnet_naming_style.s_camel_case.capitalization = camel_case
+dotnet_naming_style.s_camel_case.required_prefix = s_
+
+dotnet_naming_style.underscore_camel_case.capitalization = camel_case
+dotnet_naming_style.underscore_camel_case.required_prefix = _
