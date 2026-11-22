@@ -75,6 +75,19 @@ namespace tcpTrigger.GUI.Views
             Password.Tag = Password.Password.Length == 0 ? _passwordPlaceholder : null;
         }
 
+        // The password box's built-in scroller takes the mouse wheel even when there's nothing to
+        // scroll, which stops the window from scrolling. Pass the wheel on to the parent instead.
+        private void Password_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            e.Handled = true;
+            MouseWheelEventArgs args = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
+            {
+                RoutedEvent = MouseWheelEvent,
+                Source = Password
+            };
+            ((UIElement)Password.Parent).RaiseEvent(args);
+        }
+
         // Start with the name textbox selected.
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {

@@ -129,7 +129,8 @@
                     <PasswordBox x:Name="Password"
                                  Grid.Column="1"
                                  Tag="(optional)"
-                                 PasswordChanged="Password_PasswordChanged"/>
+                                 PasswordChanged="Password_PasswordChanged"
+                                 PreviewMouseWheel="Password_PreviewMouseWheel"/>
                 </Grid>
             </StackPanel>
 
