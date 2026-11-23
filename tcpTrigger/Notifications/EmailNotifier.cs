@@ -33,7 +33,7 @@ namespace tcpTrigger
                     {
                         smtpClient.Host = email.SmtpServer;
                         smtpClient.Port = email.Port;
-                        smtpClient.EnableSsl = email.IsStartTlsEnabled;
+                        smtpClient.EnableSsl = email.Security == EmailSecurity.StartTls;
                         if (!string.IsNullOrWhiteSpace(email.Username))
                         {
                             smtpClient.Credentials = new NetworkCredential(email.Username, email.Password);

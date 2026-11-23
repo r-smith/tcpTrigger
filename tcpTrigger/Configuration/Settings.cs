@@ -94,7 +94,7 @@ namespace tcpTrigger
                     case NotificationEmail email:
                         sb.AppendLine("  Type: Email");
                         sb.AppendLine($"  Server: {email.SmtpServer}:{email.Port}");
-                        sb.AppendLine($"  STARTTLS: {(email.IsStartTlsEnabled ? "Enabled" : "Disabled")}");
+                        sb.AppendLine($"  Security: {(email.Security == EmailSecurity.StartTls ? "STARTTLS" : "None")}");
                         sb.AppendLine("  Authentication: " + (string.IsNullOrWhiteSpace(email.Username) ? "Disabled" : "Enabled"));
                         sb.AppendLine("  Recipients: " + string.Join(", ", email.Recipients));
                         sb.AppendLine($"  From: {email.FromAddress}");

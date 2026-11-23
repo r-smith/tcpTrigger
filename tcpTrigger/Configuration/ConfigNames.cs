@@ -11,6 +11,10 @@
         public const string NotificationTypeLogFile = "logFile";
         public const string NotificationTypeCommand = "command";
 
+        // Values of the <security> element in email notifications.
+        public const string EmailSecurityNone = "none";
+        public const string EmailSecurityStartTls = "starttls";
+
         public const string DetectionIcmp = "/tcpTrigger/detection/icmp";
         public const string DetectionTcp = "/tcpTrigger/detection/tcp";
         public const string DetectionUdp = "/tcpTrigger/detection/udp";
