@@ -80,6 +80,7 @@
     <Compile Include="Notifications\EmailNotifier.cs" />
     <Compile Include="Models\IgnoreRule.cs" />
     <Compile Include="Notifications\JsonLogLine.cs" />
+    <Compile Include="Notifications\SmtpSender.cs" />
     <Compile Include="Service\Logger.cs" />
     <Compile Include="Network\PacketListener.cs" />
     <Compile Include="Network\PacketMatcher.cs" />
