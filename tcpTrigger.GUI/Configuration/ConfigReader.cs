@@ -101,7 +101,7 @@ namespace tcpTrigger.GUI.Configuration
                             Name = ReadString(node, "name"),
                             SmtpServer = ReadString(node, "server"),
                             Port = ReadString(node, "port"),
-                            IsStartTlsEnabled = ReadBool(node, "startTls", false),
+                            Security = ReadEmailSecurity(node, "security"),
                             Username = ReadCredential(node, "username"),
                             Password = ReadCredential(node, "password"),
                             Recipients = ReadList(node, "recipientList/address"),
@@ -277,7 +277,7 @@ namespace tcpTrigger.GUI.Configuration
                 IsEnabled = ReadBool(xd, ConfigNames.EnabledActionsEmailNotification, false),
                 SmtpServer = ReadString(xd, ConfigNames.EmailServer),
                 Port = ReadString(xd, ConfigNames.EmailPort),
-                IsStartTlsEnabled = ReadBool(xd, ConfigNames.EmailIsTlsEnabled, false),
+                Security = ReadBool(xd, ConfigNames.EmailIsTlsEnabled, false) ? EmailSecurity.StartTls : EmailSecurity.None,
                 Username = ReadCredential(xd, ConfigNames.EmailUsername),
                 Password = ReadCredential(xd, ConfigNames.EmailPassword),
                 Recipients = ReadList(xd, ConfigNames.EmailRecipientListAddress),
@@ -323,6 +323,15 @@ namespace tcpTrigger.GUI.Configuration
         {
             string text = ReadString(node, path);
             return string.IsNullOrWhiteSpace(text) ? defaultValue : int.Parse(text);
+        }
+
+        // Returns the node at path as an email security setting. A missing or unknown value is treated as none.
+        private static EmailSecurity ReadEmailSecurity(XmlNode node, string path)
+        {
+            string text = ReadString(node, path);
+            return string.Equals(text, ConfigNames.EmailSecurityStartTls, StringComparison.OrdinalIgnoreCase)
+                ? EmailSecurity.StartTls
+                : EmailSecurity.None;
         }
 
         // Returns the text of the node at path, decrypting it if the node has encrypted="true".

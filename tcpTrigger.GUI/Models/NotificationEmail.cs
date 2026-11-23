@@ -2,6 +2,13 @@
 
 namespace tcpTrigger.GUI.Models
 {
+    // How the connection to the mail server is secured.
+    public enum EmailSecurity
+    {
+        None,
+        StartTls
+    }
+
     public class NotificationEmail : Notification
     {
         public const int DefaultRateLimitSeconds = 300;
@@ -30,7 +37,7 @@ namespace tcpTrigger.GUI.Models
 
         public string SmtpServer { get; set; }
         public string Port { get; set; }
-        public bool IsStartTlsEnabled { get; set; }
+        public EmailSecurity Security { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
         public List<string> Recipients { get; set; } = new List<string>();

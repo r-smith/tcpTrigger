@@ -47,7 +47,7 @@ namespace tcpTrigger.GUI.Views
             Recipients.Text = string.Join(",", notification.Recipients);
             Password.Password = notification.Password;
 
-            if (notification.IsStartTlsEnabled)
+            if (notification.Security == EmailSecurity.StartTls)
             {
                 EncryptionStartTls.IsSelected = true;
             }
@@ -111,7 +111,7 @@ namespace tcpTrigger.GUI.Views
             {
                 notification.Password = Password.Password;
                 notification.Recipients = EmailInput.ParseRecipients(Recipients.Text);
-                notification.IsStartTlsEnabled = EncryptionStartTls.IsSelected;
+                notification.Security = EncryptionStartTls.IsSelected ? EmailSecurity.StartTls : EmailSecurity.None;
 
                 // ValidateInputs has already checked that these are valid numbers.
                 if (int.TryParse(RateLimitSeconds.Text, out int rateLimit))

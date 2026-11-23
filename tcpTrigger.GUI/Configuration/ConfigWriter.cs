@@ -124,7 +124,9 @@ namespace tcpTrigger.GUI.Configuration
             writer.WriteElementString("name", email.Name);
             writer.WriteElementString("server", email.SmtpServer);
             writer.WriteElementString("port", email.Port);
-            writer.WriteElementString("startTls", XmlConvert.ToString(email.IsStartTlsEnabled));
+            writer.WriteElementString("security", email.Security == EmailSecurity.StartTls
+                ? ConfigNames.EmailSecurityStartTls
+                : ConfigNames.EmailSecurityNone);
             WriteSecret(writer, "username", email.Username);
             WriteSecret(writer, "password", email.Password);
 
