@@ -99,10 +99,10 @@
                               MinWidth="140"
                               Padding="10,8.5">
                         <ComboBoxItem x:Name="EncryptionNone"
-                                      Content="none"
-                                      IsSelected="True"/>
+                                      Content="none"/>
                         <ComboBoxItem x:Name="EncryptionStartTls"
-                                      Content="STARTTLS"/>
+                                      Content="STARTTLS"
+                                      IsSelected="True"/>
                     </ComboBox>
                 </Grid>
 

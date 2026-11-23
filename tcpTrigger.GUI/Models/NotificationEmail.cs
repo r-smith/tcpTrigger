@@ -15,6 +15,7 @@ namespace tcpTrigger.GUI.Models
         public const int DefaultWaitSeconds = 30;
 
         // Filled in for each new email notification.
+        public const string DefaultPort = "587";
         public const string DefaultSubject = "Alert: Suspicious network activity from {SOURCE_IP}";
         public const string DefaultBody =
             "tcpTrigger on {SENSOR_NAME} detected activity from {SOURCE_IP}.\r\n"

@@ -32,6 +32,8 @@ namespace tcpTrigger.GUI.Views
             DataContext = new Models.NotificationEmail
             {
                 IsEnabled = true,
+                Port = Models.NotificationEmail.DefaultPort,
+                Security = EmailSecurity.StartTls,
                 Subject = Models.NotificationEmail.DefaultSubject,
                 Body = Models.NotificationEmail.DefaultBody
             };
