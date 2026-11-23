@@ -14,6 +14,7 @@
         // Values of the <security> element in email notifications.
         public const string EmailSecurityNone = "none";
         public const string EmailSecurityStartTls = "starttls";
+        public const string EmailSecurityTls = "tls";
 
         public const string DetectionIcmp = "/tcpTrigger/detection/icmp";
         public const string DetectionTcp = "/tcpTrigger/detection/tcp";

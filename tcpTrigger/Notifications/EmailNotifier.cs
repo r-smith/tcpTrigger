@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Mail;
-using System.Threading.Tasks;
 
 namespace tcpTrigger
 {
@@ -10,7 +9,7 @@ namespace tcpTrigger
     internal static class EmailNotifier
     {
         // Sends the notification's email for a batch of detections. Errors are logged, not thrown.
-        public static async Task SendAsync(NotificationEmail email, IPAddress sourceIp, List<PacketHeader> detections)
+        public static void Send(NotificationEmail email, IPAddress sourceIp, List<PacketHeader> detections)
         {
             try
             {
@@ -29,17 +28,8 @@ namespace tcpTrigger
                         }
                     }
 
-                    using (SmtpClient smtpClient = new SmtpClient())
-                    {
-                        smtpClient.Host = email.SmtpServer;
-                        smtpClient.Port = email.Port;
-                        smtpClient.EnableSsl = email.Security == EmailSecurity.StartTls;
-                        if (!string.IsNullOrWhiteSpace(email.Username))
-                        {
-                            smtpClient.Credentials = new NetworkCredential(email.Username, email.Password);
-                        }
-                        await smtpClient.SendMailAsync(message);
-                    }
+                    List<string> rejected = SmtpSender.Send(
+                        email.SmtpServer, email.Port, email.Security, email.Username, email.Password, message);
 
                     Logger.Write(
                         $"An email notification was sent through {email.SmtpServer}:{email.Port}."
@@ -49,6 +39,18 @@ namespace tcpTrigger
                         + $"Recipients: {string.Join(", ", message.To)}{Environment.NewLine}"
                         + $"Detections: {detections.Count}",
                         Logger.EventCode.EmailSent);
+
+                    // Warn about any recipients the server rejected. The email was still sent to the others.
+                    if (rejected.Count > 0)
+                    {
+                        Logger.WriteWarning(
+                            "The mail server rejected some recipients of an email notification. The email was sent to the others."
+                            + $"{Environment.NewLine}{Environment.NewLine}"
+                            + $"Notification: {email.Name}{Environment.NewLine}"
+                            + $"Rejected recipients:{Environment.NewLine}"
+                            + string.Join(Environment.NewLine, rejected),
+                            Logger.EventCode.EmailRecipientsRejected);
+                    }
                 }
             }
             catch (Exception ex)

@@ -224,14 +224,14 @@ namespace tcpTrigger
         }
 
         // Starts sending the batch's email on another thread, then empties the batch.
-        // EmailNotifier.SendAsync logs its own errors.
+        // EmailNotifier.Send logs its own errors.
         private static Task SendBatch(NotificationEmail email, IPAddress sourceIp, EmailBatch batch)
         {
             // Copy the detections first, since the batch is emptied below while the email is still being sent.
             List<PacketHeader> detections = batch.Detections.ToList();
 
             // Send on a thread-pool thread, so a slow DNS lookup or mail server doesn't hold up the detection queue.
-            Task send = Task.Run(() => EmailNotifier.SendAsync(email, sourceIp, detections));
+            Task send = Task.Run(() => EmailNotifier.Send(email, sourceIp, detections));
 
             batch.Detections.Clear();
             batch.LastSent = DateTime.UtcNow;

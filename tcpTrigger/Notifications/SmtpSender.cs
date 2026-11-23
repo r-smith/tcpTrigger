@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Net;
 using System.Net.Mail;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -11,7 +12,16 @@ using System.Threading;
 
 namespace tcpTrigger
 {
-    // Sends email over SMTP. Currently supports implicit TLS only (usually port 465).
+    // How the connection to the mail server is secured.
+    internal enum EmailSecurity
+    {
+        None,
+        StartTls,
+        Tls
+    }
+
+    // Sends email over SMTP. Implicit TLS is sent by this class.
+    // No security and STARTTLS are sent by .NET's SmtpClient.
     internal static class SmtpSender
     {
         // How long to wait for the mail server on each read and write.
@@ -25,9 +35,17 @@ namespace tcpTrigger
 
         // Sends the message through the mail server. Only the message's To recipients are used, and authentication
         // is skipped if there's no username. The message is sent to every recipient the server accepts. Returns
-        // the rejected recipients, each with the server's reply. Throws an exception if the server rejects any
+        // any rejected recipients, each with the server's reply. Throws an exception if the server rejects any
         // other step, or every recipient.
-        public static List<string> Send(string host, int port, string username, string password, MailMessage message)
+        public static List<string> Send(string host, int port, EmailSecurity security, string username, string password, MailMessage message)
+        {
+            return security == EmailSecurity.Tls
+                ? SendImplicitTls(host, port, username, password, message)
+                : SendWithSmtpClient(host, port, security == EmailSecurity.StartTls, username, password, message);
+        }
+
+        // Sends over implicit TLS. Gives up if the whole send takes longer than s_sendTimeout.
+        private static List<string> SendImplicitTls(string host, int port, string username, string password, MailMessage message)
         {
             using (TcpClient tcp = new TcpClient())
             {
@@ -65,7 +83,7 @@ namespace tcpTrigger
                 SendLine(ssl, "EHLO " + Environment.MachineName);
                 List<string> capabilities = ReadReply(reader, 250);
 
-                if (!string.IsNullOrEmpty(username))
+                if (!string.IsNullOrWhiteSpace(username))
                 {
                     Authenticate(ssl, reader, capabilities, username, password ?? string.Empty);
                 }
@@ -108,6 +126,44 @@ namespace tcpTrigger
                 }
 
                 return rejected;
+            }
+        }
+
+        // Sends with .NET's SmtpClient, with STARTTLS or without security. Returns any rejected recipients.
+        private static List<string> SendWithSmtpClient(string host, int port, bool useStartTls, string username, string password, MailMessage message)
+        {
+            using (SmtpClient smtpClient = new SmtpClient(host, port))
+            {
+                smtpClient.EnableSsl = useStartTls;
+                if (!string.IsNullOrWhiteSpace(username))
+                {
+                    smtpClient.Credentials = new NetworkCredential(username, password);
+                }
+
+                try
+                {
+                    smtpClient.Send(message);
+                    return new List<string>();
+                }
+                catch (SmtpFailedRecipientException ex)
+                {
+                    // SmtpClient sends the message to the accepted recipients, then throws for the rejected ones.
+                    // If every recipient was rejected, nothing was sent.
+                    SmtpFailedRecipientException[] failures = ex is SmtpFailedRecipientsException several
+                        ? several.InnerExceptions
+                        : new[] { ex };
+                    if (failures.Length >= message.To.Count)
+                    {
+                        throw;
+                    }
+
+                    List<string> rejected = new List<string>();
+                    foreach (SmtpFailedRecipientException failure in failures)
+                    {
+                        rejected.Add($"{failure.FailedRecipient.Trim('<', '>')} ({failure.Message})");
+                    }
+                    return rejected;
+                }
             }
         }
 

@@ -28,6 +28,7 @@ namespace tcpTrigger
             CommandPathMissing = 301,
             EmailSettingsIncomplete = 302,
             IgnoreRuleInvalid = 303,
+            EmailRecipientsRejected = 304,
             StartFailed = 400,
             ReloadFailed = 401,
             QueuedDetectionsDropped = 402,

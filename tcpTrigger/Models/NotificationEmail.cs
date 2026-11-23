@@ -3,13 +3,6 @@ using System.Net;
 
 namespace tcpTrigger
 {
-    // How the connection to the mail server is secured.
-    internal enum EmailSecurity
-    {
-        None,
-        StartTls
-    }
-
     // Sends an email for detections. Detections are collected for the wait time and sent together,
     // at most once per rate limit.
     internal class NotificationEmail : Notification

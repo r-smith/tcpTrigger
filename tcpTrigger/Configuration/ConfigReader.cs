@@ -326,9 +326,15 @@ namespace tcpTrigger
         private static EmailSecurity ReadEmailSecurity(XmlNode node, string path)
         {
             string text = ReadString(node, path);
-            return string.Equals(text, ConfigNames.EmailSecurityStartTls, StringComparison.OrdinalIgnoreCase)
-                ? EmailSecurity.StartTls
-                : EmailSecurity.None;
+            if (string.Equals(text, ConfigNames.EmailSecurityStartTls, StringComparison.OrdinalIgnoreCase))
+            {
+                return EmailSecurity.StartTls;
+            }
+            if (string.Equals(text, ConfigNames.EmailSecurityTls, StringComparison.OrdinalIgnoreCase))
+            {
+                return EmailSecurity.Tls;
+            }
+            return EmailSecurity.None;
         }
 
         // Returns the text of the node at path, decrypting it if the node has encrypted="true".
