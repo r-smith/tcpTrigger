@@ -97,7 +97,8 @@
                     <ComboBox Grid.Column="1"
                               HorizontalAlignment="Left"
                               MinWidth="140"
-                              Padding="10,8.5">
+                              Padding="10,8.5"
+                              SelectionChanged="Security_SelectionChanged">
                         <ComboBoxItem x:Name="EncryptionNone"
                                       Content="none"/>
                         <ComboBoxItem x:Name="EncryptionStartTls"

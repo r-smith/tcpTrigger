@@ -94,6 +94,36 @@ namespace tcpTrigger.GUI.Views
             ((UIElement)Password.Parent).RaiseEvent(args);
         }
 
+        // When the security setting changes, fills in its usual port. A port the user typed is kept.
+        private void Security_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Skip the selection made while the form is set up.
+            if (!IsLoaded || e.RemovedItems.Count == 0 || e.AddedItems.Count == 0)
+            {
+                return;
+            }
+
+            string port = Port.Text.Trim();
+            if (port.Length == 0 || port == GetUsualPort(e.RemovedItems[0]))
+            {
+                Port.Text = GetUsualPort(e.AddedItems[0]);
+            }
+        }
+
+        // Returns the port usually used with a security option.
+        private string GetUsualPort(object securityItem)
+        {
+            if (securityItem == EncryptionTls)
+            {
+                return "465";
+            }
+            if (securityItem == EncryptionStartTls)
+            {
+                return "587";
+            }
+            return "25";
+        }
+
         // Start with the name textbox selected.
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
