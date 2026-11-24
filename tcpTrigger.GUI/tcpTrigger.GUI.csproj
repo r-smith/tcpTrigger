@@ -77,6 +77,7 @@
     <Compile Include="Configuration\ConfigPaths.cs" />
     <Compile Include="Configuration\ConfigReader.cs" />
     <Compile Include="Configuration\ConfigWriter.cs" />
+    <Compile Include="Configuration\IgnoreRuleTransfer.cs" />
     <Compile Include="Configuration\PortListConversion.cs" />
     <Compile Include="Configuration\ServiceConfig.cs" />
     <Compile Include="Interop\NativeMethods.cs" />

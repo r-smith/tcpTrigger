@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using tcpTrigger.GUI.Models;
 
 namespace tcpTrigger.GUI.Validation
 {
@@ -42,6 +43,28 @@ namespace tcpTrigger.GUI.Validation
         public static string GetFirstInvalidService(string text)
         {
             return ParseLines(text).FirstOrDefault(service => !IsValidService(service));
+        }
+
+        // Returns true if the rule's sources, destinations, and ports are all valid.
+        // Used to check imported rules.
+        public static bool IsValidRule(IgnoreRule rule)
+        {
+            return IsValidList(rule.Sources, IsValidAddress)
+                && IsValidList(rule.Destinations, IsValidAddress)
+                && IsValidList(rule.Services, IsValidService)
+                && !(IsAny(rule.Sources) && IsAny(rule.Services));
+        }
+
+        private static bool IsValidList(List<string> list, Func<string, bool> isValid)
+        {
+            return list != null
+                && list.Count > 0
+                && (IsAny(list) || list.All(entry => isValid(NormalizeLine(entry))));
+        }
+
+        private static bool IsAny(List<string> list)
+        {
+            return list.Count == 1 && string.Equals(list[0].Trim(), "any", StringComparison.OrdinalIgnoreCase);
         }
 
         // Lowercase, trim, and remove whitespace around a range's '-' or a CIDR's '/'.
