@@ -32,6 +32,7 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <CheckBox IsChecked="{Binding IsSelected}"
+                                  IsEnabled="{Binding CanSelect}"
                                   Click="Rule_Click"
                                   Margin="0,2">
                             <Grid>
@@ -39,6 +40,7 @@
                                     <ColumnDefinition Width="200"/>
                                     <ColumnDefinition Width="170"/>
                                     <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <!-- Name, and a badge if the rule is disabled -->
                                 <StackPanel Orientation="Horizontal">
@@ -63,6 +65,15 @@
                                            Foreground="{StaticResource Rule.Service.Foreground}"
                                            TextTrimming="CharacterEllipsis"
                                            Margin="12,0,0,0"/>
+                                <!-- Warning and error badges, such as "Already exists" -->
+                                <StackPanel Grid.Column="3" Orientation="Horizontal">
+                                    <ContentControl Style="{StaticResource WarningBadge}"
+                                                    Content="{Binding WarningBadge}"
+                                                    Margin="10,0,0,0"/>
+                                    <ContentControl Style="{StaticResource ErrorBadge}"
+                                                    Content="{Binding ErrorBadge}"
+                                                    Margin="10,0,0,0"/>
+                                </StackPanel>
                             </Grid>
                         </CheckBox>
                     </DataTemplate>

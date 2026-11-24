@@ -24,6 +24,13 @@ namespace tcpTrigger.GUI.Models
             }
         }
 
+        // False for a rule that can't be chosen, such as an imported rule that isn't valid.
+        public bool CanSelect { get; set; } = true;
+
+        // Badges beside the rule, such as "Already exists" or "Not valid". Null for none.
+        public string WarningBadge { get; set; }
+        public string ErrorBadge { get; set; }
+
         // One-line previews of the rule's sources and ports, such as "10.0.0.5, 10.0.0.6 +2 more".
         public string SourcesPreview => Preview(Rule.Sources, "Any IP address");
         public string ServicesPreview => Preview(Rule.Services, "Any port");

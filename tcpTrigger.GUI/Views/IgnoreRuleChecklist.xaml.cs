@@ -34,9 +34,9 @@ namespace tcpTrigger.GUI.Views
 
         private void SelectAll_Click(object sender, RoutedEventArgs e)
         {
-            // A click on a partly checked box checks every rule.
+            // A click on a partly checked box checks every rule that can be chosen.
             bool isSelected = SelectAll.IsChecked != false;
-            foreach (SelectableIgnoreRule rule in _rules)
+            foreach (SelectableIgnoreRule rule in _rules.Where(rule => rule.CanSelect))
             {
                 rule.IsSelected = isSelected;
             }
@@ -48,15 +48,18 @@ namespace tcpTrigger.GUI.Views
             UpdateSelection();
         }
 
-        // Updates the Select all box and the count to match the selected rules.
+        // Updates the Select all box and the count to match the selected rules. Rules that can't be chosen
+        // aren't counted.
         private void UpdateSelection()
         {
             int selected = SelectedCount;
+            int selectable = _rules.Count(rule => rule.CanSelect);
+            SelectAll.IsEnabled = selectable > 0;
             if (selected == 0)
             {
                 SelectAll.IsChecked = false;
             }
-            else if (selected == _rules.Count)
+            else if (selected == selectable)
             {
                 SelectAll.IsChecked = true;
             }
@@ -65,7 +68,7 @@ namespace tcpTrigger.GUI.Views
                 SelectAll.IsChecked = null;
             }
 
-            SelectedCountText.Text = $"{selected} of {_rules.Count} selected";
+            SelectedCountText.Text = $"{selected} of {selectable} selected";
             SelectionChanged?.Invoke(this, EventArgs.Empty);
         }
     }
