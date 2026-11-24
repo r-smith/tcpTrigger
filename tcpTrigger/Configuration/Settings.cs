@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -98,6 +99,10 @@ namespace tcpTrigger
                             sb.AppendLine("  Send with: Microsoft 365");
                             sb.AppendLine($"  Tenant ID: {email.TenantId}");
                             sb.AppendLine($"  Client ID: {email.ClientId}");
+                            if (email.ClientSecretExpires.HasValue)
+                            {
+                                sb.AppendLine($"  Client secret expires: {email.ClientSecretExpires.Value.ToString(ConfigNames.DateFormat, CultureInfo.InvariantCulture)}");
+                            }
                         }
                         else
                         {

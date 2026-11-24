@@ -15,6 +15,9 @@
         public const string EmailSendMethodSmtp = "smtp";
         public const string EmailSendMethodMicrosoft365 = "microsoft365";
 
+        // Format of dates, such as <clientSecretExpires> in email notifications.
+        public const string DateFormat = "yyyy-MM-dd";
+
         // Values of the <security> element in email notifications.
         public const string EmailSecurityNone = "none";
         public const string EmailSecurityStartTls = "starttls";

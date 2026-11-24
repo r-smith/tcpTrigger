@@ -36,6 +36,9 @@ namespace tcpTrigger
         // Runs the notifications for detections on a background thread.
         private DetectionQueue _detectionQueue;
 
+        // Reminds about Microsoft 365 client secrets that are about to expire.
+        private ClientSecretReminder _clientSecretReminder;
+
         // Held while starting monitoring, stopping monitoring, or checking for network changes
         // so they never run at the same time.
         private readonly object _monitoringLock = new object();
@@ -284,7 +287,8 @@ namespace tcpTrigger
             }
         }
 
-        // Starts the detection queue thread, the network listeners, and the network change detection.
+        // Starts the detection queue thread, the client secret reminder, the network listeners, and the network
+        // change detection.
         private void StartMonitoring()
         {
             lock (_monitoringLock)
@@ -294,6 +298,10 @@ namespace tcpTrigger
                 // Start the detection queue thread.
                 _detectionQueue = new DetectionQueue();
                 _detectionQueue.Start();
+
+                // Check for expiring client secrets now, then every day.
+                _clientSecretReminder = new ClientSecretReminder(Settings.Notifications);
+                _clientSecretReminder.Start();
 
                 // Start the listeners now, then check every minute for network changes
                 // and restart the listeners when the interfaces change.
@@ -308,7 +316,8 @@ namespace tcpTrigger
             }
         }
 
-        // Stops the network change detection, the network listeners, and the detection queue thread.
+        // Stops the network change detection, the network listeners, the client secret reminder, and the detection
+        // queue thread.
         private void StopMonitoring()
         {
             lock (_monitoringLock)
@@ -330,6 +339,8 @@ namespace tcpTrigger
                 {
                     listener.Stop();
                 }
+
+                _clientSecretReminder.Stop();
 
                 // Let detections already queued finish before stopping.
                 _detectionQueue.Stop();

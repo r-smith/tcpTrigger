@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 
 namespace tcpTrigger
@@ -30,6 +31,7 @@ namespace tcpTrigger
         public string TenantId { get; set; }
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
+        public DateTime? ClientSecretExpires { get; set; }
 
         public List<string> Recipients { get; set; } = new List<string>();
         public string FromAddress { get; set; }
