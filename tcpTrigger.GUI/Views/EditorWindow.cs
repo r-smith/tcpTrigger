@@ -9,7 +9,8 @@ using tcpTrigger.GUI.Views.Dialogs;
 
 namespace tcpTrigger.GUI.Views
 {
-    // Base class for the rule create/edit windows. Show these windows with ShowDialog().
+    // Base class for the rule create/edit windows and the ignore rule export and import windows.
+    // Show these windows with ShowDialog().
     //
     // Provides the shared title bar behavior (dark title bar, drag to move, no minimize
     // or maximize) and the in-window overlay used for validation errors, messages, and

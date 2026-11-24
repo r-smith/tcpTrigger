@@ -93,6 +93,7 @@
     <Compile Include="Models\NotificationLogFile.cs" />
     <Compile Include="Models\NotificationType.cs" />
     <Compile Include="Models\PortNames.cs" />
+    <Compile Include="Models\SelectableIgnoreRule.cs" />
     <Compile Include="Services\DetectionLogWatcher.cs" />
     <Compile Include="Services\ElevatedCommand.cs" />
     <Compile Include="Services\ElevatedServiceControl.cs" />
@@ -141,6 +142,9 @@
     </Compile>
     <Compile Include="Views\IgnoreCreateWindow.xaml.cs">
       <DependentUpon>IgnoreCreateWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\IgnoreExportWindow.xaml.cs">
+      <DependentUpon>IgnoreExportWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\NotifyEditWindow.xaml.cs">
       <DependentUpon>NotifyEditWindow.xaml</DependentUpon>
@@ -279,6 +283,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\IgnoreCreateWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\IgnoreExportWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
