@@ -108,7 +108,9 @@ namespace tcpTrigger
             {
                 using (response)
                 {
-                    throw new WebException(GetErrorMessage(ReadText(response), (int)response.StatusCode), ex);
+                    // The original exception isn't kept as the inner exception: its message only repeats the HTTP
+                    // status, which the new message already has.
+                    throw new WebException(GetErrorMessage(ReadText(response), (int)response.StatusCode), ex.Status);
                 }
             }
         }
@@ -121,34 +123,119 @@ namespace tcpTrigger
             }
         }
 
-        // Returns Microsoft's error message from an error response, or the HTTP status if it has none.
+        // Returns Microsoft's error message from an error response, with the HTTP status. Common errors start with
+        // a plain explanation, and sign-in errors end with their support details. Each is its own paragraph.
+        // If the response has no message, returns just the HTTP status.
         private static string GetErrorMessage(string responseText, int statusCode)
         {
+            string summary = "Microsoft 365 returned an error";
+            string message = null;
+            string code = null;
+            string supportDetails = null;
             try
             {
                 Dictionary<string, object> json = new JavaScriptSerializer().Deserialize<Dictionary<string, object>>(responseText);
 
                 // A sign-in error: {"error": "invalid_client", "error_description": "AADSTS7000215: ..."}
-                // The description ends with trace and correlation IDs on their own lines, so only its first
-                // line is kept.
+                // The description starts with the error code.
                 if (json != null && json.TryGetValue("error_description", out object description) && description is string descriptionText)
                 {
-                    return "Microsoft 365 sign-in failed: " + descriptionText.Split('\r', '\n')[0];
+                    summary = "Microsoft 365 sign-in failed";
+                    SplitDescription(descriptionText, out message, out supportDetails);
+                    code = message.Split(':')[0];
                 }
-
-                // A Graph error: {"error": {"code": "ErrorAccessDenied", "message": "..."}}
-                if (json != null
+                else if (json != null
                     && json.TryGetValue("error", out object error) && error is Dictionary<string, object> details
-                    && details.TryGetValue("message", out object message) && message is string messageText)
+                    && details.TryGetValue("message", out object messageValue) && messageValue is string messageText)
                 {
-                    return "Microsoft 365 didn't send the email: " + messageText;
+                    // A Graph error: {"error": {"code": "ErrorAccessDenied", "message": "..."}}
+                    summary = "Microsoft 365 didn't send the email";
+                    message = messageText;
+                    code = details.TryGetValue("code", out object codeValue) ? codeValue as string : null;
                 }
             }
             catch (Exception)
             {
                 // The response isn't JSON, such as an HTML error page.
             }
-            return $"Microsoft 365 returned HTTP status {statusCode}.";
+
+            string explanation = GetExplanation(code, statusCode);
+            if (message == null)
+            {
+                return explanation != null
+                    ? $"{summary}: {explanation} (HTTP {statusCode})"
+                    : $"Microsoft 365 returned HTTP status {statusCode}.";
+            }
+
+            // A sign-in message already starts with its code, so the code is only added for Graph errors.
+            string status = code != null && !message.StartsWith(code, StringComparison.Ordinal)
+                ? $"({code}, HTTP {statusCode})"
+                : $"(HTTP {statusCode})";
+
+            List<string> paragraphs = new List<string>();
+            if (explanation != null)
+            {
+                paragraphs.Add($"{summary}: {explanation}");
+                paragraphs.Add($"{message} {status}");
+            }
+            else
+            {
+                paragraphs.Add($"{summary}: {message} {status}");
+            }
+            if (supportDetails != null)
+            {
+                paragraphs.Add(supportDetails);
+            }
+            return string.Join(Environment.NewLine + Environment.NewLine, paragraphs);
+        }
+
+        // Splits a sign-in error's description into its message and its support details: the trace ID,
+        // correlation ID, and timestamp, one per line. The support details are null if there are none.
+        // Microsoft puts them after the message, either on the same line or on their own lines.
+        private static void SplitDescription(string description, out string message, out string supportDetails)
+        {
+            string text = description.Replace("\r\n", " ").Replace('\r', ' ').Replace('\n', ' ');
+            int start = text.IndexOf(" Trace ID:", StringComparison.Ordinal);
+            if (start < 0)
+            {
+                message = text.Trim();
+                supportDetails = null;
+                return;
+            }
+
+            message = text.Substring(0, start).Trim();
+            supportDetails = text.Substring(start).Trim()
+                .Replace(" Correlation ID:", Environment.NewLine + "Correlation ID:")
+                .Replace(" Timestamp:", Environment.NewLine + "Timestamp:");
+        }
+
+        // Returns a plain explanation of a common error, or null for any other error.
+        private static string GetExplanation(string code, int statusCode)
+        {
+            switch (code)
+            {
+                case "AADSTS7000215":
+                    return "The client secret is wrong. Use the secret's Value, not its Secret ID.";
+                case "AADSTS7000222":
+                    return "The client secret has expired. Create a new one in the app registration's Certificates & secrets.";
+                case "AADSTS700016":
+                    return "The client ID wasn't found in this tenant. Check the client ID and tenant ID.";
+                case "AADSTS90002":
+                case "AADSTS900023":
+                    return "The tenant ID wasn't found. Use the Directory (tenant) ID from Microsoft Entra.";
+                case "ErrorAccessDenied":
+                    return "The app isn't allowed to send as this mailbox. Check that it has the Mail.Send application permission, with admin consent.";
+                case "ErrorInvalidUser":
+                case "MailboxNotEnabledForRESTAPI":
+                case "ResourceNotFound":
+                    return "The From address isn't a Microsoft 365 mailbox in this tenant.";
+            }
+
+            if (statusCode == 429)
+            {
+                return "Microsoft 365 is limiting how often this app can send. Try again later.";
+            }
+            return null;
         }
     }
 }
