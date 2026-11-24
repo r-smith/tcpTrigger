@@ -7,6 +7,7 @@
         <Setter Property="Focusable" Value="False"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="MinWidth" Value="340"/>
         <Setter Property="BorderBrush" Value="{StaticResource Dialog.Accent}"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -85,7 +86,7 @@
     <!-- Dialog heading -->
     <Style x:Key="DialogHeading" TargetType="{x:Type TextBlock}">
         <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="FontSize" Value="19"/>
+        <Setter Property="FontSize" Value="18"/>
         <Setter Property="FontFamily" Value="Segoe UI"/>
         <Setter Property="FontWeight" Value="Regular"/>
         <Setter Property="Foreground" Value="{StaticResource Dialog.Foreground}"/>
@@ -97,7 +98,7 @@
         <Setter Property="Margin" Value="30,12,0,0"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
-        <Setter Property="Foreground" Value="{StaticResource Dialog.Foreground}"/>
+        <Setter Property="Foreground" Value="{StaticResource Dialog.Message.Foreground}"/>
     </Style>
 
     <!-- Dialog buttons, in the footer -->
