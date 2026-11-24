@@ -55,18 +55,46 @@
         <Setter Property="Padding" Value="25,14"/>
     </Style>
 
+    <!-- Trash can icon for the delete dialog, drawn the same way as InfoIcon and WarningIcon -->
+    <PathGeometry x:Key="DeleteIcon" Figures="M4,7 L20,7 M10,11 L10,17 M14,11 L14,17 M5,7 L6,20 L18,20 L19,7 M9,7 L9,4 L15,4 L15,7"/>
+
+    <!-- Icon beside the dialog heading. Set Tag to the icon, and Foreground to the dialog's color.
+         Use: <ContentControl Style="{StaticResource DialogIcon}" Tag="{StaticResource InfoIcon}" Foreground="{StaticResource Dialog.Accent}"/> -->
+    <Style x:Key="DialogIcon" TargetType="{x:Type ContentControl}">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0,0,10,0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ContentControl}">
+                    <Viewbox Width="20" Height="20">
+                        <Canvas Width="24" Height="24">
+                            <Path Data="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
+                                  Stroke="{TemplateBinding Foreground}"
+                                  StrokeThickness="2"
+                                  StrokeLineJoin="Round"
+                                  StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round"/>
+                        </Canvas>
+                    </Viewbox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Dialog heading -->
     <Style x:Key="DialogHeading" TargetType="{x:Type TextBlock}">
+        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="FontSize" Value="19"/>
         <Setter Property="FontFamily" Value="Segoe UI"/>
         <Setter Property="FontWeight" Value="Regular"/>
         <Setter Property="Foreground" Value="{StaticResource Dialog.Foreground}"/>
     </Style>
 
-    <!-- Dialog message, below the heading -->
+    <!-- Dialog message, below the heading. The left margin lines it up with the heading, past the icon. -->
     <Style x:Key="DialogMessage" TargetType="{x:Type TextBlock}">
         <Setter Property="TextWrapping" Value="Wrap"/>
-        <Setter Property="Margin" Value="0,12,0,0"/>
+        <Setter Property="Margin" Value="30,12,0,0"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="Foreground" Value="{StaticResource Dialog.Foreground}"/>

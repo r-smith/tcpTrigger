@@ -12,9 +12,14 @@
                 <!-- Heading and message -->
                 <Border Style="{StaticResource DialogBody}">
                     <StackPanel>
-                        <TextBlock x:Name="Heading"
-                                   d:Text="Error"
-                                   Style="{StaticResource DialogHeading}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl Style="{StaticResource DialogIcon}"
+                                            Tag="{StaticResource InfoIcon}"
+                                            Foreground="{StaticResource Dialog.Accent}"/>
+                            <TextBlock x:Name="Heading"
+                                       d:Text="Error"
+                                       Style="{StaticResource DialogHeading}"/>
+                        </StackPanel>
                         <TextBlock x:Name="Message"
                                    d:Text="A message goes here."
                                    MinWidth="270"

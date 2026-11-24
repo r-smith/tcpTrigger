@@ -12,8 +12,13 @@
                 <!-- Heading and message -->
                 <Border Style="{StaticResource DialogBody}">
                     <StackPanel>
-                        <TextBlock Text="Save changes?"
-                                   Style="{StaticResource DialogHeading}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl Style="{StaticResource DialogIcon}"
+                                            Tag="{StaticResource WarningIcon}"
+                                            Foreground="{StaticResource Dialog.Warning.Accent}"/>
+                            <TextBlock Text="Save changes?"
+                                       Style="{StaticResource DialogHeading}"/>
+                        </StackPanel>
                         <TextBlock Text="Your changes to tcpTrigger haven't been saved."
                                    Style="{StaticResource DialogMessage}"/>
                     </StackPanel>

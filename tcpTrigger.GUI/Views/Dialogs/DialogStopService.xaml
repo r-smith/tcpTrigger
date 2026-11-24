@@ -12,8 +12,13 @@
                 <!-- Heading and message -->
                 <Border Style="{StaticResource DialogBody}">
                     <StackPanel>
-                        <TextBlock Text="Stop monitoring?"
-                                   Style="{StaticResource DialogHeading}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl Style="{StaticResource DialogIcon}"
+                                            Tag="{StaticResource WarningIcon}"
+                                            Foreground="{StaticResource Dialog.Warning.Accent}"/>
+                            <TextBlock Text="Stop monitoring?"
+                                       Style="{StaticResource DialogHeading}"/>
+                        </StackPanel>
                         <TextBlock Text="tcpTrigger won't detect anything until the service is started again."
                                    Style="{StaticResource DialogMessage}"/>
                     </StackPanel>

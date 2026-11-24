@@ -14,8 +14,13 @@
                 <!-- Heading and message -->
                 <Border Style="{StaticResource DialogBody}">
                     <StackPanel>
-                        <TextBlock Text="Confirm delete"
-                                   Style="{StaticResource DialogHeading}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl Style="{StaticResource DialogIcon}"
+                                            Tag="{StaticResource DeleteIcon}"
+                                            Foreground="{StaticResource Dialog.Danger.Accent}"/>
+                            <TextBlock Text="Confirm delete"
+                                       Style="{StaticResource DialogHeading}"/>
+                        </StackPanel>
                         <TextBlock Width="270"
                                    MaxHeight="100"
                                    TextTrimming="WordEllipsis"
