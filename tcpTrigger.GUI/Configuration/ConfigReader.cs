@@ -108,6 +108,7 @@ namespace tcpTrigger.GUI.Configuration
                             TenantId = ReadString(node, "tenantId"),
                             ClientId = ReadString(node, "clientId"),
                             ClientSecret = ReadCredential(node, "clientSecret"),
+                            ClientSecretExpires = ReadDate(node, "clientSecretExpires"),
                             Recipients = ReadList(node, "recipientList/address"),
                             FromAddress = ReadString(node, "fromAddress"),
                             FromDisplayName = ReadString(node, "fromDisplayName"),
@@ -327,6 +328,13 @@ namespace tcpTrigger.GUI.Configuration
         {
             string text = ReadString(node, path);
             return string.IsNullOrWhiteSpace(text) ? defaultValue : int.Parse(text);
+        }
+
+        // Returns the node at path as a date, or null if the node is missing or empty.
+        private static DateTime? ReadDate(XmlNode node, string path)
+        {
+            string text = ReadString(node, path);
+            return string.IsNullOrWhiteSpace(text) ? (DateTime?)null : XmlConvert.ToDateTime(text.Trim(), ConfigNames.DateFormat);
         }
 
         // Returns the node at path as an email send method. A missing value is treated as SMTP.

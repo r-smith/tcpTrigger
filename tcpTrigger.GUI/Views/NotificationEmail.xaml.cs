@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using tcpTrigger.GUI.Configuration;
 using tcpTrigger.GUI.Models;
 using tcpTrigger.GUI.Validation;
 using tcpTrigger.GUI.Views.Controls;
@@ -52,6 +54,7 @@ namespace tcpTrigger.GUI.Views
             Recipients.Text = string.Join(",", notification.Recipients);
             Password.Password = notification.Password;
             ClientSecret.Password = notification.ClientSecret;
+            ClientSecretExpires.Text = notification.ClientSecretExpires?.ToString(ConfigNames.DateFormat, CultureInfo.InvariantCulture);
 
             if (notification.SendMethod == EmailSendMethod.Microsoft365)
             {
@@ -284,6 +287,9 @@ namespace tcpTrigger.GUI.Views
                 notification.SendMethod = GetSelectedSendMethod();
                 notification.Password = Password.Password;
                 notification.ClientSecret = ClientSecret.Password;
+                notification.ClientSecretExpires = EmailInput.TryParseDate(ClientSecretExpires.Text, out DateTime expires)
+                    ? expires
+                    : (DateTime?)null;
                 notification.Recipients = EmailInput.ParseRecipients(Recipients.Text);
                 notification.Security = GetSelectedSecurity();
 
@@ -425,6 +431,26 @@ namespace tcpTrigger.GUI.Views
                     $"Please enter the client secret.{Environment.NewLine}{Environment.NewLine}"
                     + "Use the secret's Value from Certificates & secrets in Microsoft Entra, not its Secret ID.",
                     ClientSecret);
+            }
+
+            // The expiry date is optional. If it's set, it must be a real date. While the notification is
+            // enabled, it must also be after today. A disabled notification never sends, so its date can be past.
+            if (ClientSecretExpires.Text.Trim().Length > 0)
+            {
+                if (!EmailInput.TryParseDate(ClientSecretExpires.Text, out DateTime expires))
+                {
+                    return ValidationOutcome.Invalid(
+                        $"Please enter the date the client secret expires as yyyy-mm-dd, such as 2028-11-23.{Environment.NewLine}{Environment.NewLine}"
+                        + "It's shown as Expires in Certificates & secrets in Microsoft Entra. Leave it empty to skip reminders.",
+                        ClientSecretExpires);
+                }
+                if (EnabledState.IsChecked == true && expires <= DateTime.Today)
+                {
+                    return ValidationOutcome.Invalid(
+                        $"The client secret's expiry date must be after today.{Environment.NewLine}{Environment.NewLine}"
+                        + "If the secret has expired, create a new one in Microsoft Entra and enter its expiry date. Leave it empty to skip reminders.",
+                        ClientSecretExpires);
+                }
             }
 
             return ValidationOutcome.ValidResult;

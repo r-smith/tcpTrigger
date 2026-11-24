@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Mail;
+using tcpTrigger.GUI.Configuration;
 
 namespace tcpTrigger.GUI.Validation
 {
@@ -13,6 +15,12 @@ namespace tcpTrigger.GUI.Validation
         public const int MaxRateLimitSeconds = 86400; // 24 hours
         public const int MinWaitSeconds = 1;
         public const int MaxWaitSeconds = 600; // 10 minutes
+
+        // Returns true and the date if the text is a date in the config's format, such as 2028-11-23.
+        public static bool TryParseDate(string text, out DateTime date)
+        {
+            return DateTime.TryParseExact(text.Trim(), ConfigNames.DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out date);
+        }
 
         // Recipients are separated by commas or semicolons.
         public static List<string> ParseRecipients(string recipients)

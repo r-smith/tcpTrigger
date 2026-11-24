@@ -130,6 +130,10 @@ namespace tcpTrigger.GUI.Configuration
                 writer.WriteElementString("tenantId", email.TenantId);
                 writer.WriteElementString("clientId", email.ClientId);
                 WriteSecret(writer, "clientSecret", email.ClientSecret);
+                if (email.ClientSecretExpires.HasValue)
+                {
+                    writer.WriteElementString("clientSecretExpires", XmlConvert.ToString(email.ClientSecretExpires.Value, ConfigNames.DateFormat));
+                }
             }
             else
             {

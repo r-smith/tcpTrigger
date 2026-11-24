@@ -198,11 +198,31 @@
                         <PasswordBox x:Name="ClientSecret"
                                      Grid.Column="1"
                                      PreviewMouseWheel="PasswordBox_PreviewMouseWheel"/>
-                        <TextBlock Grid.Row="1"
-                                   Grid.Column="1"
-                                   Text="Sends from the mailbox in the From address below. The app registration needs the Mail.Send application permission."
-                                   Style="{StaticResource HintText}"/>
                     </Grid>
+
+                    <!-- Client secret expiry date -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Secret expires"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <TextBox x:Name="ClientSecretExpires"
+                                     Tag="(optional)"
+                                     Width="140"
+                                     MaxLength="10"/>
+                            <TextBlock Text="yyyy-mm-dd. A reminder is sent 7 days before."
+                                       Style="{StaticResource HintText}"
+                                       Margin="12,0,0,0"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Microsoft 365 requirements -->
+                    <ContentControl Style="{StaticResource InfoBox}"
+                                    Margin="0,16,0,0"
+                                    Content="The From address must be a mailbox in this tenant. The app registration needs the Mail.Send application permission, with admin consent."/>
                 </StackPanel>
             </StackPanel>
 
