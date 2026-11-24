@@ -8,6 +8,7 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace tcpTrigger
@@ -32,6 +33,9 @@ namespace tcpTrigger
 
         // The most lines a reply can have. A normal reply has fewer than 20.
         private const int MaxReplyLines = 100;
+
+        // One reply line: the reply code, then an enhanced status code such as "5.7.9" if there is one, then the text.
+        private static readonly Regex s_replyLine = new Regex(@"^(\d{3})[ -]?(?:([245]\.\d{1,3}\.\d{1,3})(?= |$))?(.*)$");
 
         // Sends the message through the mail server. Only the message's To recipients are used, and authentication
         // is skipped if there's no username. The message is sent to every recipient the server accepts. Returns
@@ -76,7 +80,18 @@ namespace tcpTrigger
             {
                 // Checks the server's certificate against the host name, without a revocation check, like SmtpClient.
                 // SslProtocols.None uses the TLS versions Windows allows.
-                ssl.AuthenticateAsClient(host, null, SslProtocols.None, checkCertificateRevocation: false);
+                try
+                {
+                    ssl.AuthenticateAsClient(host, null, SslProtocols.None, checkCertificateRevocation: false);
+                }
+                catch (IOException ex)
+                {
+                    // This usually means the server expects plain SMTP on this port, like a STARTTLS port.
+                    // A certificate problem is an AuthenticationException, so it isn't caught here.
+                    throw new IOException(
+                        $"The mail server didn't start an SSL/TLS connection. Port {port} may not use SSL/TLS: try STARTTLS instead.",
+                        ex);
+                }
 
                 // Created after the handshake, because ssl can't be read before it. It isn't in a using,
                 // because disposing ssl is enough: the reader has nothing else to clean up.
@@ -102,7 +117,7 @@ namespace tcpTrigger
                     List<string> reply = ReadReplyLines(reader);
                     if (!HasCode(reply, 250, 251))
                     {
-                        rejected.Add($"{recipient.Address} ({string.Join(" ", reply)})");
+                        rejected.Add($"{recipient.Address} ({FormatReply(reply)})");
                     }
                 }
                 if (rejected.Count > 0 && rejected.Count == message.To.Count)
@@ -231,7 +246,7 @@ namespace tcpTrigger
             List<string> lines = ReadReplyLines(reader);
             if (!HasCode(lines, expectedCodes))
             {
-                throw new SmtpException("The mail server replied: " + string.Join(" ", lines));
+                throw new SmtpException("The mail server replied: " + FormatReply(lines));
             }
             return lines;
         }
@@ -262,6 +277,33 @@ namespace tcpTrigger
         {
             string line = reply[reply.Count - 1];
             return line.Length >= 3 && int.TryParse(line.Substring(0, 3), out int code) && Array.IndexOf(expectedCodes, code) >= 0;
+        }
+
+        // Joins a reply's lines into one line. The reply code and enhanced status code are shown once at the
+        // start, instead of on every line.
+        private static string FormatReply(List<string> reply)
+        {
+            Match first = s_replyLine.Match(reply[0]);
+            if (!first.Success)
+            {
+                return string.Join(" ", reply);
+            }
+
+            List<string> parts = new List<string> { first.Groups[1].Value };
+            if (first.Groups[2].Success)
+            {
+                parts.Add(first.Groups[2].Value);
+            }
+            foreach (string line in reply)
+            {
+                Match match = s_replyLine.Match(line);
+                string text = match.Success ? match.Groups[3].Value.Trim() : line.Trim();
+                if (text.Length > 0)
+                {
+                    parts.Add(text);
+                }
+            }
+            return string.Join(" ", parts);
         }
 
         // Sends one SMTP command, followed by <CRLF>.
