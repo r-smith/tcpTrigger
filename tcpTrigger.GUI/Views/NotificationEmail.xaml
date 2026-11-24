@@ -185,6 +185,20 @@
                              Text="{Binding FromDisplayName, UpdateSourceTrigger=Explicit}"
                              Grid.Column="1"/>
                 </Grid>
+
+                <!-- Test email -->
+                <Grid Margin="0,14,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="TestButton"
+                            Grid.Column="1"
+                            Content="Send test email"
+                            Style="{StaticResource SecondaryButton}"
+                            HorizontalAlignment="Left"
+                            Click="Test_Click"/>
+                </Grid>
             </StackPanel>
 
             <!-- Message content -->

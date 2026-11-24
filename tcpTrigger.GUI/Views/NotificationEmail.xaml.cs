@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net.Mail;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -124,6 +127,110 @@ namespace tcpTrigger.GUI.Views
             return "25";
         }
 
+        // Returns the selected security option.
+        private EmailSecurity GetSelectedSecurity()
+        {
+            if (EncryptionTls.IsSelected)
+            {
+                return EmailSecurity.Tls;
+            }
+            if (EncryptionStartTls.IsSelected)
+            {
+                return EmailSecurity.StartTls;
+            }
+            return EmailSecurity.None;
+        }
+
+        // Sends a test email with the server and address settings on the form, and shows the result.
+        private async void Test_Click(object sender, RoutedEventArgs e)
+        {
+            EditorWindow window = (EditorWindow)Window.GetWindow(this);
+            ValidationOutcome validation = ValidateSendInputs();
+            if (!validation.IsValid)
+            {
+                window.ShowErrorDialog(validation);
+                return;
+            }
+
+            // Read the form now. The send runs on a background thread, which can't read it.
+            string server = Server.Text.Trim();
+            int port = int.Parse(Port.Text);
+            EmailSecurity security = GetSelectedSecurity();
+            string username = Username.Text;
+            string password = Password.Password;
+
+            object buttonContent = TestButton.Content;
+            TestButton.Content = "Sending...";
+            TestButton.IsEnabled = false;
+            try
+            {
+                using (MailMessage message = CreateTestMessage())
+                {
+                    List<string> rejected = await Task.Run(
+                        () => SmtpSender.Send(server, port, security, username, password, message));
+
+                    if (rejected.Count == 0)
+                    {
+                        window.ShowMessage(
+                            "Test email sent",
+                            $"The mail server accepted the test email for {string.Join(", ", message.To)}.{Environment.NewLine}{Environment.NewLine}"
+                            + "If it doesn't arrive, check the spam or junk folder.");
+                    }
+                    else
+                    {
+                        string text = "The mail server accepted the test email, but rejected these recipients:"
+                            + Environment.NewLine + Environment.NewLine
+                            + string.Join(Environment.NewLine, rejected);
+                        window.ShowMessage("Test email sent", text, text);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string text = GetErrorText(ex);
+                window.ShowMessage("Test email failed", text, text);
+            }
+            finally
+            {
+                TestButton.Content = buttonContent;
+                TestButton.IsEnabled = true;
+            }
+        }
+
+        // The test email. Its subject and body are fixed, because the variables need a detection.
+        private MailMessage CreateTestMessage()
+        {
+            string fromAddress = FromAddress.Text.Trim();
+            MailMessage message = new MailMessage
+            {
+                From = string.IsNullOrWhiteSpace(FromDisplayName.Text)
+                    ? new MailAddress(fromAddress)
+                    : new MailAddress(fromAddress, FromDisplayName.Text.Trim()),
+                Subject = "tcpTrigger test email",
+                Body = $"This is a test email from tcpTrigger on {Environment.MachineName}."
+            };
+            foreach (string recipient in EmailInput.ParseRecipients(Recipients.Text))
+            {
+                message.To.Add(recipient);
+            }
+            return message;
+        }
+
+        // Returns the error's message, followed by the messages of the errors inside it, one per line.
+        // SmtpClient's own message is often just "Failure sending mail.", with the cause inside.
+        private static string GetErrorText(Exception ex)
+        {
+            List<string> messages = new List<string>();
+            for (Exception current = ex; current != null; current = current.InnerException)
+            {
+                if (!messages.Contains(current.Message))
+                {
+                    messages.Add(current.Message);
+                }
+            }
+            return string.Join(Environment.NewLine, messages);
+        }
+
         // Start with the name textbox selected.
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
@@ -147,18 +254,7 @@ namespace tcpTrigger.GUI.Views
             {
                 notification.Password = Password.Password;
                 notification.Recipients = EmailInput.ParseRecipients(Recipients.Text);
-                if (EncryptionTls.IsSelected)
-                {
-                    notification.Security = EmailSecurity.Tls;
-                }
-                else if (EncryptionStartTls.IsSelected)
-                {
-                    notification.Security = EmailSecurity.StartTls;
-                }
-                else
-                {
-                    notification.Security = EmailSecurity.None;
-                }
+                notification.Security = GetSelectedSecurity();
 
                 // ValidateInputs has already checked that these are valid numbers.
                 if (int.TryParse(RateLimitSeconds.Text, out int rateLimit))
@@ -190,30 +286,10 @@ namespace tcpTrigger.GUI.Views
                 return ValidationOutcome.Invalid("Please enter a notification name.", FriendlyName);
             }
 
-            if (string.IsNullOrWhiteSpace(Server.Text))
+            ValidationOutcome sendValidation = ValidateSendInputs();
+            if (!sendValidation.IsValid)
             {
-                return ValidationOutcome.Invalid("Please enter an SMTP server address for sending notifications.", Server);
-            }
-
-            if (!PortList.IsValidPort(Port.Text))
-            {
-                return ValidationOutcome.Invalid(
-                    $"Please enter a valid port number.{Environment.NewLine}{Environment.NewLine}"
-                    + "Typically, this will be port 25 or 587. Implicit TLS connections, typically port 465, are not supported.",
-                    Port);
-            }
-
-            if (string.IsNullOrWhiteSpace(Recipients.Text) || !EmailInput.IsValidRecipients(Recipients.Text))
-            {
-                return ValidationOutcome.Invalid(
-                    $"Please enter at least one valid recipient email address for receiving notifications, such as alerts@example.com.{Environment.NewLine}{Environment.NewLine}"
-                    + "Multiple addresses should be separated by commas (,) or semicolons (;).",
-                    Recipients);
-            }
-
-            if (!EmailInput.IsValidAddress(FromAddress.Text))
-            {
-                return ValidationOutcome.Invalid("Please enter a valid 'from' email address to use when sending notifications, such as tcptrigger@example.com.", FromAddress);
+                return sendValidation;
             }
 
             if (string.IsNullOrWhiteSpace(Subject.Text))
@@ -240,6 +316,38 @@ namespace tcpTrigger.GUI.Views
                     $"Please enter how long to collect detections before sending, between {EmailInput.MinWaitSeconds} and {EmailInput.MaxWaitSeconds} seconds.{Environment.NewLine}{Environment.NewLine}"
                     + $"The default is {Models.NotificationEmail.DefaultWaitSeconds} seconds.",
                     WaitSeconds);
+            }
+
+            return ValidationOutcome.ValidResult;
+        }
+
+        // Checks the inputs needed to send an email: the server, port, recipients, and from address.
+        private ValidationOutcome ValidateSendInputs()
+        {
+            if (string.IsNullOrWhiteSpace(Server.Text))
+            {
+                return ValidationOutcome.Invalid("Please enter an SMTP server address for sending notifications.", Server);
+            }
+
+            if (!PortList.IsValidPort(Port.Text))
+            {
+                return ValidationOutcome.Invalid(
+                    $"Please enter a valid port number.{Environment.NewLine}{Environment.NewLine}"
+                    + "Usually 25, 587 (STARTTLS), or 465 (SSL/TLS).",
+                    Port);
+            }
+
+            if (string.IsNullOrWhiteSpace(Recipients.Text) || !EmailInput.IsValidRecipients(Recipients.Text))
+            {
+                return ValidationOutcome.Invalid(
+                    $"Please enter at least one valid recipient email address for receiving notifications, such as alerts@example.com.{Environment.NewLine}{Environment.NewLine}"
+                    + "Multiple addresses should be separated by commas (,) or semicolons (;).",
+                    Recipients);
+            }
+
+            if (!EmailInput.IsValidAddress(FromAddress.Text))
+            {
+                return ValidationOutcome.Invalid("Please enter a valid 'from' email address to use when sending notifications, such as tcptrigger@example.com.", FromAddress);
             }
 
             return ValidationOutcome.ValidResult;
