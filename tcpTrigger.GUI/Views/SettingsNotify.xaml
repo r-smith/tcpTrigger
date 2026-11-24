@@ -117,6 +117,13 @@
                                                         Style="{StaticResource DisabledBadge}"
                                                         Visibility="{Binding IsEnabled, Converter={StaticResource TrueToCollapsed}}"
                                                         Margin="10,0,0,0"/>
+                                        <!-- Warning and error badges -->
+                                        <ContentControl Style="{StaticResource WarningBadge}"
+                                                        Content="{Binding WarningBadge}"
+                                                        Margin="10,0,0,0"/>
+                                        <ContentControl Style="{StaticResource ErrorBadge}"
+                                                        Content="{Binding ErrorBadge}"
+                                                        Margin="10,0,0,0"/>
                                     </StackPanel>
                                     <TextBlock Grid.Column="1"
                                                Visibility="{Binding IsMouseOver, ElementName=ItemBorder, Converter={StaticResource TrueToVisible}}"

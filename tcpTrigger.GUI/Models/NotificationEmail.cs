@@ -30,7 +30,19 @@ namespace tcpTrigger.GUI.Models
             WaitSeconds = DefaultWaitSeconds;
         }
 
-        public EmailSendMethod SendMethod { get; set; }
+        // How many days before the client secret expires to show a badge in the settings list.
+        private const int SecretBadgeDays = 30;
+
+        private EmailSendMethod _sendMethod;
+        public EmailSendMethod SendMethod
+        {
+            get { return _sendMethod; }
+            set
+            {
+                _sendMethod = value;
+                OnSecretBadgeChanged();
+            }
+        }
 
         // Used when sending with SMTP.
         public string SmtpServer { get; set; }
@@ -43,7 +55,16 @@ namespace tcpTrigger.GUI.Models
         public string TenantId { get; set; }
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
-        public DateTime? ClientSecretExpires { get; set; }
+        private DateTime? _clientSecretExpires;
+        public DateTime? ClientSecretExpires
+        {
+            get { return _clientSecretExpires; }
+            set
+            {
+                _clientSecretExpires = value;
+                OnSecretBadgeChanged();
+            }
+        }
 
         public List<string> Recipients { get; set; } = new List<string>();
         public string FromAddress { get; set; }
@@ -52,5 +73,44 @@ namespace tcpTrigger.GUI.Models
         public string Body { get; set; }
         public int RateLimitSeconds { get; set; }
         public int WaitSeconds { get; set; }
+
+        public override string WarningBadge
+        {
+            get
+            {
+                int? daysLeft = GetSecretDaysLeft();
+                if (daysLeft == null || daysLeft < 0 || daysLeft > SecretBadgeDays)
+                {
+                    return null;
+                }
+                if (daysLeft == 0)
+                {
+                    return "Secret expires today";
+                }
+                if (daysLeft == 1)
+                {
+                    return "Secret expires tomorrow";
+                }
+                return $"Secret expires in {daysLeft} days";
+            }
+        }
+
+        public override string ErrorBadge => GetSecretDaysLeft() < 0 ? "Secret expired" : null;
+
+        // Returns the days until the Microsoft 365 client secret expires, or null if there's no expiry date.
+        private int? GetSecretDaysLeft()
+        {
+            if (SendMethod != EmailSendMethod.Microsoft365 || !ClientSecretExpires.HasValue)
+            {
+                return null;
+            }
+            return (int)(ClientSecretExpires.Value.Date - DateTime.Today).TotalDays;
+        }
+
+        private void OnSecretBadgeChanged()
+        {
+            OnPropertyChanged(nameof(WarningBadge));
+            OnPropertyChanged(nameof(ErrorBadge));
+        }
     }
 }

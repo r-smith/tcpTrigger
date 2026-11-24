@@ -39,4 +39,30 @@
         <Setter Property="BorderBrush" Value="{StaticResource AdvancedBadge.Border}"/>
         <Setter Property="Foreground" Value="{StaticResource AdvancedBadge.Foreground}"/>
     </Style>
+
+    <!-- Warns about a notification in the settings list. Hidden while it has no text.
+         Use: <ContentControl Style="{StaticResource WarningBadge}" Content="Text"/> -->
+    <Style x:Key="WarningBadge" TargetType="{x:Type ContentControl}" BasedOn="{StaticResource Badge}">
+        <Setter Property="Background" Value="{StaticResource WarningBadge.Background}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource WarningBadge.Border}"/>
+        <Setter Property="Foreground" Value="{StaticResource WarningBadge.Foreground}"/>
+        <Style.Triggers>
+            <Trigger Property="Content" Value="{x:Null}">
+                <Setter Property="Visibility" Value="Collapsed"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Marks a problem with a notification in the settings list. Hidden while it has no text.
+         Use: <ContentControl Style="{StaticResource ErrorBadge}" Content="Text"/> -->
+    <Style x:Key="ErrorBadge" TargetType="{x:Type ContentControl}" BasedOn="{StaticResource Badge}">
+        <Setter Property="Background" Value="{StaticResource ErrorBadge.Background}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource ErrorBadge.Border}"/>
+        <Setter Property="Foreground" Value="{StaticResource ErrorBadge.Foreground}"/>
+        <Style.Triggers>
+            <Trigger Property="Content" Value="{x:Null}">
+                <Setter Property="Visibility" Value="Collapsed"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>

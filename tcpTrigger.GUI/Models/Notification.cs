@@ -28,6 +28,10 @@ namespace tcpTrigger.GUI.Models
             }
         }
 
+        // Warning and error badges for the settings list. Null when there's none.
+        public virtual string WarningBadge => null;
+        public virtual string ErrorBadge => null;
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {

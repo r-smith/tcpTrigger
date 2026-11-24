@@ -161,6 +161,12 @@
     <SolidColorBrush x:Key="AdvancedBadge.Background" Color="#268E6EFF"/>
     <SolidColorBrush x:Key="AdvancedBadge.Border" Color="#8C8E6EFF"/>
     <SolidColorBrush x:Key="AdvancedBadge.Foreground" Color="#B7A6FF"/>
+    <SolidColorBrush x:Key="WarningBadge.Background" Color="#1E1A0B"/>
+    <SolidColorBrush x:Key="WarningBadge.Border" Color="#6B5A1A"/>
+    <SolidColorBrush x:Key="WarningBadge.Foreground" Color="#FFD43B"/>
+    <SolidColorBrush x:Key="ErrorBadge.Background" Color="#2A0E0E"/>
+    <SolidColorBrush x:Key="ErrorBadge.Border" Color="#7A2A2A"/>
+    <SolidColorBrush x:Key="ErrorBadge.Foreground" Color="#FF8A8A"/>
 
     <!-- ==== Monitor window ==== -->
 
