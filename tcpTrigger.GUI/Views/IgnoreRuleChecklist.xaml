@@ -1,0 +1,73 @@
+﻿<UserControl x:Class="tcpTrigger.GUI.Views.IgnoreRuleChecklist"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="600">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Select all, and how many are selected -->
+        <DockPanel Margin="0,0,0,8">
+            <TextBlock x:Name="SelectedCountText"
+                       DockPanel.Dock="Right"
+                       Style="{StaticResource HintText}"
+                       Margin="0"
+                       VerticalAlignment="Center"/>
+            <CheckBox x:Name="SelectAll"
+                      Content="Select all"
+                      HorizontalAlignment="Left"
+                      Click="SelectAll_Click"/>
+        </DockPanel>
+
+        <!-- Rules -->
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      Focusable="False">
+            <ItemsControl x:Name="RulesList" Focusable="False">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox IsChecked="{Binding IsSelected}"
+                                  Click="Rule_Click"
+                                  Margin="0,2">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="170"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <!-- Name, and a badge if the rule is disabled -->
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Rule.Name}"
+                                               TextTrimming="CharacterEllipsis"
+                                               MaxWidth="150"/>
+                                    <ContentControl Style="{StaticResource DisabledBadge}"
+                                                    Visibility="{Binding Rule.IsEnabled, Converter={StaticResource TrueToCollapsed}}"
+                                                    Margin="8,0,0,0"/>
+                                </StackPanel>
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding SourcesPreview}"
+                                           FontFamily="Consolas"
+                                           FontSize="13"
+                                           Foreground="{StaticResource Rule.Source.Foreground}"
+                                           TextTrimming="CharacterEllipsis"
+                                           Margin="12,0,0,0"/>
+                                <TextBlock Grid.Column="2"
+                                           Text="{Binding ServicesPreview}"
+                                           FontFamily="Consolas"
+                                           FontSize="13"
+                                           Foreground="{StaticResource Rule.Service.Foreground}"
+                                           TextTrimming="CharacterEllipsis"
+                                           Margin="12,0,0,0"/>
+                            </Grid>
+                        </CheckBox>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

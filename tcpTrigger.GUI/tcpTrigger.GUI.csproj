@@ -146,6 +146,9 @@
     <Compile Include="Views\IgnoreExportWindow.xaml.cs">
       <DependentUpon>IgnoreExportWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\IgnoreRuleChecklist.xaml.cs">
+      <DependentUpon>IgnoreRuleChecklist.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\NotifyEditWindow.xaml.cs">
       <DependentUpon>NotifyEditWindow.xaml</DependentUpon>
     </Compile>
@@ -287,6 +290,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\IgnoreExportWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\IgnoreRuleChecklist.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
