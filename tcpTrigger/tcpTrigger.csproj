@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\EmailSendMethod.cs" />
     <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\NotificationCommand.cs" />
     <Compile Include="Models\NotificationEmail.cs" />

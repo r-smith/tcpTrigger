@@ -93,9 +93,19 @@ namespace tcpTrigger
                         break;
                     case NotificationEmail email:
                         sb.AppendLine("  Type: Email");
-                        sb.AppendLine($"  Server: {email.SmtpServer}:{email.Port}");
-                        sb.AppendLine($"  Security: {GetSecurityName(email.Security)}");
-                        sb.AppendLine("  Authentication: " + (string.IsNullOrWhiteSpace(email.Username) ? "Disabled" : "Enabled"));
+                        if (email.SendMethod == EmailSendMethod.Microsoft365)
+                        {
+                            sb.AppendLine("  Send with: Microsoft 365");
+                            sb.AppendLine($"  Tenant ID: {email.TenantId}");
+                            sb.AppendLine($"  Client ID: {email.ClientId}");
+                        }
+                        else
+                        {
+                            sb.AppendLine("  Send with: SMTP server");
+                            sb.AppendLine($"  Server: {email.SmtpServer}:{email.Port}");
+                            sb.AppendLine($"  Security: {GetSecurityName(email.Security)}");
+                            sb.AppendLine("  Authentication: " + (string.IsNullOrWhiteSpace(email.Username) ? "Disabled" : "Enabled"));
+                        }
                         sb.AppendLine("  Recipients: " + string.Join(", ", email.Recipients));
                         sb.AppendLine($"  From: {email.FromAddress}");
                         sb.AppendLine($"  From display name: {email.FromDisplayName}");

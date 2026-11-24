@@ -246,7 +246,22 @@ namespace tcpTrigger
                     {
                         missing.Add("sender address");
                     }
-                    if (string.IsNullOrWhiteSpace(email.SmtpServer))
+                    if (email.SendMethod == EmailSendMethod.Microsoft365)
+                    {
+                        if (string.IsNullOrWhiteSpace(email.TenantId))
+                        {
+                            missing.Add("Microsoft 365 tenant ID");
+                        }
+                        if (string.IsNullOrWhiteSpace(email.ClientId))
+                        {
+                            missing.Add("Microsoft 365 client ID");
+                        }
+                        if (string.IsNullOrWhiteSpace(email.ClientSecret))
+                        {
+                            missing.Add("Microsoft 365 client secret");
+                        }
+                    }
+                    else if (string.IsNullOrWhiteSpace(email.SmtpServer))
                     {
                         missing.Add("mail server");
                     }

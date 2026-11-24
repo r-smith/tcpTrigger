@@ -95,11 +95,15 @@ namespace tcpTrigger
                         Settings.Notifications.Add(new NotificationEmail
                         {
                             Name = ReadString(node, "name"),
+                            SendMethod = ReadEmailSendMethod(node, "sendMethod"),
                             SmtpServer = ReadString(node, "server"),
                             Port = ReadInt(node, "port", 25),
                             Security = ReadEmailSecurity(node, "security"),
                             Username = ReadCredential(node, "username"),
                             Password = ReadCredential(node, "password"),
+                            TenantId = ReadString(node, "tenantId"),
+                            ClientId = ReadString(node, "clientId"),
+                            ClientSecret = ReadCredential(node, "clientSecret"),
                             Recipients = ReadList(node, "recipientList/address"),
                             FromAddress = ReadString(node, "fromAddress"),
                             FromDisplayName = ReadString(node, "fromDisplayName"),
@@ -320,6 +324,23 @@ namespace tcpTrigger
         {
             string text = ReadString(node, path);
             return string.IsNullOrWhiteSpace(text) ? defaultValue : int.Parse(text);
+        }
+
+        // Returns the node at path as an email send method. A missing value is treated as SMTP.
+        // Throws for an unknown value.
+        private static EmailSendMethod ReadEmailSendMethod(XmlNode node, string path)
+        {
+            string text = ReadString(node, path);
+            if (string.IsNullOrWhiteSpace(text) || string.Equals(text, ConfigNames.EmailSendMethodSmtp, StringComparison.OrdinalIgnoreCase))
+            {
+                return EmailSendMethod.Smtp;
+            }
+            if (string.Equals(text, ConfigNames.EmailSendMethodMicrosoft365, StringComparison.OrdinalIgnoreCase))
+            {
+                return EmailSendMethod.Microsoft365;
+            }
+            throw new FormatException(
+                $"'{text}' isn't a valid way to send email. Use '{ConfigNames.EmailSendMethodSmtp}' or '{ConfigNames.EmailSendMethodMicrosoft365}'.");
         }
 
         // Returns the node at path as an email security setting. A missing or unknown value is treated as none.

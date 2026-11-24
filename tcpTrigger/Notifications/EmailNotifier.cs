@@ -11,6 +11,11 @@ namespace tcpTrigger
         // Sends the notification's email for a batch of detections. Errors are logged, not thrown.
         public static void Send(NotificationEmail email, IPAddress sourceIp, List<PacketHeader> detections)
         {
+            // Where the email is sent through, for the log.
+            string route = email.SendMethod == EmailSendMethod.Microsoft365
+                ? "Microsoft 365"
+                : $"{email.SmtpServer}:{email.Port}";
+
             try
             {
                 using (MailMessage message = new MailMessage())
@@ -28,11 +33,21 @@ namespace tcpTrigger
                         }
                     }
 
-                    List<string> rejected = SmtpSender.Send(
-                        email.SmtpServer, email.Port, email.Security, email.Username, email.Password, message);
+                    // Microsoft 365 doesn't report rejected recipients when sending. The mailbox gets a bounce email later instead.
+                    List<string> rejected;
+                    if (email.SendMethod == EmailSendMethod.Microsoft365)
+                    {
+                        Microsoft365Sender.Send(email.TenantId, email.ClientId, email.ClientSecret, message);
+                        rejected = new List<string>();
+                    }
+                    else
+                    {
+                        rejected = SmtpSender.Send(
+                            email.SmtpServer, email.Port, email.Security, email.Username, email.Password, message);
+                    }
 
                     Logger.Write(
-                        $"An email notification was sent through {email.SmtpServer}:{email.Port}."
+                        $"An email notification was sent through {route}."
                         + $"{Environment.NewLine}{Environment.NewLine}"
                         + $"Notification: {email.Name}{Environment.NewLine}"
                         + $"Source: {sourceIp}{Environment.NewLine}"
@@ -56,7 +71,7 @@ namespace tcpTrigger
             catch (Exception ex)
             {
                 Logger.WriteError(
-                    $"tcpTrigger failed to send the email notification through {email.SmtpServer}:{email.Port}."
+                    $"tcpTrigger failed to send the email notification through {route}."
                     + $"{Environment.NewLine}{Environment.NewLine}Notification: {email.Name}"
                     + $"{Environment.NewLine}{Environment.NewLine}{ex.Message}"
                     + (ex.InnerException != null ? $"{Environment.NewLine}{ex.InnerException.Message}" : string.Empty),
