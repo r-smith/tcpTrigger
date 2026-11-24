@@ -27,7 +27,7 @@
                                 BorderBrush="{StaticResource Dialog.Border}"
                                 BorderThickness="1,0,1,1"
                                 CornerRadius="4"
-                                Padding="25,28,25,25">
+                                Padding="0,3,0,0">
                             <ContentPresenter/>
                         </Border>
                         <!-- Strip in the dialog's color across the top -->
@@ -39,6 +39,20 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!-- Dialog heading and message area -->
+    <Style x:Key="DialogBody" TargetType="{x:Type Border}">
+        <Setter Property="Padding" Value="25,25,25,24"/>
+    </Style>
+
+    <!-- Dialog footer, which holds the buttons -->
+    <Style x:Key="DialogFooter" TargetType="{x:Type Border}">
+        <Setter Property="Background" Value="{StaticResource ButtonBar.Background}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource ButtonBar.Border}"/>
+        <Setter Property="BorderThickness" Value="0,1,0,0"/>
+        <Setter Property="CornerRadius" Value="0,0,3,3"/>
+        <Setter Property="Padding" Value="25,14"/>
     </Style>
 
     <!-- Dialog heading -->
@@ -58,10 +72,9 @@
         <Setter Property="Foreground" Value="{StaticResource Dialog.Foreground}"/>
     </Style>
 
-    <!-- Dialog buttons, at the bottom right -->
+    <!-- Dialog buttons, in the footer -->
     <Style x:Key="DialogButtons" TargetType="{x:Type StackPanel}">
         <Setter Property="Orientation" Value="Horizontal"/>
         <Setter Property="HorizontalAlignment" Value="Right"/>
-        <Setter Property="Margin" Value="0,45,0,0"/>
     </Style>
 </ResourceDictionary>

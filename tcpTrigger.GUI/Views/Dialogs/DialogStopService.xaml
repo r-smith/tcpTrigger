@@ -9,29 +9,37 @@
     <Grid Background="{StaticResource Dialog.Overlay}">
         <ContentControl Style="{StaticResource DialogBox}" BorderBrush="{StaticResource Dialog.Warning.Accent}">
             <StackPanel>
-                <TextBlock Text="Stop monitoring?"
-                           Style="{StaticResource DialogHeading}"/>
-                <TextBlock Text="tcpTrigger won't detect anything until the service is started again."
-                           Style="{StaticResource DialogMessage}"/>
-                <StackPanel Style="{StaticResource DialogButtons}">
-                    <Button Click="Stop_Click"
-                            Margin="0,0,10,0">
-                        <StackPanel Orientation="Horizontal">
-                            <!-- Shield icon -->
-                            <Image Source="{StaticResource icon.shield}"
-                                   Width="14"
-                                   Height="14"
-                                   Margin="0,0,6,0"
-                                   VerticalAlignment="Center"/>
-                            <AccessText Text="_Stop service"/>
-                        </StackPanel>
-                    </Button>
-                    <Button x:Name="CancelButton"
-                            Content="Cancel"
-                            Style="{StaticResource SecondaryButton}"
-                            Click="Cancel_Click"
-                            IsCancel="True"/>
-                </StackPanel>
+                <!-- Heading and message -->
+                <Border Style="{StaticResource DialogBody}">
+                    <StackPanel>
+                        <TextBlock Text="Stop monitoring?"
+                                   Style="{StaticResource DialogHeading}"/>
+                        <TextBlock Text="tcpTrigger won't detect anything until the service is started again."
+                                   Style="{StaticResource DialogMessage}"/>
+                    </StackPanel>
+                </Border>
+                <!-- Buttons -->
+                <Border Style="{StaticResource DialogFooter}">
+                    <StackPanel Style="{StaticResource DialogButtons}">
+                        <Button Click="Stop_Click"
+                                Margin="0,0,10,0">
+                            <StackPanel Orientation="Horizontal">
+                                <!-- Shield icon -->
+                                <Image Source="{StaticResource icon.shield}"
+                                       Width="14"
+                                       Height="14"
+                                       Margin="0,0,6,0"
+                                       VerticalAlignment="Center"/>
+                                <AccessText Text="_Stop service"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="CancelButton"
+                                Content="Cancel"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="Cancel_Click"
+                                IsCancel="True"/>
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </ContentControl>
     </Grid>

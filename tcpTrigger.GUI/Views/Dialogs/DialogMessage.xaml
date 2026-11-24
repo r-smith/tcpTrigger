@@ -9,28 +9,36 @@
     <Grid Background="{StaticResource Dialog.Overlay}">
         <ContentControl Style="{StaticResource DialogBox}" BorderBrush="{StaticResource Dialog.Accent}">
             <StackPanel>
-                <TextBlock x:Name="Heading"
-                           d:Text="Error"
-                           Style="{StaticResource DialogHeading}"/>
-                <TextBlock x:Name="Message"
-                           d:Text="A message goes here."
-                           MinWidth="270"
-                           MaxWidth="420"
-                           Style="{StaticResource DialogMessage}"/>
-                <StackPanel Style="{StaticResource DialogButtons}">
-                    <!-- Shown when the dialog is given text to copy -->
-                    <Button x:Name="CopyButton"
-                            Content="_Copy"
-                            Style="{StaticResource SecondaryButton}"
-                            Click="Copy_Click"
-                            Margin="0,0,10,0"
-                            Visibility="Collapsed"/>
-                    <Button x:Name="OkButton"
-                            Content="OK"
-                            Click="OK_Click"
-                            IsCancel="True"
-                            IsDefault="True"/>
-                </StackPanel>
+                <!-- Heading and message -->
+                <Border Style="{StaticResource DialogBody}">
+                    <StackPanel>
+                        <TextBlock x:Name="Heading"
+                                   d:Text="Error"
+                                   Style="{StaticResource DialogHeading}"/>
+                        <TextBlock x:Name="Message"
+                                   d:Text="A message goes here."
+                                   MinWidth="270"
+                                   MaxWidth="420"
+                                   Style="{StaticResource DialogMessage}"/>
+                    </StackPanel>
+                </Border>
+                <!-- Buttons -->
+                <Border Style="{StaticResource DialogFooter}">
+                    <StackPanel Style="{StaticResource DialogButtons}">
+                        <!-- Shown when the dialog is given text to copy -->
+                        <Button x:Name="CopyButton"
+                                Content="_Copy"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="Copy_Click"
+                                Margin="0,0,10,0"
+                                Visibility="Collapsed"/>
+                        <Button x:Name="OkButton"
+                                Content="OK"
+                                Click="OK_Click"
+                                IsCancel="True"
+                                IsDefault="True"/>
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </ContentControl>
     </Grid>
