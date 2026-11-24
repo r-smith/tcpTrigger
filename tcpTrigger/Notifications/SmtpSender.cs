@@ -73,11 +73,14 @@ namespace tcpTrigger
             tcp.Connect(host, port);
 
             using (SslStream ssl = new SslStream(tcp.GetStream()))
-            using (StreamReader reader = new StreamReader(ssl, Encoding.ASCII))
             {
                 // Checks the server's certificate against the host name, without a revocation check, like SmtpClient.
                 // SslProtocols.None uses the TLS versions Windows allows.
                 ssl.AuthenticateAsClient(host, null, SslProtocols.None, checkCertificateRevocation: false);
+
+                // Created after the handshake, because ssl can't be read before it. It isn't in a using,
+                // because disposing ssl is enough: the reader has nothing else to clean up.
+                StreamReader reader = new StreamReader(ssl, Encoding.ASCII);
 
                 ReadReply(reader, 220);
                 SendLine(ssl, "EHLO " + Environment.MachineName);
