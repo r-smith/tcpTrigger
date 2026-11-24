@@ -132,25 +132,30 @@ namespace tcpTrigger.GUI.Configuration
         {
             foreach (XmlNode node in SelectNodes(xd, ConfigNames.IgnoreRules))
             {
-                IgnoreRule rule = new IgnoreRule
-                {
-                    IsEnabled = ReadBool(node, "enabled", false),
-                    Name = ReadString(node, "name"),
-                    Sources = ReadList(node, "sourceList/source"),
-                    Destinations = ReadList(node, "destinationList/destination"),
-                    Services = ReadList(node, "serviceList/service"),
-                };
-                if (DateTime.TryParse(ReadString(node, "created"), out DateTime created))
-                {
-                    rule.Created = created;
-                }
-                if (DateTime.TryParse(ReadString(node, "modified"), out DateTime modified))
-                {
-                    rule.Modified = modified;
-                }
-
-                config.IgnoreRules.Add(rule);
+                config.IgnoreRules.Add(ReadIgnoreRule(node));
             }
+        }
+
+        // Reads one <rule> element. Also used to import ignore rules.
+        public static IgnoreRule ReadIgnoreRule(XmlNode node)
+        {
+            IgnoreRule rule = new IgnoreRule
+            {
+                IsEnabled = ReadBool(node, "enabled", false),
+                Name = ReadString(node, "name"),
+                Sources = ReadList(node, "sourceList/source"),
+                Destinations = ReadList(node, "destinationList/destination"),
+                Services = ReadList(node, "serviceList/service"),
+            };
+            if (DateTime.TryParse(ReadString(node, "created"), out DateTime created))
+            {
+                rule.Created = created;
+            }
+            if (DateTime.TryParse(ReadString(node, "modified"), out DateTime modified))
+            {
+                rule.Modified = modified;
+            }
+            return rule;
         }
 
         // tcpTrigger/networkInterfaceExcludeList

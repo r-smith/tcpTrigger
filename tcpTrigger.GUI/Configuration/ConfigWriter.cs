@@ -169,36 +169,42 @@ namespace tcpTrigger.GUI.Configuration
             writer.WriteStartElement("ignoreRules");
             foreach (IgnoreRule rule in config.IgnoreRules)
             {
-                writer.WriteStartElement("rule");
-                writer.WriteElementString("enabled", XmlConvert.ToString(rule.IsEnabled));
-                writer.WriteElementString("name", rule.Name);
-                writer.WriteElementString("created", ToIso8601(rule.Created));
-                writer.WriteElementString("modified", ToIso8601(rule.Modified));
-
-                writer.WriteStartElement("sourceList");
-                foreach (string source in rule.Sources)
-                {
-                    writer.WriteElementString("source", source);
-                }
-                writer.WriteEndElement(); // End: sourceList
-
-                writer.WriteStartElement("destinationList");
-                foreach (string destination in rule.Destinations)
-                {
-                    writer.WriteElementString("destination", destination);
-                }
-                writer.WriteEndElement(); // End: destinationList
-
-                writer.WriteStartElement("serviceList");
-                foreach (string service in rule.Services)
-                {
-                    writer.WriteElementString("service", service);
-                }
-                writer.WriteEndElement(); // End: serviceList
-
-                writer.WriteEndElement(); // End: rule
+                WriteIgnoreRule(writer, rule);
             }
             writer.WriteEndElement(); // End: ignoreRules
+        }
+
+        // Writes one <rule> element. Also used to export ignore rules.
+        public static void WriteIgnoreRule(XmlWriter writer, IgnoreRule rule)
+        {
+            writer.WriteStartElement("rule");
+            writer.WriteElementString("enabled", XmlConvert.ToString(rule.IsEnabled));
+            writer.WriteElementString("name", rule.Name);
+            writer.WriteElementString("created", ToIso8601(rule.Created));
+            writer.WriteElementString("modified", ToIso8601(rule.Modified));
+
+            writer.WriteStartElement("sourceList");
+            foreach (string source in rule.Sources)
+            {
+                writer.WriteElementString("source", source);
+            }
+            writer.WriteEndElement(); // End: sourceList
+
+            writer.WriteStartElement("destinationList");
+            foreach (string destination in rule.Destinations)
+            {
+                writer.WriteElementString("destination", destination);
+            }
+            writer.WriteEndElement(); // End: destinationList
+
+            writer.WriteStartElement("serviceList");
+            foreach (string service in rule.Services)
+            {
+                writer.WriteElementString("service", service);
+            }
+            writer.WriteEndElement(); // End: serviceList
+
+            writer.WriteEndElement(); // End: rule
         }
 
         private static void WriteExcludedInterfaces(XmlWriter writer, ServiceConfig config)
