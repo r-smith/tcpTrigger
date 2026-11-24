@@ -11,6 +11,10 @@
         public const string NotificationTypeLogFile = "logFile";
         public const string NotificationTypeCommand = "command";
 
+        // Values of the <sendMethod> element in email notifications.
+        public const string EmailSendMethodSmtp = "smtp";
+        public const string EmailSendMethodMicrosoft365 = "microsoft365";
+
         // Values of the <security> element in email notifications.
         public const string EmailSecurityNone = "none";
         public const string EmailSecurityStartTls = "starttls";

@@ -122,11 +122,24 @@ namespace tcpTrigger.GUI.Configuration
             writer.WriteAttributeString("type", ConfigNames.NotificationTypeEmail);
             writer.WriteElementString("enabled", XmlConvert.ToString(email.IsEnabled));
             writer.WriteElementString("name", email.Name);
-            writer.WriteElementString("server", email.SmtpServer);
-            writer.WriteElementString("port", email.Port);
-            writer.WriteElementString("security", GetSecurityValue(email.Security));
-            WriteSecret(writer, "username", email.Username);
-            WriteSecret(writer, "password", email.Password);
+
+            // Only the chosen send method's settings are written.
+            if (email.SendMethod == EmailSendMethod.Microsoft365)
+            {
+                writer.WriteElementString("sendMethod", ConfigNames.EmailSendMethodMicrosoft365);
+                writer.WriteElementString("tenantId", email.TenantId);
+                writer.WriteElementString("clientId", email.ClientId);
+                WriteSecret(writer, "clientSecret", email.ClientSecret);
+            }
+            else
+            {
+                writer.WriteElementString("sendMethod", ConfigNames.EmailSendMethodSmtp);
+                writer.WriteElementString("server", email.SmtpServer);
+                writer.WriteElementString("port", email.Port);
+                writer.WriteElementString("security", GetSecurityValue(email.Security));
+                WriteSecret(writer, "username", email.Username);
+                WriteSecret(writer, "password", email.Password);
+            }
 
             writer.WriteStartElement("recipientList");
             foreach (string recipient in email.Recipients)

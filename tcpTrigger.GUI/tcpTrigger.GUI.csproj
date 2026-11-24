@@ -78,6 +78,7 @@
     <Compile Include="Interop\NativeMethods.cs" />
     <Compile Include="Interop\WindowInterop.cs" />
     <Compile Include="Models\DetectionEvent.cs" />
+    <Compile Include="Models\EmailSendMethod.cs" />
     <Compile Include="Models\IgnoreRule.cs" />
     <Compile Include="Models\LimitedObservableCollection.cs" />
     <Compile Include="Models\MatchType.cs" />
