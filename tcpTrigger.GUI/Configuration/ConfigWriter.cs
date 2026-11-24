@@ -124,9 +124,7 @@ namespace tcpTrigger.GUI.Configuration
             writer.WriteElementString("name", email.Name);
             writer.WriteElementString("server", email.SmtpServer);
             writer.WriteElementString("port", email.Port);
-            writer.WriteElementString("security", email.Security == EmailSecurity.StartTls
-                ? ConfigNames.EmailSecurityStartTls
-                : ConfigNames.EmailSecurityNone);
+            writer.WriteElementString("security", GetSecurityValue(email.Security));
             WriteSecret(writer, "username", email.Username);
             WriteSecret(writer, "password", email.Password);
 
@@ -230,6 +228,20 @@ namespace tcpTrigger.GUI.Configuration
             return dateTime == DateTime.MinValue
                 ? string.Empty
                 : dateTime.ToUniversalTime().ToString("u").Replace(" ", "T");
+        }
+
+        // Returns the config value for an email security setting.
+        private static string GetSecurityValue(EmailSecurity security)
+        {
+            switch (security)
+            {
+                case EmailSecurity.StartTls:
+                    return ConfigNames.EmailSecurityStartTls;
+                case EmailSecurity.Tls:
+                    return ConfigNames.EmailSecurityTls;
+                default:
+                    return ConfigNames.EmailSecurityNone;
+            }
         }
     }
 }

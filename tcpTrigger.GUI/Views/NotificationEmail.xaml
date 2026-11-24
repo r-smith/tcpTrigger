@@ -80,7 +80,7 @@
                                  Text="{Binding Port, UpdateSourceTrigger=Explicit}"
                                  Width="140"
                                  MaxLength="5"/>
-                        <TextBlock Text="Usually 25, or 587 with STARTTLS"
+                        <TextBlock Text="Usually 25, 587 (STARTTLS), or 465 (SSL/TLS)"
                                    Style="{StaticResource HintText}"
                                    Margin="12,0,0,0"
                                    VerticalAlignment="Center"/>
@@ -103,6 +103,8 @@
                         <ComboBoxItem x:Name="EncryptionStartTls"
                                       Content="STARTTLS"
                                       IsSelected="True"/>
+                        <ComboBoxItem x:Name="EncryptionTls"
+                                      Content="SSL/TLS"/>
                     </ComboBox>
                 </Grid>
 

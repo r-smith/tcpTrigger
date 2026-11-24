@@ -64,6 +64,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="..\tcpTrigger\Notifications\SmtpSender.cs">
+      <Link>Services\SmtpSender.cs</Link>
+    </Compile>
     <Compile Include="CommandLineArgs.cs" />
     <Compile Include="Configuration\CommonUdpTrafficRule.cs" />
     <Compile Include="Configuration\ConfigNames.cs" />

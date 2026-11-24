@@ -13,7 +13,7 @@ using System.Threading;
 namespace tcpTrigger
 {
     // How the connection to the mail server is secured.
-    internal enum EmailSecurity
+    public enum EmailSecurity
     {
         None,
         StartTls,
