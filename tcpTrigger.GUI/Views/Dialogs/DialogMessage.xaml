@@ -7,30 +7,17 @@
              d:DesignHeight="450" d:DesignWidth="800"
              UseLayoutRounding="True">
     <Grid Background="{StaticResource Dialog.Overlay}">
-        <Border Background="{StaticResource Dialog.Background}"
-                CornerRadius="4"
-                Padding="25"
-                BorderBrush="{StaticResource Dialog.Border}"
-                BorderThickness="2"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center">
+        <ContentControl Style="{StaticResource DialogBox}" BorderBrush="{StaticResource Dialog.Border}">
             <StackPanel>
                 <TextBlock x:Name="Heading"
                            d:Text="Error"
-                           FontSize="19"
-                           FontFamily="Segoe UI"
-                           FontWeight="Regular"
-                           Foreground="{StaticResource Dialog.Foreground}"/>
+                           Style="{StaticResource DialogHeading}"/>
                 <TextBlock x:Name="Message"
                            d:Text="A message goes here."
-                           TextWrapping="Wrap"
-                           Margin="0,12,0,0"
                            MinWidth="270"
                            MaxWidth="420"
-                           FontSize="14"
-                           HorizontalAlignment="Left"
-                           Foreground="{StaticResource Dialog.Foreground}"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,45,0,0">
+                           Style="{StaticResource DialogMessage}"/>
+                <StackPanel Style="{StaticResource DialogButtons}">
                     <!-- Shown when the dialog is given text to copy -->
                     <Button x:Name="CopyButton"
                             Content="_Copy"
@@ -45,6 +32,6 @@
                             IsDefault="True"/>
                 </StackPanel>
             </StackPanel>
-        </Border>
+        </ContentControl>
     </Grid>
 </UserControl>

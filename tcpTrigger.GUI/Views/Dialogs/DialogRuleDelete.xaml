@@ -9,31 +9,18 @@
              d:Width="500" d:Height="500"
              UseLayoutRounding="True">
     <Grid Background="{StaticResource Dialog.Overlay}">
-        <Border Background="{StaticResource Dialog.Background}"
-                CornerRadius="4"
-                Padding="25"
-                BorderBrush="{StaticResource Dialog.Danger.Border}"
-                BorderThickness="2"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center">
+        <ContentControl Style="{StaticResource DialogBox}" BorderBrush="{StaticResource Dialog.Danger.Border}">
             <StackPanel>
                 <TextBlock Text="Confirm delete"
-                           FontSize="19"
-                           FontFamily="Segoe UI"
-                           FontWeight="Regular"
-                           Foreground="{StaticResource Dialog.Foreground}"/>
-                <TextBlock TextWrapping="Wrap"
-                           Margin="0,12,0,0"
-                           Width="270"
+                           Style="{StaticResource DialogHeading}"/>
+                <TextBlock Width="270"
                            MaxHeight="100"
                            TextTrimming="WordEllipsis"
-                           FontSize="14"
-                           HorizontalAlignment="Left"
-                           Foreground="{StaticResource Dialog.Foreground}">
+                           Style="{StaticResource DialogMessage}">
                     <Run Foreground="{StaticResource Dialog.RuleName.Foreground}" d:Text="-{xxx}-" Text="{Binding Name}"/>
                     <Run Text="will be deleted when you save settings."/>
                 </TextBlock>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,45,0,0">
+                <StackPanel Style="{StaticResource DialogButtons}">
                     <Button Content="_Delete"
                             Style="{StaticResource DangerButton}"
                             Click="Delete_Click"
@@ -45,6 +32,6 @@
                             IsCancel="True"/>
                 </StackPanel>
             </StackPanel>
-        </Border>
+        </ContentControl>
     </Grid>
 </UserControl>

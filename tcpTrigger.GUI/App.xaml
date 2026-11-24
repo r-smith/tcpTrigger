@@ -15,6 +15,7 @@
                 <ResourceDictionary Source="Themes/Converters.xaml"/>
                 <ResourceDictionary Source="Themes/CheckBoxStyle.xaml"/>
                 <ResourceDictionary Source="Themes/DataGridStyle.xaml"/>
+                <ResourceDictionary Source="Themes/DialogStyle.xaml"/>
                 <ResourceDictionary Source="Themes/InfoBoxStyle.xaml"/>
                 <ResourceDictionary Source="Themes/MenuItemStyle.xaml"/>
                 <ResourceDictionary Source="Themes/ScrollBarStyle.xaml"/>

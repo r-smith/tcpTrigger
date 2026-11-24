@@ -1,0 +1,49 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Dialog box. Set BorderBrush to the dialog's color.
+         Use: <ContentControl Style="{StaticResource DialogBox}" BorderBrush="{StaticResource Dialog.Border}"> -->
+    <Style x:Key="DialogBox" TargetType="{x:Type ContentControl}">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="BorderBrush" Value="{StaticResource Dialog.Border}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ContentControl}">
+                    <Border Background="{StaticResource Dialog.Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="2"
+                            CornerRadius="4"
+                            Padding="25">
+                        <ContentPresenter/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Dialog heading -->
+    <Style x:Key="DialogHeading" TargetType="{x:Type TextBlock}">
+        <Setter Property="FontSize" Value="19"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontWeight" Value="Regular"/>
+        <Setter Property="Foreground" Value="{StaticResource Dialog.Foreground}"/>
+    </Style>
+
+    <!-- Dialog message, below the heading -->
+    <Style x:Key="DialogMessage" TargetType="{x:Type TextBlock}">
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="Margin" Value="0,12,0,0"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="Foreground" Value="{StaticResource Dialog.Foreground}"/>
+    </Style>
+
+    <!-- Dialog buttons, at the bottom right -->
+    <Style x:Key="DialogButtons" TargetType="{x:Type StackPanel}">
+        <Setter Property="Orientation" Value="Horizontal"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="Margin" Value="0,45,0,0"/>
+    </Style>
+</ResourceDictionary>
