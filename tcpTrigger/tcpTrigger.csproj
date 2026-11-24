@@ -63,6 +63,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -78,6 +79,7 @@
     <Compile Include="Configuration\ConfigReader.cs" />
     <Compile Include="Notifications\EmailBatch.cs" />
     <Compile Include="Notifications\EmailNotifier.cs" />
+    <Compile Include="Notifications\Microsoft365Sender.cs" />
     <Compile Include="Models\IgnoreRule.cs" />
     <Compile Include="Notifications\JsonLogLine.cs" />
     <Compile Include="Notifications\SmtpSender.cs" />
