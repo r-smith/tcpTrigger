@@ -7,7 +7,7 @@
              d:DesignHeight="450" d:DesignWidth="800"
              UseLayoutRounding="True">
     <Grid Background="{StaticResource Dialog.Overlay}">
-        <ContentControl Style="{StaticResource DialogBox}" BorderBrush="{StaticResource Dialog.Border}">
+        <ContentControl Style="{StaticResource DialogBox}" BorderBrush="{StaticResource Dialog.Accent}">
             <StackPanel>
                 <TextBlock x:Name="Heading"
                            d:Text="Error"

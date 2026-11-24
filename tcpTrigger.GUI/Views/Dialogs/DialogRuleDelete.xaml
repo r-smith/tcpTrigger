@@ -9,7 +9,7 @@
              d:Width="500" d:Height="500"
              UseLayoutRounding="True">
     <Grid Background="{StaticResource Dialog.Overlay}">
-        <ContentControl Style="{StaticResource DialogBox}" BorderBrush="{StaticResource Dialog.Danger.Border}">
+        <ContentControl Style="{StaticResource DialogBox}" BorderBrush="{StaticResource Dialog.Danger.Accent}">
             <StackPanel>
                 <TextBlock Text="Confirm delete"
                            Style="{StaticResource DialogHeading}"/>

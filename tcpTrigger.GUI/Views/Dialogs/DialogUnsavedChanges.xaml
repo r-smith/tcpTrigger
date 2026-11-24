@@ -7,7 +7,7 @@
              d:Width="600" d:Height="500"
              UseLayoutRounding="True">
     <Grid Background="{StaticResource Dialog.Overlay}">
-        <ContentControl Style="{StaticResource DialogBox}" BorderBrush="{StaticResource Dialog.Warning.Border}">
+        <ContentControl Style="{StaticResource DialogBox}" BorderBrush="{StaticResource Dialog.Warning.Accent}">
             <StackPanel>
                 <TextBlock Text="Save changes?"
                            Style="{StaticResource DialogHeading}"/>
