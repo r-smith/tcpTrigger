@@ -51,6 +51,12 @@ namespace tcpTrigger.GUI.Views
 
             Recipients.Text = string.Join(",", notification.Recipients);
             Password.Password = notification.Password;
+            ClientSecret.Password = notification.ClientSecret;
+
+            if (notification.SendMethod == EmailSendMethod.Microsoft365)
+            {
+                SendWithMicrosoft365.IsSelected = true;
+            }
 
             switch (notification.Security)
             {
@@ -84,17 +90,18 @@ namespace tcpTrigger.GUI.Views
             Password.Tag = Password.Password.Length == 0 ? _passwordPlaceholder : null;
         }
 
-        // The password box's built-in scroller takes the mouse wheel even when there's nothing to
+        // A password box's built-in scroller takes the mouse wheel even when there's nothing to
         // scroll, which stops the window from scrolling. Pass the wheel on to the parent instead.
-        private void Password_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        private void PasswordBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
+            PasswordBox passwordBox = (PasswordBox)sender;
             e.Handled = true;
             MouseWheelEventArgs args = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
             {
                 RoutedEvent = MouseWheelEvent,
-                Source = Password
+                Source = passwordBox
             };
-            ((UIElement)Password.Parent).RaiseEvent(args);
+            ((UIElement)passwordBox.Parent).RaiseEvent(args);
         }
 
         // When the security setting changes, fills in its usual port. A port the user typed is kept.
@@ -127,6 +134,12 @@ namespace tcpTrigger.GUI.Views
             return "25";
         }
 
+        // Returns the selected send method.
+        private EmailSendMethod GetSelectedSendMethod()
+        {
+            return SendWithMicrosoft365.IsSelected ? EmailSendMethod.Microsoft365 : EmailSendMethod.Smtp;
+        }
+
         // Returns the selected security option.
         private EmailSecurity GetSelectedSecurity()
         {
@@ -141,7 +154,7 @@ namespace tcpTrigger.GUI.Views
             return EmailSecurity.None;
         }
 
-        // Sends a test email with the server and address settings on the form, and shows the result.
+        // Sends a test email with the connection and address settings on the form, and shows the result.
         private async void Test_Click(object sender, RoutedEventArgs e)
         {
             EditorWindow window = (EditorWindow)Window.GetWindow(this);
@@ -153,11 +166,15 @@ namespace tcpTrigger.GUI.Views
             }
 
             // Read the form now. The send runs on a background thread, which can't read it.
+            bool isMicrosoft365 = GetSelectedSendMethod() == EmailSendMethod.Microsoft365;
             string server = Server.Text.Trim();
-            int port = int.Parse(Port.Text);
             EmailSecurity security = GetSelectedSecurity();
             string username = Username.Text;
             string password = Password.Password;
+            string tenantId = TenantId.Text.Trim();
+            string clientId = ClientId.Text.Trim();
+            string clientSecret = ClientSecret.Password;
+            string acceptedBy = isMicrosoft365 ? "Microsoft 365" : "The mail server";
 
             object buttonContent = TestButton.Content;
             TestButton.Content = "Sending...";
@@ -166,14 +183,24 @@ namespace tcpTrigger.GUI.Views
             {
                 using (MailMessage message = CreateTestMessage())
                 {
-                    List<string> rejected = await Task.Run(
-                        () => SmtpSender.Send(server, port, security, username, password, message));
+                    // Microsoft 365 doesn't report rejected recipients when sending.
+                    List<string> rejected;
+                    if (isMicrosoft365)
+                    {
+                        await Task.Run(() => Microsoft365Sender.Send(tenantId, clientId, clientSecret, message));
+                        rejected = new List<string>();
+                    }
+                    else
+                    {
+                        int port = int.Parse(Port.Text);
+                        rejected = await Task.Run(() => SmtpSender.Send(server, port, security, username, password, message));
+                    }
 
                     if (rejected.Count == 0)
                     {
                         window.ShowMessage(
                             "Test email sent",
-                            $"The mail server accepted the test email for {string.Join(", ", message.To)}.{Environment.NewLine}{Environment.NewLine}"
+                            $"{acceptedBy} accepted the test email for {string.Join(", ", message.To)}.{Environment.NewLine}{Environment.NewLine}"
                             + "If it doesn't arrive, check the spam or junk folder.");
                     }
                     else
@@ -248,11 +275,15 @@ namespace tcpTrigger.GUI.Views
         public void UpdateNotificationData()
         {
             Port.Text = Port.Text.Trim();
+            TenantId.Text = TenantId.Text.Trim();
+            ClientId.Text = ClientId.Text.Trim();
 
             // Inputs without a binding.
             if (DataContext is Models.NotificationEmail notification)
             {
+                notification.SendMethod = GetSelectedSendMethod();
                 notification.Password = Password.Password;
+                notification.ClientSecret = ClientSecret.Password;
                 notification.Recipients = EmailInput.ParseRecipients(Recipients.Text);
                 notification.Security = GetSelectedSecurity();
 
@@ -273,6 +304,8 @@ namespace tcpTrigger.GUI.Views
             Server.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
             Port.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
             Username.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+            TenantId.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+            ClientId.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
             FromAddress.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
             FromDisplayName.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
             Subject.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
@@ -321,8 +354,34 @@ namespace tcpTrigger.GUI.Views
             return ValidationOutcome.ValidResult;
         }
 
-        // Checks the inputs needed to send an email: the server, port, recipients, and from address.
+        // Checks the inputs needed to send an email: the connection settings, recipients, and from address.
         private ValidationOutcome ValidateSendInputs()
+        {
+            ValidationOutcome connection = GetSelectedSendMethod() == EmailSendMethod.Microsoft365
+                ? ValidateMicrosoft365Inputs()
+                : ValidateSmtpInputs();
+            if (!connection.IsValid)
+            {
+                return connection;
+            }
+
+            if (string.IsNullOrWhiteSpace(Recipients.Text) || !EmailInput.IsValidRecipients(Recipients.Text))
+            {
+                return ValidationOutcome.Invalid(
+                    $"Please enter at least one valid recipient email address for receiving notifications, such as alerts@example.com.{Environment.NewLine}{Environment.NewLine}"
+                    + "Multiple addresses should be separated by commas (,) or semicolons (;).",
+                    Recipients);
+            }
+
+            if (!EmailInput.IsValidAddress(FromAddress.Text))
+            {
+                return ValidationOutcome.Invalid("Please enter a valid 'from' email address to use when sending notifications, such as tcptrigger@example.com.", FromAddress);
+            }
+
+            return ValidationOutcome.ValidResult;
+        }
+
+        private ValidationOutcome ValidateSmtpInputs()
         {
             if (string.IsNullOrWhiteSpace(Server.Text))
             {
@@ -337,17 +396,35 @@ namespace tcpTrigger.GUI.Views
                     Port);
             }
 
-            if (string.IsNullOrWhiteSpace(Recipients.Text) || !EmailInput.IsValidRecipients(Recipients.Text))
+            return ValidationOutcome.ValidResult;
+        }
+
+        // The tenant ID can be a GUID or a domain, such as contoso.onmicrosoft.com, so it's only checked
+        // for being filled in. The client ID is always a GUID.
+        private ValidationOutcome ValidateMicrosoft365Inputs()
+        {
+            if (string.IsNullOrWhiteSpace(TenantId.Text))
             {
                 return ValidationOutcome.Invalid(
-                    $"Please enter at least one valid recipient email address for receiving notifications, such as alerts@example.com.{Environment.NewLine}{Environment.NewLine}"
-                    + "Multiple addresses should be separated by commas (,) or semicolons (;).",
-                    Recipients);
+                    $"Please enter the tenant ID of your Microsoft 365 organization.{Environment.NewLine}{Environment.NewLine}"
+                    + "It's shown as Directory (tenant) ID on the app registration's overview page in Microsoft Entra.",
+                    TenantId);
             }
 
-            if (!EmailInput.IsValidAddress(FromAddress.Text))
+            if (!Guid.TryParse(ClientId.Text.Trim(), out _))
             {
-                return ValidationOutcome.Invalid("Please enter a valid 'from' email address to use when sending notifications, such as tcptrigger@example.com.", FromAddress);
+                return ValidationOutcome.Invalid(
+                    $"Please enter a valid client ID.{Environment.NewLine}{Environment.NewLine}"
+                    + "It's shown as Application (client) ID on the app registration's overview page in Microsoft Entra.",
+                    ClientId);
+            }
+
+            if (string.IsNullOrWhiteSpace(ClientSecret.Password))
+            {
+                return ValidationOutcome.Invalid(
+                    $"Please enter the client secret.{Environment.NewLine}{Environment.NewLine}"
+                    + "Use the secret's Value from Certificates & secrets in Microsoft Entra, not its Secret ID.",
+                    ClientSecret);
             }
 
             return ValidationOutcome.ValidResult;

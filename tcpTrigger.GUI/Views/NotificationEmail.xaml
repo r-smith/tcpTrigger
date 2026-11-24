@@ -51,90 +51,159 @@
                           Margin="18,0,0,0"/>
             </Grid>
 
-            <!-- Server settings -->
-            <TextBlock Text="SMTP server"
+            <!-- Connection settings -->
+            <TextBlock Text="Connection"
                        Style="{StaticResource SectionHeading}"
                        Margin="0,40,0,1"/>
             <StackPanel Grid.IsSharedSizeScope="True" Margin="0,12,0,0">
-                <!-- Server address -->
+                <!-- Send method -->
                 <Grid Margin="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Server address"/>
-                    <TextBox x:Name="Server"
-                             Text="{Binding SmtpServer, UpdateSourceTrigger=Explicit}"
-                             Grid.Column="1"/>
-                </Grid>
-
-                <!-- Port -->
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="Port"/>
-                    <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <TextBox x:Name="Port"
-                                 Text="{Binding Port, UpdateSourceTrigger=Explicit}"
-                                 Width="140"
-                                 MaxLength="5"/>
-                        <TextBlock Text="Usually 25, 587 (STARTTLS), or 465 (SSL/TLS)"
-                                   Style="{StaticResource HintText}"
-                                   Margin="12,0,0,0"
-                                   VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Grid>
-
-                <!-- Security -->
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="Security"/>
+                    <TextBlock Text="Send with"/>
                     <ComboBox Grid.Column="1"
                               HorizontalAlignment="Left"
-                              MinWidth="140"
-                              Padding="10,8.5"
-                              SelectionChanged="Security_SelectionChanged">
-                        <ComboBoxItem x:Name="EncryptionNone"
-                                      Content="none"/>
-                        <ComboBoxItem x:Name="EncryptionStartTls"
-                                      Content="STARTTLS"
+                              Width="180"
+                              Padding="10,8.5">
+                        <ComboBoxItem x:Name="SendWithSmtp"
+                                      Content="SMTP server"
                                       IsSelected="True"/>
-                        <ComboBoxItem x:Name="EncryptionTls"
-                                      Content="SSL/TLS"/>
+                        <ComboBoxItem x:Name="SendWithMicrosoft365"
+                                      Content="Microsoft 365"/>
                     </ComboBox>
                 </Grid>
 
-                <!-- Username -->
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="Username"/>
-                    <TextBox x:Name="Username"
-                             Tag="(optional)"
-                             Text="{Binding Username, UpdateSourceTrigger=Explicit}"
-                             Grid.Column="1"/>
-                </Grid>
+                <!-- SMTP settings -->
+                <StackPanel Visibility="{Binding IsSelected, ElementName=SendWithSmtp, Converter={StaticResource TrueToVisible}}">
+                    <!-- Server address -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Server address"/>
+                        <TextBox x:Name="Server"
+                                 Text="{Binding SmtpServer, UpdateSourceTrigger=Explicit}"
+                                 Grid.Column="1"/>
+                    </Grid>
 
-                <!-- Password -->
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="Password"/>
-                    <PasswordBox x:Name="Password"
-                                 Grid.Column="1"
+                    <!-- Port -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Port"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <TextBox x:Name="Port"
+                                     Text="{Binding Port, UpdateSourceTrigger=Explicit}"
+                                     Width="140"
+                                     MaxLength="5"/>
+                            <TextBlock Text="Usually 25, 587 (STARTTLS), or 465 (SSL/TLS)"
+                                       Style="{StaticResource HintText}"
+                                       Margin="12,0,0,0"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Security -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Security"/>
+                        <ComboBox Grid.Column="1"
+                                  HorizontalAlignment="Left"
+                                  MinWidth="140"
+                                  Padding="10,8.5"
+                                  SelectionChanged="Security_SelectionChanged">
+                            <ComboBoxItem x:Name="EncryptionNone"
+                                          Content="none"/>
+                            <ComboBoxItem x:Name="EncryptionStartTls"
+                                          Content="STARTTLS"
+                                          IsSelected="True"/>
+                            <ComboBoxItem x:Name="EncryptionTls"
+                                          Content="SSL/TLS"/>
+                        </ComboBox>
+                    </Grid>
+
+                    <!-- Username -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Username"/>
+                        <TextBox x:Name="Username"
                                  Tag="(optional)"
-                                 PasswordChanged="Password_PasswordChanged"
-                                 PreviewMouseWheel="Password_PreviewMouseWheel"/>
-                </Grid>
+                                 Text="{Binding Username, UpdateSourceTrigger=Explicit}"
+                                 Grid.Column="1"/>
+                    </Grid>
+
+                    <!-- Password -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Password"/>
+                        <PasswordBox x:Name="Password"
+                                     Grid.Column="1"
+                                     Tag="(optional)"
+                                     PasswordChanged="Password_PasswordChanged"
+                                     PreviewMouseWheel="PasswordBox_PreviewMouseWheel"/>
+                    </Grid>
+                </StackPanel>
+
+                <!-- Microsoft 365 settings -->
+                <StackPanel Visibility="{Binding IsSelected, ElementName=SendWithMicrosoft365, Converter={StaticResource TrueToVisible}}">
+                    <!-- Tenant ID -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Tenant ID"/>
+                        <TextBox x:Name="TenantId"
+                                 Text="{Binding TenantId, UpdateSourceTrigger=Explicit}"
+                                 Grid.Column="1"/>
+                    </Grid>
+
+                    <!-- Client ID -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Client ID"/>
+                        <TextBox x:Name="ClientId"
+                                 Text="{Binding ClientId, UpdateSourceTrigger=Explicit}"
+                                 Grid.Column="1"/>
+                    </Grid>
+
+                    <!-- Client secret -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition SharedSizeGroup="Labels" Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Client secret"/>
+                        <PasswordBox x:Name="ClientSecret"
+                                     Grid.Column="1"
+                                     PreviewMouseWheel="PasswordBox_PreviewMouseWheel"/>
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="1"
+                                   Text="Sends from the mailbox in the From address below. The app registration needs the Mail.Send application permission."
+                                   Style="{StaticResource HintText}"/>
+                    </Grid>
+                </StackPanel>
             </StackPanel>
 
             <!-- Addresses -->

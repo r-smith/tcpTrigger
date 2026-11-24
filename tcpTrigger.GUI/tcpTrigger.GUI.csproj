@@ -49,6 +49,7 @@
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -64,6 +65,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="..\tcpTrigger\Notifications\Microsoft365Sender.cs">
+      <Link>Services\Microsoft365Sender.cs</Link>
+    </Compile>
     <Compile Include="..\tcpTrigger\Notifications\SmtpSender.cs">
       <Link>Services\SmtpSender.cs</Link>
     </Compile>
