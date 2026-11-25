@@ -26,6 +26,9 @@ namespace tcpTrigger.GUI.Configuration
                 }
                 writer.WriteEndElement(); // End: ignoreRules
             }
+
+            // End with a line break.
+            text.AppendLine();
             return text.ToString();
         }
 
