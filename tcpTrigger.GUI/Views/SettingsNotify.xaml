@@ -67,13 +67,6 @@
                                     </Style>
                                 </Border.Style>
                                 <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
                                     <!-- Styling for disabled state -->
                                     <Grid.Resources>
                                         <Style x:Key="OpacityToggle" TargetType="{x:Type TextBlock}">
@@ -86,7 +79,13 @@
                                         </Style>
                                     </Grid.Resources>
 
-                                    <StackPanel Orientation="Horizontal">
+                                    <!-- Icon, name, and badges. The right margin leaves room for the chevron. -->
+                                    <Grid HorizontalAlignment="Left" Margin="0,0,30,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
                                         <!-- Icon -->
                                         <Image Source="{Binding Type, Converter={StaticResource TypeToIcon}}"
                                                Width="18"
@@ -105,32 +104,36 @@
                                             </Image.Style>
                                         </Image>
                                         <!-- Notification name -->
-                                        <TextBlock Text="{Binding Name}"
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding Name}"
                                                    Style="{StaticResource OpacityToggle}"
                                                    FontSize="17"
                                                    FontWeight="Regular"
                                                    Foreground="{StaticResource SettingsList.Name.Foreground}"
                                                    TextTrimming="CharacterEllipsis"
                                                    VerticalAlignment="Center"/>
-                                        <!-- Disabled badge -->
-                                        <ContentControl x:Name="DisabledTag"
-                                                        Style="{StaticResource DisabledBadge}"
-                                                        Visibility="{Binding IsEnabled, Converter={StaticResource TrueToCollapsed}}"
-                                                        Margin="10,0,0,0"/>
-                                        <!-- Warning and error badges -->
-                                        <ContentControl Style="{StaticResource WarningBadge}"
-                                                        Content="{Binding WarningBadge}"
-                                                        Margin="10,0,0,0"/>
-                                        <ContentControl Style="{StaticResource ErrorBadge}"
-                                                        Content="{Binding ErrorBadge}"
-                                                        Margin="10,0,0,0"/>
-                                    </StackPanel>
-                                    <TextBlock Grid.Column="1"
-                                               Visibility="{Binding IsMouseOver, ElementName=ItemBorder, Converter={StaticResource TrueToVisible}}"
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                            <!-- Disabled badge -->
+                                            <ContentControl x:Name="DisabledTag"
+                                                            Style="{StaticResource DisabledBadge}"
+                                                            Visibility="{Binding IsEnabled, Converter={StaticResource TrueToCollapsed}}"
+                                                            Margin="10,0,0,0"/>
+                                            <!-- Warning and error badges -->
+                                            <ContentControl Style="{StaticResource WarningBadge}"
+                                                            Content="{Binding WarningBadge}"
+                                                            Margin="10,0,0,0"/>
+                                            <ContentControl Style="{StaticResource ErrorBadge}"
+                                                            Content="{Binding ErrorBadge}"
+                                                            Margin="10,0,0,0"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <TextBlock Visibility="{Binding IsMouseOver, ElementName=ItemBorder, Converter={StaticResource TrueToVisible}}"
                                                Text="&#x203A;"
                                                FontSize="17"
                                                Padding="0,0,16,0"
-                                               Foreground="{StaticResource SettingsList.Chevron.Foreground}"/>
+                                               Foreground="{StaticResource SettingsList.Chevron.Foreground}"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"/>
                                 </Grid>
                             </Border>
                         </DataTemplate>

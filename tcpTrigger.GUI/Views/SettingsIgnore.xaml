@@ -152,7 +152,14 @@
                                     </Style>
                                 </Grid.Resources>
 
-                                <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2">
+                                <!-- Name and badges. The right margin leaves room for the chevron. -->
+                                <Grid Grid.ColumnSpan="2"
+                                      HorizontalAlignment="Left"
+                                      Margin="0,0,30,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
                                     <!-- Rule name -->
                                     <TextBlock Text="{Binding Name}"
                                                Style="{StaticResource OpacityToggle}"
@@ -161,16 +168,18 @@
                                                Foreground="{StaticResource SettingsList.Name.Foreground}"
                                                TextTrimming="CharacterEllipsis"
                                                Margin="0,0,0,4"/>
-                                    <!-- Disabled badge -->
-                                    <ContentControl x:Name="DisabledTag"
-                                                    Style="{StaticResource DisabledBadge}"
-                                                    Visibility="{Binding IsEnabled, Converter={StaticResource TrueToCollapsed}}"
-                                                    Margin="10,0,0,4"/>
-                                    <!-- Imported badge -->
-                                    <ContentControl Style="{StaticResource ImportedBadge}"
-                                                    Visibility="{Binding IsImported, Converter={StaticResource TrueToVisible}}"
-                                                    Margin="10,0,0,4"/>
-                                </StackPanel>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <!-- Disabled badge -->
+                                        <ContentControl x:Name="DisabledTag"
+                                                        Style="{StaticResource DisabledBadge}"
+                                                        Visibility="{Binding IsEnabled, Converter={StaticResource TrueToCollapsed}}"
+                                                        Margin="10,0,0,4"/>
+                                        <!-- Imported badge -->
+                                        <ContentControl Style="{StaticResource ImportedBadge}"
+                                                        Visibility="{Binding IsImported, Converter={StaticResource TrueToVisible}}"
+                                                        Margin="10,0,0,4"/>
+                                    </StackPanel>
+                                </Grid>
 
                                 <!-- Rule sources -->
                                 <StackPanel Grid.Row="2">
