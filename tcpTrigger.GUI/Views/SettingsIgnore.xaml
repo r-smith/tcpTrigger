@@ -27,12 +27,40 @@
                            Style="{StaticResource PageHeading}"/>
                 <Separator Background="{StaticResource PageHeading.Separator}"/>
 
-                <!-- New rule button -->
-                <Button Content="_New rule"
-                        Style="{StaticResource AddButton}"
-                        HorizontalAlignment="Left"
-                        Margin="0,20,0,5"
-                        Click="NewRule_Click"/>
+                <!-- New rule button, and the import and export menu -->
+                <DockPanel Margin="0,20,0,5">
+                    <Button Content="_New rule"
+                            DockPanel.Dock="Left"
+                            Style="{StaticResource AddButton}"
+                            Click="NewRule_Click"/>
+                    <Button x:Name="ImportExportButton"
+                            HorizontalAlignment="Right"
+                            Style="{StaticResource SecondaryButton}"
+                            MinWidth="0"
+                            Padding="10,5"
+                            ToolTip="Import or export rules"
+                            AutomationProperties.Name="Import or export rules"
+                            Click="ImportExport_Click"
+                            SizeChanged="ImportExportButton_SizeChanged">
+                        <!-- "More" glyph -->
+                        <TextBlock Text="&#xE712;"
+                                   FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                   FontSize="14"/>
+                        <Button.ContextMenu>
+                            <ContextMenu Opened="ImportExportMenu_Opened" Closed="ImportExportMenu_Closed">
+                                <MenuItem x:Name="ExportMenuItem"
+                                          Header="_Export rules..."
+                                          Click="ExportRules_Click"/>
+                                <Separator/>
+                                <MenuItem Header="_Import rules from file..."
+                                          Click="ImportFromFile_Click"/>
+                                <MenuItem x:Name="PasteMenuItem"
+                                          Header="_Paste rules"
+                                          Click="PasteRules_Click"/>
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                    </Button>
+                </DockPanel>
             </StackPanel>
 
             <!-- Column headers (sources and destinations) -->
