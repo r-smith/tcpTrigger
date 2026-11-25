@@ -41,6 +41,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Name"/>
                 <TextBox x:Name="FriendlyName"
+                         MaxLength="100"
                          Text="{Binding Name, UpdateSourceTrigger=Explicit}"
                          Grid.Column="1"/>
                 <CheckBox x:Name="EnabledState"
@@ -85,6 +86,7 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Server address"/>
                         <TextBox x:Name="Server"
+                                 MaxLength="256"
                                  Text="{Binding SmtpServer, UpdateSourceTrigger=Explicit}"
                                  Grid.Column="1"/>
                     </Grid>
@@ -138,6 +140,7 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Username"/>
                         <TextBox x:Name="Username"
+                                 MaxLength="256"
                                  Tag="(optional)"
                                  Text="{Binding Username, UpdateSourceTrigger=Explicit}"
                                  Grid.Column="1"/>
@@ -151,6 +154,7 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Password"/>
                         <PasswordBox x:Name="Password"
+                                     MaxLength="2048"
                                      Grid.Column="1"
                                      Tag="(optional)"
                                      PasswordChanged="Password_PasswordChanged"
@@ -168,6 +172,7 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Tenant ID"/>
                         <TextBox x:Name="TenantId"
+                                 MaxLength="256"
                                  Text="{Binding TenantId, UpdateSourceTrigger=Explicit}"
                                  Grid.Column="1"/>
                     </Grid>
@@ -180,6 +185,7 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Client ID"/>
                         <TextBox x:Name="ClientId"
+                                 MaxLength="256"
                                  Text="{Binding ClientId, UpdateSourceTrigger=Explicit}"
                                  Grid.Column="1"/>
                     </Grid>
@@ -196,6 +202,7 @@
                         </Grid.RowDefinitions>
                         <TextBlock Text="Client secret"/>
                         <PasswordBox x:Name="ClientSecret"
+                                     MaxLength="2048"
                                      Grid.Column="1"
                                      PreviewMouseWheel="PasswordBox_PreviewMouseWheel"/>
                     </Grid>
@@ -243,6 +250,7 @@
                     </Grid.RowDefinitions>
                     <TextBlock Text="Recipient(s)"/>
                     <TextBox x:Name="Recipients"
+                             MaxLength="2048"
                              Grid.Column="1"/>
                     <TextBlock Grid.Row="1"
                                Grid.Column="1"
@@ -258,6 +266,7 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="From address"/>
                     <TextBox x:Name="FromAddress"
+                             MaxLength="256"
                              Text="{Binding FromAddress, UpdateSourceTrigger=Explicit}"
                              Grid.Column="1"/>
                 </Grid>
@@ -270,6 +279,7 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="From display name"/>
                     <TextBox x:Name="FromDisplayName"
+                             MaxLength="256"
                              Tag="(optional)"
                              Text="{Binding FromDisplayName, UpdateSourceTrigger=Explicit}"
                              Grid.Column="1"/>
@@ -303,6 +313,7 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Email subject"/>
                     <TextBox x:Name="Subject"
+                             MaxLength="256"
                              GotKeyboardFocus="VariableTarget_GotKeyboardFocus"
                              Text="{Binding Subject, UpdateSourceTrigger=Explicit}"
                              Grid.Column="1"/>

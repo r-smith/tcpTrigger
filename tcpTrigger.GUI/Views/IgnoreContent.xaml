@@ -67,7 +67,7 @@
             <TextBlock Text="Name"/>
             <TextBox x:Name="FriendlyName"
                      Grid.Column="1"
-                     MaxLength="255"
+                     MaxLength="100"
                      Text="{Binding Name, UpdateSourceTrigger=Explicit}"/>
             <CheckBox x:Name="EnabledState"
                       Grid.Column="2"

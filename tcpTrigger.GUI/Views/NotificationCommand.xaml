@@ -38,6 +38,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Name"/>
                 <TextBox x:Name="FriendlyName"
+                         MaxLength="100"
                          Text="{Binding Name, UpdateSourceTrigger=Explicit}"
                          Grid.Column="1"/>
                 <CheckBox x:Name="EnabledState"
@@ -64,6 +65,7 @@
                                VerticalAlignment="Top"
                                Margin="0,9,0,0"/>
                     <TextBox x:Name="Path"
+                             MaxLength="2048"
                              Text="{Binding Path, UpdateSourceTrigger=Explicit}"
                              Grid.Column="1"
                              Padding="0,4.5,2,4.5"
@@ -102,6 +104,7 @@
                                VerticalAlignment="Top"
                                Margin="0,12,0,0"/>
                     <TextBox x:Name="Arguments"
+                             MaxLength="2048"
                              Tag="(optional)"
                              Text="{Binding Arguments, UpdateSourceTrigger=Explicit}"
                              Grid.Column="1"
