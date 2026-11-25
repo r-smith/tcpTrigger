@@ -12,73 +12,62 @@
         </Grid.RowDefinitions>
 
         <!-- Select all, and how many are selected -->
-        <DockPanel Margin="0,0,0,8">
+        <DockPanel Margin="0,0,0,4">
             <TextBlock x:Name="SelectedCountText"
                        DockPanel.Dock="Right"
                        Style="{StaticResource HintText}"
-                       Margin="0"
+                       Margin="0,0,13,0"
                        VerticalAlignment="Center"/>
             <CheckBox x:Name="SelectAll"
+                      Style="{StaticResource ListCheckBox}"
                       Content="Select all"
                       HorizontalAlignment="Left"
+                      Margin="5,0,0,0"
                       Click="SelectAll_Click"/>
         </DockPanel>
 
         <!-- Rules -->
-        <ScrollViewer Grid.Row="1"
-                      VerticalScrollBarVisibility="Auto"
-                      Focusable="False">
-            <ItemsControl x:Name="RulesList" Focusable="False">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <CheckBox IsChecked="{Binding IsSelected}"
-                                  IsEnabled="{Binding CanSelect}"
-                                  Click="Rule_Click"
-                                  Margin="0,2">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="200"/>
-                                    <ColumnDefinition Width="170"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <!-- Name, and a badge if the rule is disabled -->
-                                <StackPanel Orientation="Horizontal">
+        <Border Grid.Row="1"
+                Background="{StaticResource Checklist.Background}"
+                BorderBrush="{StaticResource Checklist.Border}"
+                BorderThickness="1"
+                CornerRadius="4"
+                Padding="4">
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          Focusable="False">
+                <ItemsControl x:Name="RulesList" Focusable="False">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox Style="{StaticResource ListCheckBox}"
+                                      IsChecked="{Binding IsSelected}"
+                                      IsEnabled="{Binding CanSelect}"
+                                      Click="Rule_Click">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <!-- Name -->
                                     <TextBlock Text="{Binding Rule.Name}"
-                                               TextTrimming="CharacterEllipsis"
-                                               MaxWidth="150"/>
-                                    <ContentControl Style="{StaticResource DisabledBadge}"
-                                                    Visibility="{Binding Rule.IsEnabled, Converter={StaticResource TrueToCollapsed}}"
-                                                    Margin="8,0,0,0"/>
-                                </StackPanel>
-                                <TextBlock Grid.Column="1"
-                                           Text="{Binding SourcesPreview}"
-                                           FontFamily="Consolas"
-                                           FontSize="13"
-                                           Foreground="{StaticResource Rule.Source.Foreground}"
-                                           TextTrimming="CharacterEllipsis"
-                                           Margin="12,0,0,0"/>
-                                <TextBlock Grid.Column="2"
-                                           Text="{Binding ServicesPreview}"
-                                           FontFamily="Consolas"
-                                           FontSize="13"
-                                           Foreground="{StaticResource Rule.Service.Foreground}"
-                                           TextTrimming="CharacterEllipsis"
-                                           Margin="12,0,0,0"/>
-                                <!-- Warning and error badges, such as "Already exists" -->
-                                <StackPanel Grid.Column="3" Orientation="Horizontal">
-                                    <ContentControl Style="{StaticResource WarningBadge}"
-                                                    Content="{Binding WarningBadge}"
-                                                    Margin="10,0,0,0"/>
-                                    <ContentControl Style="{StaticResource ErrorBadge}"
-                                                    Content="{Binding ErrorBadge}"
-                                                    Margin="10,0,0,0"/>
-                                </StackPanel>
-                            </Grid>
-                        </CheckBox>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+                                               TextTrimming="CharacterEllipsis"/>
+                                    <!-- Badges, such as "Disabled" or "Already exists" -->
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <ContentControl Style="{StaticResource DisabledBadge}"
+                                                        Visibility="{Binding Rule.IsEnabled, Converter={StaticResource TrueToCollapsed}}"
+                                                        Margin="10,0,0,0"/>
+                                        <ContentControl Style="{StaticResource WarningBadge}"
+                                                        Content="{Binding WarningBadge}"
+                                                        Margin="10,0,0,0"/>
+                                        <ContentControl Style="{StaticResource ErrorBadge}"
+                                                        Content="{Binding ErrorBadge}"
+                                                        Margin="10,0,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </CheckBox>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
     </Grid>
 </UserControl>

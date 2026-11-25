@@ -269,6 +269,11 @@
     <SolidColorBrush x:Key="Rule.Destination.Foreground" Color="#B7A6FF"/>
     <SolidColorBrush x:Key="Rule.Service.Foreground" Color="#DD66DD"/>
 
+    <!-- Export and import windows: the list of rules, and the summary above it -->
+    <SolidColorBrush x:Key="Checklist.Background" Color="#000000"/>
+    <SolidColorBrush x:Key="Checklist.Border" Color="#444444"/>
+    <SolidColorBrush x:Key="ImportSummary.Foreground" Color="#E0E0E0"/>
+
     <!-- ==== Dialogs ==== -->
     <SolidColorBrush x:Key="Dialog.Overlay" Color="#88000000"/>
     <SolidColorBrush x:Key="Dialog.Background" Color="#1C1C1C"/>

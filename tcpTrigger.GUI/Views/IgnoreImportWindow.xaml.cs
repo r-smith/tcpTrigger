@@ -42,7 +42,7 @@ namespace tcpTrigger.GUI.Views
             }
 
             string count = found.Count == 1 ? "1 rule" : $"{found.Count} rules";
-            Summary.Text = $"Found {count} {source}. Checked rules are added when you save settings.";
+            Summary.Text = $"Found {count} {source}.{Environment.NewLine}Checked rules are added when you save settings.";
             Checklist.SetRules(rules);
         }
 
