@@ -26,6 +26,7 @@
         <Grid IsEnabled="{Binding Visibility, ElementName=DialogOverlay, Converter={StaticResource VisibleToDisabled}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -36,14 +37,22 @@
                        TextWrapping="Wrap"
                        Margin="25,20,25,14"/>
 
+            <!-- Note about rules with destination addresses -->
+            <ContentControl x:Name="DestinationsNote"
+                            Grid.Row="1"
+                            Style="{StaticResource InfoBox}"
+                            Margin="25,0,25,14"
+                            Visibility="Collapsed"
+                            Content="Some rules apply to specific destination IP addresses. You may need to update them to match this computer."/>
+
             <!-- Rules -->
             <local:IgnoreRuleChecklist x:Name="Checklist"
-                                       Grid.Row="1"
+                                       Grid.Row="2"
                                        Margin="25,0,25,16"
                                        SelectionChanged="Checklist_SelectionChanged"/>
 
             <!-- Button section -->
-            <Border Grid.Row="2" Background="{StaticResource ButtonBar.Background}" BorderBrush="{StaticResource ButtonBar.Border}" BorderThickness="0,1,0,0">
+            <Border Grid.Row="3" Background="{StaticResource ButtonBar.Background}" BorderBrush="{StaticResource ButtonBar.Border}" BorderThickness="0,1,0,0">
                 <DockPanel Margin="0,14,25,14" HorizontalAlignment="Right">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button x:Name="AddButton"
