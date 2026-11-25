@@ -270,6 +270,12 @@ namespace tcpTrigger.GUI.Views
             {
                 HasUnsavedChanges = false;
                 SaveButton.IsEnabled = false;
+
+                // Imported rules are saved now, so their Imported badges go away.
+                foreach (IgnoreRule rule in _config.IgnoreRules)
+                {
+                    rule.IsImported = false;
+                }
             }
 
             await ShowSaveOutcomeAsync(outcome);

@@ -199,6 +199,7 @@ namespace tcpTrigger.GUI.Views
                 {
                     rule.Created = now;
                     rule.Modified = now;
+                    rule.IsImported = true;
                     _config.IgnoreRules.Add(rule);
                 }
                 Changed?.Invoke(this, EventArgs.Empty);

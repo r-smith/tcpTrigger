@@ -31,6 +31,18 @@ namespace tcpTrigger.GUI.Models
             }
         }
 
+        // True for a rule added by importing, until settings are saved. It isn't saved to the configuration.
+        private bool _isImported;
+        public bool IsImported
+        {
+            get { return _isImported; }
+            set
+            {
+                _isImported = value;
+                OnPropertyChanged();
+            }
+        }
+
         // Source IP addresses, such as 192.168.0.1, 192.168.0.1-100, or 192.168.0.0/24. Or just "any".
         private List<string> _sources;
         public List<string> Sources

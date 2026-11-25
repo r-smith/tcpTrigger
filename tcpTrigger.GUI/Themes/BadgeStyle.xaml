@@ -40,6 +40,15 @@
         <Setter Property="Foreground" Value="{StaticResource AdvancedBadge.Foreground}"/>
     </Style>
 
+    <!-- Marks an imported ignore rule in the settings list, until settings are saved.
+         Use: <ContentControl Style="{StaticResource ImportedBadge}"/> -->
+    <Style x:Key="ImportedBadge" TargetType="{x:Type ContentControl}" BasedOn="{StaticResource Badge}">
+        <Setter Property="Content" Value="Imported"/>
+        <Setter Property="Background" Value="{StaticResource ImportedBadge.Background}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource ImportedBadge.Border}"/>
+        <Setter Property="Foreground" Value="{StaticResource ImportedBadge.Foreground}"/>
+    </Style>
+
     <!-- Warns about a notification in the settings list. Hidden while it has no text.
          Use: <ContentControl Style="{StaticResource WarningBadge}" Content="Text"/> -->
     <Style x:Key="WarningBadge" TargetType="{x:Type ContentControl}" BasedOn="{StaticResource Badge}">

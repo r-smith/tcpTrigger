@@ -161,6 +161,9 @@
     <SolidColorBrush x:Key="AdvancedBadge.Background" Color="#268E6EFF"/>
     <SolidColorBrush x:Key="AdvancedBadge.Border" Color="#8C8E6EFF"/>
     <SolidColorBrush x:Key="AdvancedBadge.Foreground" Color="#B7A6FF"/>
+    <SolidColorBrush x:Key="ImportedBadge.Background" Color="#0E1F14"/>
+    <SolidColorBrush x:Key="ImportedBadge.Border" Color="#2A6B3E"/>
+    <SolidColorBrush x:Key="ImportedBadge.Foreground" Color="#6FD98C"/>
     <SolidColorBrush x:Key="WarningBadge.Background" Color="#1E1A0B"/>
     <SolidColorBrush x:Key="WarningBadge.Border" Color="#6B5A1A"/>
     <SolidColorBrush x:Key="WarningBadge.Foreground" Color="#FFD43B"/>

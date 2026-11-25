@@ -166,6 +166,10 @@
                                                     Style="{StaticResource DisabledBadge}"
                                                     Visibility="{Binding IsEnabled, Converter={StaticResource TrueToCollapsed}}"
                                                     Margin="10,0,0,4"/>
+                                    <!-- Imported badge -->
+                                    <ContentControl Style="{StaticResource ImportedBadge}"
+                                                    Visibility="{Binding IsImported, Converter={StaticResource TrueToVisible}}"
+                                                    Margin="10,0,0,4"/>
                                 </StackPanel>
 
                                 <!-- Rule sources -->
