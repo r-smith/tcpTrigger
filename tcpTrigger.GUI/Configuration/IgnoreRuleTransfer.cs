@@ -56,14 +56,6 @@ namespace tcpTrigger.GUI.Configuration
                 {
                     rule.Name = "Imported rule";
                 }
-                if (rule.Created == default(DateTime))
-                {
-                    rule.Created = DateTime.Now;
-                }
-                if (rule.Modified == default(DateTime))
-                {
-                    rule.Modified = rule.Created;
-                }
                 rules.Add(rule);
             }
             return rules;

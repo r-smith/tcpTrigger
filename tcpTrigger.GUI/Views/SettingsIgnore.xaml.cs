@@ -167,7 +167,8 @@ namespace tcpTrigger.GUI.Views
 
         // Shows the rules in the text so the user can choose which to add. `source` says where the text came
         // from, such as "on the clipboard". If there are no rules, shows `noRulesTitle` and `noRulesMessage`
-        // instead. The chosen rules are added like new rules, so saving settings keeps them.
+        // instead. The chosen rules are added like new rules, so saving settings keeps them. Their created and
+        // modified dates are set to now.
         private void ImportRules(string text, string source, string noRulesTitle, string noRulesMessage)
         {
             List<IgnoreRule> found;
@@ -193,8 +194,11 @@ namespace tcpTrigger.GUI.Views
             };
             if (importWindow.ShowDialog() == true)
             {
+                DateTime now = DateTime.Now;
                 foreach (IgnoreRule rule in importWindow.ImportedRules)
                 {
+                    rule.Created = now;
+                    rule.Modified = now;
                     _config.IgnoreRules.Add(rule);
                 }
                 Changed?.Invoke(this, EventArgs.Empty);
