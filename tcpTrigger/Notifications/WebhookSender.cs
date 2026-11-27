@@ -18,12 +18,46 @@ namespace tcpTrigger
         private const int DiscordMaxLength = 2000;
         private const int GoogleChatMaxLength = 4000;
         private const int NtfyMaxLength = 4000;
+        private const int TeamsMaxLength = 20000;
 
         // Returns true if the URL is an absolute http or https URL.
         public static bool IsValidUrl(string url)
         {
             return Uri.TryCreate(url?.Trim(), UriKind.Absolute, out Uri uri)
                 && (uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp);
+        }
+
+        // Microsoft Teams, through a Workflows webhook. The message is posted as an Adaptive Card. Its text runs aren't
+        // read as Markdown, so nothing needs escaping, and line breaks show as they are.
+        public static void SendTeams(string url, string title, string message)
+        {
+            List<object> body = new List<object>();
+            if (!string.IsNullOrWhiteSpace(title))
+            {
+                body.Add(CreateTextBlock(title.Trim(), isTitle: true));
+            }
+            body.Add(CreateTextBlock(Shorten(message, TeamsMaxLength), isTitle: false));
+
+            PostJson(url, "Microsoft Teams", new Dictionary<string, object>
+            {
+                ["type"] = "message",
+                ["attachments"] = new List<object>
+                {
+                    new Dictionary<string, object>
+                    {
+                        ["contentType"] = "application/vnd.microsoft.card.adaptive",
+                        ["content"] = new Dictionary<string, object>
+                        {
+                            ["$schema"] = "http://adaptivecards.io/schemas/adaptive-card.json",
+                            ["type"] = "AdaptiveCard",
+                            ["version"] = "1.2",
+                            ["body"] = body,
+                            // Use the full width of the channel, so detection lines don't wrap as much.
+                            ["msteams"] = new Dictionary<string, object> { ["width"] = "Full" }
+                        }
+                    }
+                }
+            });
         }
 
         // Slack, and Slack-compatible webhooks such as Mattermost and Rocket.Chat.
@@ -71,6 +105,26 @@ namespace tcpTrigger
                 headers["Title"] = EncodeHeader(title);
             }
             Post(url, "ntfy", "text/plain; charset=utf-8", Shorten(message, NtfyMaxLength), headers);
+        }
+
+        // Returns an Adaptive Card block with the text in one run. The title is bold and larger.
+        private static Dictionary<string, object> CreateTextBlock(string text, bool isTitle)
+        {
+            Dictionary<string, object> run = new Dictionary<string, object>
+            {
+                ["type"] = "TextRun",
+                ["text"] = text
+            };
+            if (isTitle)
+            {
+                run["weight"] = "Bolder";
+                run["size"] = "Medium";
+            }
+            return new Dictionary<string, object>
+            {
+                ["type"] = "RichTextBlock",
+                ["inlines"] = new List<object> { run }
+            };
         }
 
         private static void PostJson(string url, string platform, Dictionary<string, object> request)
@@ -205,6 +259,12 @@ namespace tcpTrigger
                     return "The channel is archived.";
                 case "action_prohibited":
                     return "A Slack admin has restricted this webhook.";
+            }
+
+            if (platform == "Microsoft Teams" && (statusCode == 401 || statusCode == 403))
+            {
+                return "The workflow only accepts requests from signed-in people. Create it from the "
+                    + "\"Send webhook alerts to a channel\" template, which accepts any request sent to its URL.";
             }
 
             switch (statusCode)

@@ -70,6 +70,9 @@ namespace tcpTrigger
         {
             switch (webhook.Platform)
             {
+                case WebhookPlatform.MicrosoftTeams:
+                    WebhookSender.SendTeams(webhook.Url, title, message);
+                    break;
                 case WebhookPlatform.Slack:
                     WebhookSender.SendSlack(webhook.Url, title, message);
                     break;
