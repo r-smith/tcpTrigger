@@ -119,6 +119,21 @@ namespace tcpTrigger.GUI.Configuration
                             WaitSeconds = Math.Max(1, ReadInt(node, "waitSeconds", NotificationEmail.DefaultWaitSeconds)),
                         });
                         break;
+                    case ConfigNames.NotificationTypeWebhook:
+                        config.Notifications.Add(new NotificationWebhook
+                        {
+                            IsEnabled = ReadBool(node, "enabled", false),
+                            Name = ReadString(node, "name"),
+                            Platform = ReadWebhookPlatform(node, "platform"),
+                            Url = ReadCredential(node, "url"),
+                            Title = ReadString(node, "title"),
+                            Message = ReadString(node, "message"),
+                            Body = ReadString(node, "body"),
+                            // A value of 0 or less is treated as 1 second.
+                            RateLimitSeconds = Math.Max(1, ReadInt(node, "rateLimitSeconds", NotificationWebhook.DefaultRateLimitSeconds)),
+                            WaitSeconds = Math.Max(1, ReadInt(node, "waitSeconds", NotificationWebhook.DefaultWaitSeconds)),
+                        });
+                        break;
                     default:
                         break;
                 }
@@ -357,6 +372,32 @@ namespace tcpTrigger.GUI.Configuration
             }
             throw new FormatException(
                 $"'{text}' isn't a valid way to send email. Use '{ConfigNames.EmailSendMethodSmtp}' or '{ConfigNames.EmailSendMethodMicrosoft365}'.");
+        }
+
+        // Returns the node at path as a webhook platform. Throws for a missing or unknown value.
+        private static WebhookPlatform ReadWebhookPlatform(XmlNode node, string path)
+        {
+            string text = ReadString(node, path)?.Trim();
+            switch (text?.ToLowerInvariant())
+            {
+                case ConfigNames.WebhookPlatformMicrosoftTeams:
+                    return WebhookPlatform.MicrosoftTeams;
+                case ConfigNames.WebhookPlatformSlack:
+                    return WebhookPlatform.Slack;
+                case ConfigNames.WebhookPlatformDiscord:
+                    return WebhookPlatform.Discord;
+                case ConfigNames.WebhookPlatformGoogleChat:
+                    return WebhookPlatform.GoogleChat;
+                case ConfigNames.WebhookPlatformNtfy:
+                    return WebhookPlatform.Ntfy;
+                case ConfigNames.WebhookPlatformCustom:
+                    return WebhookPlatform.Custom;
+            }
+
+            const string validValues = "'teams', 'slack', 'discord', 'googlechat', 'ntfy', or 'custom'";
+            throw new FormatException(string.IsNullOrEmpty(text)
+                ? $"A webhook notification needs a platform. Use {validValues}."
+                : $"'{text}' isn't a valid webhook platform. Use {validValues}.");
         }
 
         // Returns the node at path as an email security setting. A missing or unknown value is treated as none.

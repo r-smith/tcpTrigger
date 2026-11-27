@@ -88,6 +88,9 @@ namespace tcpTrigger.GUI.Configuration
                     case NotificationEmail email:
                         WriteEmailNotification(writer, email);
                         break;
+                    case NotificationWebhook webhook:
+                        WriteWebhookNotification(writer, webhook);
+                        break;
                     default:
                         break;
                 }
@@ -161,6 +164,31 @@ namespace tcpTrigger.GUI.Configuration
             writer.WriteElementString("body", email.Body);
             writer.WriteElementString("rateLimitSeconds", XmlConvert.ToString(email.RateLimitSeconds));
             writer.WriteElementString("waitSeconds", XmlConvert.ToString(email.WaitSeconds));
+            writer.WriteEndElement(); // End: notification
+        }
+
+        private static void WriteWebhookNotification(XmlWriter writer, NotificationWebhook webhook)
+        {
+            writer.WriteStartElement("notification");
+            writer.WriteAttributeString("type", ConfigNames.NotificationTypeWebhook);
+            writer.WriteElementString("enabled", XmlConvert.ToString(webhook.IsEnabled));
+            writer.WriteElementString("name", webhook.Name);
+            writer.WriteElementString("platform", GetPlatformValue(webhook.Platform));
+            WriteSecret(writer, "url", webhook.Url);
+
+            // Only the chosen platform's settings are written. Custom has a request body, the others a title and message.
+            if (webhook.Platform == WebhookPlatform.Custom)
+            {
+                writer.WriteElementString("body", webhook.Body);
+            }
+            else
+            {
+                writer.WriteElementString("title", webhook.Title);
+                writer.WriteElementString("message", webhook.Message);
+            }
+
+            writer.WriteElementString("rateLimitSeconds", XmlConvert.ToString(webhook.RateLimitSeconds));
+            writer.WriteElementString("waitSeconds", XmlConvert.ToString(webhook.WaitSeconds));
             writer.WriteEndElement(); // End: notification
         }
 
@@ -264,6 +292,25 @@ namespace tcpTrigger.GUI.Configuration
                     return ConfigNames.EmailSecurityTls;
                 default:
                     return ConfigNames.EmailSecurityNone;
+            }
+        }
+
+        private static string GetPlatformValue(WebhookPlatform platform)
+        {
+            switch (platform)
+            {
+                case WebhookPlatform.MicrosoftTeams:
+                    return ConfigNames.WebhookPlatformMicrosoftTeams;
+                case WebhookPlatform.Slack:
+                    return ConfigNames.WebhookPlatformSlack;
+                case WebhookPlatform.Discord:
+                    return ConfigNames.WebhookPlatformDiscord;
+                case WebhookPlatform.GoogleChat:
+                    return ConfigNames.WebhookPlatformGoogleChat;
+                case WebhookPlatform.Ntfy:
+                    return ConfigNames.WebhookPlatformNtfy;
+                default:
+                    return ConfigNames.WebhookPlatformCustom;
             }
         }
     }

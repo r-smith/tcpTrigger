@@ -4,6 +4,7 @@
     {
         Email,
         LogFile,
-        Command
+        Command,
+        Webhook
     }
 }

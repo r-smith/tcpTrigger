@@ -72,6 +72,8 @@
     <Compile Include="Models\NotificationCommand.cs" />
     <Compile Include="Models\NotificationEmail.cs" />
     <Compile Include="Models\NotificationLogFile.cs" />
+    <Compile Include="Models\NotificationWebhook.cs" />
+    <Compile Include="Models\WebhookPlatform.cs" />
     <Compile Include="Network\IPv4Address.cs" />
     <Compile Include="Notifications\DetectionQueue.cs" />
     <Compile Include="Notifications\NotificationRunner.cs" />
@@ -131,4 +133,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-</Project>
+</Project>

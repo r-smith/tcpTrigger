@@ -10,6 +10,7 @@
         public const string NotificationTypeEmail = "email";
         public const string NotificationTypeLogFile = "logFile";
         public const string NotificationTypeCommand = "command";
+        public const string NotificationTypeWebhook = "webhook";
 
         // Values of the <sendMethod> element in email notifications.
         public const string EmailSendMethodSmtp = "smtp";
@@ -22,6 +23,14 @@
         public const string EmailSecurityNone = "none";
         public const string EmailSecurityStartTls = "starttls";
         public const string EmailSecurityTls = "tls";
+
+        // Values of the <platform> element in webhook notifications.
+        public const string WebhookPlatformMicrosoftTeams = "teams";
+        public const string WebhookPlatformSlack = "slack";
+        public const string WebhookPlatformDiscord = "discord";
+        public const string WebhookPlatformGoogleChat = "googlechat";
+        public const string WebhookPlatformNtfy = "ntfy";
+        public const string WebhookPlatformCustom = "custom";
 
         public const string DetectionIcmp = "/tcpTrigger/detection/icmp";
         public const string DetectionTcp = "/tcpTrigger/detection/tcp";

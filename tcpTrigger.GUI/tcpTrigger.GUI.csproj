@@ -92,8 +92,10 @@
     <Compile Include="Models\NotificationCommand.cs" />
     <Compile Include="Models\NotificationLogFile.cs" />
     <Compile Include="Models\NotificationType.cs" />
+    <Compile Include="Models\NotificationWebhook.cs" />
     <Compile Include="Models\PortNames.cs" />
     <Compile Include="Models\SelectableIgnoreRule.cs" />
+    <Compile Include="Models\WebhookPlatform.cs" />
     <Compile Include="Services\DetectionLogWatcher.cs" />
     <Compile Include="Services\ElevatedCommand.cs" />
     <Compile Include="Services\ElevatedServiceControl.cs" />
@@ -381,4 +383,4 @@
     <Resource Include="tcpTrigger.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-</Project>
+</Project>
