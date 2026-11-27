@@ -1,8 +1,7 @@
 ﻿namespace tcpTrigger
 {
-    // Posts a message to a webhook for detections, such as a Teams or Slack channel. Detections are collected
-    // for the wait time and sent together, at most once per rate limit.
-    internal class NotificationWebhook : Notification
+    // Posts a message to a webhook for each batch of detections.
+    internal class NotificationWebhook : BatchedNotification
     {
         public const int DefaultRateLimitSeconds = 300;
         public const int DefaultWaitSeconds = 30;
@@ -23,8 +22,5 @@
 
         // Used by the Custom platform: the JSON request body.
         public string Body { get; set; }
-
-        public int RateLimitSeconds { get; set; }
-        public int WaitSeconds { get; set; }
     }
 }

@@ -12,11 +12,11 @@ namespace tcpTrigger
         // Maximum time Stop waits for queued detections to finish.
         private static readonly TimeSpan s_stopTimeout = TimeSpan.FromSeconds(10);
 
-        // How often the thread checks for emails that are due, while any batches are waiting.
-        private static readonly TimeSpan s_emailCheckInterval = TimeSpan.FromSeconds(1);
+        // How often the thread checks for batches that are due, while any batches are waiting.
+        private static readonly TimeSpan s_batchCheckInterval = TimeSpan.FromSeconds(1);
 
-        // Maximum time to wait for the last emails to send when stopping. Less than s_stopTimeout.
-        private static readonly TimeSpan s_lastEmailsTimeout = TimeSpan.FromSeconds(5);
+        // Maximum time to wait for the last batches to send when stopping. Less than s_stopTimeout.
+        private static readonly TimeSpan s_lastBatchesTimeout = TimeSpan.FromSeconds(5);
 
         // Detections waiting for their notifications to run.
         private readonly BlockingCollection<PacketHeader> _detections = new BlockingCollection<PacketHeader>();
@@ -59,7 +59,7 @@ namespace tcpTrigger
         }
 
         // Runs the notifications for each detection (on the background thread) in the order they were queued.
-        // Also sends the emails that are due, checking once a second while any batches are waiting.
+        // Also sends the batches that are due, checking once a second while any batches are waiting.
         private void RunNotifications()
         {
             // The loop ends once Stop is called and the queue is empty.
@@ -67,13 +67,13 @@ namespace tcpTrigger
             {
                 try
                 {
-                    // Wait for the next detection. If email batches are waiting, wake at least once a second so emails go out on time.
-                    TimeSpan timeout = NotificationRunner.HasEmailBatches ? s_emailCheckInterval : Timeout.InfiniteTimeSpan;
+                    // Wait for the next detection. If batches are waiting, wake at least once a second so they go out on time.
+                    TimeSpan timeout = NotificationRunner.HasBatches ? s_batchCheckInterval : Timeout.InfiniteTimeSpan;
                     if (_detections.TryTake(out PacketHeader detection, timeout))
                     {
                         NotificationRunner.Run(detection);
                     }
-                    NotificationRunner.SendDueEmails();
+                    NotificationRunner.SendDueBatches();
                 }
                 catch (Exception ex)
                 {
@@ -84,8 +84,8 @@ namespace tcpTrigger
                 }
             }
 
-            // Send the emails still waiting, so stopping or reloading doesn't lose them.
-            Task.WaitAll(NotificationRunner.SendAllEmails(), s_lastEmailsTimeout);
+            // Send the batches still waiting, so stopping or reloading doesn't lose them.
+            Task.WaitAll(NotificationRunner.SendAllBatches(), s_lastBatchesTimeout);
         }
     }
 }

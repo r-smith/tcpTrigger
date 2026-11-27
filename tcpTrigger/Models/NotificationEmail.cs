@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 
 namespace tcpTrigger
 {
-    // Sends an email for detections. Detections are collected for the wait time and sent together,
-    // at most once per rate limit.
-    internal class NotificationEmail : Notification
+    // Sends an email for each batch of detections.
+    internal class NotificationEmail : BatchedNotification
     {
         public const int DefaultRateLimitSeconds = 300;
         public const int DefaultWaitSeconds = 30;
@@ -38,10 +36,5 @@ namespace tcpTrigger
         public string FromDisplayName { get; set; }
         public string Subject { get; set; }
         public string Body { get; set; }
-        public int RateLimitSeconds { get; set; }
-        public int WaitSeconds { get; set; }
-
-        // Detections waiting to be emailed, one batch per source IP. Only used on the detection queue thread.
-        public Dictionary<IPAddress, EmailBatch> Batches { get; } = new Dictionary<IPAddress, EmailBatch>();
     }
 }

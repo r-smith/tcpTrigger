@@ -29,8 +29,8 @@ namespace tcpTrigger
                     case NotificationCommand command:
                         RunCommand(packetHeader, command);
                         break;
-                    case NotificationEmail email:
-                        AddToEmailBatch(packetHeader, email);
+                    case BatchedNotification batched:
+                        AddToBatch(packetHeader, batched);
                         break;
                 }
             }
@@ -159,13 +159,13 @@ namespace tcpTrigger
             }
         }
 
-        // Adds the detection to the email notification's batch for its source IP. SendDueEmails sends it later.
-        private static void AddToEmailBatch(PacketHeader packetHeader, NotificationEmail email)
+        // Adds the detection to the notification's batch for its source IP. SendDueBatches sends it later.
+        private static void AddToBatch(PacketHeader packetHeader, BatchedNotification notification)
         {
-            if (!email.Batches.TryGetValue(packetHeader.SourceIP, out EmailBatch batch))
+            if (!notification.Batches.TryGetValue(packetHeader.SourceIP, out DetectionBatch batch))
             {
-                batch = new EmailBatch();
-                email.Batches.Add(packetHeader.SourceIP, batch);
+                batch = new DetectionBatch();
+                notification.Batches.Add(packetHeader.SourceIP, batch);
             }
 
             if (batch.Detections.Count == 0)
@@ -175,63 +175,71 @@ namespace tcpTrigger
             batch.Detections.Add(packetHeader);
         }
 
-        // True if any email notification still has emails to send or a rate limit to wait out.
-        public static bool HasEmailBatches =>
-            Settings.Notifications.OfType<NotificationEmail>().Any(email => email.Batches.Count > 0);
+        // True if any batched notification still has batches to send or a rate limit to wait out.
+        public static bool HasBatches =>
+            Settings.Notifications.OfType<BatchedNotification>().Any(notification => notification.Batches.Count > 0);
 
-        // Sends each email that's due, and removes sources that have nothing left to send.
-        // A source's email is due once the wait time has passed since its first detection
-        // and the rate limit has passed since its last email.
-        public static void SendDueEmails()
+        // Sends each batch that's due, and removes sources that have nothing left to send.
+        // A source's batch is due once the wait time has passed since its first detection
+        // and the rate limit has passed since its last batch was sent.
+        public static void SendDueBatches()
         {
             DateTime now = DateTime.UtcNow;
-            foreach (NotificationEmail email in Settings.Notifications.OfType<NotificationEmail>())
+            foreach (BatchedNotification notification in Settings.Notifications.OfType<BatchedNotification>())
             {
-                foreach (KeyValuePair<IPAddress, EmailBatch> pair in email.Batches.ToList())
+                foreach (KeyValuePair<IPAddress, DetectionBatch> pair in notification.Batches.ToList())
                 {
-                    EmailBatch batch = pair.Value;
-                    bool isWaitOver = now >= batch.FirstDetection.AddSeconds(email.WaitSeconds);
-                    bool isRateLimitOver = now >= batch.LastSent.AddSeconds(email.RateLimitSeconds);
+                    DetectionBatch batch = pair.Value;
+                    bool isWaitOver = now >= batch.FirstDetection.AddSeconds(notification.WaitSeconds);
+                    bool isRateLimitOver = now >= batch.LastSent.AddSeconds(notification.RateLimitSeconds);
 
                     if (batch.Detections.Count > 0 && isWaitOver && isRateLimitOver)
                     {
-                        SendBatch(email, pair.Key, batch);
+                        SendBatch(notification, pair.Key, batch);
                     }
                     else if (batch.Detections.Count == 0 && isRateLimitOver)
                     {
-                        email.Batches.Remove(pair.Key);
+                        notification.Batches.Remove(pair.Key);
                     }
                 }
             }
         }
 
-        // Sends every email that's waiting, due or not, so stopping or reloading doesn't lose them.
+        // Sends every batch that's waiting, due or not, so stopping or reloading doesn't lose them.
         // Returns the sends, so the caller can wait for them.
-        public static Task[] SendAllEmails()
+        public static Task[] SendAllBatches()
         {
             List<Task> sends = new List<Task>();
-            foreach (NotificationEmail email in Settings.Notifications.OfType<NotificationEmail>())
+            foreach (BatchedNotification notification in Settings.Notifications.OfType<BatchedNotification>())
             {
-                foreach (KeyValuePair<IPAddress, EmailBatch> pair in email.Batches)
+                foreach (KeyValuePair<IPAddress, DetectionBatch> pair in notification.Batches)
                 {
                     if (pair.Value.Detections.Count > 0)
                     {
-                        sends.Add(SendBatch(email, pair.Key, pair.Value));
+                        sends.Add(SendBatch(notification, pair.Key, pair.Value));
                     }
                 }
             }
             return sends.ToArray();
         }
 
-        // Starts sending the batch's email on another thread, then empties the batch.
-        // EmailNotifier.Send logs its own errors.
-        private static Task SendBatch(NotificationEmail email, IPAddress sourceIp, EmailBatch batch)
+        // Starts sending the batch on another thread, then empties the batch. Each sender logs its own errors.
+        private static Task SendBatch(BatchedNotification notification, IPAddress sourceIp, DetectionBatch batch)
         {
-            // Copy the detections first, since the batch is emptied below while the email is still being sent.
+            // Copy the detections first, since the batch is emptied below while it's still being sent.
             List<PacketHeader> detections = batch.Detections.ToList();
 
-            // Send on a thread-pool thread, so a slow DNS lookup or mail server doesn't hold up the detection queue.
-            Task send = Task.Run(() => EmailNotifier.Send(email, sourceIp, detections));
+            // Send on a thread-pool thread, so a slow DNS lookup or server doesn't hold up the detection queue.
+            Task send;
+            switch (notification)
+            {
+                case NotificationEmail email:
+                    send = Task.Run(() => EmailNotifier.Send(email, sourceIp, detections));
+                    break;
+                default:
+                    send = Task.CompletedTask;
+                    break;
+            }
 
             batch.Detections.Clear();
             batch.LastSent = DateTime.UtcNow;

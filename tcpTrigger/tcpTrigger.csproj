@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\BatchedNotification.cs" />
     <Compile Include="Models\EmailSendMethod.cs" />
     <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\NotificationCommand.cs" />
@@ -81,7 +82,7 @@
     <Compile Include="Configuration\ConfigPaths.cs" />
     <Compile Include="Configuration\ConfigReader.cs" />
     <Compile Include="Notifications\ClientSecretReminder.cs" />
-    <Compile Include="Notifications\EmailBatch.cs" />
+    <Compile Include="Notifications\DetectionBatch.cs" />
     <Compile Include="Notifications\EmailNotifier.cs" />
     <Compile Include="Notifications\Microsoft365Sender.cs" />
     <Compile Include="Models\IgnoreRule.cs" />
