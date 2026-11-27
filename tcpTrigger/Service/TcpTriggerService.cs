@@ -282,6 +282,28 @@ namespace tcpTrigger
                         return false;
                     }
                     return true;
+                case NotificationWebhook webhook:
+                    if (!WebhookSender.IsValidUrl(webhook.Url))
+                    {
+                        string urlProblem = string.IsNullOrWhiteSpace(webhook.Url)
+                            ? "no webhook URL is set"
+                            : "the webhook URL isn't a valid http or https URL";
+                        Logger.WriteWarning(
+                            $"{name} has been disabled because {urlProblem}. Update your tcpTrigger configuration with the webhook's URL.",
+                            Logger.EventCode.WebhookSettingsIncomplete);
+                        return false;
+                    }
+
+                    bool isCustom = webhook.Platform == WebhookPlatform.Custom;
+                    string content = isCustom ? "request body" : "message";
+                    if (string.IsNullOrWhiteSpace(isCustom ? webhook.Body : webhook.Message))
+                    {
+                        Logger.WriteWarning(
+                            $"{name} has been disabled because no {content} is set. Update your tcpTrigger configuration with the {content} to send.",
+                            Logger.EventCode.WebhookSettingsIncomplete);
+                        return false;
+                    }
+                    return true;
                 default:
                     return true;
             }

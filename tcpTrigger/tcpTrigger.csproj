@@ -96,6 +96,8 @@
     <Compile Include="Network\TcpTriggerInterface.cs" />
     <Compile Include="Network\PacketHeader.cs" />
     <Compile Include="Notifications\UserVariableExpansion.cs" />
+    <Compile Include="Notifications\WebhookNotifier.cs" />
+    <Compile Include="Notifications\WebhookSender.cs" />
     <Compile Include="Service\TcpTriggerService.cs">
       <SubType>Component</SubType>
     </Compile>

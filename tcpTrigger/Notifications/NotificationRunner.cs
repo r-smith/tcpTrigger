@@ -236,6 +236,9 @@ namespace tcpTrigger
                 case NotificationEmail email:
                     send = Task.Run(() => EmailNotifier.Send(email, sourceIp, detections));
                     break;
+                case NotificationWebhook webhook:
+                    send = Task.Run(() => WebhookNotifier.Send(webhook, sourceIp, detections));
+                    break;
                 default:
                     send = Task.CompletedTask;
                     break;

@@ -66,7 +66,7 @@ namespace tcpTrigger
             return message;
         }
 
-        // Replaces the variables for an email. Each email is for one source IP.
+        // Replaces the variables for a batch of detections, such as an email. Each batch is for one source IP.
         // If that source IP hit more than one interface, {DESTINATION_IP} and {DESTINATION_MAC} list each, separated by commas.
         public static string GetExpandedString(string message, IPAddress sourceIp, List<PacketHeader> detections)
         {

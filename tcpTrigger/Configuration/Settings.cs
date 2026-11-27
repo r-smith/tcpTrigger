@@ -118,6 +118,17 @@ namespace tcpTrigger
                         sb.AppendLine($"  Rate limit: {email.RateLimitSeconds} seconds");
                         sb.AppendLine($"  Wait: {email.WaitSeconds} seconds");
                         break;
+                    case NotificationWebhook webhook:
+                        sb.AppendLine("  Type: Webhook");
+                        sb.AppendLine($"  Platform: {WebhookNotifier.GetPlatformName(webhook.Platform)}");
+                        sb.AppendLine($"  Server: {WebhookNotifier.GetHost(webhook.Url)}");
+                        if (webhook.Platform != WebhookPlatform.Custom)
+                        {
+                            sb.AppendLine($"  Title: {webhook.Title}");
+                        }
+                        sb.AppendLine($"  Rate limit: {webhook.RateLimitSeconds} seconds");
+                        sb.AppendLine($"  Wait: {webhook.WaitSeconds} seconds");
+                        break;
                 }
             }
 
