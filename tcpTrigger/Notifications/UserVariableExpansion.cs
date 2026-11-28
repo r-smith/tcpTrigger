@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Web.Script.Serialization;
 
 namespace tcpTrigger
 {
@@ -68,31 +69,45 @@ namespace tcpTrigger
 
         // Replaces the variables for a batch of detections, such as an email. Each batch is for one source IP.
         // If that source IP hit more than one interface, {DESTINATION_IP} and {DESTINATION_MAC} list each, separated by commas.
-        public static string GetExpandedString(string message, IPAddress sourceIp, List<PacketHeader> detections)
+        // If escapeJson is true, each variable's value is escaped so it's safe inside a JSON string.
+        public static string GetExpandedString(string message, IPAddress sourceIp, List<PacketHeader> detections, bool escapeJson = false)
         {
-            string destinationIps = string.Join(", ", detections.Select(d => d.DestinationIP.ToString()).Distinct());
-            string destinationMacs = string.Join(", ", detections.Select(d => d.DestinationMacAsString).Distinct());
-            string detectionLog = string.Join(Environment.NewLine, detections.Select(GetDetectionLogLine));
+            string destinationIps = Escape(string.Join(", ", detections.Select(d => d.DestinationIP.ToString()).Distinct()), escapeJson);
+            string destinationMacs = Escape(string.Join(", ", detections.Select(d => d.DestinationMacAsString).Distinct()), escapeJson);
+            string detectionLog = Escape(string.Join(Environment.NewLine, detections.Select(GetDetectionLogLine)), escapeJson);
 
-            message = message.Replace(SensorName, Environment.MachineName);
-            message = message.Replace(SourceIp, sourceIp?.ToString());
+            message = message.Replace(SensorName, Escape(Environment.MachineName, escapeJson));
+            message = message.Replace(SourceIp, Escape(sourceIp?.ToString(), escapeJson));
             if (message.Contains(SourceHostname))
             {
-                message = message.Replace(SourceHostname, GetHostname(sourceIp));
+                message = message.Replace(SourceHostname, Escape(GetHostname(sourceIp), escapeJson));
             }
-            message = message.Replace(SourceOsGuess, string.Join(", ", detections.Select(d => GetSourceOsGuess(d.Ttl)).Distinct()));
+            message = message.Replace(SourceOsGuess, Escape(string.Join(", ", detections.Select(d => GetSourceOsGuess(d.Ttl)).Distinct()), escapeJson));
             message = message.Replace(DestinationIp, destinationIps);
             message = message.Replace(OldInterfaceIp, destinationIps);
             message = message.Replace(DestinationMac, destinationMacs);
-            message = message.Replace(DestinationServices, GetDestinationServices(detections));
-            message = message.Replace(DetectionType, ConnectionDetectionType);
-            message = message.Replace(DetectionCount, detections.Count.ToString());
+            message = message.Replace(DestinationServices, Escape(GetDestinationServices(detections), escapeJson));
+            message = message.Replace(DetectionType, Escape(ConnectionDetectionType, escapeJson));
+            message = message.Replace(DetectionCount, Escape(detections.Count.ToString(), escapeJson));
 
             // The detection log goes in last, so nothing in it is taken for a variable.
             message = message.Replace(DetectionLog, detectionLog);
             message = message.Replace(OldConnectionLog, detectionLog);
 
             return message;
+        }
+
+        // Escapes the text so it's safe inside a JSON string, if escapeJson is true.
+        private static string Escape(string text, bool escapeJson)
+        {
+            if (!escapeJson || text == null)
+            {
+                return text;
+            }
+
+            // Serialize returns the text as a quoted JSON string. The quotes are removed, since the body has its own.
+            string quoted = new JavaScriptSerializer().Serialize(text);
+            return quoted.Substring(1, quoted.Length - 2);
         }
 
         // Returns a one-line description of a detection, for {DETECTION_LOG}.

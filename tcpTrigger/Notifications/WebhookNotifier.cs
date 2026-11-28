@@ -12,9 +12,7 @@ namespace tcpTrigger
         {
             try
             {
-                string title = UserVariableExpansion.GetExpandedString(webhook.Title ?? string.Empty, sourceIp, detections);
-                string message = UserVariableExpansion.GetExpandedString(webhook.Message ?? string.Empty, sourceIp, detections);
-                SendMessage(webhook, title, message);
+                SendMessage(webhook, sourceIp, detections);
 
                 Logger.Write(
                     "A webhook notification was sent."
@@ -66,8 +64,19 @@ namespace tcpTrigger
             return Uri.TryCreate(url?.Trim(), UriKind.Absolute, out Uri uri) ? uri.Host : "(not a valid URL)";
         }
 
-        private static void SendMessage(NotificationWebhook webhook, string title, string message)
+        // Fills in the variables and sends the message in the platform's format.
+        private static void SendMessage(NotificationWebhook webhook, IPAddress sourceIp, List<PacketHeader> detections)
         {
+            if (webhook.Platform == WebhookPlatform.Custom)
+            {
+                // The values are escaped, so they're always valid inside the body's JSON strings.
+                string body = UserVariableExpansion.GetExpandedString(webhook.Body ?? string.Empty, sourceIp, detections, escapeJson: true);
+                WebhookSender.SendCustom(webhook.Url, body);
+                return;
+            }
+
+            string title = UserVariableExpansion.GetExpandedString(webhook.Title ?? string.Empty, sourceIp, detections);
+            string message = UserVariableExpansion.GetExpandedString(webhook.Message ?? string.Empty, sourceIp, detections);
             switch (webhook.Platform)
             {
                 case WebhookPlatform.MicrosoftTeams:
@@ -85,8 +94,6 @@ namespace tcpTrigger
                 case WebhookPlatform.Ntfy:
                     WebhookSender.SendNtfy(webhook.Url, title, message);
                     break;
-                default:
-                    throw new NotSupportedException($"Sending to {GetPlatformName(webhook.Platform)} isn't supported yet.");
             }
         }
     }

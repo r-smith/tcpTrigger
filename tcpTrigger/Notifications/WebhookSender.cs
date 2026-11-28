@@ -127,6 +127,22 @@ namespace tcpTrigger
             };
         }
 
+        // Any other service: the body is sent as it is. Throws FormatException if the body isn't valid JSON.
+        public static void SendCustom(string url, string body)
+        {
+            try
+            {
+                new JavaScriptSerializer().DeserializeObject(body);
+            }
+            catch (ArgumentException)
+            {
+                throw new FormatException(
+                    "The request body isn't valid JSON. Check that each variable that holds text is inside quotes, "
+                    + "such as \"{SOURCE_HOSTNAME}\".");
+            }
+            Post(url, "The webhook", "application/json; charset=utf-8", body, null);
+        }
+
         private static void PostJson(string url, string platform, Dictionary<string, object> request)
         {
             Post(url, platform, "application/json", new JavaScriptSerializer().Serialize(request), null);
